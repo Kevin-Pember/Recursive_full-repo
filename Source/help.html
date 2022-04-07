@@ -1,0 +1,131 @@
+<html>
+
+<head>
+    <link rel="icon" href="Images/mainIcon.png">
+    <title> Recursive </title>
+    <link rel="stylesheet" href="stylesheets.css">
+    <meta name="theme-color" content="#000000">
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+<body id="helpBody" onload="helpLoad()">
+    <div id="navColumn">
+        <div id="topNavColumn">
+            <button id="backButton"><img
+                    src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="40" height="40"></button>
+            <h1 class="h2Settings">Help</h1>
+        </div>
+        <button id="LooknFeel" class="navButtons"><img
+                src="Images/CalculatorIcon.svg" id="calcIcon" class="settingsIcon" height="100%">Main Calculator</button>
+        <button id="Preferences" class="navButtons"><img
+                src="Images/customFunctionIcon.svg" id="funcsIcon" class="settingsIcon" height="100%">Custom Functions</button>
+        <button id="About" class="navButtons"><img
+                src="Images/settingsPageIcon.svg" id="setIcon" class="settingsIcon" height="100%">Settings</button>
+        <div id="mainCalculatorHelp" class="settingTabContent" style="visibility: visible;">
+            <button id="mainCalBack" class="settingBackButtons"><img
+                    src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="35" height="35"></button>
+            <h1 class="settingsHeaders">Main Calculator</h1>
+            <div id="MemFuncDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Memory Functions</summary>
+                    <p class="helpParagraphs">MRC works to both recall and deletes a recorded number. To first recall a
+                        number press the MRC button then the number will appear in the entry field. To use the MRC
+                        button to delete the recorded value, press it when the only value in the entry field
+                        <br> <br>M or memory add button adds whatever is in the entry field to the recorded value, this
+                        includes any operators so if there is a multiplication sign in front of the number it will then
+                        it multiply the recorded value by that number
+                    </p>
+                </details>
+            </div>
+            <div id="RadDegDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Rad and Deg Modes</summary>
+                    <p class="helpParagraphs">Whatever the button’s currently displaying is what mode it's in, press it
+                        to change it. Whenever recursive starts it defaults to degrees.</p>
+                </details>
+            </div>
+            <div id="ParBehaviorDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Parenthesis button behavior</summary>
+                    <p class="helpParagraphs">When you press this button depending on if there is or isn’t already a
+                        front parenthesis it will type the corresponding sign needed to start or end a parenthesis
+                        statement.
+                        <br><br>If there isn’t a front parenthesis ‘(’ or all parenthesis before caret position already
+                        form a complete statement or both a front and back parenthesis the button will type a front
+                        parenthesis. It will also type a front parenthesis if the character before the caret is also a
+                        front parenthesis.
+                        <br><br>If the conditions do not meet any of the conditions stated above the parenthesis button
+                        with type a back parenthesis ‘)’.
+                    </p>
+                </details>
+            </div>
+            <div id="CaretPowerDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Power of Button</summary>
+                    <p class="helpParagraphs">The Power of Button changes all functions into their power of equivalent
+                        forms which will be processed at solve time. To get of power of mode press the arrow right key.
+                    </p>
+                </details>
+            </div>
+            <div id="d→fDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Decimal to Fration function</summary>
+                    <p class="helpParagraphs">Otherwise noted as d→f, this function converts a decimal to a fraction</p>
+                </details>
+            </div>
+            <div id="deleteHistoryDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Delete History Button</summary>
+                    <p class="helpParagraphs">This is the button with a trash can and an arrow pointing down</p>
+                </details>
+            </div>
+        </div>
+        <div id="customFuncHelp" class="settingTabContent">
+            <h1 class="settingsHeaders">Custom Function</h1>
+            <button id="customFuncBack" class="settingBackButtons"><img
+                    src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="35" height="35"></button>
+            <h2 class="secondaryHeaders" id="v1Header">V1</h2>
+            <div id="FunctionsDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Functions</summary>
+                    <p class="helpParagraphs">Equations that are used in these functions can’t have an equal or if
+                        they do they must be equal too as currently recursive can’t isolate variables
+                        <br><br>Functions may no longer function after recursive is updated and may need to be
+                        reentered
+                    </p>
+                </details>
+            </div>
+            <div id="FunctionsDiv" class="helpDivs">
+                <details>
+                    <summary class="secondaryHeaders">Graphs</summary>
+                    <p class="helpParagraphs">After changing a value in the domain or range to a particularly high value
+                        may take time and windows may mark it as not responding but it is calculating the values in the
+                        graph</p>
+                </details>
+            </div>
+        </div>
+    </div>
+    <div id="settingsHelp" class="settingTabContent">
+        <h1 class="settingsHeaders">Settings</h1>
+        <button id="settingsBack" class="settingBackButtons" onclick="SettingsBack('LooknFeelTab')"><img
+                src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="35" height="35"></button>
+        <div id="ColorsHelpDiv" class="helpDivs">
+            <details>
+                <summary class="secondaryHeaders">Colors</summary>
+                <p class="helpParagraphs">The colors section of colors is for choosing the individual colors of certain parts of recursive. This gives you more power to customize recursive.
+                    <br><br>The themes section of recursive has the preset themes of dark and light with more on the way.</p>
+            </details>
+        </div>
+        <div id="preferencesHelpDiv" class="helpDivs">
+            <details>
+                <summary class="secondaryHeaders">Preferences</summary>
+                <p class="helpParagraphs">Output Length is the length of numbers that recursive returns. If the number recursive solves is longer than this length it will change the number into the scientific notation of that number.
+                <br><br>Default domain and range are the default values that a graph custom function goes to by default. These values are only the default and can be changed in the custom graph itself</p>
+            </details>
+        </div>
+    </div>
+    </div>
+    <script src="load.js"></script>
+</body>
+
+</html>

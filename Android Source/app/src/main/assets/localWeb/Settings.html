@@ -1,0 +1,159 @@
+<html>
+
+<head>
+    <link rel="icon" href="Images/mainIcon.png">
+    <title> Recursive Settings</title>
+    <link rel="stylesheet" href="stylesheets.css">
+    <meta name="theme-color" content="#000000">
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+<body id="settingsBody">
+    <div id="navColumn">
+        <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="40"
+                height="40"></button>
+        <h1 id="settingsTitle">Settings</h1>
+        <button id="LooknFeel" class="navButtons"><img id="ColorsIcon" src="Images/ColorsWhite.svg" class="settingsIcon"
+                height="100%">Colors</button>
+        <button id="Preferences" class="navButtons"><img id="PreferencesIcon" src="Images/CalipiersWhite.svg"
+                class="settingsIcon" height="100%">Calculations</button>
+        <button id="About" class="navButtons"><img id="AboutIcon" src="Images/aboutUSWhite.svg" class="settingsIcon"
+                height="100%">About</button>
+    </div>
+    <div id="colorsTab" class="settingTabContent">
+        <button id="colorsBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                class="backIcon"></button>
+        <h1 class="settingsHeaders">Colors</h1>
+        <div id="ColorsDiv" class="settingsDiv">
+            <h2 class="h2Settings" id="colorsHeader">Colors</h2>
+            <div class="displayBase" id="displayPreview">
+                <h2 id="showcaseTextColor" class="textDisplay">T</h2>
+                <div id="numsPreview" class="numsBase"></div>
+                <div id="funcPreview" class="functionBase"></div>
+            </div>
+            <div id="colorPickerGrid">
+                <Label class="colorsLabels">
+                    <h5 class="h5Colors" id="DisplayLabel">Display</h5>
+                    <input id="DisplayColorPicker" class="colorPicker" type="color">
+                </Label>
+                <label class="colorsLabels">
+                    <h5 class="h5Colors">Numbers</h5>
+                    <input id="NumbersColorPicker" class="colorPicker" value="#1a1a1a" type="color">
+                </label>
+                <label class="colorsLabels">
+                    <h5 class="h5Colors">Functions</h5>
+                    <input id="FunctionsColorPicker" class="colorPicker" value="#000000" type="color">
+                </label>
+                <label class="colorsLabels">
+                    <h5 class="h5Colors">Text</h5>
+                    <div id="textdropdown">
+                        <button id="dropbtn">White</button>
+                        <div class="dropdown-content">
+                            <a id="selectorBlack" value="#000000">Black</a>
+                            <a id="selectorWhite" value="#000000">White</a>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div id="ThemesContainerDiv" class="settingsDiv">
+            <h2 class="h2Settings">Themes</h2>
+            <div id="ThemesDiv" class="settingsDiv">
+                <button class="clearModifiers"><img id="addIcon" src="Images/addObjectWhite.svg" width="40"
+                        height="40"></button>
+                <button id="minusButton" class="clearModifiers"><img id="minusIcon" src="Images/minusIconWhite.svg"
+                        width="40" height="40"></button>
+                <template class="themeTemplate">
+                    <div id="themeTemplateDiv" class="theme">
+                        <label onmousedown="preventFocus()" class="ThemesLabel">
+                            <input id="themeRadio" onmousedown="preventFocus()" type="radio" class="radio">
+                            <span class="checkmark"></span>
+                        </label>
+                        <h3 contenteditable="true" id="themeName">Theme Name</h3>
+                        <img class="themeRemove" id="removeButton" src="Images/xIconWhite.svg" height="100%">
+                        <div class="displayBaseThemeType" id="themesDisplayBase">
+                            <h2 class="textDisplay" id="textDisplayBase">T</h2>
+                            <div class="numsBase" id="numsDisplayBase"></div>
+                            <div class="functionBase" id="functionsDisplayBase"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    <div id="PreferencesTab" class="settingTabContent">
+        <button id="PreferencesBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                class="backIcon"></button>
+        <h1 class="settingsHeaders">Calculations</h1>
+        <div class="settingsDiv">
+            <h2 class="h2Settings" id="colorsHeader">General</h2>
+            <div id="PreferencesGrid">
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Angle Mode</h5>
+                    <button class="settingsButton" id="degModeBut" style="right: 45px;">deg</button>
+                    <button class="settingsButton" id="radModeBut">rad</button>
+                </label>
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Output Length</h5>
+                    <input type="text" id="outputLength" class="settingsTextInput">
+                </label>
+            </div>
+        </div>
+        <div class="settingsDiv" style="margin-top: 15px;">
+            <h2 class="h2Settings" id="colorsHeader">Graph</h2>
+            <div id="PreferencesGrid">
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Domain Steps</h5>
+                    <input type="text" id="graphDStep" class="settingsTextInput">
+                </label>
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Default Domain</h5>
+                    <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 60px;">
+                    <input type="text" id="domainTopG" class="settingsTextInput">
+                </label>
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Range Steps</h5>
+                    <input type="text" id="graphRStep" class="settingsTextInput">
+                </label>
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Default Range</h5>
+                    <input type="text" id="rangeBottomG" class="settingsTextInput" style="right: 60px;">
+                    <input type="text" id="rangeTopG" class="settingsTextInput">
+                </label>
+            </div>
+        </div>
+        <div class="settingsDiv" style="margin-top: 15px;">
+            <h2 class="h2Settings" id="colorsHeader">Table</h2>
+            <div id="PreferencesGrid">
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Default Cell Step</h5>
+                    <input type="text" id="tableStep" class="settingsTextInput">
+                </label>
+                <label class="calculationsLabels">
+                    <h5 class="h5Settings">Default Cells</h5>
+                    <input type="text" id="tableCells" class="settingsTextInput">
+                </label>
+            </div>
+        </div>
+    </div>
+    <div id="AboutTab" class="settingTabContent">
+        <button id="AboutBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                class="backIcon"></button>
+        <h1 class="settingsHeaders">About</h1>
+        <div id="AboutUsDiv">
+            <h2 class="h2Settings">About Us</h2>
+            <h2 class="h5Settings" id="aboutTag">Made by a small one man team that puts too much effort in whatever they
+                try to program</h2>
+        </div>
+        <div id="VersionDiv">
+            <h2 class="h2Settings" id="colorsHeader">Version</h2>
+            <h5 class="h5Settings" id="versionID">Recursvie 2.0</h5>
+            <img id="versionImage" src="Images/versionIcon.svg" height="80%">
+        </div>
+        <p id="copyright">©2021, Kevin Pember</p>
+    </div>
+    </div>
+    <script src="load.js"></script>
+</body>
+
+</html>
