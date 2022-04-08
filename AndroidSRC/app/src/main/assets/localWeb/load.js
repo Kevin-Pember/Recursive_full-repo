@@ -1,6 +1,7 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 var settings;
+console.log(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 if(localStorage.getItem("settings") != undefined){
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log("settings got");
@@ -251,6 +252,9 @@ if (document.getElementById("mainBody") != null) {
           text = text.replace(letItem, item.symbol);
           console.log(text+" : "+letItem+" : "+item.symbol);
           document.getElementById("enterHeader").innerHTML = text;
+          let sel = window.getSelection();
+          let range = document.createRange();
+          document.getElementById("enterHeader").childNodes
           break;
         }
       }
@@ -341,19 +345,22 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('DisplayColorPicker').addEventListener("input", updatePreview, false)
   document.getElementById('NumbersColorPicker').addEventListener("input", updatePreview, false)
   document.getElementById('FunctionsColorPicker').addEventListener("input", updatePreview, false);
-  document.getElementById('backButton').addEventListener("click", function(){settingExit()});
+  document.getElementById('backButton').addEventListener("click", function(){universalBack();});
   document.getElementById('LooknFeel').addEventListener("click", function(){settingsTabChange('colorsTab')});
   document.getElementById('Preferences').addEventListener("click", function(){settingsTabChange('PreferencesTab')});
   document.getElementById('About').addEventListener("click", function(){settingsTabChange('AboutTab')});
-  document.getElementById('colorsBack').addEventListener("click", function(){SettingsBack('colorsTab')});
+  document.getElementById('colorsBack').addEventListener("click", function(){universalBack();});
   document.getElementById('selectorBlack').addEventListener("click", function(){dropPressed('Black')});
   document.getElementById('selectorWhite').addEventListener("click", function(){dropPressed('White')});
   document.getElementById('addIcon').addEventListener("click", function(){newTheme()});
   document.getElementById('minusIcon').addEventListener("click", function(){removeThemes()});
-  document.getElementById('PreferencesBack').addEventListener("click", function(){SettingsBack('PreferencesTab')});
+  document.getElementById('PreferencesBack').addEventListener("click", function(){universalBack();});
   document.getElementById('degModeBut').addEventListener("click", function(){degRadSwitch(true)});
   document.getElementById('radModeBut').addEventListener("click", function(){degRadSwitch(false)});
-  document.getElementById('AboutBack').addEventListener("click", function(){SettingsBack('AboutTab')});
+  document.getElementById('AboutBack').addEventListener("click", function(){
+    //SettingsBack('AboutTab')
+    universalBack();
+  });
 
 } else if (document.getElementById('helpBody') != null) {
   let rootCss = document.querySelector(':root');
@@ -541,7 +548,6 @@ let facingBack = [
   }
 ];
 function universalBack() {
-  let page = document.getElementById('body').id;
   let currentElement = sessionStorage.getItem("facing");
   for(let elem of facingBack) {
     if (elem.elm == currentElement) {
@@ -799,7 +805,9 @@ function custFuncExisting(equation, name, duplicates) {
 }
 function custButton(equation, name, target) {
   let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
-  clon.getElementById("customFuncButton").innerHTML = "<h2>" + equation + "</h2>" + name;
+  //clon.getElementById("customFuncButton").innerHTML = "<h2>" + equation + "</h2>" + name;
+  clon.getElementById('equationLabel').innerHTML = equation;
+  clon.getElementById('nameLabel').innerHTML = name;
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
@@ -812,15 +820,11 @@ function custButton(equation, name, target) {
           tabs[i].style.visibility = 'hidden';
         }
         newCustFuncTab(name + "»" + equation + "»");
-        console.log("Tab has been created ")
         document.getElementById('extraFuncPopUp').visibility = 'hidden';
         document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
         document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
         document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
         document.getElementById('customFuncDisplay').style.visibility = "hidden";
-
-        console.log("various values changed")
-
         let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
         tabClon.getElementById('newTabName').innerHTML =   name;
         tabClon.getElementById('tabButton').dataset.tabmap = name + "»" + equation + "»";
@@ -1284,14 +1288,27 @@ function newCustFuncTab(text) {
       liveTab.dataset.tab = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";
     });
     clon.getElementById('cellsTable').addEventListener("input", function (e) {
-      parseVariables(varGrid, equationDIV,funcTabs);
+      try{
+        parseVariables(varGrid, equationDIV,funcTabs);
+      }catch(e){
+
+      }
     });
     clon.getElementById('stepTable').addEventListener("input", function (e) {
-      parseVariables(varGrid, equationDIV,funcTabs);
+      try{
+        parseVariables(varGrid, equationDIV,funcTabs);
+      }catch(e){
+
+      }
+      
     });
     document.getElementById("mainBody").appendChild(clon);
     checkVar(varGrid, equationDIV,funcTabs);
-    parseVariables(varGrid, equationDIV,funcTabs);
+    try{
+      parseVariables(varGrid, equationDIV,funcTabs);
+    }catch(e){
+
+    }
   }
 }
 function hidModes(num,tabs){
@@ -1562,7 +1579,9 @@ function newVariable(name, varGrid,equationArea,funcTabs,equation){
   varClon.getElementById('variableEntry').addEventListener('input', function (e) {
   if(varClon.getElementById('variableEntry') != ''){
     equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
-    parseVariables(varGrid, equationArea,funcTabs);
+    try{
+      parseVariables(varGrid, equationArea,funcTabs);
+    }catch(e){}
   }
   });
   varGrid.appendChild(varClon)
