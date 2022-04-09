@@ -26,6 +26,13 @@ if (document.getElementById("mainBody") != null) {
   rootCss.style.setProperty('--functionsColor', settings.func);
   rootCss.style.setProperty('--textColor', settings.text);
   TextColorGlobal = settings.text;
+  if(settings.degRad){
+    document.getElementById('degPopup').innerHTML = "deg";
+    document.getElementById('degEx').innerHTML = "deg";
+  }else{
+    document.getElementById('degPopup').innerHTML = "rad";
+    document.getElementById('degEx').innerHTML = "rad";
+  }
   if (settings.text == "#000000") {
     document.getElementById('settingsCogIcon').src = "Images/SettingsCog.svg";
     document.getElementById('backspcaeIcon').src = "Images/backIcon.svg";
@@ -52,16 +59,17 @@ if (document.getElementById("mainBody") != null) {
     }
   }
   var funcs = getFuncList();
+  console.log(funcs)
   for (let funcObject of funcs) {
     switch (funcObject.type) {
       case "Function":
-        custButton(funcObject.equation, funcObject.name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
       case "Code":
-        custButton("Code Only", funcObject.name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
       case "Hybrid":
-        custButton("Coded Func", funcObject.name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
     }
   }
@@ -162,6 +170,15 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('deciToFracEx').addEventListener("click", function () { frontButtonPressed('d→f('); });
   document.getElementById('absEx').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modEx').addEventListener("click", function () { frontButtonPressed('mod('); });
+  document.getElementById('degEx').addEventListener("click", function (e){
+    if(document.getElementById('degEx').innerHTML == "deg"){
+      document.getElementById('degEx').innerHTML = "rad"
+      settings.degRad = false;
+    }else {
+      document.getElementById('degEx').innerHTML = "deg"
+      settings.degRad = true;
+    }
+  });
   document.getElementById('arcEx').addEventListener("click", function () { arcSwitch(); });
   document.getElementById('sinEx').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosEx').addEventListener("click", function () { trigPressed('cos('); });
@@ -196,6 +213,15 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('lnPopup').addEventListener("click", function () { frontButtonPressed('ln('); });
   document.getElementById('ePopup').addEventListener("click", function () { frontButtonPressed('e'); });
   document.getElementById('factorialPopup').addEventListener("click", function () { frontButtonPressed('!'); });
+  document.getElementById('degPopup').addEventListener("click", function (e){
+    if(document.getElementById('degPopup').innerHTML == "deg"){
+      document.getElementById('degPopup').innerHTML = "rad"
+      settings.degRad = false;
+    }else {
+      document.getElementById('degPopup').innerHTML = "deg"
+      settings.degRad = true;
+    }
+  });
   document.getElementById('arcPopup').addEventListener("click", function () { arcSwitch(); });
   document.getElementById('sinPopup').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosPopup').addEventListener("click", function () { trigPressed('cos('); });
@@ -204,7 +230,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc();
+    createFunc('Function');
     document.getElementById('nameEntry').style.visibility = "hidden";
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
@@ -408,19 +434,16 @@ function createFunc(type) {
   let text = document.getElementById('enterHeader').innerHTML;
   var funcList = getFuncList();
   if (!custFuncExisting(name, false)) {
-    custButton(text, name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
-    let object = { "name": name };
+    custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+    let object = { "name": name, "type": type};
     switch (type) {
-      case "func":
-        object.type = "Function";
+      case "Function":
         object.equation = text;
         break;
-      case "code":
-        object.type = "Code";
+      case "Code":
         object.code = text;
         break;
-      case "hybr":
-        object.type = "Hybrid";
+      case "Hybrid":
         object.code = text;
         break;
     }
@@ -645,9 +668,6 @@ function plainSup(sel) {
     return false;
   }
 }
-function diagnostic() {
-  let sel = window.getSelection();
-}
 function pow(type) {
   let display = document.getElementById('enterHeader');
   let sel = window.getSelection();
@@ -832,6 +852,7 @@ function funcRemove(e) {
   let link = e.target.parentNode
   console.log(link);
   removeFunc(link.querySelector("#nameLabel").innerHTML);
+  //Thing that i have to work on
   document.getElementById('customFuncDisplayGrid').removeChild(link);
   document.getElementById('custFuncGridPopup').removeChild(link);
 }
@@ -868,15 +889,13 @@ function custButton(funcConfig, target) {
       document.getElementById('customFuncDisplay').style.visibility = "hidden";
       if (type == "Function") {
         if (e.target.id != 'removeFunc') {
-          //let equation = buttonNode.querySelector('h2').innerHTML;
-          //let Name = buttonNode.childNodes[1].innerHTML;
           if (!tabOpen(name)) {
             let tabs = document.getElementsByClassName('tabcontent');
             for (let i = 0; i < tabs.length; i++) {
               tabs[i].style.visibility = 'hidden';
             }
             newCustFuncTab(funcConfig); //need to chage method for Func Config not string
-            
+
             let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
             tabClon.getElementById('newTabName').innerHTML = name;
             tabClon.getElementById('tabButton').dataset.tabmap = funcConfig;
@@ -897,9 +916,6 @@ function custButton(funcConfig, target) {
 
             });
             tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-              /*if(window.innerWidth / window.innerHeight < 3/4){
-                changeTabAs(false);
-              }*/
               removeCustFunc(e);
               setNumOfTabs();
             })
@@ -908,6 +924,10 @@ function custButton(funcConfig, target) {
             highlightTab(highlight);
           }
         }
+      } else if (type = "Code") {
+
+      } else if (type = "Hybrid"){
+        
       }
     });
     document.getElementById(target[i]).appendChild(clonClone);
@@ -1013,7 +1033,7 @@ function openElement(evt) {
   }
   match = matchTab(evtElement.dataset.tabmap, false);
   for (let i = 0; i < tabs.length; i++) {
-    if (matchTab != tabs[i]) {
+    if (match != tabs[i]) {
       tabs[i].style.visibility = 'hidden';
     }
   }
@@ -1228,146 +1248,141 @@ function newCustFuncTab(config) {
     }
   }
   if (!exist) {
-    //parsing the func string
-    let name = config.name;
-    let equation = config.equation;
-
-    clon.getElementById('customFuncTab').dataset.tab = config;
-    clon.getElementById("nameFunc").value = name;
-    clon.getElementById("EquationFunc").innerHTML = equation;
-    clon.getElementById("EquationFunc").dataset.baseE = equation;
-
     clon = defaultSetup(clon);
-    //setting the value of elements on the page
-    
+    switch (config.type) {
+      case ('Function'):
+        let name = config.name;
+        let equation = config.equation;
+        let varGrid = clon.getElementById("varGrid");
+        let equationDIV = clon.getElementById("EquationFunc");
+        let movable = clon.getElementById("selectorUnder");
+        let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+        movable.dataset.pos = 0;
 
-    //creating variables that wil be used in the Event listeners
-    let varGrid = clon.getElementById("varGrid");
-    let equationDIV = clon.getElementById("EquationFunc");
-    let movable = clon.getElementById("selectorUnder");
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-    movable.dataset.pos = 0;
-    console.log("Equation given to the function: " + equation);
+        clon.getElementById('customFuncTab').dataset.tab = config;
+        clon.getElementById("nameFunc").value = name;
+        clon.getElementById("EquationFunc").innerHTML = equation;
+        clon.getElementById("EquationFunc").dataset.baseE = equation;
 
-    //adding event listeners
-    clon.getElementById('nameFunc').addEventListener("input", function (e) {
-      let tabsElements = document.getElementsByClassName('tablinks')
-      let liveTab = e.target.parentNode;
-      let currentTab = e.target.parentNode.dataset.tab;
-      let matchPage = matchTab(currentTab, true);
-
-      matchPage.querySelector("#newTabName").innerHTML = e.target.value;
-      matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
-      changeFunc(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")), matchPage, liveTab);
-    });
-    varGrid.addEventListener("change", function (e) {
-      console.log("%c Vargid Changed", "color: red;");
-    });
-    
-    clon.getElementById("EquationFunc").addEventListener("focus", function (e) {
-      let initEquation = e.target.parentNode.parentNode.dataset.tab;
-      initEquation = initEquation.substring(initEquation.indexOf("»") + 1);
-      initEquation = initEquation.substring(0, initEquation.indexOf("»"));
-      equationDIV.innerHTML = initEquation;
-      setSelect(equationDIV, equationDIV.innerHTML.length);
-    });
-    clon.getElementById('EquationFunc').addEventListener("input", function (e) {
-      checkVar(varGrid, equationDIV, funcTabs);
-      let liveTab = e.target.parentNode.parentNode;
-      let currentTab = liveTab.dataset.tab;
-      let matchPage = matchTab(currentTab, true);
-      equationDIV.dataset.baseE = equationDIV.innerHTML;
-      /*localStorage.setItem(matchData(currentTab), currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»");
-      updateCustomButtons(currentTab, currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»");
-      matchPage.dataset.tabmap = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";
-      liveTab.dataset.tab = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";*/
-      changeFunc(currentTab, currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»", matchPage, liveTab);
-    });
-    document.getElementById("mainBody").appendChild(clon);
-    checkVar(varGrid, equationDIV, funcTabs);
-    try {
-      parseVariables(varGrid, equationDIV, funcTabs);
-    } catch (e) {
-
-    }
-  }
-}
-function defaultSetup(clon){
-    clon.getElementById("minDomainGraph").value = settings.gDMin;
-    clon.getElementById("maxDomainGraph").value = settings.gDMax;
-    clon.getElementById("stepDomainGraph").value = settings.gDS;
-    clon.getElementById("minRangeGraph").value = settings.gRMin;
-    clon.getElementById("maxRangeGraph").value = settings.gRMax;
-    clon.getElementById("stepRangeGraph").value = settings.gRS;
-    clon.getElementById("cellsTable").value = settings.tC;
-    clon.getElementById('stepTable').value = settings.tS;
-    let chart = clon.getElementById("funcChart");
-    var cfcg = new Chart(chart, {
-      type: 'line',
-      data: {
-        labels: [-2, 4],
-        datasets: [{
-          data: [10, 20],
-          label: 'x',
-          fontColor: '#FFFFFF',
-          borderColor: "#FFFFFF",
-          backgroundColor: "#FFFFFF",
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            radius: 0
-          }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-            }
-          }
-        }
-      }
-    })
-
-    let movable = clon.getElementById("selectorUnder");
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-    movable.dataset.pos = 0;
-    clon.getElementById('functionMode').addEventListener("click", function () {
-      funcTabs[0].style.visibility = "inherit";
-      hidModes(parseInt(movable.dataset.pos), funcTabs);
-      animateModes(parseInt(movable.dataset.pos), 0, movable);
-    });
-    clon.getElementById("graphMode").addEventListener("click", function () {
-      console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
-      funcTabs[1].style.visibility = "inherit";
-      hidModes(parseInt(movable.dataset.pos), funcTabs);
-      animateModes(parseInt(movable.dataset.pos), 75, movable);
-    });
-    clon.getElementById("tableMode").addEventListener("click", function () {
-      console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
-      funcTabs[2].style.visibility = "inherit";
-      hidModes(parseInt(movable.dataset.pos), funcTabs);
-      animateModes(parseInt(movable.dataset.pos), 150, movable);
-    });
-    let updateElements = [
-      "stepTable",
-      "cellsTable"
-    ];
-    for(let element of updateElements){
-      clon.getElementById(element).addEventListener("input", function (e) {
+        clon.getElementById('nameFunc').addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode;
+          let oldVal = e.target.parentNode.dataset.tab;
+          let newVal = e.target.parentNode.dataset.tab
+          newVal.name = e.target.value;
+          let matchPage = matchTab(currentTab, true);
+          
+          matchPage.querySelector("#newTabName").innerHTML = e.target.value;
+          matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+        });
+        clon.getElementById("EquationFunc").addEventListener("focus", function (e) {
+          let initEquation = e.target.parentNode.parentNode.dataset.tab;
+          equationDIV.innerHTML = initEquation.equation;
+          setSelect(equationDIV, equationDIV.innerHTML.length);
+        });
+        clon.getElementById('EquationFunc').addEventListener("input", function (e) {
+          //Test this method with a sup subclass
+          checkVar(varGrid, equationDIV, funcTabs);
+          let liveTab = e.target.parentNode.parentNode;
+          let oldVal = liveTab.dataset.tab;
+          let matchPage = matchTab(currentTab, true);
+          let newValue = liveTab.dataset.tab
+          newValue.equation = e.target.innerHTML
+          equationDIV.dataset.baseE = equationDIV.innerHTML;
+          changeFunc(oldVal, newValue, matchPage, liveTab);
+        });
+        document.getElementById("mainBody").appendChild(clon);
+        checkVar(varGrid, equationDIV, funcTabs);
         try {
           parseVariables(varGrid, equationDIV, funcTabs);
         } catch (e) {
-  
+    
         }
-  
-      });
+        break;
+      case ("Hybrid"):
+
+        break;
     }
-    return clon;
+    //adding event listeners
+    
+  }
+}
+function defaultSetup(clon) {
+  clon.getElementById("minDomainGraph").value = settings.gDMin;
+  clon.getElementById("maxDomainGraph").value = settings.gDMax;
+  clon.getElementById("stepDomainGraph").value = settings.gDS;
+  clon.getElementById("minRangeGraph").value = settings.gRMin;
+  clon.getElementById("maxRangeGraph").value = settings.gRMax;
+  clon.getElementById("stepRangeGraph").value = settings.gRS;
+  clon.getElementById("cellsTable").value = settings.tC;
+  clon.getElementById('stepTable').value = settings.tS;
+  let chart = clon.getElementById("funcChart");
+  var cfcg = new Chart(chart, {
+    type: 'line',
+    data: {
+      labels: [-2, 4],
+      datasets: [{
+        data: [10, 20],
+        label: 'x',
+        fontColor: '#FFFFFF',
+        borderColor: "#FFFFFF",
+        backgroundColor: "#FFFFFF",
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+          }
+        }
+      }
+    }
+  })
+
+  let movable = clon.getElementById("selectorUnder");
+  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+  movable.dataset.pos = 0;
+  clon.getElementById('functionMode').addEventListener("click", function () {
+    funcTabs[0].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 0, movable);
+  });
+  clon.getElementById("graphMode").addEventListener("click", function () {
+    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
+    funcTabs[1].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 75, movable);
+  });
+  clon.getElementById("tableMode").addEventListener("click", function () {
+    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
+    funcTabs[2].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 150, movable);
+  });
+  let updateElements = [
+    "stepTable",
+    "cellsTable"
+  ];
+  for (let element of updateElements) {
+    clon.getElementById(element).addEventListener("input", function (e) {
+      try {
+        parseVariables(varGrid, equationDIV, funcTabs);
+      } catch (e) {
+
+      }
+
+    });
+  }
+  return clon;
 }
 function changeFunc(og, newString, tab, page) {
   var funcList = getFuncList();
@@ -1562,16 +1577,23 @@ function solveTable(parsedEquation, data) {
 function updateCustomButtons(oldVal, newValue) {
   console.log('Old Val is ' + oldVal + " New Value is " + newValue);
   let functionLinks = document.getElementsByClassName('customFuncLinks');
-  let Name = oldVal.substring(0, oldVal.indexOf('»'));
-  oldVal = oldVal.substring(oldVal.indexOf('»') + 1);
-  let Function = oldVal.substring(0, oldVal.indexOf('»'));
-  let newName = newValue.substring(0, newValue.indexOf('»'));
-  newValue = newValue.substring(newValue.indexOf('»') + 1);
-  let newFunction = newValue.substring(0, newValue.indexOf('»'));
-  console.log(newName + " and " + newFunction);
+  let Name = oldVal.name;
+  let newName = newValue.name;
+  let newFunction = "";
+  switch(oldVal.type){
+    case("Function"):
+      newFunction =  newValue.equation;
+    break;
+    case("Code"):
+      newFunction = "Code";
+    break;
+    case("Hybrid"):
+      newFunction = "Hybrid";
+    break;
+  }
   for (let i = 0; i < functionLinks.length; i++) {
     console.log("Checking " + functionLinks[i].childNodes[1].data + " and " + functionLinks[i].childNodes[0].innerHTML);
-    if (functionLinks[i].querySelector("#nameLabel").innerHTML == Name && functionLinks[i].querySelector("#equationLabel").innerHTML == Function) {
+    if (functionLinks[i].querySelector("#nameLabel").innerHTML == Name) {
       console.log("Matching Found");
       functionLinks[i].querySelector("#equationLabel").innerHTML = newFunction;
       functionLinks[i].querySelector("#nameLabel").innerHTML = newName;
@@ -2116,7 +2138,7 @@ function getFuncList() {
   console.log(array);
   for (let func of array) {
     let funcJSON = {};
-    switch (func.charAt(0)) {
+    switch (func.substring(0,1)) {
       case "F":
         funcJSON.type = "Function";
         func = func.substring(func.indexOf('»') + 1);
@@ -2138,7 +2160,11 @@ function getFuncList() {
         func = func.substring(func.indexOf('»') + 1);
         funcJSON.code = func.substring(0, func.indexOf('»'));
         break;
+      default:
+        console.log("Defa")
+        break;
     }
+    finalArray.push(funcJSON);
   }
   return finalArray;
 }
@@ -2148,13 +2174,13 @@ function setFuncList(array) {
     let parsedString = "";
     switch (array[i].type) {
       case "Function":
-        parseString = "F" + "»" + array[i].name + "»" + array[i].equation;
+        parseString = "F" + "»" + array[i].name + "»" + array[i].equation+ "»";
         break;
       case "Hybrid":
-        parseString = "H" + "»" + array[i].name + "»" + array[i].code;
+        parseString = "H" + "»" + array[i].name + "»" + array[i].code+ "»";
         break;
       case "Code":
-        parseString = "C" + "»" + array[i].name + "»" + array[i].code;
+        parseString = "C" + "»" + array[i].name + "»" + array[i].code+ "»";
         break;
     }
     if (i != 0) {
@@ -2167,11 +2193,32 @@ function setFuncList(array) {
 }
 function removeFunc(funcName) {
   let array = getFuncList();
+  console.log(funcName)
   for (let item of array) {
-    console.log(item + " vs. " + funcConfig);
     if (item.name == funcName) {
       array.splice(array.indexOf(item), 1);
     }
   }
   setFuncList(array);
+}
+function funcAssebly(type,name,text){
+  let object = {};
+  switch (type) {
+    case "Function":
+      object.type = "Function";
+      object.name = name;
+      object.equation = text;
+      break;
+    case "Hybrid":
+      object.type = "Hybrid";
+      object.name = name;
+      object.code = text;
+      break;
+    case "Code":
+      object.type = "Code";
+      object.name = name;
+      object.code = text;
+      break;
+  }
+  return object;
 }
