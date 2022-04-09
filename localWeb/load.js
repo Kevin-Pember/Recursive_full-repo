@@ -51,7 +51,7 @@ if (document.getElementById("mainBody") != null) {
       item.src = "Images/MoreFuncArrow.svg";
     }
   }
-  var funcs = JSON.parse(localStorage.getItem("funcList"));
+  var funcs = getFuncList();
   for (let funcConfig of funcs) {
     let funcname = funcConfig.substring(0, funcConfig.indexOf('»'))
     funcConfig = funcConfig.substring(funcConfig.indexOf('»') + 1);
@@ -399,11 +399,11 @@ function degRadSwitch(mode){
 function createFunc(){
   let name = document.getElementById('nameEntryArea').value;
   let func = document.getElementById('enterHeader').innerHTML;
-  var funcList = JSON.parse(localStorage.getItem("funcList"))
+  var funcList = getFuncList();
   if (!custFuncExisting(func, name, false)) {
     custButton(func, name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
     funcList.push(name + "»" + func + "»");
-    localStorage.setItem('funcList',JSON.stringify(funcList));
+    setFuncList(funcList);
   }
 }
 function openPopup(){
@@ -798,7 +798,7 @@ function parsMethod() {
 function custFuncExisting(equation, name, duplicates) {
   let exist = false, existing = document.getElementsByClassName("customFuncLinks");
   for (i = 0; i < existing.length; i++) {
-    if (existing[i].innerHTML == "<h2>" + equation + "</h2>" + name && !duplicates) {
+    if (existing[i].querySelector("#equationLabel").innerHTML == equation && existing[i].querySelector("#nameLabel").innerHTML == name && !duplicates) {
       exist = true;
       break;
     }
@@ -807,12 +807,14 @@ function custFuncExisting(equation, name, duplicates) {
 }
 function custButton(equation, name, target) {
   let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
-  //clon.getElementById("customFuncButton").innerHTML = "<h2>" + equation + "</h2>" + name;
   clon.getElementById('equationLabel').innerHTML = equation;
   clon.getElementById('nameLabel').innerHTML = name;
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
+    buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
+      removeFunc(e);
+    });
     buttonNode.addEventListener('click', function (e) {
       let equation = buttonNode.querySelector('h2').innerHTML;
       let Name = buttonNode.childNodes[1].innerHTML;
@@ -861,13 +863,6 @@ function custButton(equation, name, target) {
     setNumOfTabs();
   }
 
-}
-function numOfSaved() {
-  for (let i = 0; i != -1; i++) {
-    if (localStorage.getItem(("Func" + i)) == undefined) {
-      return i;
-    }
-  }
 }
 function removeCustFunc(event) {
   let tabLink = event.target.parentNode;
@@ -1158,11 +1153,11 @@ function updatePreview(event) {
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
   }
 }
-function customFunctionPress() {
+/*function customFunctionPress() {
   document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
   custButton(document.getElementById('equationArea').value, document.getElementById('nameArea').value, 'funcGrid', false);
   setTimeout(function () { document.getElementById('nameArea').value = ""; document.getElementById('equationArea').value = ""; document.getElementById('newFunctionsPage').style.visibility = "hidden"; }, 250);
-}
+}*/
 function dropPressed(color) {
   if (color == "Black") {
     document.getElementById("showcaseTextColor").style.color = "#000000";
@@ -1251,12 +1246,7 @@ function newCustFuncTab(text) {
 
       matchPage.querySelector("#newTabName").innerHTML = e.target.value;
       matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
-
-      //localStorage.setItem(matchData(currentTab), e.target.value + currentTab.substring(currentTab.indexOf("»")));
       changeFunc(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")),matchPage,liveTab);
-      //updateCustomButtons(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")));
-      //matchPage.dataset.tabmap = e.target.value + currentTab.substring(currentTab.indexOf("»"));
-      //liveTab.dataset.tab = e.target.value + currentTab.substring(currentTab.indexOf("»"))
     });
     varGrid.addEventListener("change", function (e) {
       console.log("%c Vargid Changed", "color: red;");
@@ -1322,16 +1312,22 @@ function newCustFuncTab(text) {
   }
 }
 function changeFunc(og, newString,tab,page){
-  var funcList = JSON.parse(localStorage.getItem("funcList"));
+  var funcList = getFuncList();
   for (let i = 0; i < funcList.length; i++){
     if(funcList[i] == og){
       funcList[i] = newString;
     }
   }
-  localStorage.setItem("funcList", JOSN.stringify(funcList))
+  setFuncList(funcList);
   tab.dataset.tabmap = newString
   page.dataset.tab = newString
-  updateCustomButtons(og,newValue);
+  updateCustomButtons(og,newString);
+}
+function removeFunc(e){
+  let link = e.target.parentNode
+  removeFunc(link.dataset.tab);
+  document.getElementById('customFuncDisplayGrid').removeChild(link);
+  document.getElementById('custFuncGridPopup').removeChild(link);
 }
 function hidModes(num,tabs){
   if(num == 0){
@@ -1523,9 +1519,10 @@ function updateCustomButtons(oldVal, newValue) {
   console.log(newName + " and " + newFunction);
   for (let i = 0; i < functionLinks.length; i++) {
     console.log("Checking " + functionLinks[i].childNodes[1].data + " and " + functionLinks[i].childNodes[0].innerHTML);
-    if (functionLinks[i].childNodes[1].data == Name && functionLinks[i].childNodes[0].innerHTML == Function) {
+    if (functionLinks[i].querySelector("#nameLabel").innerHTML == Name && functionLinks[i].querySelector("#equationLabel").innerHTML == Function) {
       console.log("Matching Found");
-      functionLinks[i].innerHTML = "<h2>" + newFunction + "</h2>" + newName;
+      functionLinks[i].querySelector("#equationLabel").innerHTML = newFunction;
+      functionLinks[i].querySelector("#nameLabel").innerHTML = newName;
       //functionLinks[i].data.
     }
   }
@@ -1550,16 +1547,6 @@ function matchTab(info, type) {
     }
   }
 }
-//Matches Data of a tab with the recorded value then returns name of the recorded value
-/*function matchData(info) {
-  for (let i = 0; localStorage.getItem("Func" + i) != null; i++) {
-    if (localStorage.getItem("Func" + i) == info) {
-      console.log()
-      return ("Func" + i);
-    }
-  }
-  return null;
-}*/
 function checkVar(varGrid,equationArea,funcTabs) {
   let tabVarContainers = varGrid.getElementsByClassName("variableContainer");
   let varExisting = [];
@@ -2064,4 +2051,35 @@ function setShowEquat(tablink, equation){
 function setNumOfTabs(){
   let tabs = document.getElementsByClassName('tablinks');
   document.getElementById("tabNum").innerHTML = tabs.length;
+}
+function getFuncList(){
+  let parseString = localStorage.getItem("funcList");
+  let array = [];
+  if(parseString == undefined){
+    array = [];
+  }else{
+    array = parseString.split('⥾');
+  }
+  console.log(array);
+  return array;
+}
+function setFuncList(array){
+  let parseString = "";
+  for(let i = 0; i < array.length; i++){
+    if(i != 0){
+      parseString += "⥾" + array[i];
+    }else{
+      parseString += array[i];
+    }
+  }
+  localStorage.setItem("funcList", parseString);
+}
+function removeFunc(funcConfig){
+  let array = getFuncList();
+  for (let item of array){
+    if(item == funcConfig){
+      array.splice(array.indexOf(item), 1);
+    }
+  }
+  setFuncList(array);
 }
