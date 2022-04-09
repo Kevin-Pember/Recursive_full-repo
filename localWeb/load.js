@@ -51,11 +51,11 @@ if (document.getElementById("mainBody") != null) {
       item.src = "Images/MoreFuncArrow.svg";
     }
   }
-  for (let i = 0; i < numOfSaved(); i++) {
-    let savedVal = localStorage.getItem(("Func" + i))
-    let funcname = savedVal.substring(0, savedVal.indexOf('»'))
-    savedVal = savedVal.substring(savedVal.indexOf('»') + 1);
-    let funcEquation = savedVal.substring(0, savedVal.indexOf('»'));
+  var funcs = JSON.parse(localStorage.getItem("funcList"));
+  for (let funcConfig of funcs) {
+    let funcname = funcConfig.substring(0, funcConfig.indexOf('»'))
+    funcConfig = funcConfig.substring(funcConfig.indexOf('»') + 1);
+    let funcEquation = funcConfig.substring(0, funcConfig.indexOf('»'));
     custButton(funcEquation, funcname, ['customFuncDisplayGrid', 'custFuncGridPopup']);
   }
 
@@ -399,9 +399,11 @@ function degRadSwitch(mode){
 function createFunc(){
   let name = document.getElementById('nameEntryArea').value;
   let func = document.getElementById('enterHeader').innerHTML;
+  var funcList = JSON.parse(localStorage.getItem("funcList"))
   if (!custFuncExisting(func, name, false)) {
     custButton(func, name, ['customFuncDisplayGrid', 'custFuncGridPopup']);
-    localStorage.setItem(('Func' + numOfSaved()), name + "»" + func + "»");
+    funcList.push(name + "»" + func + "»");
+    localStorage.setItem('funcList',JSON.stringify(funcList));
   }
 }
 function openPopup(){
@@ -1246,12 +1248,15 @@ function newCustFuncTab(text) {
       let liveTab = e.target.parentNode;
       let currentTab = e.target.parentNode.dataset.tab;
       let matchPage = matchTab(currentTab, true);
+
       matchPage.querySelector("#newTabName").innerHTML = e.target.value;
       matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
-      localStorage.setItem(matchData(currentTab), e.target.value + currentTab.substring(currentTab.indexOf("»")));
-      updateCustomButtons(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")));
-      matchPage.dataset.tabmap = e.target.value + currentTab.substring(currentTab.indexOf("»"));
-      liveTab.dataset.tab = e.target.value + currentTab.substring(currentTab.indexOf("»"))
+
+      //localStorage.setItem(matchData(currentTab), e.target.value + currentTab.substring(currentTab.indexOf("»")));
+      changeFunc(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")),matchPage,liveTab);
+      //updateCustomButtons(currentTab, e.target.value + currentTab.substring(currentTab.indexOf("»")));
+      //matchPage.dataset.tabmap = e.target.value + currentTab.substring(currentTab.indexOf("»"));
+      //liveTab.dataset.tab = e.target.value + currentTab.substring(currentTab.indexOf("»"))
     });
     varGrid.addEventListener("change", function (e) {
       console.log("%c Vargid Changed", "color: red;");
@@ -1286,10 +1291,11 @@ function newCustFuncTab(text) {
       let currentTab = liveTab.dataset.tab;
       let matchPage = matchTab(currentTab, true);
       equationDIV.dataset.baseE = equationDIV.innerHTML;
-      localStorage.setItem(matchData(currentTab), currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»");
+      /*localStorage.setItem(matchData(currentTab), currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»");
       updateCustomButtons(currentTab, currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»");
       matchPage.dataset.tabmap = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";
-      liveTab.dataset.tab = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";
+      liveTab.dataset.tab = currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»";*/
+      changeFunc(currentTab,currentTab.substring(0, currentTab.indexOf("»") + 1) + e.target.innerHTML + "»",matchPage,liveTab);
     });
     clon.getElementById('cellsTable').addEventListener("input", function (e) {
       try{
@@ -1314,6 +1320,18 @@ function newCustFuncTab(text) {
 
     }
   }
+}
+function changeFunc(og, newString,tab,page){
+  var funcList = JSON.parse(localStorage.getItem("funcList"));
+  for (let i = 0; i < funcList.length; i++){
+    if(funcList[i] == og){
+      funcList[i] = newString;
+    }
+  }
+  localStorage.setItem("funcList", JOSN.stringify(funcList))
+  tab.dataset.tabmap = newString
+  page.dataset.tab = newString
+  updateCustomButtons(og,newValue);
 }
 function hidModes(num,tabs){
   if(num == 0){
@@ -1533,7 +1551,7 @@ function matchTab(info, type) {
   }
 }
 //Matches Data of a tab with the recorded value then returns name of the recorded value
-function matchData(info) {
+/*function matchData(info) {
   for (let i = 0; localStorage.getItem("Func" + i) != null; i++) {
     if (localStorage.getItem("Func" + i) == info) {
       console.log()
@@ -1541,7 +1559,7 @@ function matchData(info) {
     }
   }
   return null;
-}
+}*/
 function checkVar(varGrid,equationArea,funcTabs) {
   let tabVarContainers = varGrid.getElementsByClassName("variableContainer");
   let varExisting = [];
