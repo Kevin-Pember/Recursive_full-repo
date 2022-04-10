@@ -894,11 +894,11 @@ function custButton(funcConfig, target) {
             for (let i = 0; i < tabs.length; i++) {
               tabs[i].style.visibility = 'hidden';
             }
-            newCustFuncTab(funcConfig); //need to chage method for Func Config not string
+            newCustFuncTab(funcConfig);
 
             let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
             tabClon.getElementById('newTabName').innerHTML = name;
-            tabClon.getElementById('tabButton').dataset.tabmap = funcConfig;
+            tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(funcConfig);
             if (TextColorGlobal == "#000000") {
               tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
             }
@@ -950,7 +950,7 @@ function tabOpen(name) {
 
   for (let i = 1; i < tabs.length; i++) {
 
-    if (name == tabs[i].dataset.tabmap.name) {
+    if (name == JSON.parse(tabs[i].dataset.tabmap).name) {
       return true;
     }
   }
@@ -1242,7 +1242,7 @@ function dropPressed(color) {
 function newCustFuncTab(config) {
   let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true), exist = false, existing = document.getElementsByClassName("tabcontent");
   for (i = 1; i < existing.length; i++) {
-    if (existing[i].dataset.tab === config) {
+    if (existing[i].dataset.tab === JSON.stringify(config)) {
       exist = true;
       break;
     }
@@ -1253,21 +1253,26 @@ function newCustFuncTab(config) {
       case ('Function'):
         let name = config.name;
         let equation = config.equation;
+        let currentTab = JSON.stringify(config);
         let varGrid = clon.getElementById("varGrid");
         let equationDIV = clon.getElementById("EquationFunc");
         let movable = clon.getElementById("selectorUnder");
         let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
         movable.dataset.pos = 0;
 
-        clon.getElementById('customFuncTab').dataset.tab = config;
+        console.log("%c config is", "color: red;");
+        console.log(config)
+
+        clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
+        console.log(clon.getElementById('customFuncTab').dataset.tab)
         clon.getElementById("nameFunc").value = name;
         clon.getElementById("EquationFunc").innerHTML = equation;
         clon.getElementById("EquationFunc").dataset.baseE = equation;
 
         clon.getElementById('nameFunc').addEventListener("input", function (e) {
           let liveTab = e.target.parentNode;
-          let oldVal = e.target.parentNode.dataset.tab;
-          let newVal = e.target.parentNode.dataset.tab
+          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
+          let newVal = JSON.parse(e.target.parentNode.dataset.tab)
           newVal.name = e.target.value;
           let matchPage = matchTab(currentTab, true);
           
@@ -1276,17 +1281,18 @@ function newCustFuncTab(config) {
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         clon.getElementById("EquationFunc").addEventListener("focus", function (e) {
-          let initEquation = e.target.parentNode.parentNode.dataset.tab;
+          let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
           equationDIV.innerHTML = initEquation.equation;
           setSelect(equationDIV, equationDIV.innerHTML.length);
         });
         clon.getElementById('EquationFunc').addEventListener("input", function (e) {
           //Test this method with a sup subclass
+          console.log("%c EquationFunc input", "color: red;");
           checkVar(varGrid, equationDIV, funcTabs);
           let liveTab = e.target.parentNode.parentNode;
-          let oldVal = liveTab.dataset.tab;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
           let matchPage = matchTab(currentTab, true);
-          let newValue = liveTab.dataset.tab
+          let newValue = JSON.parse(liveTab.dataset.tab);
           newValue.equation = e.target.innerHTML
           equationDIV.dataset.baseE = equationDIV.innerHTML;
           changeFunc(oldVal, newValue, matchPage, liveTab);
@@ -1385,15 +1391,19 @@ function defaultSetup(clon) {
   return clon;
 }
 function changeFunc(og, newString, tab, page) {
+  console.log(og)
   var funcList = getFuncList();
   for (let i = 0; i < funcList.length; i++) {
-    if (funcList[i] == og) {
+    console.log(`${JSON.stringify(funcList[i])} vs. ${JSON.stringify(og)}`);
+    if (JSON.stringify(funcList[i]) == JSON.stringify(og)) {
+      console.log("matched")
       funcList[i] = newString;
     }
   }
+  console.log(funcList);
   setFuncList(funcList);
-  tab.dataset.tabmap = newString
-  page.dataset.tab = newString
+  tab.dataset.tabmap = JSON.stringify(newString);
+  page.dataset.tab = JSON.stringify(newString);
   updateCustomButtons(og, newString);
 }
 function hidModes(num, tabs) {
@@ -2133,8 +2143,13 @@ function getFuncList() {
   if (parseString == undefined) {
     array = [];
   } else {
-    array = parseString.split('⥾');
-  }
+    //array = parseString.split('⥾');
+    while(parseString.includes('⥾')) {
+      array.push(parseString.substring(0, parseString.indexOf('⥾')));
+      parseString = parseString.substring(parseString.indexOf('⥾') + 1);
+    }
+
+    }
   console.log(array);
   for (let func of array) {
     let funcJSON = {};
@@ -2170,6 +2185,7 @@ function getFuncList() {
 }
 function setFuncList(array) {
   let parseString = "";
+  console.log(array);
   for (let i = 0; i < array.length; i++) {
     let parsedString = "";
     switch (array[i].type) {
@@ -2183,12 +2199,9 @@ function setFuncList(array) {
         parseString = "C" + "»" + array[i].name + "»" + array[i].code+ "»";
         break;
     }
-    if (i != 0) {
-      parseString += "⥾" + parsedString;
-    } else {
-      parseString += parsedString;
-    }
+    parseString += "⥾" + parsedString;
   }
+  console.log(`parsedString: ${parseString}`);
   localStorage.setItem("funcList", parseString);
 }
 function removeFunc(funcName) {

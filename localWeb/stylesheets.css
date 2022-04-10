@@ -1622,7 +1622,7 @@ button:focus, input[type="button"]:focus {
   width: 100%;
   left: 0;
   grid-template-columns: 100%;
-  grid-auto-rows: 30px;
+  grid-auto-rows: 40px;
   justify-content: center;
   align-content: end;
   padding-bottom: 20px;
@@ -1631,11 +1631,12 @@ button:focus, input[type="button"]:focus {
   background-color: var(--numbersColor);
   border: none;
   border-width: 1.5px;
-  height: 25px;
-  width: 50px;
+  height: 35px;
+  width: 60px;
   text-align: center;
   color: var(--textColor);
   text-indent: 5px;
+  font-size: 15px;
   border-radius: 8px;
   margin-right: 10px;
   right: 0;
@@ -1647,10 +1648,11 @@ button:focus, input[type="button"]:focus {
   width: fit-content;
   padding-left: 10px;
   padding-right: 10px;
-  height: 25px;
+  font-size: 20px;
+  height: 35px;
   right: 0px;
   margin-right: 10px;
-  border-radius: 15px;
+  border-radius: 20px;
   border: none;
   position: absolute;
 }
