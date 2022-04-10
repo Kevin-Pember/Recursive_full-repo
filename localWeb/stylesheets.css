@@ -458,7 +458,7 @@ button:focus, input[type="button"]:focus {
   .drop-cont {
     display: none;
     position: absolute;
-    background-color: var(--displayColor);
+    background-color: var(--numbersColor);
     min-width: 50px;
     z-index: 1;
     border-radius: 0px 0 15px 15px;
@@ -474,7 +474,7 @@ button:focus, input[type="button"]:focus {
     border-radius: 15px 15px 0px 0px;
   }
   #modBtn {
-    background-color: var(--displayColor);
+    background-color: var(--numbersColor);
     color: var(--textColor);
     border-radius: 25px;
     width: 50px;
@@ -1510,7 +1510,7 @@ button:focus, input[type="button"]:focus {
   width: 97%;
   top: 59px;
   left: 1.5%;
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   border-radius: 15px;
   position: absolute;
   z-index: 1;
@@ -1912,7 +1912,7 @@ button:focus, input[type="button"]:focus {
 }
 #varEquationContainer{
   position: absolute;
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   display: block;
   flex-wrap: wrap;
   border-radius: 25px;
@@ -1923,9 +1923,10 @@ button:focus, input[type="button"]:focus {
   overflow-y: scroll;
 }
 #varGrid{
-  width: 100%;
-  height:60%;
-  position: absolute;
+  width: calc(101% - 10px);
+  margin-left: 5px;
+  height:auto;
+  position: relative;
   bottom: 0px;
   display: grid;
   grid-template-columns: 33.3333% 33.3333% 33.3333%;
@@ -1933,7 +1934,7 @@ button:focus, input[type="button"]:focus {
   overflow-y: auto;
 }
 .variableContainer{
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   height: 25px;
   width: 95%;
   margin-left: 2.5%;
@@ -1953,7 +1954,7 @@ button:focus, input[type="button"]:focus {
   width: 25px;
   flex-shrink: 0;
   text-align: center;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   
 }
 #variableEntry{
@@ -1967,7 +1968,7 @@ button:focus, input[type="button"]:focus {
   text-align: center;
 }
 #resultPane{
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   top: 47.5%;
   bottom: 2.5%;
   width: 95%;
@@ -1976,12 +1977,16 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
 }
 #EquationFunc{
-  width: 100%;
-  height: 40%;
-  padding: 10px;
+  width: calc(101% - 20px);
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  height: auto;
+  padding: 5px;
   padding-bottom: 5px;
   color: var(--textColor);
-  background-color: transparent;
+  background-color: var(--numbersColor);
   z-index: 0;
   overflow-y: auto;
   font-size: 4.5vh;
@@ -2016,7 +2021,7 @@ button:focus, input[type="button"]:focus {
   width: 70px;
   z-index: 1;
   position: absolute;
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   border-radius: 25px;
 }
 #FunctionDiv{
@@ -2027,12 +2032,12 @@ button:focus, input[type="button"]:focus {
   position: absolute;
 }
 #resultDiv{
-  margin-top: 5px;
+  margin-top: 10px;
   padding: 5px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 25px;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   position: absolute;
 }
 #equalsHeader{
@@ -2086,7 +2091,7 @@ button:focus, input[type="button"]:focus {
   text-indent: 10px;
 }
 .selectorDiv{
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   padding: 5px;
   border-radius: 0 25px 25px 25px;;
 }
@@ -2100,7 +2105,7 @@ button:focus, input[type="button"]:focus {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 25px;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   padding: 5px 10px;
   border-radius: 25px 25px 25px 25px;
   margin-top: 10px;
@@ -2123,7 +2128,7 @@ button:focus, input[type="button"]:focus {
   padding-left: 14px;
   border-radius: 25px;
   border: none;
-  background-color: var(--numbersColor);
+  background-color: var(--displayColor);
   text-align: center;
 }
 .stepInputs{
@@ -2133,7 +2138,7 @@ button:focus, input[type="button"]:focus {
   padding-left: 12px;
   border-radius: 25px;
   border: none;
-  background-color: var(--numbersColor);
+  background-color: var(--displayColor);
   text-align: center;
 }
 #tableDiv{
@@ -2155,11 +2160,6 @@ button:focus, input[type="button"]:focus {
     top: 15%;
     width: 45%;
     left: 51.8%;
-  }
-  #EquationFunc{
-    height: auto;
-    display: block;
-    max-width: 100%;
   }
   #vargrid{
     position: relative;
