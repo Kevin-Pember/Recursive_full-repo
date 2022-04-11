@@ -1,5 +1,6 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
+let state = {};
 var settings;
 console.log(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 if (localStorage.getItem("settings") != undefined) {
@@ -10,6 +11,13 @@ if (localStorage.getItem("settings") != undefined) {
   localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","display": "#d9d9d9","func": "#919191","nums": "#a3a3a3","text": "#000000","tS" : 1,"tC" : 5,"gDS" : 1,"gDMin" : -10,"gDMax" : 10,"gRS" : 1,"gRMin" : -10,"gRMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
+}
+if (sessionStorage.getItem("state") == undefined) {
+  let object = { "et": "", "dR":settings.degRad, "tS":[false,false],"fO":[]}
+  state = object;
+  sessionStorage.setItem("state", JSON.stringify(state));
+}else{
+  state = JSON.parse(sessionStorage.getItem("state"));
 }
 BackgroundColorGlobal = settings.func;
 var allMetaElements = document.getElementsByTagName('meta');
@@ -26,12 +34,8 @@ if (document.getElementById("mainBody") != null) {
   rootCss.style.setProperty('--functionsColor', settings.func);
   rootCss.style.setProperty('--textColor', settings.text);
   TextColorGlobal = settings.text;
-  if(settings.degRad){
-    document.getElementById('degPopup').innerHTML = "deg";
-    document.getElementById('degEx').innerHTML = "deg";
-  }else{
-    document.getElementById('degPopup').innerHTML = "rad";
-    document.getElementById('degEx').innerHTML = "rad";
+  if (!settings.degRad) {
+    setDegMode();
   }
   if (settings.text == "#000000") {
     document.getElementById('settingsCogIcon').src = "Images/SettingsCog.svg";
@@ -170,16 +174,10 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('deciToFracEx').addEventListener("click", function () { frontButtonPressed('d→f('); });
   document.getElementById('absEx').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modEx').addEventListener("click", function () { frontButtonPressed('mod('); });
-  document.getElementById('degEx').addEventListener("click", function (e){
-    if(document.getElementById('degEx').innerHTML == "deg"){
-      document.getElementById('degEx').innerHTML = "rad"
-      settings.degRad = false;
-    }else {
-      document.getElementById('degEx').innerHTML = "deg"
-      settings.degRad = true;
-    }
+  document.getElementById('degEx').addEventListener("click", function (e) {
+    setDegMode();
   });
-  document.getElementById('arcEx').addEventListener("click", function () { arcSwitch(); });
+  document.getElementById('arcEx').addEventListener("click", function () { setArc; });
   document.getElementById('sinEx').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosEx').addEventListener("click", function () { trigPressed('cos('); });
   document.getElementById('tanEx').addEventListener("click", function () { trigPressed('tan('); });
@@ -213,16 +211,10 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('lnPopup').addEventListener("click", function () { frontButtonPressed('ln('); });
   document.getElementById('ePopup').addEventListener("click", function () { frontButtonPressed('e'); });
   document.getElementById('factorialPopup').addEventListener("click", function () { frontButtonPressed('!'); });
-  document.getElementById('degPopup').addEventListener("click", function (e){
-    if(document.getElementById('degPopup').innerHTML == "deg"){
-      document.getElementById('degPopup').innerHTML = "rad"
-      settings.degRad = false;
-    }else {
-      document.getElementById('degPopup').innerHTML = "deg"
-      settings.degRad = true;
-    }
+  document.getElementById('degPopup').addEventListener("click", function (e) {
+    setDegMode();
   });
-  document.getElementById('arcPopup').addEventListener("click", function () { arcSwitch(); });
+  document.getElementById('arcPopup').addEventListener("click", function () { setArc; });
   document.getElementById('sinPopup').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosPopup').addEventListener("click", function () { trigPressed('cos('); });
   document.getElementById('tanPopup').addEventListener("click", function () { trigPressed('tan('); });
@@ -435,7 +427,7 @@ function createFunc(type) {
   var funcList = getFuncList();
   if (!custFuncExisting(name, false)) {
     custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
-    let object = { "name": name, "type": type};
+    let object = { "name": name, "type": type };
     switch (type) {
       case "Function":
         object.equation = text;
@@ -877,6 +869,9 @@ function custButton(funcConfig, target) {
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
+    if (TextColorGlobal == "#000000") {
+      buttonNode.querySelector('#removeFunc').src = "Images/xIcon.svg";
+    }
     buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
       console.log("Remove Func ran")
       funcRemove(e);
@@ -926,8 +921,8 @@ function custButton(funcConfig, target) {
         }
       } else if (type = "Code") {
 
-      } else if (type = "Hybrid"){
-        
+      } else if (type = "Hybrid") {
+
       }
     });
     document.getElementById(target[i]).appendChild(clonClone);
@@ -959,7 +954,7 @@ function tabOpen(name) {
 function enterPressed(input) {
   let display = document.getElementById('enterHeader');
   historyMethod(input);
-  input = solveInpr(input, settings.degRad);
+  input = solveInpr(input, state.dR);
   console.log("Equation after interpeter " + input);
   var mySolver = new Solver({
     s: input,
@@ -1047,7 +1042,7 @@ function highlightTab(element) {
   }
   element.className += " active"
 }
-function arcSwitch() {
+/*function arcSwitch() {
   if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
     for (let i = 0; i < document.getElementsByClassName('arcText').length; i++) {
       document.getElementsByClassName('arcText')[i].innerHTML = 'arc';
@@ -1063,7 +1058,7 @@ function arcSwitch() {
       document.getElementsByClassName('trigButton')[i].innerHTML = "a" + document.getElementsByClassName('trigButton')[i].innerHTML;
     }
   }
-}
+}*/
 function trigPressed(input) {
   if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
     frontButtonPressed("a" + input);
@@ -1275,7 +1270,7 @@ function newCustFuncTab(config) {
           let newVal = JSON.parse(e.target.parentNode.dataset.tab)
           newVal.name = e.target.value;
           let matchPage = matchTab(currentTab, true);
-          
+
           matchPage.querySelector("#newTabName").innerHTML = e.target.value;
           matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
           changeFunc(oldVal, newVal, matchPage, liveTab);
@@ -1302,7 +1297,7 @@ function newCustFuncTab(config) {
         try {
           parseVariables(varGrid, equationDIV, funcTabs);
         } catch (e) {
-    
+
         }
         break;
       case ("Hybrid"):
@@ -1310,7 +1305,7 @@ function newCustFuncTab(config) {
         break;
     }
     //adding event listeners
-    
+
   }
 }
 function defaultSetup(clon) {
@@ -1517,7 +1512,7 @@ function parseVariables(element, equationDIV, funcTabs) {
 }
 function solveEquation(parsedEquation, funcTabs) {
   console.log("Parsed Equation is " + parsedEquation);
-  let fullyParsed = solveInpr(parsedEquation, settings.degRad);
+  let fullyParsed = solveInpr(parsedEquation, state.dR);
   console.log("%c parsedEquation post op: " + fullyParsed, "color:green");
   var mySolver = new Solver({
     s: fullyParsed,
@@ -1590,16 +1585,16 @@ function updateCustomButtons(oldVal, newValue) {
   let Name = oldVal.name;
   let newName = newValue.name;
   let newFunction = "";
-  switch(oldVal.type){
-    case("Function"):
-      newFunction =  newValue.equation;
-    break;
-    case("Code"):
+  switch (oldVal.type) {
+    case ("Function"):
+      newFunction = newValue.equation;
+      break;
+    case ("Code"):
       newFunction = "Code";
-    break;
-    case("Hybrid"):
+      break;
+    case ("Hybrid"):
       newFunction = "Hybrid";
-    break;
+      break;
   }
   for (let i = 0; i < functionLinks.length; i++) {
     console.log("Checking " + functionLinks[i].childNodes[1].data + " and " + functionLinks[i].childNodes[0].innerHTML);
@@ -2144,16 +2139,16 @@ function getFuncList() {
     array = [];
   } else {
     //array = parseString.split('⥾');
-    while(parseString.includes('⥾')) {
+    while (parseString.includes('⥾')) {
       array.push(parseString.substring(0, parseString.indexOf('⥾')));
       parseString = parseString.substring(parseString.indexOf('⥾') + 1);
     }
 
-    }
+  }
   console.log(array);
   for (let func of array) {
     let funcJSON = {};
-    switch (func.substring(0,1)) {
+    switch (func.substring(0, 1)) {
       case "F":
         funcJSON.type = "Function";
         func = func.substring(func.indexOf('»') + 1);
@@ -2190,13 +2185,13 @@ function setFuncList(array) {
     let parsedString = "";
     switch (array[i].type) {
       case "Function":
-        parseString = "F" + "»" + array[i].name + "»" + array[i].equation+ "»";
+        parseString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
         break;
       case "Hybrid":
-        parseString = "H" + "»" + array[i].name + "»" + array[i].code+ "»";
+        parseString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
         break;
       case "Code":
-        parseString = "C" + "»" + array[i].name + "»" + array[i].code+ "»";
+        parseString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
         break;
     }
     parseString += "⥾" + parsedString;
@@ -2214,7 +2209,7 @@ function removeFunc(funcName) {
   }
   setFuncList(array);
 }
-function funcAssebly(type,name,text){
+function funcAssebly(type, name, text) {
   let object = {};
   switch (type) {
     case "Function":
@@ -2234,4 +2229,86 @@ function funcAssebly(type,name,text){
       break;
   }
   return object;
+}
+function setInverse() {
+  let trig = [{ "base": "sin", "inverse": "csc" }, { "base": "cos", "inverse": "sec" }, { "base": "tan", "inverse": "cot" }];
+  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
+  let invButtons = ['invPopup', 'invEx'];
+  let arc = state.tS[1];
+  let text = "";
+
+  //sets the text of inv buttons and sets the state value
+  if (invPopup.innerHTML == "inv") {
+    text = "reg"
+    state.tS[0] = true;
+  } else {
+    text = "inv"
+    state.tS[0] = false;
+  }
+  for (let elem of invButtons) {
+    document.getElementById(elem).innerHTML = text;
+  }
+  //sets the text of trig buttons based on values
+  for (let elem of elements) {
+    let elemText = document.getElementById(elem).innerHTML;
+    let outText = "";
+    if (arc) {
+      elemText = elemText.substring(1);
+    }
+    for (let tr of trig) {
+      if (text == 'reg') {
+        if (elemText == tr.inverse) {
+          outText = tr.base;
+        }
+      } else {
+        if (elemText == tr.base) {
+          outText = tr.inverse;
+        }
+      }
+    }
+    if (arc) {
+      outText = "a" + outText;
+    }
+    document.getElementById(elem).innerHTML = outText;
+  }
+}
+function setArc() {
+  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
+  let invButtons = ['arcPopup', 'arcEx'];
+  let arc = state.tS[1];
+  for (let elem of elements) {
+    let text = document.getElementById(elem).innerHTML;
+    if (!arc) {
+      document.getElementById(elem).innerHTML = "a"+text;
+      state.tS[1] = true;
+    } else {
+      document.getElementById(elem).innerHTML = text.substring(1);
+      state.tS[1] = false;
+    }
+  }
+}
+function setDegMode(){
+  let text = "";
+  let elements = ['degEx', 'degPopup'];
+  if (document.getElementById('degPopup').innerHTML == "deg") {
+    text = "rad"
+    state.dR = false;
+  } else {
+    text = "deg"
+    settings.dR = true;
+  }
+  for (let elem of elements) {
+    document.getElementById(elem).innerHTML = text;
+  }
+}
+function setState(){
+  state.eT = document.getElementById('enterHeader').innerHTML;
+  let tabs = document.getElementsByClassName('tablinks');
+  for(let tab of tabs){
+    let tabmap = tab.dataset.tablink
+    if(tabmap != "mainTab"){
+      let object = JSON.parse(tabmap);
+      state.fO.push(object.name)
+    }
+  }
 }
