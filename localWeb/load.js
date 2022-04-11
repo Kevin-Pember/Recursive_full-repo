@@ -12,13 +12,6 @@ if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
-if (sessionStorage.getItem("state") == undefined) {
-  let object = { "et": "", "dR":settings.degRad, "tS":[false,false],"fO":[]}
-  state = object;
-  sessionStorage.setItem("state", JSON.stringify(state));
-}else{
-  state = JSON.parse(sessionStorage.getItem("state"));
-}
 BackgroundColorGlobal = settings.func;
 var allMetaElements = document.getElementsByTagName('meta');
 for (var i = 0; i < allMetaElements.length; i++) {
@@ -60,6 +53,23 @@ if (document.getElementById("mainBody") != null) {
     let arrowIcons = document.getElementsByClassName('arrows');
     for (let item of arrowIcons) {
       item.src = "Images/MoreFuncArrow.svg";
+    }
+  }
+  if (sessionStorage.getItem("state") == undefined) {
+    let object = { "eT": "", "dR":settings.degRad, "tS":[false,false],"fO":[]}
+    state = object;
+    sessionStorage.setItem("state", JSON.stringify(state));
+  }else{
+    state = JSON.parse(sessionStorage.getItem("state"));
+    let funcAry = state.fO;
+    let funcList = getFuncList();
+    for(let item of funcAry){
+      for(let func of funcList){
+        console.log(`${func.name} vs. ${item}`)
+        if(func.name == item){
+          custButton(func, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        }
+      }
     }
   }
   var funcs = getFuncList();
@@ -114,7 +124,7 @@ if (document.getElementById("mainBody") != null) {
       changeTabAs(false);
     }
   });
-  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); document.location = 'Settings.html' });
+  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); setState(); document.location = 'Settings.html' });
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -161,7 +171,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
-  document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; sessionStorage.setItem("facing", "helpOut"); });
+  document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
     if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
       document.getElementById('extendedFuncGrid').style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect";
@@ -206,7 +216,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
   document.getElementById('historyPopup').addEventListener("click", function () { deleteHistory(); });
   document.getElementById('deciToFracPopup').addEventListener("click", function () { frontButtonPressed('d→f('); });
-  document.getElementById('helpPopup').addEventListener("click", function () { document.location = 'help.html'; sessionStorage.setItem("facing", "helpOut"); });
+  document.getElementById('helpPopup').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('log10Popup').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
   document.getElementById('lnPopup').addEventListener("click", function () { frontButtonPressed('ln('); });
   document.getElementById('ePopup').addEventListener("click", function () { frontButtonPressed('e'); });
@@ -295,7 +305,7 @@ if (document.getElementById("mainBody") != null) {
 
   //coloring UI elements that are images but need sytling
   if (settings.text == "#000000") {
-    document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
+    //document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
     document.getElementById('addIcon').src = "Images/addObject.svg";
     document.getElementById('minusIcon').src = "Images/minusIcon.svg";
     document.getElementById('ColorsIcon').src = "Images/Colors.svg";
@@ -306,18 +316,14 @@ if (document.getElementById("mainBody") != null) {
       item.src = "Images/MoreFuncArrow.svg";
     }
   } else {
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+    //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
 
   //Setting the values of elements
   //elements in the colors tab
-  document.getElementById('DisplayColorPicker').value = settings.display;
+  /*document.getElementById('DisplayColorPicker').value = settings.display;
   document.getElementById('NumbersColorPicker').value = settings.nums;
-  document.getElementById('FunctionsColorPicker').value = settings.func;
-  createTheme("#D9D9D9", "#A3A3A3", "#919191", "#000000", "Cityscape", false);
-  createTheme("#383838", "#525252", "#292929", "#ffffff", "Backstreet", false);
-  createTheme("#6CB999", "#88BDA7", "#538E76", "#000000", "Seafoam", false);
-  createTheme("#ec8888", "#ce9797", "#291e1e", "#FFFFFF", "Salmon", false);
+  document.getElementById('FunctionsColorPicker').value = settings.func;*/
   //elements in the Calculations Tab
   if (settings.degRad == true) {
     document.getElementById('degModeBut').className = "settingsButton active";
@@ -337,48 +343,17 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById("tableStep").value = settings.tS;
   document.getElementById("tableCells").value = settings.tC;
 
-  //Theme parsing part
-  var i = 1;
-  let themeRaw;
-  while (i != -1) {
-    try {
-      themeRaw = localStorage.getItem('theme' + i);
-      let displayColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let numsColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let funcColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let textColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let themeName = themeRaw.substring(0, themeRaw.indexOf("»"));
-      createTheme(displayColor, numsColor, funcColor, textColor, themeName, true);
-      i++;
-    } catch (err) {
-      console.log(err);
-      break;
-    }
-  }
-  let themes = document.getElementsByClassName("displayBaseThemeType");
-  for (i = 0; i < themes.length; i++) {
-    if (rgbToHex(themes[i].style.backgroundColor) == localStorage.getItem('displayColor') && rgbToHex(themes[i].childNodes[3].style.backgroundColor) == localStorage.getItem('numsColor') && rgbToHex(themes[i].childNodes[5].style.backgroundColor) == localStorage.getItem('funcColor') && rgbToHex(themes[i].childNodes[1].style.color) == localStorage.getItem('textColor')) {
-      themes[i].parentNode.querySelector('label').querySelector('input').checked = true;
-      break;
-    }
-  }
   //Adding events to elements
-  document.getElementById('DisplayColorPicker').addEventListener("input", updatePreview, false)
+  /*document.getElementById('DisplayColorPicker').addEventListener("input", updatePreview, false)
   document.getElementById('NumbersColorPicker').addEventListener("input", updatePreview, false)
-  document.getElementById('FunctionsColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('FunctionsColorPicker').addEventListener("input", updatePreview, false);*/
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
   document.getElementById('About').addEventListener("click", function () { settingsTabChange('AboutTab') });
   document.getElementById('colorsBack').addEventListener("click", function () { universalBack(); });
-  document.getElementById('selectorBlack').addEventListener("click", function () { dropPressed('Black') });
-  document.getElementById('selectorWhite').addEventListener("click", function () { dropPressed('White') });
-  document.getElementById('addIcon').addEventListener("click", function () { newTheme() });
-  document.getElementById('minusIcon').addEventListener("click", function () { removeThemes() });
+  //document.getElementById('selectorBlack').addEventListener("click", function () { dropPressed('Black') });
+  //document.getElementById('selectorWhite').addEventListener("click", function () { dropPressed('White') });
   document.getElementById('PreferencesBack').addEventListener("click", function () { universalBack(); });
   document.getElementById('degModeBut').addEventListener("click", function () { degRadSwitch(true) });
   document.getElementById('radModeBut').addEventListener("click", function () { degRadSwitch(false) });
@@ -883,7 +858,6 @@ function custButton(funcConfig, target) {
       document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
       document.getElementById('customFuncDisplay').style.visibility = "hidden";
       if (type == "Function") {
-        if (e.target.id != 'removeFunc') {
           if (!tabOpen(name)) {
             let tabs = document.getElementsByClassName('tabcontent');
             for (let i = 0; i < tabs.length; i++) {
@@ -918,7 +892,7 @@ function custButton(funcConfig, target) {
             setNumOfTabs();
             highlightTab(highlight);
           }
-        }
+        
       } else if (type = "Code") {
 
       } else if (type = "Hybrid") {
@@ -1190,9 +1164,6 @@ function settingExit() {
   }
   localStorage.setItem("settings", JSON.stringify(newSettings));
   document.location = 'Recursive.html';
-}
-function helpLoad() {
-
 }
 function openNewFunc() {
   if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
@@ -2305,10 +2276,12 @@ function setState(){
   state.eT = document.getElementById('enterHeader').innerHTML;
   let tabs = document.getElementsByClassName('tablinks');
   for(let tab of tabs){
-    let tabmap = tab.dataset.tablink
+    let tabmap = tab.dataset.tabmap;
     if(tabmap != "mainTab"){
+      console.log(tabmap);
       let object = JSON.parse(tabmap);
       state.fO.push(object.name)
     }
   }
+  sessionStorage.setItem("state", JSON.stringify(state));
 }
