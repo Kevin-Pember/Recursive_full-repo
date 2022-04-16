@@ -8,10 +8,18 @@ if (localStorage.getItem("settings") != undefined) {
   console.log("settings got");
   console.log(settings);
 } else {
-  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","display": "#d9d9d9","func": "#919191","nums": "#a3a3a3","text": "#000000","tS" : 1,"tC" : 5,"gDS" : 1,"gDMin" : -10,"gDMax" : 10,"gRS" : 1,"gRMin" : -10,"gRMax" : 10}');
+  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tS" : 1,"tC" : 5,"gDS" : 1,"gDMin" : -10,"gDMax" : 10,"gRS" : 1,"gRMin" : -10,"gRMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
+let themes = getThemes();
+for(let theme of themes){
+  if(theme.name == settings.theme){
+    setRoot(theme.getMth());
+  }
+}
+//Deprecated method for web apps
+/*
 BackgroundColorGlobal = settings.func;
 var allMetaElements = document.getElementsByTagName('meta');
 for (var i = 0; i < allMetaElements.length; i++) {
@@ -19,41 +27,61 @@ for (var i = 0; i < allMetaElements.length; i++) {
     allMetaElements[i].setAttribute('content', BackgroundColorGlobal);
     break;
   }
-}
+}*/
 if (document.getElementById("mainBody") != null) {
-  let rootCss = document.querySelector(':root');
+  /*let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', settings.display);
   rootCss.style.setProperty('--numbersColor', settings.nums);
   rootCss.style.setProperty('--functionsColor', settings.func);
-  rootCss.style.setProperty('--textColor', settings.text);
-  TextColorGlobal = settings.text;
+  rootCss.style.setProperty('--textColor', settings.text);*/
+  
   if (!settings.degRad) {
     setDegMode();
   }
-  if (settings.text == "#000000") {
-    document.getElementById('settingsCogIcon').src = "Images/SettingsCog.svg";
-    document.getElementById('backspcaeIcon').src = "Images/backIcon.svg";
-    document.getElementById('mobileTabIcon').src = "Images/mobileTabsIcon.svg";
-    let helpIcons = document.getElementsByClassName("helpIcon");
-    for (let item of helpIcons) {
-      item.src = "Images/help.svg";
+  let images = [
+    {
+      "type": "single",
+      "id": "settingsCogIcon",
+      "src": "Images/SettingsCog.svg"
+    },
+    {
+      "type": "single",
+      "id": "backspcaeIcon",
+      "src": "Images/backIcon.svg"
+    },
+    {
+      "type": "single",
+      "id": "mobileTabIcon",
+      "src": "Images/mobileTabsIcon.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "helpIcon",
+      "src": "Images/help.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "historyIcon",
+      "src": "Images/historyIcon.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "addIcon",
+      "src": "Images/addObject.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "minusIcon",
+      "src": "Images/minusIcon.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "arrows",
+      "src": "Images/MoreFuncArrow.svg"
     }
-    let historyIcons = document.getElementsByClassName('historyIcon');
-    for (let item of historyIcons) {
-      item.src = "Images/historyIcon.svg";
-    }
-    let addIcons = document.getElementsByClassName('addIcon');
-    for (let item of addIcons) {
-      item.src = "Images/addObject.svg";
-    }
-    let minusIcons = document.getElementsByClassName('minusIcon');
-    for (let item of minusIcons) {
-      item.src = "Images/minusIcon.svg";
-    }
-    let arrowIcons = document.getElementsByClassName('arrows');
-    for (let item of arrowIcons) {
-      item.src = "Images/MoreFuncArrow.svg";
-    }
+  ];
+  if (TextColorGlobal == "#000000") {
+    setImages(images);
   }
   if (sessionStorage.getItem("state") == undefined) {
     let object = { "eT": "", "dR":settings.degRad, "tS":[false,false],"fO":[]}
@@ -297,34 +325,53 @@ if (document.getElementById("mainBody") != null) {
   });
 } else if (document.getElementById("settingsBody") != null) {
   //setting the root color variables in css
-  let rootCss = document.querySelector(':root');
+  /*let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', settings.display);
   rootCss.style.setProperty('--numbersColor', settings.nums);
   rootCss.style.setProperty('--functionsColor', settings.func);
-  rootCss.style.setProperty('--textColor', settings.text);
+  rootCss.style.setProperty('--textColor', settings.text);*/
 
   //coloring UI elements that are images but need sytling
-  if (settings.text == "#000000") {
-    //document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
-    document.getElementById('addIcon').src = "Images/addObject.svg";
-    document.getElementById('minusIcon').src = "Images/minusIcon.svg";
-    document.getElementById('ColorsIcon').src = "Images/Colors.svg";
-    document.getElementById('PreferencesIcon').src = "Images/Calipiers.svg";
-    document.getElementById('AboutIcon').src = "Images/aboutUS.svg";
-    let backIcons = document.getElementsByClassName('backIcon');
-    for (let item of backIcons) {
-      item.src = "Images/MoreFuncArrow.svg";
-    }
+  if (TextColorGlobal == "#000000") {
+    let images = [
+      {
+        "type": "single",
+        "id": "ColorsIcon",
+        "src": "Images/Colors.svg"
+      },
+      {
+        "type": "single",
+        "id": "PreferencesIcon",
+        "src": "Images/Calipiers.svg"
+      },
+      {
+        "type": "single",
+        "id": "AboutIcon",
+        "src": "Images/aboutUS.svg"
+      },
+      {
+        "type": "mutiple",
+        "class": "backIcon",
+        "src": "Images/MoreFuncArrow.svg"
+      },
+    ];
+    setImages(images);
   } else {
     //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
 
   //Setting the values of elements
-  //elements in the colors tab
-  /*document.getElementById('DisplayColorPicker').value = settings.display;
-  document.getElementById('NumbersColorPicker').value = settings.nums;
-  document.getElementById('FunctionsColorPicker').value = settings.func;*/
-  //elements in the Calculations Tab
+  let accents = getAccents();
+  let defaultThemes = getThemes();
+  let catalog = getCatalog();
+  for(let acc of accents){
+    document.getElementById(acc.id).style.background = acc.val;
+    document.getElementById(acc.id).dataset.color = acc.val;
+    if(acc.id === settings.acc){
+      document.getElementById(acc.id).className = "accButton active";
+    }
+  }
+  document.getElementById(settings.theme).className = "themeElem active";
   if (settings.degRad == true) {
     document.getElementById('degModeBut').className = "settingsButton active";
   } else {
@@ -344,31 +391,63 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById("tableCells").value = settings.tC;
 
   //Adding events to elements
-  /*document.getElementById('DisplayColorPicker').addEventListener("input", updatePreview, false)
-  document.getElementById('NumbersColorPicker').addEventListener("input", updatePreview, false)
-  document.getElementById('FunctionsColorPicker').addEventListener("input", updatePreview, false);*/
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
   document.getElementById('About').addEventListener("click", function () { settingsTabChange('AboutTab') });
   document.getElementById('colorsBack').addEventListener("click", function () { universalBack(); });
-  //document.getElementById('selectorBlack').addEventListener("click", function () { dropPressed('Black') });
-  //document.getElementById('selectorWhite').addEventListener("click", function () { dropPressed('White') });
   document.getElementById('PreferencesBack').addEventListener("click", function () { universalBack(); });
   document.getElementById('degModeBut').addEventListener("click", function () { degRadSwitch(true) });
   document.getElementById('radModeBut').addEventListener("click", function () { degRadSwitch(false) });
   document.getElementById('AboutBack').addEventListener("click", function () {
-    //SettingsBack('AboutTab')
     universalBack();
   });
+  document.getElementById('buyCustTheme').addEventListener('click', function(){
+    document.getElementById('buyScreen').style.visibility = "visible";
+    sessionStorage.setItem("facing","buyPageOut");
 
+  });
+  document.getElementById('buyExit').addEventListener('click', function(){
+    universalBack();
+  });
+  document.getElementById('buyButton').addEventListener('click', function(){
+    unlockCustomTheme();
+    universalBack();
+  });
+  let accElems = document.getElementsByClassName('accButton');
+  for (let item of accElems) {
+    item.addEventListener("click", function () {
+      let selectAcc = document.getElementsByClassName('accButton active');
+      for(let selc of selectAcc){
+        selc.className = "accButton";
+      }
+      item.className = "accButton active";
+    });
+  }
+  let themeElems = document.getElementsByClassName('themeElem');
+  for (let item of themeElems) {
+    item.addEventListener("click", function () {
+      if(item.id == "darkMode" || item.id == "lightMode"){
+        let selectTheme = document.getElementsByClassName('themeElem active');
+      for(let selc of selectTheme){
+        selc.className = "themeElem";
+      }
+      item.className = "themeElem active";
+      }else{
+        if(queryPurchase(item.i)){
+
+        }
+      }
+    });
+  }
+  let themes = document.getElementsByClassName('themeButton');
 } else if (document.getElementById('helpBody') != null) {
-  let rootCss = document.querySelector(':root');
+  /*&let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', localStorage.getItem('displayColor'));
   rootCss.style.setProperty('--numbersColor', localStorage.getItem('numsColor'));
   rootCss.style.setProperty('--functionsColor', localStorage.getItem('funcColor'));
-  rootCss.style.setProperty('--textColor', localStorage.getItem('textColor'));
-  if (localStorage.getItem('textColor') == "#000000") {
+  rootCss.style.setProperty('--textColor', localStorage.getItem('textColor'));*/
+  if (TextColorGlobal == "#000000") {
     let addIcons = document.getElementsByClassName('backIcon');
     for (let item of addIcons) {
       item.src = "Images/MoreFuncArrow.svg";
@@ -510,6 +589,14 @@ let facingBack = [
     "prtCont": 'settings',
     "mth": function () {
       SettingsBack('colorsTab');
+    }
+  },
+  {
+    "elm": "buyPageOut",
+    "backElm": "themePageOut",
+    "prtCont": 'settings',
+    "mth": function () {
+      document.getElementById('buyScreen').style.visibility = "hidden";
     }
   },
   {
@@ -1141,14 +1228,15 @@ function settingExit() {
     localStorage.setItem('textColor', "#FFFFFF");
   }
   document.location = 'Recursive.html';*/
+  let defaultThemes = getThemes();
   let newSettings = settings;
-  newSettings.display = document.getElementById("DisplayColorPicker").value;
-  newSettings.func = document.getElementById("FunctionsColorPicker").value;
-  newSettings.nums = document.getElementById("NumbersColorPicker").value;
-  if (document.getElementById('dropbtn').childNodes[0].nodeValue === "Black ") {
-    newSettings.text = "#000000";
-  } else {
-    newSettings.text = "#FFFFFF";
+  let selTheme = document.getElementsByClassName("themeElem active")[0];
+  if(selTheme.id == "darkMode" || selTheme.id == "lightMode"){
+    newSettings.theme = selTheme.id;
+    let selAcc = document.getElementsByClassName("accButton active")[0];
+    newSettings.acc = selAcc.id;
+  }else{
+    
   }
   //newSettings.oL = document.getElementById("outputLength").value;
   newSettings.gDS = Number(document.getElementById("graphDStep").value);
@@ -2284,4 +2372,112 @@ function setState(){
     }
   }
   sessionStorage.setItem("state", JSON.stringify(state));
+}
+function queryPurchase(item){
+  return false;
+}
+function setPurchase(name){
+  if(localStorage.getItem('purchased') != undefined){
+    let purchased = JSON.parse(localStorage.getItem('purchased'));
+    purchased.purchaseList.push(name)
+    localStorage.setItem('purchased', JSON.stringify(purchased));
+  }else{
+    localStorage.setItem('purchased', JSON.stringify({"purchaseList": [name]}));
+  }
+}
+function unlockCustomTheme(){
+  document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
+  document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
+}
+function getCatalog(){
+  return [
+    {
+      "name": "custTheme",
+      "price": "0.99",
+      "have": queryPurchase()
+    }
+  ];
+}
+function getThemes(){
+  return [
+    {
+      "name":"lightMode",
+      "primary":"#ffffff",
+      "secondary":"#dedede",
+      'text':'#000000',
+      'getMth': function (){
+        return ["#ffffff",getColorAcc(settings.acc),"#dedede","#000000"];
+      }
+    },
+    {
+      "name":"darkMode",
+      "primary":"#000000",
+      "secondary":"#1f1f1f",
+      'text':'#FFFFFF',
+      'getMth': function (){
+        return ["#000000",getColorAcc(settings.acc),"#1f1f1f",'#FFFFFF'];
+      }
+    }
+  ];
+}
+function getAccents(){
+  return [
+    {
+      "id": 'red',
+      "val": '#d6564d'
+    },
+    {
+      "id": 'orange',
+      "val": '#fca31e'
+    },
+    {
+      "id": 'yellow',
+      "val": '#e9e455'
+    },
+    {
+      "id": 'green',
+      "val": '#68c43e'
+    },
+    {
+      "id": 'blue',
+      "val": '#4193ff'
+    },
+    {
+      "id": 'purple',
+      "val": '#6a2bfd'
+    },
+    {
+      "id": 'grey',
+      "val": '#b8b8b8'
+    }
+  ];
+}
+function getColorAcc(acc){
+  let accents = getAccents();
+  for(let accent of accents){
+    if(accent.id == acc){
+      console.log(`accent is ${accent.val}`);
+      return accent.val;
+    }
+  }
+}
+function setRoot(colorArray){
+  let rootCss = document.querySelector(':root');
+  rootCss.style.setProperty('--displayColor', colorArray[2]);
+  rootCss.style.setProperty('--numbersColor', colorArray[1]);
+  rootCss.style.setProperty('--functionsColor', colorArray[0]);
+  rootCss.style.setProperty('--textColor', colorArray[3]);
+  TextColorGlobal = colorArray[3];
+}
+function setImages(imgList){
+  for(let img of imgList){
+    if(img.type == "mutiple"){
+      let elems = document.getElementsByClassName(img.class);
+      for(elem of elems){
+        elem.src = img.src;
+      }
+    }else{
+      document.getElementById(img.id).src = img.src;
+    }
+  }
 }
