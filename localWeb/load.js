@@ -2388,6 +2388,9 @@ function setPurchase(name){
 function unlockCustomTheme(){
   document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
   document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
+  document.getElementById('custPurchasable').addEventListener("click", function (){
+    
+  });
 }
 function getCatalog(){
   return [
