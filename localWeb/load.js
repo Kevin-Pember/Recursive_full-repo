@@ -90,7 +90,7 @@ if (document.getElementById("mainBody") != null) {
     setImages(images);
   }
   if (sessionStorage.getItem("state") == undefined) {
-    let object = { "eT": "", "dR": settings.degRad, "tS": [false, false], "fO": [] }
+    let object = { "eT": "", "tS": [false, false], "fO": [] }
     state = object;
     sessionStorage.setItem("state", JSON.stringify(state));
   } else {
@@ -100,10 +100,10 @@ if (document.getElementById("mainBody") != null) {
     for (let item of funcAry) {
       createTab(findFuncConfig(item))
     }
-    if(object.tS[0]){
+    if(state.tS[0]){
       setInverse();
     }
-    if(object.tS[1]){
+    if(state.tS[1]){
       setArc();
     }
   }
@@ -2349,9 +2349,11 @@ function setInverse() {
   let trig = [{ "base": "sin", "inverse": "csc" }, { "base": "cos", "inverse": "sec" }, { "base": "tan", "inverse": "cot" }];
   let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
   let invButtons = ['invPopup', 'invEx'];
-  let arc = state.tS[1];
+  let arc = false;
   let text = "";
-
+  if(document.getElementById('sinPopup').innerHTML.substring(0,1) == "a"){
+    arc = true;
+  }
   //sets the text of inv buttons and sets the state value
   if (document.getElementById('invPopup').innerHTML == "inv") {
     text = "reg"
@@ -2386,7 +2388,10 @@ function setInverse() {
 function setArc() {
   let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
   let invButtons = ['arcPopup', 'arcEx'];
-  let arc = state.tS[1];
+  let arc = false;
+  if(document.getElementById('sinPopup').innerHTML.substring(0,1) == "a"){
+    arc = true;
+  }
   for (let elem of elements) {
     let text = document.getElementById(elem).innerHTML;
     if (!arc) {
