@@ -1,9 +1,10 @@
 :root{
-  --displayColor: #d9d9d9;
-  --numbersColor: #A3A3A3;
-  --functionsColor: #919191;
+  --displayColor: #000000;
+  --numbersColor: #000000;
+  --functionsColor: #000000;
   --textColor: #000000;
   --translucent: #00000033;
+  --semi-transparent: #000000c5;
 }
 *{
   box-sizing: border-box;
@@ -11,6 +12,7 @@
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--textColor);
+  -webkit-tap-highlight-color:transparent;
 }
 body{
   overflow-x: hidden;
@@ -458,7 +460,7 @@ button:focus, input[type="button"]:focus {
   .drop-cont {
     display: none;
     position: absolute;
-    background-color: var(--displayColor);
+    background-color: var(--numbersColor);
     min-width: 50px;
     z-index: 1;
     border-radius: 0px 0 15px 15px;
@@ -474,7 +476,7 @@ button:focus, input[type="button"]:focus {
     border-radius: 15px 15px 0px 0px;
   }
   #modBtn {
-    background-color: var(--displayColor);
+    background-color: var(--numbersColor);
     color: var(--textColor);
     border-radius: 25px;
     width: 50px;
@@ -1279,6 +1281,7 @@ button:focus, input[type="button"]:focus {
   align-self: center;
   position: relative;
   top: 5px;
+  margin-bottom: 15px;
   left: 2.5%;
   width: 95%;
 }
@@ -1489,132 +1492,90 @@ button:focus, input[type="button"]:focus {
   top: 33.3333%;
   position: absolute;
 }
-#ThemesContainerDiv{
+#accentColorDiv{
   background-color: var(--functionsColor);
-  height: 408px;
+  height: 200px;
   border-radius: 25px;
   align-self: center;
-  top: 20px;
+  top: 5px;
   left: 2.5%;
   width: 95%;
 }
-#themesLine{
-  top: 355px;
-  height: 0.25px;
+#accentColorGrid{
+  display: grid;
+  margin-top: 10px;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+  grid-template-rows: 50% 50%;
   width: 100%;
-  position: absolute;
-  color: var(--textColor);
+  height: calc(100% - 64px);
+  justify-items: center;
 }
-#ThemesDiv{
-  height: 340px;
-  width: 97%;
-  top: 59px;
-  left: 1.5%;
-  background-color: var(--numbersColor);
-  border-radius: 15px;
-  position: absolute;
-  z-index: 1;
-  overflow-x:auto;
-  overflow-y: none;
-  flex-wrap: nowrap;
-  display:flex;
-}
-#themesDisplayBase{
-  position: relative;
-  overflow:hidden;
-  border-width: 0.0000000005px;
-  left: 0px;
-  top: 25px;
-}
-#themeTemplate{
-  height: 275px;
-  width: 180px;
-}
-.themeRemove{
-  visibility:hidden;
-  right: 0;
-  top: 25px;
-  height: 35px;
-  position:absolute;
-  z-index: 1;
-}
-.ThemesLabel{
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 20;
-  color: var(--textColor);
-  height: 25px;
-  width: 155px;
-  left:25px;
-  position: absolute;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-#themeName{
-  left: 30px;
-  top: 2.5px;
-  text-align: center;
-  align-self: center;
-  font-size: 20;
-  position: absolute;
-}
-#themeTemplateDiv{
-  top: 40px;
-  height: 275px;
-  margin-left: 10px;
-  margin-right: 10px;
-  position: relative;
-}
-#minusButton{
-  margin-left: 40px;
-}
-.ThemesLabel input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: -25;
-  height: 25px;
-  width: 25px;
-  background-color: var(--functionsColor);
+.accButton{
+  height: 55px;
+  width: 55px;
+  padding: none;
   border-radius: 50%;
+  border: none;
 }
-.ThemesLabel input:checked ~ .checkmark {
-  background-color: var(--functionsColor);
+.accButton.active{
+  border:solid;
+  border-color: var(--textColor);
 }
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
+#themeCont{
+  height: 210px;
+  width: calc(100% - 10px);
+  margin-left: 5px;
+  margin-top: 10px;
+  padding-bottom: 15px;
+  grid-template-columns: 180px;
+  grid-template-rows: 100%;
+  grid-auto-flow: column;
+  display: grid;
+  overflow-x: scroll;
 }
-.ThemesLabel input:checked ~ .checkmark:after {
-  display:flex;
+.themeElem.active{
+  background-color: var(--numbersColor);
 }
-.ThemesLabel .checkmark:after {
- 	top: 4.25px;
-	left: 4.25px;
-	width: 17px;
-	height: 17px;
-	border-radius: 50%;
-	background: var(--textColor);
+.themeElem{
+  height: 100%;
+  width: 170px;
+  border-radius: 40px;
+  border: none;
+  color: var(--backgroundColor);
+  font-size: 15px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  margin-left: 10px;
+  padding: 10px;
 }
-.displayBaseThemeType{
-  background-color: var(--displayColor);
-  height: 250px;
-  width: 180px;
-  position: absolute;
-  border-width: 0.0000000005px;
-  border-color: #000000;
-  border: solid;
-  border-radius: 10px;
-  top: 90px;
-  right: 15px;
+.firstHalf{
+  height: 150px;
+  width: 75px;
+  border-radius: 150px 0 0 150px;
+}
+.secondHalf{
+  
+  height: 150px;
+  width: 75px;
+  margin-top: -150px;
+  margin-left: 74px;
+  border-radius: 0 150px 150px 0;
+}
+#buyCustTheme{
+  height: 30px;
+  border: none;
+  background-color: var(--numbersColor);
+  margin-top: -15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 15px;
+}
+#custLabel{
+  margin-top: -80px;
+  margin-bottom: 21px;
 }
 #PreferencesGrid{
   top: 50px;
@@ -1622,7 +1583,7 @@ button:focus, input[type="button"]:focus {
   width: 100%;
   left: 0;
   grid-template-columns: 100%;
-  grid-auto-rows: 30px;
+  grid-auto-rows: 40px;
   justify-content: center;
   align-content: end;
   padding-bottom: 20px;
@@ -1631,11 +1592,12 @@ button:focus, input[type="button"]:focus {
   background-color: var(--numbersColor);
   border: none;
   border-width: 1.5px;
-  height: 25px;
-  width: 50px;
+  height: 35px;
+  width: 60px;
   text-align: center;
   color: var(--textColor);
   text-indent: 5px;
+  font-size: 15px;
   border-radius: 8px;
   margin-right: 10px;
   right: 0;
@@ -1647,10 +1609,11 @@ button:focus, input[type="button"]:focus {
   width: fit-content;
   padding-left: 10px;
   padding-right: 10px;
-  height: 25px;
+  font-size: 20px;
+  height: 35px;
   right: 0px;
   margin-right: 10px;
-  border-radius: 15px;
+  border-radius: 20px;
   border: none;
   position: absolute;
 }
@@ -1662,12 +1625,12 @@ button:focus, input[type="button"]:focus {
   height: auto;
   border-radius: 25px;
   position: relative;
-  top: 5px;
+  margin-top: 15px;
   left: 2.5%;
   width: 95%;
 }
 #aboutTag{
-  padding-top: 50px;
+  padding-top: 10px;
   padding-left: 1%;
   padding-bottom: 20px;
   width: 98%;
@@ -1675,9 +1638,9 @@ button:focus, input[type="button"]:focus {
 }
 #VersionDiv{
   background-color: var(--functionsColor);
-  height: 90px;
   border-radius: 25px;
   position: relative;
+  height: auto;
   margin-top: 20px;
   left: 2.5%;
   width: 95%;
@@ -1696,6 +1659,62 @@ button:focus, input[type="button"]:focus {
   bottom: 0px;
   position: absolute;
   font-family: Arial, Helvetica, sans-serif;
+}
+#buyScreen{
+  position: absolute;
+  z-index: 1;
+  width:100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: var(--semi-transparent);
+}
+#buyExit{
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+#buyTitle{
+  position: absolute;
+  top: 50px;
+  width: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 25px;
+  margin-left: 10px;
+  text-align: start;
+  left: 0px;
+  background-color: var(--displayColor);
+}
+#imagesContainer{
+  width: calc(100% - 20px);
+  height: 250px;
+  margin-top: 170px;
+  background-color: var(--displayColor);
+  border-radius: 25px;
+  margin-left: 10px;
+}
+#itemDescript{
+  width: calc(100% - 20px);
+  height: auto;
+  margin-top: 10px;
+  background-color: var(--displayColor);
+  border-radius: 25px;
+  margin-left: 10px;
+  padding: 10px;
+}
+#buyButton{
+  position: absolute;
+  bottom: 10px;
+  width: 90px;
+  height: 50px;
+  font-size: 25px;
+  border-radius: 25px;
+  border: none;
+  left: calc(50% - 45px);
+  background-color: var(--numbersColor);
 }
 @media only screen and (max-aspect-ratio: 3/4) {
   #navColumn{
@@ -1912,7 +1931,7 @@ button:focus, input[type="button"]:focus {
 }
 #varEquationContainer{
   position: absolute;
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   display: block;
   flex-wrap: wrap;
   border-radius: 25px;
@@ -1923,9 +1942,10 @@ button:focus, input[type="button"]:focus {
   overflow-y: scroll;
 }
 #varGrid{
-  width: 100%;
-  height:60%;
-  position: absolute;
+  width: calc(101% - 10px);
+  margin-left: 5px;
+  height:auto;
+  position: relative;
   bottom: 0px;
   display: grid;
   grid-template-columns: 33.3333% 33.3333% 33.3333%;
@@ -1933,7 +1953,7 @@ button:focus, input[type="button"]:focus {
   overflow-y: auto;
 }
 .variableContainer{
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   height: 25px;
   width: 95%;
   margin-left: 2.5%;
@@ -1953,7 +1973,7 @@ button:focus, input[type="button"]:focus {
   width: 25px;
   flex-shrink: 0;
   text-align: center;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   
 }
 #variableEntry{
@@ -1967,7 +1987,7 @@ button:focus, input[type="button"]:focus {
   text-align: center;
 }
 #resultPane{
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   top: 47.5%;
   bottom: 2.5%;
   width: 95%;
@@ -1976,12 +1996,16 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
 }
 #EquationFunc{
-  width: 100%;
-  height: 40%;
-  padding: 10px;
+  width: calc(101% - 20px);
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  height: auto;
+  padding: 5px;
   padding-bottom: 5px;
   color: var(--textColor);
-  background-color: transparent;
+  background-color: var(--numbersColor);
   z-index: 0;
   overflow-y: auto;
   font-size: 4.5vh;
@@ -2016,7 +2040,7 @@ button:focus, input[type="button"]:focus {
   width: 70px;
   z-index: 1;
   position: absolute;
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   border-radius: 25px;
 }
 #FunctionDiv{
@@ -2027,12 +2051,12 @@ button:focus, input[type="button"]:focus {
   position: absolute;
 }
 #resultDiv{
-  margin-top: 5px;
+  margin-top: 10px;
   padding: 5px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 25px;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   position: absolute;
 }
 #equalsHeader{
@@ -2086,7 +2110,7 @@ button:focus, input[type="button"]:focus {
   text-indent: 10px;
 }
 .selectorDiv{
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   padding: 5px;
   border-radius: 0 25px 25px 25px;;
 }
@@ -2100,7 +2124,7 @@ button:focus, input[type="button"]:focus {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 25px;
-  background-color: var(--displayColor);
+  background-color: var(--numbersColor);
   padding: 5px 10px;
   border-radius: 25px 25px 25px 25px;
   margin-top: 10px;
@@ -2123,7 +2147,7 @@ button:focus, input[type="button"]:focus {
   padding-left: 14px;
   border-radius: 25px;
   border: none;
-  background-color: var(--numbersColor);
+  background-color: var(--displayColor);
   text-align: center;
 }
 .stepInputs{
@@ -2133,7 +2157,7 @@ button:focus, input[type="button"]:focus {
   padding-left: 12px;
   border-radius: 25px;
   border: none;
-  background-color: var(--numbersColor);
+  background-color: var(--displayColor);
   text-align: center;
 }
 #tableDiv{
@@ -2155,11 +2179,6 @@ button:focus, input[type="button"]:focus {
     top: 15%;
     width: 45%;
     left: 51.8%;
-  }
-  #EquationFunc{
-    height: auto;
-    display: block;
-    max-width: 100%;
   }
   #vargrid{
     position: relative;

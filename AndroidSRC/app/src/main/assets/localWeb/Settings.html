@@ -9,6 +9,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
 <body id="settingsBody">
+    <div id="buyScreen" style="visibility: hidden;">
+        <h1 class="settingsHeaders" id="buyTitle">Custom <br> Themes</h1>
+        <img id="buyExit" src="Images/xIconWhite.svg" width="50px">
+        <div id="imagesContainer">
+
+        </div>
+        <div id="itemDescript">
+            <h2>Description</h2>
+            <h4>Allows full customization of Themes. </h4>
+        </div>
+        <button id="buyButton">$ 0.99</button>
+    </div>
     <div id="navColumn">
         <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="40"
                 height="40"></button>
@@ -24,7 +36,7 @@
         <button id="colorsBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                 class="backIcon"></button>
         <h1 class="settingsHeaders">Colors</h1>
-        <div id="ColorsDiv" class="settingsDiv">
+        <div id="ColorsDiv" class="settingsDiv" style="visibility: hidden; position: absolute;">
             <h2 class="h2Settings" id="colorsHeader">Colors</h2>
             <div class="displayBase" id="displayPreview">
                 <h2 id="showcaseTextColor" class="textDisplay">T</h2>
@@ -56,31 +68,53 @@
                 </label>
             </div>
         </div>
-        <div id="ThemesContainerDiv" class="settingsDiv">
-            <h2 class="h2Settings">Themes</h2>
-            <div id="ThemesDiv" class="settingsDiv">
-                <button class="clearModifiers"><img id="addIcon" src="Images/addObjectWhite.svg" width="40"
-                        height="40"></button>
-                <button id="minusButton" class="clearModifiers"><img id="minusIcon" src="Images/minusIconWhite.svg"
-                        width="40" height="40"></button>
-                <template class="themeTemplate">
-                    <div id="themeTemplateDiv" class="theme">
-                        <label onmousedown="preventFocus()" class="ThemesLabel">
-                            <input id="themeRadio" onmousedown="preventFocus()" type="radio" class="radio">
-                            <span class="checkmark"></span>
-                        </label>
-                        <h3 contenteditable="true" id="themeName">Theme Name</h3>
-                        <img class="themeRemove" id="removeButton" src="Images/xIconWhite.svg" height="100%">
-                        <div class="displayBaseThemeType" id="themesDisplayBase">
-                            <h2 class="textDisplay" id="textDisplayBase">T</h2>
-                            <div class="numsBase" id="numsDisplayBase"></div>
-                            <div class="functionBase" id="functionsDisplayBase"></div>
-                        </div>
+        <div id="accentColorDiv" class="settingsDiv">
+            <h2 class="h2Settings" id="colorsHeader">Accent</h2>
+            <div id="accentColorGrid" class="colorDiv">
+                <button class="accButton" id="red"></button>
+                <button class="accButton" id="orange"></button>
+                <button class="accButton" id="yellow"></button>
+                <button class="accButton" id="green" ></button>
+                <button class="accButton" id="blue"></button>
+                <button class="accButton" id="purple"></button>
+                <button class="accButton" id="grey"></button>
+            </div>
+        </div>
+        <div id="themeDiv" class="settingsDiv">
+            <h2 class="h2Settings" id="colorsHeader">Themes</h2>
+            <div id="themeCont">
+                <div class="themeElem" id="darkMode" unselectable="on">
+                    <div class="firstHalf" style="background-color: #000000">
+
                     </div>
-                </template>
+                    <div class="secondHalf" style="background-color: #1f1f1f;">
+
+                    </div>
+                    <h3 class="themeLabel">Dark</h3>
+                </div>
+                <div class="themeElem" id="lightMode" unselectable="on">
+                    <div class="firstHalf" style="background-color: #ffffff">
+
+                    </div>
+                    <div class="secondHalf" style="background-color: #dedede;">
+
+                    </div>
+                    <h3 class="themeLabel">Light</h3>
+                </div>
+                <div class="themeElem" id="custPurchasable" unselectable="on">
+                    <div class="firstHalf" style="background-color: #707070">
+
+                    </div>
+                    <div class="secondHalf" style="background-color: #525252;">
+
+                    </div>
+                    <h3 id="custLabel" class="themeLabel">Custom</h3>
+                    <button id="buyCustTheme"> Buy</button>
+                </div>
             </div>
         </div>
     </div>
+    
     <div id="PreferencesTab" class="settingTabContent">
         <button id="PreferencesBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                 class="backIcon"></button>
@@ -90,7 +124,7 @@
             <div id="PreferencesGrid">
                 <label class="calculationsLabels">
                     <h5 class="h5Settings">Angle Mode</h5>
-                    <button class="settingsButton" id="degModeBut" style="right: 45px;">deg</button>
+                    <button class="settingsButton" id="degModeBut" style="right: 55px;">deg</button>
                     <button class="settingsButton" id="radModeBut">rad</button>
                 </label>
                 <label class="calculationsLabels">
@@ -99,7 +133,7 @@
                 </label>
             </div>
         </div>
-        <div class="settingsDiv" style="margin-top: 15px;">
+        <div class="settingsDiv">
             <h2 class="h2Settings" id="colorsHeader">Graph</h2>
             <div id="PreferencesGrid">
                 <label class="calculationsLabels">
@@ -108,7 +142,7 @@
                 </label>
                 <label class="calculationsLabels">
                     <h5 class="h5Settings">Default Domain</h5>
-                    <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 60px;">
+                    <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 70px;">
                     <input type="text" id="domainTopG" class="settingsTextInput">
                 </label>
                 <label class="calculationsLabels">
@@ -117,12 +151,12 @@
                 </label>
                 <label class="calculationsLabels">
                     <h5 class="h5Settings">Default Range</h5>
-                    <input type="text" id="rangeBottomG" class="settingsTextInput" style="right: 60px;">
+                    <input type="text" id="rangeBottomG" class="settingsTextInput" style="right: 70px;">
                     <input type="text" id="rangeTopG" class="settingsTextInput">
                 </label>
             </div>
         </div>
-        <div class="settingsDiv" style="margin-top: 15px;">
+        <div class="settingsDiv">
             <h2 class="h2Settings" id="colorsHeader">Table</h2>
             <div id="PreferencesGrid">
                 <label class="calculationsLabels">
@@ -140,17 +174,16 @@
         <button id="AboutBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                 class="backIcon"></button>
         <h1 class="settingsHeaders">About</h1>
+        <div id="VersionDiv">
+            <h2 class="h2Settings" id="versionHeader" style="border-radius: 25px;">Version</h2>
+            <h1 style="position: absolute; right: 7px; top: 3.5px; ">V2</h1>
+        </div>
         <div id="AboutUsDiv">
             <h2 class="h2Settings">About Us</h2>
-            <h2 class="h5Settings" id="aboutTag">Made by a small one man team that puts too much effort in whatever they
-                try to program</h2>
+            <h2 class="h5Settings" id="aboutTag">We are a team that works to make the lives of our customers easier & to make apps that we believe in.</h2>
         </div>
-        <div id="VersionDiv">
-            <h2 class="h2Settings" id="colorsHeader">Version</h2>
-            <h5 class="h5Settings" id="versionID">Recursvie 2.0</h5>
-            <img id="versionImage" src="Images/versionIcon.svg" height="80%">
-        </div>
-        <p id="copyright">©2021, Kevin Pember</p>
+        
+        <p id="copyright">©2022, Kevin Pember</p>
     </div>
     </div>
     <script src="load.js"></script>
