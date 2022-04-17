@@ -13,11 +13,17 @@ if (localStorage.getItem("settings") != undefined) {
   console.log(settings);
 }
 let themes = getThemes();
-for(let theme of themes){
-  if(theme.name == settings.theme){
+for (let theme of themes) {
+  if (theme.name == settings.theme) {
     setRoot(theme.getMth());
   }
 }
+/*if(){
+
+}
+if(){
+
+}*/
 //Deprecated method for web apps
 /*
 BackgroundColorGlobal = settings.func;
@@ -34,7 +40,7 @@ if (document.getElementById("mainBody") != null) {
   rootCss.style.setProperty('--numbersColor', settings.nums);
   rootCss.style.setProperty('--functionsColor', settings.func);
   rootCss.style.setProperty('--textColor', settings.text);*/
-  
+
   if (!settings.degRad) {
     setDegMode();
   }
@@ -84,20 +90,21 @@ if (document.getElementById("mainBody") != null) {
     setImages(images);
   }
   if (sessionStorage.getItem("state") == undefined) {
-    let object = { "eT": "", "dR":settings.degRad, "tS":[false,false],"fO":[]}
+    let object = { "eT": "", "dR": settings.degRad, "tS": [false, false], "fO": [] }
     state = object;
     sessionStorage.setItem("state", JSON.stringify(state));
-  }else{
+  } else {
     state = JSON.parse(sessionStorage.getItem("state"));
+    document.getElementById('enterHeader').innerHTML = state.eT;
     let funcAry = state.fO;
-    let funcList = getFuncList();
-    for(let item of funcAry){
-      for(let func of funcList){
-        console.log(`${func.name} vs. ${item}`)
-        if(func.name == item){
-          custButton(func, ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        }
-      }
+    for (let item of funcAry) {
+      createTab(findFuncConfig(item))
+    }
+    if(object.tS[0]){
+      setInverse();
+    }
+    if(object.tS[1]){
+      setArc();
     }
   }
   var funcs = getFuncList();
@@ -215,7 +222,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('degEx').addEventListener("click", function (e) {
     setDegMode();
   });
-  document.getElementById('arcEx').addEventListener("click", function () { setArc; });
+  document.getElementById('arcEx').addEventListener("click", function () { setArc(); });
+  document.getElementById('invEx').addEventListener("click", function () { setInverse(); });
   document.getElementById('sinEx').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosEx').addEventListener("click", function () { trigPressed('cos('); });
   document.getElementById('tanEx').addEventListener("click", function () { trigPressed('tan('); });
@@ -252,7 +260,10 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('degPopup').addEventListener("click", function (e) {
     setDegMode();
   });
-  document.getElementById('arcPopup').addEventListener("click", function () { setArc; });
+  document.getElementById('arcPopup').addEventListener("click", function () { setArc(); });
+  document.getElementById('invPopup').addEventListener("click", function() {
+    setInverse();
+  })
   document.getElementById('sinPopup').addEventListener("click", function () { trigPressed('sin('); });
   document.getElementById('cosPopup').addEventListener("click", function () { trigPressed('cos('); });
   document.getElementById('tanPopup').addEventListener("click", function () { trigPressed('tan('); });
@@ -364,11 +375,17 @@ if (document.getElementById("mainBody") != null) {
   let accents = getAccents();
   let defaultThemes = getThemes();
   let catalog = getCatalog();
-  for(let acc of accents){
+  let purchaseList = getPurshaseList();
+  for (let acc of accents) {
     document.getElementById(acc.id).style.background = acc.val;
     document.getElementById(acc.id).dataset.color = acc.val;
-    if(acc.id === settings.acc){
+    if (acc.id === settings.acc) {
       document.getElementById(acc.id).className = "accButton active";
+    }
+  }
+  for (let purchase of purchaseList) {
+    if (purchase == "custPurchasable") {
+      unlockCustomTheme();
     }
   }
   document.getElementById(settings.theme).className = "themeElem active";
@@ -402,23 +419,24 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('AboutBack').addEventListener("click", function () {
     universalBack();
   });
-  document.getElementById('buyCustTheme').addEventListener('click', function(){
+  document.getElementById('buyCustTheme').addEventListener('click', function () {
     document.getElementById('buyScreen').style.visibility = "visible";
-    sessionStorage.setItem("facing","buyPageOut");
+    sessionStorage.setItem("facing", "buyPageOut");
 
   });
-  document.getElementById('buyExit').addEventListener('click', function(){
+  document.getElementById('buyExit').addEventListener('click', function () {
     universalBack();
   });
-  document.getElementById('buyButton').addEventListener('click', function(){
+  document.getElementById('buyButton').addEventListener('click', function () {
     unlockCustomTheme();
+    setPurchase('custPurchasable');
     universalBack();
   });
   let accElems = document.getElementsByClassName('accButton');
   for (let item of accElems) {
     item.addEventListener("click", function () {
       let selectAcc = document.getElementsByClassName('accButton active');
-      for(let selc of selectAcc){
+      for (let selc of selectAcc) {
         selc.className = "accButton";
       }
       item.className = "accButton active";
@@ -427,15 +445,21 @@ if (document.getElementById("mainBody") != null) {
   let themeElems = document.getElementsByClassName('themeElem');
   for (let item of themeElems) {
     item.addEventListener("click", function () {
-      if(item.id == "darkMode" || item.id == "lightMode"){
+      let elemID = item.id;
+      if (queryPurchase(elemID)) {
         let selectTheme = document.getElementsByClassName('themeElem active');
-      for(let selc of selectTheme){
-        selc.className = "themeElem";
-      }
-      item.className = "themeElem active";
-      }else{
-        if(queryPurchase(item.i)){
-
+        for (let selc of selectTheme) {
+          selc.className = "themeElem";
+        }
+        item.className = "themeElem active";
+        if (elemID == "custPurchasable") {
+          if (document.getElementById('ColorsDiv').style.visibility != 'visible') {
+            toggleCustTheme();
+          }
+        } else {
+          if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
+            toggleCustTheme();
+          }
         }
       }
     });
@@ -904,11 +928,18 @@ function custFuncExisting(name, duplicates) {
 function funcRemove(e) {
   console.log("helllooooooooo")
   let link = e.target.parentNode
-  console.log(link);
+  let buttonName = link.querySelector("#nameLabel").innerHTML;
   removeFunc(link.querySelector("#nameLabel").innerHTML);
   //Thing that i have to work on
-  document.getElementById('customFuncDisplayGrid').removeChild(link);
-  document.getElementById('custFuncGridPopup').removeChild(link);
+  //document.getElementById('customFuncDisplayGrid').removeChild(link);
+  let names = document.getElementsByClassName("custFuncNames");
+  while (names.length > 0) {
+    if (names[0].innerHTML == buttonName) {
+      let parent = names[0].parentNode;
+      parent.remove();
+    }
+  }
+  //document.getElementById('custFuncGridPopup').removeChild(link);
 }
 function custButton(funcConfig, target) {
   let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
@@ -939,57 +970,71 @@ function custButton(funcConfig, target) {
       funcRemove(e);
     });
     buttonNode.addEventListener('click', function (e) {
-      document.getElementById('extraFuncPopUp').visibility = 'hidden';
-      document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
-      document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
-      document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-      document.getElementById('customFuncDisplay').style.visibility = "hidden";
-      if (type == "Function") {
-          if (!tabOpen(name)) {
-            let tabs = document.getElementsByClassName('tabcontent');
-            for (let i = 0; i < tabs.length; i++) {
-              tabs[i].style.visibility = 'hidden';
-            }
-            newCustFuncTab(funcConfig);
-
-            let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
-            tabClon.getElementById('newTabName').innerHTML = name;
-            tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(funcConfig);
-            if (TextColorGlobal == "#000000") {
-              tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
-            }
-            let highlight = tabClon.getElementById('tabButton');
-            tabClon.getElementById('tabButton').addEventListener("click", function (e) {
-              if (e.target.id != "tabRemove") {
-                if (window.innerWidth / window.innerHeight < 3 / 4) {
-                  changeTabAs(false);
-                }
-                if (e.target != highlight.querySelector("IMG")) {
-                  openElement(highlight)
-                  sessionStorage.setItem("facing", "custFunc");
-                }
-              }
-
-            });
-            tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-              removeCustFunc(e);
-              setNumOfTabs();
-            })
-            document.getElementById('tabContainer').appendChild(tabClon);
-            setNumOfTabs();
-            highlightTab(highlight);
-          }
-        
-      } else if (type = "Code") {
-
-      } else if (type = "Hybrid") {
-
+      let elem = e.target;
+      if(e.target.tagName != "BUTTON"){
+        elem = e.target.parentNode
+      }
+      let funcName = elem.querySelector("#nameLabel").innerHTML;
+      let funcParse = findFuncConfig(name);
+      console.log(funcParse)
+      if (e.target.tagName != "IMG") {
+        createTab(funcParse)
       }
     });
     document.getElementById(target[i]).appendChild(clonClone);
     setNumOfTabs();
   }
 
+}
+function createTab(config) {
+  let name = config.name;
+  let type = config.type;
+  document.getElementById('extraFuncPopUp').visibility = 'hidden';
+  document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
+  document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
+  document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
+  document.getElementById('customFuncDisplay').style.visibility = "hidden";
+  if (type == "Function") {
+    if (!tabOpen(name)) {
+      let tabs = document.getElementsByClassName('tabcontent');
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.visibility = 'hidden';
+      }
+      newCustFuncTab(config);
+
+      let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
+      tabClon.getElementById('newTabName').innerHTML = name;
+      tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
+      if (TextColorGlobal == "#000000") {
+        tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
+      }
+      let highlight = tabClon.getElementById('tabButton');
+      tabClon.getElementById('tabButton').addEventListener("click", function (e) {
+        if (e.target.id != "tabRemove") {
+          if (window.innerWidth / window.innerHeight < 3 / 4) {
+            changeTabAs(false);
+          }
+          if (e.target != highlight.querySelector("IMG")) {
+            openElement(highlight)
+            sessionStorage.setItem("facing", "custFunc");
+          }
+        }
+
+      });
+      tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
+        removeCustFunc(e);
+        setNumOfTabs();
+      })
+      document.getElementById('tabContainer').appendChild(tabClon);
+      setNumOfTabs();
+      highlightTab(highlight);
+    }
+
+  } else if (type = "Code") {
+
+  } else if (type = "Hybrid") {
+
+  }
 }
 function removeCustFunc(event) {
   let tabLink = event.target.parentNode;
@@ -1231,12 +1276,12 @@ function settingExit() {
   let defaultThemes = getThemes();
   let newSettings = settings;
   let selTheme = document.getElementsByClassName("themeElem active")[0];
-  if(selTheme.id == "darkMode" || selTheme.id == "lightMode"){
+  if (selTheme.id == "darkMode" || selTheme.id == "lightMode") {
     newSettings.theme = selTheme.id;
     let selAcc = document.getElementsByClassName("accButton active")[0];
     newSettings.acc = selAcc.id;
-  }else{
-    
+  } else {
+
   }
   //newSettings.oL = document.getElementById("outputLength").value;
   newSettings.gDS = Number(document.getElementById("graphDStep").value);
@@ -1326,9 +1371,10 @@ function newCustFuncTab(config) {
         clon.getElementById('nameFunc').addEventListener("input", function (e) {
           let liveTab = e.target.parentNode;
           let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
-          let newVal = JSON.parse(e.target.parentNode.dataset.tab)
+          let matchPage = matchTab(e.target.parentNode.dataset.tab, true);
+          let newVal = JSON.parse(e.target.parentNode.dataset.tab);
+
           newVal.name = e.target.value;
-          let matchPage = matchTab(currentTab, true);
 
           matchPage.querySelector("#newTabName").innerHTML = e.target.value;
           matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
@@ -1340,13 +1386,14 @@ function newCustFuncTab(config) {
           setSelect(equationDIV, equationDIV.innerHTML.length);
         });
         clon.getElementById('EquationFunc').addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newValue = JSON.parse(liveTab.dataset.tab);
+
           //Test this method with a sup subclass
           console.log("%c EquationFunc input", "color: red;");
           checkVar(varGrid, equationDIV, funcTabs);
-          let liveTab = e.target.parentNode.parentNode;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(currentTab, true);
-          let newValue = JSON.parse(liveTab.dataset.tab);
           newValue.equation = e.target.innerHTML
           equationDIV.dataset.baseE = equationDIV.innerHTML;
           changeFunc(oldVal, newValue, matchPage, liveTab);
@@ -1456,6 +1503,7 @@ function changeFunc(og, newString, tab, page) {
   }
   console.log(funcList);
   setFuncList(funcList);
+  console.log(tab)
   tab.dataset.tabmap = JSON.stringify(newString);
   page.dataset.tab = JSON.stringify(newString);
   updateCustomButtons(og, newString);
@@ -2237,6 +2285,14 @@ function getFuncList() {
   }
   return finalArray;
 }
+function findFuncConfig(name){
+  let funcList = getFuncList();
+  for(let func of funcList){
+    if(func.name == name){
+      return func;
+    }
+  }
+}
 function setFuncList(array) {
   let parseString = "";
   console.log(array);
@@ -2297,7 +2353,7 @@ function setInverse() {
   let text = "";
 
   //sets the text of inv buttons and sets the state value
-  if (invPopup.innerHTML == "inv") {
+  if (document.getElementById('invPopup').innerHTML == "inv") {
     text = "reg"
     state.tS[0] = true;
   } else {
@@ -2315,14 +2371,10 @@ function setInverse() {
       elemText = elemText.substring(1);
     }
     for (let tr of trig) {
-      if (text == 'reg') {
-        if (elemText == tr.inverse) {
-          outText = tr.base;
-        }
-      } else {
-        if (elemText == tr.base) {
-          outText = tr.inverse;
-        }
+      if (elemText == tr.base) {
+        outText = tr.inverse;
+      }else if (elemText == tr.inverse) {
+        outText = tr.base;
       }
     }
     if (arc) {
@@ -2338,7 +2390,7 @@ function setArc() {
   for (let elem of elements) {
     let text = document.getElementById(elem).innerHTML;
     if (!arc) {
-      document.getElementById(elem).innerHTML = "a"+text;
+      document.getElementById(elem).innerHTML = "a" + text;
       state.tS[1] = true;
     } else {
       document.getElementById(elem).innerHTML = text.substring(1);
@@ -2346,7 +2398,7 @@ function setArc() {
     }
   }
 }
-function setDegMode(){
+function setDegMode() {
   let text = "";
   let elements = ['degEx', 'degPopup'];
   if (document.getElementById('degPopup').innerHTML == "deg") {
@@ -2360,12 +2412,12 @@ function setDegMode(){
     document.getElementById(elem).innerHTML = text;
   }
 }
-function setState(){
+function setState() {
   state.eT = document.getElementById('enterHeader').innerHTML;
   let tabs = document.getElementsByClassName('tablinks');
-  for(let tab of tabs){
+  for (let tab of tabs) {
     let tabmap = tab.dataset.tabmap;
-    if(tabmap != "mainTab"){
+    if (tabmap != "mainTab") {
       console.log(tabmap);
       let object = JSON.parse(tabmap);
       state.fO.push(object.name)
@@ -2373,26 +2425,51 @@ function setState(){
   }
   sessionStorage.setItem("state", JSON.stringify(state));
 }
-function queryPurchase(item){
+function queryPurchase(item) {
+  let queryList = getPurshaseList();
+  let defaultPurchases = ["darkMode", "lightMode"];
+  for (let normal of defaultPurchases) {
+    if (normal == item) {
+      return true;
+    }
+  }
+  for (let purchased of queryList) {
+    if (purchased == item) {
+      return true;
+    }
+  }
   return false;
 }
-function setPurchase(name){
-  if(localStorage.getItem('purchased') != undefined){
+function getPurshaseList() {
+  let list = [];
+  if (localStorage.getItem('purchased') != undefined) {
+    list = JSON.parse(localStorage.getItem('purchased')).purchaseList;
+  }
+  return list;
+}
+function setPurchase(name) {
+  if (localStorage.getItem('purchased') != undefined) {
     let purchased = JSON.parse(localStorage.getItem('purchased'));
     purchased.purchaseList.push(name)
     localStorage.setItem('purchased', JSON.stringify(purchased));
-  }else{
-    localStorage.setItem('purchased', JSON.stringify({"purchaseList": [name]}));
+  } else {
+    localStorage.setItem('purchased', JSON.stringify({ "purchaseList": [name] }));
   }
 }
-function unlockCustomTheme(){
+function unlockCustomTheme() {
   document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
   document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
-  document.getElementById('custPurchasable').addEventListener("click", function (){
-    
-  });
 }
-function getCatalog(){
+function toggleCustTheme() {
+  if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
+    document.getElementById('ColorsDiv').style = "visibility: hidden; position: absolute;";
+    document.getElementById('accentColorDiv').style = "visibility: visible; position: relative;";
+  } else {
+    document.getElementById('ColorsDiv').style = "visibility: visible; position: relative;";
+    document.getElementById('accentColorDiv').style = "visibility: hidden; position: absolute;";
+  }
+}
+function getCatalog() {
   return [
     {
       "name": "custTheme",
@@ -2401,29 +2478,29 @@ function getCatalog(){
     }
   ];
 }
-function getThemes(){
+function getThemes() {
   return [
     {
-      "name":"lightMode",
-      "primary":"#ffffff",
-      "secondary":"#dedede",
-      'text':'#000000',
-      'getMth': function (){
-        return ["#ffffff",getColorAcc(settings.acc),"#dedede","#000000"];
+      "name": "lightMode",
+      "primary": "#ffffff",
+      "secondary": "#dedede",
+      'text': '#000000',
+      'getMth': function () {
+        return ["#ffffff", getColorAcc(settings.acc), "#dedede", "#000000"];
       }
     },
     {
-      "name":"darkMode",
-      "primary":"#000000",
-      "secondary":"#1f1f1f",
-      'text':'#FFFFFF',
-      'getMth': function (){
-        return ["#000000",getColorAcc(settings.acc),"#1f1f1f",'#FFFFFF'];
+      "name": "darkMode",
+      "primary": "#000000",
+      "secondary": "#1f1f1f",
+      'text': '#FFFFFF',
+      'getMth': function () {
+        return ["#000000", getColorAcc(settings.acc), "#1f1f1f", '#FFFFFF'];
       }
     }
   ];
 }
-function getAccents(){
+function getAccents() {
   return [
     {
       "id": 'red',
@@ -2455,16 +2532,16 @@ function getAccents(){
     }
   ];
 }
-function getColorAcc(acc){
+function getColorAcc(acc) {
   let accents = getAccents();
-  for(let accent of accents){
-    if(accent.id == acc){
+  for (let accent of accents) {
+    if (accent.id == acc) {
       console.log(`accent is ${accent.val}`);
       return accent.val;
     }
   }
 }
-function setRoot(colorArray){
+function setRoot(colorArray) {
   let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
@@ -2472,14 +2549,14 @@ function setRoot(colorArray){
   rootCss.style.setProperty('--textColor', colorArray[3]);
   TextColorGlobal = colorArray[3];
 }
-function setImages(imgList){
-  for(let img of imgList){
-    if(img.type == "mutiple"){
+function setImages(imgList) {
+  for (let img of imgList) {
+    if (img.type == "mutiple") {
       let elems = document.getElementsByClassName(img.class);
-      for(elem of elems){
+      for (elem of elems) {
         elem.src = img.src;
       }
-    }else{
+    } else {
       document.getElementById(img.id).src = img.src;
     }
   }
