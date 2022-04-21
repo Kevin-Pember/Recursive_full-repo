@@ -18,12 +18,6 @@ for (let theme of themes) {
     setRoot(theme.getMth());
   }
 }
-/*if(){
-
-}
-if(){
-
-}*/
 //Deprecated method for web apps
 /*
 BackgroundColorGlobal = settings.func;
@@ -1264,15 +1258,6 @@ function SettingsBack(tab) {
   }
 }
 function settingExit() {
-  /*localStorage.setItem('displayColor', document.getElementById("DisplayColorPicker").value);
-  localStorage.setItem('funcColor', document.getElementById("FunctionsColorPicker").value);
-  localStorage.setItem('numsColor', document.getElementById("NumbersColorPicker").value);
-  if (document.getElementById('dropbtn').childNodes[0].nodeValue === "Black ") {
-    localStorage.setItem('textColor', "#000000");
-  } else {
-    localStorage.setItem('textColor', "#FFFFFF");
-  }
-  document.location = 'Recursive.html';*/
   let defaultThemes = getThemes();
   let newSettings = settings;
   let selTheme = document.getElementsByClassName("themeElem active")[0];
@@ -1280,10 +1265,17 @@ function settingExit() {
     newSettings.theme = selTheme.id;
     let selAcc = document.getElementsByClassName("accButton active")[0];
     newSettings.acc = selAcc.id;
-  } else {
-
+  } else if(selTheme.id == "custPurchasable"){
+    newSettings.theme = selTheme.id;
+    newSettings.p = document.getElementById("primaryColorPicker").value;
+    newSettings.s = document.getElementById("secondaryColorPicker").value;
+    newSettings.a = document.getElementById("accentColorPicker").value;
+    if(document.getElementById('dropbtn').innerHTML= "Black"){
+      newSettings.t = '#000000';
+    }else{
+      newSettings.t = '#FFFFFF';
+    }
   }
-  //newSettings.oL = document.getElementById("outputLength").value;
   newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
   newSettings.gDMax = Number(document.getElementById("domainTopG").value);
@@ -1298,14 +1290,14 @@ function settingExit() {
   localStorage.setItem("settings", JSON.stringify(newSettings));
   document.location = 'Recursive.html';
 }
-function openNewFunc() {
+/*function openNewFunc() {
   if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
     document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
   } else {
     document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideLeft";
     document.getElementById('newFunctionsPage').style.visibility = "visible";
   }
-}
+}*/
 function backMoreFunction() {
   if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
     document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
@@ -1314,6 +1306,7 @@ function backMoreFunction() {
     document.location = 'Recursive.html';
   }
 }
+//needs work because deprecatiated
 function updatePreview(event) {
   if (event.target.id == "DisplayColorPicker") {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
@@ -1876,7 +1869,7 @@ function containsValue(fullInput, checkValue, parPos, contain) {
     return false;
   }
 }
-function newTheme() {
+/*function newTheme() {
   let numThemes = document.getElementsByClassName('theme').length - 3;
   let textColor;
   if (document.getElementById("dropbtn").innerHTML == "White <h3 id='displayText' style='color: white;'>t</h3>") {
@@ -2098,7 +2091,7 @@ function storedThemes() {
   }
   console.log("Stored Themes are " + custThemesRaw);
   return custThemesRaw;
-}
+}*/
 function helpTabChange(name) {
   var tabs = document.getElementsByClassName("settingTabContent");
   if (window.innerWidth / window.innerHeight > 3 / 4) {
