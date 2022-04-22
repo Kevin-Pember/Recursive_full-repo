@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/services.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 void main() {
   runApp(const MyApp());
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.purple,
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -30,19 +36,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  late WebViewPlusController _controller;
 
   @override
   Widget build(BuildContext context) {
+    
+
     return Scaffold(
-      body: WebView(
-        initialUrl: 'https://flutter.dev',
+      body: SafeArea(
+        child: WebViewPlus(
+          initialUrl: 'about:blank',
+          javascriptMode: JavascriptMode.unrestricted,
+          
+          onWebViewCreated: (controller){
+            controller.loadUrl('assets/localWeb/Recursive.html');
+          },
+        ),
       ),
     );
   }

@@ -1,0 +1,35 @@
+<html>
+
+        <head>
+                <link rel="icon" href="Images/mainIcon.png">
+                <title> Recursive </title>
+                <link rel="stylesheet" href="stylesheets.css">
+                <script src="Main.js"></script>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/expr-eval@2.0.2/dist/bundle.min.js"></script>
+        </head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+        <body id="moreFunctionsBody" onload="custFuncLoad()">
+                <img id="backIconFunc" onclick="backMoreFunction()" src="Images/MoreFuncArrowWhite.svg"
+                        width="40" height="40">
+                <input type="text" class="textInputTop" id="searchArea" placeholder="Search">
+                <div id="funcGrid">
+                        <button class="clearModifiers" onmousedown="preventFocus()" onclick="openNewFunc()"><img
+                                        src="Images/addObjectWhite.svg" width="40" height="40" id="addIcon"></button>
+                        <button class="clearModifiers" id="minusButton" onmousedown="preventFocus()"><img
+                                        src="Images/minusIconWhite.svg" width="40" height="40" id="minusIcon"></button>
+                        <template class="customFuncTemplate">
+                                <button class="customFuncLinks" onclick() id="customFuncButton">
+                                        <h2>Equation</h2>New Function
+                                </button>
+                        </template>
+                </div>
+                <div id="newFunctionsPage">
+                        <input type="text" class="textInputTop" id="nameArea" placeholder="Name">
+                        <textarea id="equationArea" placeholder="Equation"></textarea>
+                        <button id="newFunction" onclick="customFunctionPress()">+</button>
+                </div>
+        </body>
+
+        </html>
