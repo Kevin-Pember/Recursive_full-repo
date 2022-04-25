@@ -2,7 +2,7 @@ let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let state = {};
 var settings;
-console.log(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+console.log();
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log("settings got");
@@ -94,10 +94,10 @@ if (document.getElementById("mainBody") != null) {
     for (let item of funcAry) {
       createTab(findFuncConfig(item))
     }
-    if(state.tS[0]){
+    if (state.tS[0]) {
       setInverse();
     }
-    if(state.tS[1]){
+    if (state.tS[1]) {
       setArc();
     }
   }
@@ -255,7 +255,7 @@ if (document.getElementById("mainBody") != null) {
     setDegMode();
   });
   document.getElementById('arcPopup').addEventListener("click", function () { setArc(); });
-  document.getElementById('invPopup').addEventListener("click", function() {
+  document.getElementById('invPopup').addEventListener("click", function () {
     setInverse();
   })
   document.getElementById('sinPopup').addEventListener("click", function () { trigPressed('sin('); });
@@ -965,7 +965,7 @@ function custButton(funcConfig, target) {
     });
     buttonNode.addEventListener('click', function (e) {
       let elem = e.target;
-      if(e.target.tagName != "BUTTON"){
+      if (e.target.tagName != "BUTTON") {
         elem = e.target.parentNode
       }
       let funcName = elem.querySelector("#nameLabel").innerHTML;
@@ -1265,14 +1265,14 @@ function settingExit() {
     newSettings.theme = selTheme.id;
     let selAcc = document.getElementsByClassName("accButton active")[0];
     newSettings.acc = selAcc.id;
-  } else if(selTheme.id == "custPurchasable"){
+  } else if (selTheme.id == "custPurchasable") {
     newSettings.theme = selTheme.id;
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
-    if(document.getElementById('dropbtn').innerHTML= "Black"){
+    if (document.getElementById('dropbtn').innerHTML = "Black") {
       newSettings.t = '#000000';
-    }else{
+    } else {
       newSettings.t = '#FFFFFF';
     }
   }
@@ -2278,10 +2278,10 @@ function getFuncList() {
   }
   return finalArray;
 }
-function findFuncConfig(name){
+function findFuncConfig(name) {
   let funcList = getFuncList();
-  for(let func of funcList){
-    if(func.name == name){
+  for (let func of funcList) {
+    if (func.name == name) {
       return func;
     }
   }
@@ -2344,7 +2344,7 @@ function setInverse() {
   let invButtons = ['invPopup', 'invEx'];
   let arc = false;
   let text = "";
-  if(document.getElementById('sinPopup').innerHTML.substring(0,1) == "a"){
+  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
     arc = true;
   }
   //sets the text of inv buttons and sets the state value
@@ -2368,7 +2368,7 @@ function setInverse() {
     for (let tr of trig) {
       if (elemText == tr.base) {
         outText = tr.inverse;
-      }else if (elemText == tr.inverse) {
+      } else if (elemText == tr.inverse) {
         outText = tr.base;
       }
     }
@@ -2382,7 +2382,7 @@ function setArc() {
   let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
   let invButtons = ['arcPopup', 'arcEx'];
   let arc = false;
-  if(document.getElementById('sinPopup').innerHTML.substring(0,1) == "a"){
+  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
     arc = true;
   }
   for (let elem of elements) {
@@ -2498,6 +2498,15 @@ function getThemes() {
     }
   ];
 }
+function getColors() {
+  console.log("you dick")
+  let themes = getThemes();
+  for (let theme of themes) {
+    if (theme.name == settings.theme) {
+      return theme.getMth();
+    }
+  }
+}
 function getAccents() {
   return [
     {
@@ -2546,6 +2555,9 @@ function setRoot(colorArray) {
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
   TextColorGlobal = colorArray[3];
+  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    colorMessager.postMessage(colorArray[0]);
+  }
 }
 function setImages(imgList) {
   for (let img of imgList) {
