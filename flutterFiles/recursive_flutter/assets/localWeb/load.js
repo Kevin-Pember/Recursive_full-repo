@@ -167,14 +167,11 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('MAddOverlay').addEventListener("click", function () {
     document.getElementById('memoryTextBoarder').style.visibility = "visible";
     let enteredText = document.getElementById('enterHeader').innerHTML;
-    var mySolver = new Solver({
-      s: solveInpr(enteredText, true),
-    })
-    document.getElementById('memoryText').innerHTML = mySolver.solve({})["s"];
+    document.getElementById('memoryText').innerHTML = inputSolver(enteredText, "error adding to memory");
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); console.log(window.devicePixelRatio); });
+  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); report("1 Pressed",true); console.log(window.devicePixelRatio); });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { document.location = 'moreFunctions.html'; });
@@ -492,6 +489,17 @@ function degRadSwitch(mode) {
   } else {
     document.getElementById('radModeBut').className = "settingsButton active";
   }
+}
+function inputSolver(equation,errorStatement){
+  equation = solveInpr(equation,state.dR)
+  try{
+    var mySolver = new Solver({
+      s: equation,
+    })
+      return mySolver.solve({})["s"];
+    }catch(e){
+      report(errorStatement,false);
+    }
 }
 function createFunc(type) {
   let name = document.getElementById('nameEntryArea').value;
@@ -1053,31 +1061,27 @@ function tabOpen(name) {
 }
 function enterPressed(input) {
   let display = document.getElementById('enterHeader');
-  historyMethod(input);
-  input = solveInpr(input, state.dR);
-  console.log("Equation after interpeter " + input);
-  var mySolver = new Solver({
-    s: input,
-  })
-  display.innerHTML = mySolver.solve({})["s"];
+  let nonparse = input;
+  display.innerHTML = inputSolver(input,"Couldn't calculate");
+  historyMethod(nonparse)
   document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
   setSelect(display.childNodes[display.childNodes.length - 1], display.childNodes[display.childNodes.length - 1].length);
 }
 function historyMethod(equation) {
+  console.log(document.getElementsByClassName("historyDateHeader"));
   let historyHeader = document.getElementById('historyHeader');
-  let interpetedEquat = solveInpr(equation, settings.degRad);
-  console.log("%cEquation after interpeter " + interpetedEquat, "color: #00ff00");
-  var mySolver = new Solver({
-    s: interpetedEquat,
-  })
-  let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3>" + equation + "=" + mySolver.solve({})["s"] + "<br> <br> ";
+  let solved = inputSolver(equation,"Couldn't Calculate")
+  /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
   let dates = document.getElementsByClassName('historyDateHeader');
-  if (dates.length == 0) {
-    exportedValue = "<h3 class='historyDateHeader'>" + getDate() + "</h3> <br>" + exportedValue;
-  } else if (dates[dates.length - 1].innerHTML != getDate()) {
-    exportedValue = "<h3 class='historyDateHeader'>" + getDate() + "</h3> <br>" + exportedValue;
+  if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
+    let clon = document.getElementsByClassName("historyDateTemp")[0].content.cloneNode(true);
+    clon.getElementById('header').innerHTML = getDate();
+    historyHeader.appendChild(clon);
   }
-  historyHeader.innerHTML = historyHeader.innerHTML + exportedValue;
+  let clon = document.getElementsByClassName("historyHeaders")[0].content.cloneNode(true);
+  clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
+  clon.getElementById('previousEquation').innerHTML = equation + "=" + inputSolver(equation);
+  historyHeader.appendChild(clon);
   localStorage.setItem("historyOut", historyHeader.innerHTML);
 }
 function getTime() {
@@ -1396,7 +1400,7 @@ function newCustFuncTab(config) {
         try {
           parseVariables(varGrid, equationDIV, funcTabs);
         } catch (e) {
-
+          report("Couldn't Calculate",false);
         }
         break;
       case ("Hybrid"):
@@ -1477,7 +1481,7 @@ function defaultSetup(clon) {
       try {
         parseVariables(varGrid, equationDIV, funcTabs);
       } catch (e) {
-
+        report("Couldn't Calculate",false);
       }
 
     });
@@ -1612,12 +1616,12 @@ function parseVariables(element, equationDIV, funcTabs) {
 }
 function solveEquation(parsedEquation, funcTabs) {
   console.log("Parsed Equation is " + parsedEquation);
-  let fullyParsed = solveInpr(parsedEquation, state.dR);
+  /*let fullyParsed = solveInpr(parsedEquation, state.dR);
   console.log("%c parsedEquation post op: " + fullyParsed, "color:green");
   var mySolver = new Solver({
     s: fullyParsed,
-  })
-  let result = "=" + mySolver.solve({})["s"];
+  })*/
+  let result = "=" + inputSolver(parsedEquation, "Couldn't Calculate");
   console.log("%c result: " + result, "color:green");
   funcTabs[0].querySelector('#equalsHeader').innerHTML = result;
 }
@@ -1646,13 +1650,13 @@ function solveTable(parsedEquation, data) {
     let loopEqua = parsedEquation;
     newData.Value = "" + currentVal;
     console.log(newData.Value)
-    loopEqua = solveInpr(parseVar(loopEqua, newData), settings.degRad);
+    /*loopEqua = solveInpr(parseVar(loopEqua, newData), settings.degRad);
     console.log(loopEqua)
     console.log("pared is " + parseVar(loopEqua, newData));
     var mySolver = new Solver({
       s: loopEqua,
-    });
-    result = mySolver.solve({})["s"];
+    });*/
+    result = inputSolver(parseVar(loopEqua, newData), "Error Making Table");
     var newRow = document.getElementById('funcTable').insertRow(i);
     var newXCell = newRow.insertCell(0);
     var newYCell = newRow.insertCell(1);
@@ -1792,306 +1796,6 @@ function varInEquat(equation) {
   console.log(varArray);
   return varArray;
 }
-/*function findVar(equation, clon, varGrid, equationArea,funcTabs) {
-  console.log("Find Var Start");
-  for (let i = 0; i < equation.length; i++) {
-    if (equation.charCodeAt(i) > 92 && equation.charCodeAt(i) < 123) {
-      if (isVar(equation.substring(i)) === 0) {
-        existingVars = varGrid.getElementsByClassName("variableContainer")
-        varExists = false;
-        for (var j = 0; j < existingVars.length; j++) {
-          if (existingVars[j].querySelector('h3').innerHTML == equation.charAt(i)) {
-            varExists = true;
-          }
-        }
-        if (!varExists) {
-          let tempvar = document.getElementsByClassName("variableTemplate")[0];
-          let varClon = tempvar.content.cloneNode(true);
-          varClon.getElementById('variableName').innerHTML = equation.charAt(i);
-          varClon.getElementById('variableEntry').addEventListener('input', function (e) {
-            if(varClon.getElementById('variableEntry') != ''){
-              clon.getElementById('EquationFunc').innerHTML = setVar(varGrid, equation);
-              parseVariables(varGrid, equation,funcTabs);
-            }
-          });
-          varGrid.appendChild(varClon)
-        }
-      } else {
-        i += isVar(equation.substring(i)) - 1;
-      }
-    }
-  }
-}*/
-function isVar(entry) {
-  console.log("%cIs Var Start", "color: green");
-  let func = funcMatch(entry);
-  if (func != "") {
-    if (getByName(func) != null) {
-      let object = getByName(func);
-      console.log("Object: " + object.name);
-      return object.funcLength;
-    } else {
-      console.log(func)
-      return func.length
-    }
-  } else {
-    return 0;
-  }
-}
-function setVar(element, equation) {
-  console.log("Parse Variables ran");
-  let varData = varListAssbely(element);
-  console.log("%c parsedEquation: " + equation, "color:red");
-  for (let data of varData) {
-    for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i)) != "") {
-        i += funcMatch(equation.substring(i)).length;
-      } else if (equation.charAt(i) == data.Name) {
-        if (data.Value != "") {
-          equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
-        }
-      }
-    }
-  }
-
-  console.log(varData)
-  return equation;
-}
-function containsValue(fullInput, checkValue, parPos, contain) {
-  if (fullInput.length - 1 > contain - parPos && parPos >= 0) {
-    if (fullInput.substring(parPos, contain) == checkValue) {
-      return true;
-    } else {
-      return false;
-    }
-
-  } else {
-    return false;
-  }
-}
-/*function newTheme() {
-  let numThemes = document.getElementsByClassName('theme').length - 3;
-  let textColor;
-  if (document.getElementById("dropbtn").innerHTML == "White <h3 id='displayText' style='color: white;'>t</h3>") {
-    textColor = "#ffffff";
-  } else {
-    textColor = "#000000";
-  }
-  createTheme(document.getElementById("DisplayColorPicker").value, document.getElementById("NumbersColorPicker").value, document.getElementById("FunctionsColorPicker").value, textColor, "New Theme", true);
-  let h3 = document.getElementsByClassName('theme')[document.getElementsByClassName('theme').length - 1].querySelector('h3');
-  if (h3 != null) {
-    let sel = window.getSelection();
-    let range = document.createRange();
-    range.setStart(h3.childNodes[0], h3.childNodes[0].nodeValue.length);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-  document.getElementById('ThemesDiv').scrollLeft = document.getElementById('ThemesDiv').scrollWidth;
-  localStorage.setItem('theme' + numThemes, document.getElementById("DisplayColorPicker").value + "»" + document.getElementById("NumbersColorPicker").value + "»" + document.getElementById("FunctionsColorPicker").value + "»" + textColor + "»" + "New Theme" + "»");
-  numThemes++;
-}
-function createTheme(displayColor, numbersColor, functionsColor, textColor, themeName, editable) {
-  let temp = document.getElementsByClassName("themeTemplate")[0];
-  let clon = temp.content.cloneNode(true);
-  let exist = false;
-  let existing = document.getElementsByClassName("displayBaseThemeType");
-  for (i = 0; i < existing.length; i++) {
-    if (rgbToHex(existing[i].style.backgroundColor) == displayColor && rgbToHex(existing[i].getElementById("numsDisplayBase").style.backgroundColor) == numbersColor && rgbToHex(existing[i].getElementById("functionsDisplayBase").style.backgroundColor) == functionsColor && rgbToHex(existing[i].getElementById("textDisplayBase").style.color) == textColor) {
-      exist = true;
-      break;
-    }
-  }
-  if (!exist) {
-    clon.getElementById("themesDisplayBase").style.backgroundColor = displayColor;
-    clon.getElementById("numsDisplayBase").style.backgroundColor = numbersColor;
-    clon.getElementById("functionsDisplayBase").style.backgroundColor = functionsColor;
-    clon.getElementById("textDisplayBase").style.color = textColor;
-    clon.getElementById("themeName").innerHTML = themeName;
-    clon.getElementById('themeRadio').addEventListener("click", function (e) { themeRadioPressed(e.target) })
-    clon.getElementById('removeButton').addEventListener("click", function (e) { removeStoredTheme(e.target) });
-    if (localStorage.getItem('textColor') == "#000000") {
-      clon.getElementById("removeButton").src = "Images/xIcon.svg";
-    }
-    let themes = document.getElementsByClassName('theme');
-    if (themes.length > 4 && themes[4].querySelector('img').style.visibility == "visible") {
-      clon.getElementById("removeButton").style.visibility = "visible";
-    }
-    clon.getElementById("themeName").setAttribute("contenteditable", editable);
-    if (editable) {
-      clon.getElementById("themeName").addEventListener('keyup', titleEdit);
-    }
-    document.getElementById("ThemesDiv").appendChild(clon);
-  }
-}
-function themeRadioPressed(elem) {
-  let tempRadio = document.getElementsByClassName('radio')
-  for (let i = 0; i < tempRadio.length; i++) {
-    if (tempRadio[i] != elem) {
-      tempRadio[i].checked = false;
-    }
-  }
-  let displayBase = elem.parentNode.parentNode.querySelector("div");
-  let textBase = displayBase.childNodes[1];
-  let numsBase = displayBase.childNodes[3];
-  let funcsBase = displayBase.childNodes[5];
-  console.log(displayBase.style.backgroundColor + " , " + textBase.style.color + " , " + numsBase.style.backgroundColor + " , " + funcsBase.style.backgroundColor);
-  document.getElementById('DisplayColorPicker').value = rgbToHex(displayBase.style.backgroundColor);
-  document.getElementById('displayPreview').style.backgroundColor = displayBase.style.backgroundColor;
-  document.getElementById('NumbersColorPicker').value = rgbToHex(numsBase.style.backgroundColor);
-  document.getElementById('numsPreview').style.backgroundColor = numsBase.style.backgroundColor;
-  document.getElementById('FunctionsColorPicker').value = rgbToHex(funcsBase.style.backgroundColor);
-  document.getElementById('funcPreview').style.backgroundColor = funcsBase.style.backgroundColor;
-  if (rgbToHex(textBase.style.color) == "#000000") {
-    document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
-  } else {
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-  }
-  document.getElementById("showcaseTextColor").style.color = textBase.style.color;
-}
-function removeThemes() {
-  let themes = document.getElementsByClassName('theme');
-  if (themes[4].querySelector('img').style.visibility != "visible") {
-    for (let i = 4; i < themes.length; i++) {
-      themes[i].querySelector('img').style.visibility = "visible";
-    }
-  } else {
-    for (let i = 4; i < themes.length; i++) {
-      themes[i].querySelector('img').style.visibility = "hidden";
-    }
-  }
-}
-function removeStoredTheme(elem) {
-  let nameBase = elem.parentNode.querySelector("h3");
-  let displayBase = elem.parentNode.querySelector("div");
-  let textBase = displayBase.childNodes[1];
-  let numsBase = displayBase.childNodes[3];
-  let funcsBase = displayBase.childNodes[5];
-  let rawThemes = storedThemes();
-  for (let j = 0; j < rawThemes.length; j++) {
-    let found = true;
-    try {
-      console.log('theme' + (j + 1) + " vs. " + nameBase.innerHTML);
-      themeRaw = rawThemes[j];
-      let displayColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(displayBase.style.backgroundColor) != displayColor) {
-        console.log("breaking at " + rgbToHex(displayBase.style.backgroundColor) + " vs " + displayColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let numsColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(numsBase.style.backgroundColor) != numsColor) {
-        console.log("breaking at " + rgbToHex(numsBase.style.backgroundColor) + " vs " + numsColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let funcColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(funcsBase.style.backgroundColor) != funcColor) {
-        console.log("breaking at " + rgbToHex(funcsBase.style.backgroundColor) + " vs " + funcColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let textColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(textBase.style.color) != textColor) {
-        console.log("breaking at " + rgbToHex(textBase.style.color) + " vs " + textColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let themeName = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (nameBase.innerHTML != themeName) {
-        console.log("breaking at " + themeName);
-        found = false;
-      }
-    } catch (err) {
-      console.log(err);
-      break;
-    }
-    if (found) {
-      let rawextThemes = storedThemes();
-      localStorage.removeItem("theme" + (j + 1));
-      if (localStorage.getItem("theme" + (j + 2)) != null) {
-        for (let k = j + 2; k != -1; k++) {
-          if (localStorage.getItem("theme" + (k)) != null) {
-            localStorage.setItem("theme" + (k - 1), localStorage.getItem("theme" + k));
-            localStorage.removeItem("theme" + k);
-          } else {
-            break;
-          }
-        }
-      }
-      let themeContainer = elem.parentNode.parentNode;
-      themeContainer.removeChild(elem.parentNode);
-    }
-  }
-
-}
-function titleEdit(e) {
-  let rawThemes = storedThemes();
-  console.log(e.target.parentNode);
-  let displayBase = e.target.parentNode.querySelector("div");
-  let textBase = displayBase.childNodes[1];
-  let numsBase = displayBase.childNodes[3];
-  let funcsBase = displayBase.childNodes[5];
-  for (let j = 0; j < rawThemes.length; j++) {
-    let found = true;
-    try {
-      themeRaw = rawThemes[j];
-      let displayColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(displayBase.style.backgroundColor) != displayColor) {
-        console.log("breaking at " + displayColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let numsColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(numsBase.style.backgroundColor) != numsColor) {
-        console.log("breaking at " + numsColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let funcColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(funcsBase.style.backgroundColor) != funcColor) {
-        console.log("breaking at " + funcColor);
-        found = false;
-      }
-      themeRaw = themeRaw.substring(themeRaw.indexOf("»") + 1);
-      let textColor = themeRaw.substring(0, themeRaw.indexOf("»"));
-      if (rgbToHex(textBase.style.color) != textColor) {
-        console.log("breaking at " + rgbToHex(textBase.style.color));
-        found = false;
-      }
-    } catch (err) {
-      console.log(err);
-      break;
-    }
-    if (found) {
-      let rawextThemes = storedThemes();
-      let beforeValue = localStorage.getItem("theme" + (j + 1));
-      let afterValue;
-      for (let i = beforeValue.length - 1; i > 0; i--) {
-        if (i == beforeValue.length - 1 && beforeValue.charAt(i) == "»") {
-          console.log("This is start of parse " + beforeValue.substring(0, i))
-        } else if (beforeValue.charAt(i) == "»") {
-          afterValue = beforeValue.substring(0, i + 1) + e.target.innerHTML + "»";
-          break;
-        }
-      }
-      console.log(afterValue);
-      localStorage.setItem("theme" + (j + 1), afterValue)
-    }
-  }
-}
-function storedThemes() {
-  let custThemesRaw = [];
-  for (let i = 1; i != -1; i++) {
-    if (localStorage.getItem('theme' + i) != null) {
-      custThemesRaw[i - 1] = localStorage.getItem('theme' + i);
-    } else {
-      break;
-    }
-  }
-  console.log("Stored Themes are " + custThemesRaw);
-  return custThemesRaw;
-}*/
 function helpTabChange(name) {
   var tabs = document.getElementsByClassName("settingTabContent");
   if (window.innerWidth / window.innerHeight > 3 / 4) {
@@ -2555,9 +2259,9 @@ function setRoot(colorArray) {
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
   TextColorGlobal = colorArray[3];
-  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+  /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
-  }
+  }*/
 }
 function setImages(imgList) {
   for (let img of imgList) {
@@ -2570,4 +2274,23 @@ function setImages(imgList) {
       document.getElementById(img.id).src = img.src;
     }
   }
+}
+function report(message, meaning){
+  console.log("report")
+  let consoleD = document.getElementById("popupConsole");
+  consoleD.innerHTML = message;
+  consoleD.style.visibility = "visible";
+  consoleD.style.animation = "1.5s ease-in 0s 1 normal forwards running slideToUpFromBottom";
+  let width = consoleD.width/2;
+  let vw = window.innerWidth;
+  consoleD.style.left = vw - width + "px";
+  if(meaning){
+    consoleD.style.backgroundColor = "#71ec71";
+  }else {
+    consoleD.style.backgroundColor = "#f74646";
+  }
+  setTimeout(function(){
+    consoleD.style.animation = null;
+    consoleD.style.visibility = "hidden";
+  }, 1500);
 }

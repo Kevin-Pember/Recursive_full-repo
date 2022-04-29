@@ -65,7 +65,8 @@ input:focus, #EquationFunc:focus, select:focus{
   height: 35px;
   width: 100%;
   display: inline-flex;
-  z-index: 1;
+  z-index: 2;
+  background-color: var(--functionsColor);
 }
 #mobileTabs{
   visibility: hidden;
@@ -266,6 +267,9 @@ button:focus, input[type="button"]:focus {
   }
   #historyTimeSubHeader{
     font-size: 15px;
+    color: var(--functionsColor);
+  }
+  #previousEquation{
     color: var(--functionsColor);
   }
   #enterHeader{
@@ -531,6 +535,22 @@ button:focus, input[type="button"]:focus {
     background-color: var(--functionsColor);
     position: relative;
     z-index: 1;
+  }
+  #popupConsole{
+    visibility: visible;
+    height: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 15px;
+    font-size: 25px;
+    top: 0;
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
   }
   #customFuncDisplay::-webkit-scrollbar {
     width: 2vh;
@@ -866,6 +886,20 @@ button:focus, input[type="button"]:focus {
     }
     100% {
       left: 150px
+    }
+  }
+  @keyframes slideToUpFromBottom{
+    0%{
+      top: 0%;
+    }
+    6.5217%{
+      top: 80px;
+    }
+    93.478%{
+      top: 80px;
+    }
+    100%{
+      top: 0%;
     }
   }
   @keyframes sveForSwitch{

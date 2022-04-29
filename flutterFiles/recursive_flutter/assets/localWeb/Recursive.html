@@ -102,13 +102,27 @@
         </div>
         <img id="settingsCogIcon" src="Images/SettingsCogWhite.svg" height="100%" name="Open Settings">
     </div>
+    <h1 id="popupConsole">
+    </h1>
     <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
         <div id="displayClip">
             <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things" autocorrect="off">
-                <h3 contenteditable="false" id="historyHeader"></h3>
+                <h3 contenteditable="false" id="historyHeader">
+                </h3>
+                <template class="historyDateTemp">
+                    <h3 class='historyDateHeader' id="header"></h3>
+                    <br>
+                </template>
+                <template class="historyHeaders">
+                    <h3 id='historyTimeSubHeader'></h3>
+                    <h4 id='previousEquation'></h4>
+                    <br> 
+                    <br>
+                </template>
                 <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled>‎</h2>
             </div>
         </div>
+        
         <div id="overlayDiv">
             <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
                 <div class="matchCircle">

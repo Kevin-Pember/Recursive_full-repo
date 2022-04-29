@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.purple,
-  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -40,28 +39,14 @@ var webController;
 
 class _MyHomePageState extends State<MyHomePage> {
   late WebViewPlusController _controller;
-  
+
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-      resizeToAvoidBottomInset : false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: WebViewPlus(
-          initialUrl: 'about:blank',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (controller) {
-            controller.loadUrl('assets/localWeb/Recursive.html');
-            webController = controller;
-          },
-          javascriptChannels: Set.from([
-            JavascriptChannel(
-                name: 'colorMessager',
-                onMessageReceived: (JavascriptMessage message) {
-                  final Color color = HexColor(message.message);
-                  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: color,));
-                })
-          ]),
+        child: InAppWebView(
+          initialFile: "assets/localWeb/Recursive.html",
         ),
       ),
     );
