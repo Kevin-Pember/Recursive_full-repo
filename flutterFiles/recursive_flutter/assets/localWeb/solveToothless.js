@@ -127,7 +127,9 @@ function solveInpr(equation, degRad) {
       );
       let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
       let funcTemp = findMethod(func, degRad);
+      console.log(`functemp ${funcTemp}`)
       let parsedFunc = assembly(func, funcTemp, values);
+      console.log(`Parsed func is ${parsedFunc}`)
       equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
       i = i + parsedFunc.length - 1;
     }
@@ -161,8 +163,10 @@ function funcMatch(equation) {
   return "";
 }
 //A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
-function findMethod(func, degRad) {
+function findMethod(funcUn, degRad) {
+  let func = JSON.parse(JSON.stringify(funcUn));
   let array = func.funcParse;
+  console.log(`%cfunc Parse ${array}`,"color: blue")
   if (func.funcRadDeg) {
     if (degRad) {
       if (array.includes("toDeg")) {
@@ -172,9 +176,9 @@ function findMethod(func, degRad) {
       }
     } else {
       if (array.includes("toDeg")) {
-        array.splice(func.funcParse.indexOf("toDeg"), 1, "");
+        array.splice(func.funcParse.indexOf("toDeg"), 1);
       } else {
-        array.splice(func.funcParse.indexOf("toRad"), 1, "");
+        array.splice(func.funcParse.indexOf("toRad"), 1);
       }
     }
   }

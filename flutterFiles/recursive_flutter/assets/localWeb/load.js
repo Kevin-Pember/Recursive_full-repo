@@ -29,6 +29,7 @@ for (var i = 0; i < allMetaElements.length; i++) {
   }
 }*/
 if (document.getElementById("mainBody") != null) {
+  console.log(createParseable("8+v+9*9"))
   /*let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', settings.display);
   rootCss.style.setProperty('--numbersColor', settings.nums);
@@ -107,6 +108,7 @@ if (document.getElementById("mainBody") != null) {
     switch (funcObject.type) {
       case "Function":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        
         break;
       case "Code":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
@@ -491,7 +493,7 @@ function degRadSwitch(mode) {
   }
 }
 function inputSolver(equation,errorStatement){
-  equation = solveInpr(equation,state.dR)
+  equation = solveInpr(equation,settings.degRad)
   try{
     var mySolver = new Solver({
       s: equation,
@@ -1746,7 +1748,7 @@ function checkVar(varGrid, equationArea, funcTabs) {
   for (let eVar of varEquation) {
     matching = false;
     for (let cVar of varExisting) {
-      if (eVar == cVar.name) {
+      if (eVar.letter == cVar.name) {
         let indexOfVar = varExisting.indexOf(cVar);
         varExisting.splice(indexOfVar, 1);
         matching = true;
@@ -1754,7 +1756,7 @@ function checkVar(varGrid, equationArea, funcTabs) {
       }
     }
     if (!matching) {
-      newVars.push(eVar);
+      newVars.push(eVar.letter);
     }
   }
   for (let oldVar of varExisting) {
@@ -1783,18 +1785,44 @@ function varInEquat(equation) {
   for (let i = 0; i < equation.length; i++) {
     if (equation.charCodeAt(i) > 92 && equation.charCodeAt(i) < 123) {
       if (isVar(equation.substring(i)) === 0) {
-        if (!varArray.includes(equation.substring(i, i + 1))) {
-          varArray.push(equation.substring(i, i + 1));
+        if (varInList(varArray,equation.substring(i, i+1)) == null) {
+          varArray.push(
+            {
+              "letter": equation.substring(i, i + 1),
+              "positions": [i]
+            }
+          );
+        }else{
+          let func = varInList(varArray,equation.substring(i, i+1));
+          func.positions.push(i);
         }
       } else {
         i += isVar(equation.substring(i));
       }
     }
   }
-  console.log("VarInEquat equtaion: " + equation);
-
-  console.log(varArray);
   return varArray;
+}
+function varInList(list, varLetter){
+  for(let item of list){
+    if(item.letter == varLetter){
+      return item;
+    }
+  }
+  return null;
+}
+function isVar(entry) {
+  let func = funcMatch(entry);
+  if(func != ""){
+    if(getByName(func) != null){
+      let object = getByName(func);
+      return object.funcLength;
+    }else {
+      return func.length
+    }
+  }else{
+    return 0;
+  }
 }
 function helpTabChange(name) {
   var tabs = document.getElementsByClassName("settingTabContent");
@@ -1959,6 +1987,7 @@ function getFuncList() {
         funcJSON.name = func.substring(0, func.indexOf('»'));
         func = func.substring(func.indexOf('»') + 1);
         funcJSON.equation = func.substring(0, func.indexOf('»'));
+
         break;
       case "H":
         funcJSON.type = "Hybrid";
@@ -1981,6 +2010,50 @@ function getFuncList() {
     finalArray.push(funcJSON);
   }
   return finalArray;
+}
+function createParseable(equation){
+  let equationArray = [];
+  let variablesInOrder = [];
+  let varArray = varInEquat(equation);
+  for(let i = 0; i < varArray.length; i++){
+    varArray[i].letter = "v" + (i+1);
+  }
+  console.log(varArray);
+  variablesInOrder.push({"name": varArray[0].letter, "index": varArray[0].positions[0]});
+  varArray.shift();
+  for(item of varArray){
+    for(let postion of item.positions){
+      for(let j = variablesInOrder.length-1; j >= 0; j--){
+        console.log(`${postion} vs. ${variablesInOrder[j].index} and ${postion > variablesInOrder[j].index}`)
+        if(postion > variablesInOrder[j].index){
+          variablesInOrder.splice(j+1, 0, {"name": item.letter, "index": postion});
+          break;
+        }
+      }
+    }
+  }
+  console.log(variablesInOrder)
+  for(let i = 0; i < variablesInOrder.length; i++){
+    let index = variablesInOrder[i].index;
+    let pre = "";
+    let vard = "";
+    if(i == 0){
+      pre = equation.substring(0,index);
+      vard = variablesInOrder[i].name;
+    }else{
+      let prevIndex = variablesInOrder[i-1].index;
+      pre = equation.substring(prevIndex+1, index);
+      vard = variablesInOrder[i].name;
+    }
+    if(pre != ""){
+      equationArray.push(pre);
+    }
+    equationArray.push(vard);
+    if(i == variablesInOrder.length-1 && equation.substring(index+1) != ''){
+      equationArray.push(equation.substring(index+1));
+    }
+  }
+  return equationArray;
 }
 function findFuncConfig(name) {
   let funcList = getFuncList();

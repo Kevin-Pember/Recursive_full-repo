@@ -46,7 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: InAppWebView(
-          initialFile: "assets/localWeb/Recursive.html",
+          onWebViewCreated: (controller) {
+            controller.loadFile(assetFilePath: "assets/localWeb/Recursive.html");
+          },
+          
         ),
       ),
     );
