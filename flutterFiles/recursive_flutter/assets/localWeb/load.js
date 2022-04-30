@@ -12,10 +12,12 @@ if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
+let themeElem = {};
 let themes = getThemes();
 for (let theme of themes) {
   if (theme.name == settings.theme) {
     setRoot(theme.getMth());
+    themeElem = theme;
   }
 }
 //Deprecated method for web apps
@@ -30,11 +32,6 @@ for (var i = 0; i < allMetaElements.length; i++) {
 }*/
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
-  /*let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', settings.display);
-  rootCss.style.setProperty('--numbersColor', settings.nums);
-  rootCss.style.setProperty('--functionsColor', settings.func);
-  rootCss.style.setProperty('--textColor', settings.text);*/
 
   if (!settings.degRad) {
     setDegMode();
@@ -328,13 +325,15 @@ if (document.getElementById("mainBody") != null) {
     }
   });
 } else if (document.getElementById("settingsBody") != null) {
-  //setting the root color variables in css
-  /*let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', settings.display);
-  rootCss.style.setProperty('--numbersColor', settings.nums);
-  rootCss.style.setProperty('--functionsColor', settings.func);
-  rootCss.style.setProperty('--textColor', settings.text);*/
-
+  if(settings.theme == "custPurchasable"){
+    document.getElementById('primaryColorPicker').value = settings.p
+    document.getElementById('secondaryColorPicker').value = settings.s
+    document.getElementById('accentColorPicker').value = settings.a
+    toggleCustTheme();
+  }
+  if(settings.t != "#000000"){
+    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+  }
   //coloring UI elements that are images but need sytling
   if (TextColorGlobal == "#000000") {
     let images = [
@@ -401,6 +400,11 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById("tableCells").value = settings.tC;
 
   //Adding events to elements
+  document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('selectorBlack').addEventListener("click", function(){dropPressed('Black')});
+  document.getElementById('selectorWhite').addEventListener("click", function(){dropPressed('White')});
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -1067,7 +1071,7 @@ function enterPressed(input) {
   display.innerHTML = inputSolver(input,"Couldn't calculate");
   historyMethod(nonparse)
   document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
-  setSelect(display.childNodes[display.childNodes.length - 1], display.childNodes[display.childNodes.length - 1].length);
+  setSelect(display, display.lastChild.length);
 }
 function historyMethod(equation) {
   console.log(document.getElementsByClassName("historyDateHeader"));
@@ -1276,11 +1280,6 @@ function settingExit() {
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
-    if (document.getElementById('dropbtn').innerHTML = "Black") {
-      newSettings.t = '#000000';
-    } else {
-      newSettings.t = '#FFFFFF';
-    }
   }
   newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
@@ -1314,9 +1313,9 @@ function backMoreFunction() {
 }
 //needs work because deprecatiated
 function updatePreview(event) {
-  if (event.target.id == "DisplayColorPicker") {
+  if (event.target.id == "secondaryColorPicker") {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
-  } else if (event.target.id == "NumbersColorPicker") {
+  } else if (event.target.id == "accentColorPicker") {
     document.getElementById("numsPreview").style.backgroundColor = event.target.value;
   } else {
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
@@ -1331,9 +1330,11 @@ function dropPressed(color) {
   if (color == "Black") {
     document.getElementById("showcaseTextColor").style.color = "#000000";
     document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
+    settings.t = "#000000";
   } else {
     document.getElementById("showcaseTextColor").style.color = "#FFFFFF";
     document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+    settings.t = "#FFFFFF";
   }
 }
 //Method that creates the tab page
@@ -1618,11 +1619,6 @@ function parseVariables(element, equationDIV, funcTabs) {
 }
 function solveEquation(parsedEquation, funcTabs) {
   console.log("Parsed Equation is " + parsedEquation);
-  /*let fullyParsed = solveInpr(parsedEquation, state.dR);
-  console.log("%c parsedEquation post op: " + fullyParsed, "color:green");
-  var mySolver = new Solver({
-    s: fullyParsed,
-  })*/
   let result = "=" + inputSolver(parsedEquation, "Couldn't Calculate");
   console.log("%c result: " + result, "color:green");
   funcTabs[0].querySelector('#equalsHeader').innerHTML = result;
@@ -1651,13 +1647,6 @@ function solveTable(parsedEquation, data) {
     var newData = data;
     let loopEqua = parsedEquation;
     newData.Value = "" + currentVal;
-    console.log(newData.Value)
-    /*loopEqua = solveInpr(parseVar(loopEqua, newData), settings.degRad);
-    console.log(loopEqua)
-    console.log("pared is " + parseVar(loopEqua, newData));
-    var mySolver = new Solver({
-      s: loopEqua,
-    });*/
     result = inputSolver(parseVar(loopEqua, newData), "Error Making Table");
     var newRow = document.getElementById('funcTable').insertRow(i);
     var newXCell = newRow.insertCell(0);
@@ -1667,23 +1656,8 @@ function solveTable(parsedEquation, data) {
     console.log(i * step)
     newYCell.innerHTML = result;
     newYCell.id = "other shit"
-    console.log(result)
   }
 }
-/*function parseEquation(element,parsedEquation){
-  console.log("Parse Equation ran");
-  let variables = element.getElementsByClassName("variableContainer");
-  let varData = '"f":"'+parsedEquation+'",';
-  for(i = 0; i < variables.length; i++){
-    if(i != variables.length-1){
-      varData += '"'+variables[i].querySelector('label').querySelector('h3').innerHTML+'":"'+variables[i].querySelector('label').querySelector('h3').innerHTML+'",';
-    }else{
-      varData += '"'+variables[i].querySelector('label').querySelector('h3').innerHTML+'":"'+variables[i].querySelector('label').querySelector('h3').innerHTML+'"';
-    }
-  }
-  console.log(JSON.parse("{"+varData+"}"));
-  return varData;
-}*/
 //Method that finds all instances of the defined function value in buttons and 
 function updateCustomButtons(oldVal, newValue) {
   console.log('Old Val is ' + oldVal + " New Value is " + newValue);
@@ -2178,10 +2152,10 @@ function setDegMode() {
   let elements = ['degEx', 'degPopup'];
   if (document.getElementById('degPopup').innerHTML == "deg") {
     text = "rad"
-    state.dR = false;
+    settings.degRad = false;
   } else {
     text = "deg"
-    settings.dR = true;
+    settings.degRad = true;
   }
   for (let elem of elements) {
     document.getElementById(elem).innerHTML = text;
@@ -2234,6 +2208,14 @@ function setPurchase(name) {
 function unlockCustomTheme() {
   document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
   document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
+  let colors = themeElem.getMth();
+  settings.p = colors[0];
+  settings.s = colors[2];
+  settings.a = colors[1];
+  settings.t = colors[3];
+  document.getElementById('primaryColorPicker').value = settings.p
+  document.getElementById('secondaryColorPicker').value = settings.s
+  document.getElementById('accentColorPicker').value = settings.a
 }
 function toggleCustTheme() {
   if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
@@ -2271,6 +2253,15 @@ function getThemes() {
       'text': '#FFFFFF',
       'getMth': function () {
         return ["#000000", getColorAcc(settings.acc), "#1f1f1f", '#FFFFFF'];
+      }
+    },
+    {
+      "name": "custPurchasable",
+      "primary": settings.p,
+      "secondary": settings.s,
+      "text": settings.t,
+      'getMth': function (){
+        return [settings.p, settings.a, settings.s, settings.t]
       }
     }
   ];
