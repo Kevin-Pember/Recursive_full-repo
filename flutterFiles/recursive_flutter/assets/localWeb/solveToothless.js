@@ -117,7 +117,6 @@ let secondList = [
 ];
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
-  equation = builtInFunc(equation);
   console.log('Inpr ran');
   for (let i = 0; i < equation.length; i++) {
     if (funcMatch(equation.substring(i)) != "") {
@@ -134,6 +133,7 @@ function solveInpr(equation, degRad) {
       i = i + parsedFunc.length - 1;
     }
   }
+  equation = builtInFunc(equation);
   return equation;
 }
 //Func method to find if the current postion has a function defined in the funclist
@@ -150,6 +150,7 @@ function funcMatch(equation) {
   for (let func of funcList) {
     let check = equation.substring(0, (func.funcLength));
     if (check == func.func) {
+      console.log(`%c func matched ${func.func}`,"color: yellow;")
       return func.func;
     }
   }
@@ -476,3 +477,82 @@ function getNameList() {
     }
   }
 }*/
+//Takes string and returns an array for funclist
+function createParseable(equation){
+  let equationArray = [];
+  let variablesInOrder = [];
+  let varArray = varInEquat(equation);
+  for(let i = 0; i < varArray.length; i++){
+    varArray[i].letter = "v" + (i+1);
+  }
+  console.log(varArray);
+  variablesInOrder.push({"name": varArray[0].letter, "index": varArray[0].positions[0]});
+  varArray.shift();
+  for(item of varArray){
+    for(let postion of item.positions){
+      for(let j = variablesInOrder.length-1; j >= 0; j--){
+        if(postion > variablesInOrder[j].index){
+          variablesInOrder.splice(j+1, 0, {"name": item.letter, "index": postion});
+          break;
+        }
+      }
+    }
+  }
+  for(let i = 0; i < variablesInOrder.length; i++){
+    let index = variablesInOrder[i].index;
+    let pre = "";
+    let vard = "";
+    if(i == 0){
+      pre = equation.substring(0,index);
+      vard = variablesInOrder[i].name;
+    }else{
+      let prevIndex = variablesInOrder[i-1].index;
+      pre = equation.substring(prevIndex+1, index);
+      vard = variablesInOrder[i].name;
+    }
+    if(pre != ""){
+      equationArray.push(pre);
+    }
+    equationArray.push(vard);
+    if(i == variablesInOrder.length-1 && equation.substring(index+1) != ''){
+      equationArray.push(equation.substring(index+1));
+    }
+  }
+  return equationArray;
+}
+//calculate inputs
+function cacInputs(array){
+  let num = 0;
+  for(let item of array){
+    if(item.charAt(0) == 'v'){
+      num++;
+    }
+  }
+  return num;
+}
+let trigDef = [
+  'sin',
+  'cos',
+  'tan',
+  'asin',
+  'acos',
+  'atan',
+  'arcsin',
+  'arccos',
+  'arctan',
+  'csc',
+  'sec',
+  'cot',
+  'acsc',
+  'asec',
+  'acot',
+  'arccsc',
+  'arcsec',
+  'arccot',
+];
+//searches an equation string for any trig and returns a true or false question
+function containsTrig(string){
+  for(let statement of trigDef){
+    return string.includes(statement);
+  }
+}

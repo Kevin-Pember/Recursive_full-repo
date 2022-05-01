@@ -32,7 +32,6 @@ for (var i = 0; i < allMetaElements.length; i++) {
 }*/
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
-
   if (!settings.degRad) {
     setDegMode();
   }
@@ -105,7 +104,17 @@ if (document.getElementById("mainBody") != null) {
     switch (funcObject.type) {
       case "Function":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        
+        let parseable = createParseable(solveInpr(funcObject.equation, settings.degRad))
+        let object = {
+          "func": funcObject.name,
+          "funcParse": parseable,
+          "inputs": cacInputs(parseable),
+          "funcRadDeg" : containsTrig(funcObject.equation),
+          "funcLength": funcObject.name.length
+        };
+        funcList.push(object);
+        console.log(`%c Func created ${funcObject.name}`,"color: blue;")
+        console.log(object);
         break;
       case "Code":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
@@ -331,7 +340,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('accentColorPicker').value = settings.a
     toggleCustTheme();
   }
-  if(settings.t != "#000000"){
+  if(settings.t == "#FFFFFF"){
     document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
   //coloring UI elements that are images but need sytling
@@ -1985,7 +1994,7 @@ function getFuncList() {
   }
   return finalArray;
 }
-function createParseable(equation){
+/*function createParseable(equation){
   let equationArray = [];
   let variablesInOrder = [];
   let varArray = varInEquat(equation);
@@ -2028,7 +2037,7 @@ function createParseable(equation){
     }
   }
   return equationArray;
-}
+}*/
 function findFuncConfig(name) {
   let funcList = getFuncList();
   for (let func of funcList) {
