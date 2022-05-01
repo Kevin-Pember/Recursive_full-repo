@@ -101,20 +101,10 @@ if (document.getElementById("mainBody") != null) {
   var funcs = getFuncList();
   console.log(funcs)
   for (let funcObject of funcs) {
+    addImplemented(funcObject);
     switch (funcObject.type) {
       case "Function":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        let parseable = createParseable(solveInpr(funcObject.equation, settings.degRad))
-        let object = {
-          "func": funcObject.name,
-          "funcParse": parseable,
-          "inputs": cacInputs(parseable),
-          "funcRadDeg" : containsTrig(funcObject.equation),
-          "funcLength": funcObject.name.length
-        };
-        funcList.push(object);
-        console.log(`%c Func created ${funcObject.name}`,"color: blue;")
-        console.log(object);
         break;
       case "Code":
         custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
@@ -179,7 +169,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); report("1 Pressed",true); console.log(window.devicePixelRatio); });
+  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { document.location = 'moreFunctions.html'; });
@@ -334,13 +324,13 @@ if (document.getElementById("mainBody") != null) {
     }
   });
 } else if (document.getElementById("settingsBody") != null) {
-  if(settings.theme == "custPurchasable"){
+  if (settings.theme == "custPurchasable") {
     document.getElementById('primaryColorPicker').value = settings.p
     document.getElementById('secondaryColorPicker').value = settings.s
     document.getElementById('accentColorPicker').value = settings.a
     toggleCustTheme();
   }
-  if(settings.t == "#FFFFFF"){
+  if (settings.t == "#FFFFFF") {
     document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
   //coloring UI elements that are images but need sytling
@@ -412,8 +402,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
-  document.getElementById('selectorBlack').addEventListener("click", function(){dropPressed('Black')});
-  document.getElementById('selectorWhite').addEventListener("click", function(){dropPressed('White')});
+  document.getElementById('selectorBlack').addEventListener("click", function () { dropPressed('Black') });
+  document.getElementById('selectorWhite').addEventListener("click", function () { dropPressed('White') });
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -505,16 +495,16 @@ function degRadSwitch(mode) {
     document.getElementById('radModeBut').className = "settingsButton active";
   }
 }
-function inputSolver(equation,errorStatement){
-  equation = solveInpr(equation,settings.degRad)
-  try{
+function inputSolver(equation, errorStatement) {
+  equation = solveInpr(equation, settings.degRad)
+  try {
     var mySolver = new Solver({
       s: equation,
     })
-      return mySolver.solve({})["s"];
-    }catch(e){
-      report(errorStatement,false);
-    }
+    return mySolver.solve({})["s"];
+  } catch (e) {
+    report(errorStatement, false);
+  }
 }
 function createFunc(type) {
   let name = document.getElementById('nameEntryArea').value;
@@ -535,6 +525,8 @@ function createFunc(type) {
         break;
     }
     funcList.push(object);
+    addImplemented(object)
+    console.log(`%c resulting funcList is ${funcList}`,"color: green;");
     setFuncList(funcList);
   }
 }
@@ -947,12 +939,11 @@ function funcRemove(e) {
   let link = e.target.parentNode
   let buttonName = link.querySelector("#nameLabel").innerHTML;
   removeFunc(link.querySelector("#nameLabel").innerHTML);
-  //Thing that i have to work on
-  //document.getElementById('customFuncDisplayGrid').removeChild(link);
   let names = document.getElementsByClassName("custFuncNames");
-  while (names.length > 0) {
-    if (names[0].innerHTML == buttonName) {
-      let parent = names[0].parentNode;
+  for (let name of names) {
+    console.log("looping")
+    if (name.innerHTML == buttonName) {
+      let parent = name.parentNode;
       parent.remove();
     }
   }
@@ -1077,7 +1068,7 @@ function tabOpen(name) {
 function enterPressed(input) {
   let display = document.getElementById('enterHeader');
   let nonparse = input;
-  display.innerHTML = inputSolver(input,"Couldn't calculate");
+  display.innerHTML = inputSolver(input, "Couldn't calculate");
   historyMethod(nonparse)
   document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
   setSelect(display, display.lastChild.length);
@@ -1085,7 +1076,7 @@ function enterPressed(input) {
 function historyMethod(equation) {
   console.log(document.getElementsByClassName("historyDateHeader"));
   let historyHeader = document.getElementById('historyHeader');
-  let solved = inputSolver(equation,"Couldn't Calculate")
+  let solved = inputSolver(equation, "Couldn't Calculate")
   /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
   let dates = document.getElementsByClassName('historyDateHeader');
   if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
@@ -1412,7 +1403,7 @@ function newCustFuncTab(config) {
         try {
           parseVariables(varGrid, equationDIV, funcTabs);
         } catch (e) {
-          report("Couldn't Calculate",false);
+          report("Couldn't Calculate", false);
         }
         break;
       case ("Hybrid"):
@@ -1493,7 +1484,7 @@ function defaultSetup(clon) {
       try {
         parseVariables(varGrid, equationDIV, funcTabs);
       } catch (e) {
-        report("Couldn't Calculate",false);
+        report("Couldn't Calculate", false);
       }
 
     });
@@ -1510,12 +1501,92 @@ function changeFunc(og, newString, tab, page) {
       funcList[i] = newString;
     }
   }
+  changeImplemented(og, newString);
   console.log(funcList);
   setFuncList(funcList);
   console.log(tab)
   tab.dataset.tabmap = JSON.stringify(newString);
   page.dataset.tab = JSON.stringify(newString);
   updateCustomButtons(og, newString);
+}
+function changeImplemented(oldConfig, newConfig) {
+  let object = {};
+  if (oldConfig.type == "Function") {
+    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
+    object = {
+      "func": oldConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(oldConfig.equation),
+      "funcLength": oldConfig.name.length
+    };
+    
+  }else if(oldConfig.type == "Code"){
+
+  }else if(oldConfig.type == "Hybrid"){
+
+  }
+  let indexOf = -1;
+  for(let i = 0; i < funcList.length; i++){
+    if(JSON.stringify(object) == JSON.stringify(funcList[i])){
+      indexOf = i;
+    }
+  }
+  if(oldConfig.type == "Function"){
+    let parseable = createParseable(solveInpr(newConfig.equation, settings.degRad))
+    let newObject = {
+      "func": newConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(newConfig.equation),
+      "funcLength": newConfig.name.length
+    };
+    funcList[i] = newObject;
+  }else if (oldConfig.type == "Code"){
+
+  }else if (oldConfig.type == "Hybrid"){
+
+  }
+}
+function addImplemented(funcConfig) {
+  if (funcConfig.type == "Function") {
+    let parseable = createParseable(solveInpr(funcConfig.equation, settings.degRad))
+    let object = {
+      "func": funcConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(funcConfig.equation),
+      "funcLength": funcConfig.name.length
+    };
+    funcList.push(object);
+  }else if(funcConfig.type == "Code"){
+
+  }else if(funcConfig.type == "Hybrid"){
+
+  }
+}
+function removeImplemented(oldConfig){
+  let object = {};
+  if (oldConfig.type == "Function") {
+    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
+    object = {
+      "func": oldConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(oldConfig.equation),
+      "funcLength": oldConfig.name.length
+    };
+    
+  }else if(oldConfig.type == "Code"){
+
+  }else if(oldConfig.type == "Hybrid"){
+
+  }
+  for(let i = 0; i < funcList.length; i++){
+    if(JSON.stringify(object) == JSON.stringify(funcList[i])){
+      funcList.splice(i, 1)
+    }
+  }
 }
 function hidModes(num, tabs) {
   if (num == 0) {
@@ -1768,15 +1839,15 @@ function varInEquat(equation) {
   for (let i = 0; i < equation.length; i++) {
     if (equation.charCodeAt(i) > 92 && equation.charCodeAt(i) < 123) {
       if (isVar(equation.substring(i)) === 0) {
-        if (varInList(varArray,equation.substring(i, i+1)) == null) {
+        if (varInList(varArray, equation.substring(i, i + 1)) == null) {
           varArray.push(
             {
               "letter": equation.substring(i, i + 1),
               "positions": [i]
             }
           );
-        }else{
-          let func = varInList(varArray,equation.substring(i, i+1));
+        } else {
+          let func = varInList(varArray, equation.substring(i, i + 1));
           func.positions.push(i);
         }
       } else {
@@ -1786,9 +1857,9 @@ function varInEquat(equation) {
   }
   return varArray;
 }
-function varInList(list, varLetter){
-  for(let item of list){
-    if(item.letter == varLetter){
+function varInList(list, varLetter) {
+  for (let item of list) {
+    if (item.letter == varLetter) {
       return item;
     }
   }
@@ -1796,14 +1867,14 @@ function varInList(list, varLetter){
 }
 function isVar(entry) {
   let func = funcMatch(entry);
-  if(func != ""){
-    if(getByName(func) != null){
+  if (func != "") {
+    if (getByName(func) != null) {
       let object = getByName(func);
       return object.funcLength;
-    }else {
+    } else {
       return func.length
     }
-  }else{
+  } else {
     return 0;
   }
 }
@@ -2053,16 +2124,16 @@ function setFuncList(array) {
     let parsedString = "";
     switch (array[i].type) {
       case "Function":
-        parseString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
+        parsedString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
         break;
       case "Hybrid":
-        parseString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
+        parsedString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
         break;
       case "Code":
-        parseString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
+        parsedString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
         break;
     }
-    parseString += "⥾" + parsedString;
+    parseString += parsedString + "⥾";
   }
   console.log(`parsedString: ${parseString}`);
   localStorage.setItem("funcList", parseString);
@@ -2072,6 +2143,7 @@ function removeFunc(funcName) {
   console.log(funcName)
   for (let item of array) {
     if (item.name == funcName) {
+      //removeImplemented(item);
       array.splice(array.indexOf(item), 1);
     }
   }
@@ -2269,7 +2341,7 @@ function getThemes() {
       "primary": settings.p,
       "secondary": settings.s,
       "text": settings.t,
-      'getMth': function (){
+      'getMth': function () {
         return [settings.p, settings.a, settings.s, settings.t]
       }
     }
@@ -2348,21 +2420,21 @@ function setImages(imgList) {
     }
   }
 }
-function report(message, meaning){
+function report(message, meaning) {
   console.log("report")
   let consoleD = document.getElementById("popupConsole");
   consoleD.innerHTML = message;
   consoleD.style.visibility = "visible";
   consoleD.style.animation = "1.5s ease-in 0s 1 normal forwards running slideToUpFromBottom";
-  let width = consoleD.width/2;
+  let width = consoleD.width / 2;
   let vw = window.innerWidth;
   consoleD.style.left = vw - width + "px";
-  if(meaning){
+  if (meaning) {
     consoleD.style.backgroundColor = "#71ec71";
-  }else {
+  } else {
     consoleD.style.backgroundColor = "#f74646";
   }
-  setTimeout(function(){
+  setTimeout(function () {
     consoleD.style.animation = null;
     consoleD.style.visibility = "hidden";
   }, 1500);
