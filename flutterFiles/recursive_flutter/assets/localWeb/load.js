@@ -1012,6 +1012,8 @@ function createTab(config) {
 
       let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
       tabClon.getElementById('newTabName').innerHTML = name;
+      tabClon.getElementById('nameDisplay').innerHTML = name;
+      tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
       tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
       if (TextColorGlobal == "#000000") {
         tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
@@ -1877,6 +1879,25 @@ function isVar(entry) {
   } else {
     return 0;
   }
+}
+function setVar(element, equation) {
+  console.log("Parse Variables ran");
+  let varData = varListAssbely(element);
+  console.log("%c parsedEquation: " + equation, "color:red");
+  for (let data of varData) {
+    for (let i = 0; i < equation.length; i++) {
+      if (funcMatch(equation.substring(i)) != "") {
+        i += funcMatch(equation.substring(i)).length;
+      } else if (equation.charAt(i) == data.Name) {
+        if (data.Value != "") {
+          equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
+        }
+      }
+    }
+  }
+
+  console.log(varData)
+  return equation;
 }
 function helpTabChange(name) {
   var tabs = document.getElementsByClassName("settingTabContent");

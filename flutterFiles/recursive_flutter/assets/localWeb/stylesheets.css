@@ -422,7 +422,7 @@ button:focus, input[type="button"]:focus {
   }
   .addIcon{
     top: 0;
-    left: 10px;
+    left: 0;
     width: 40px;
     height: 40px;
     background-color: transparent;
@@ -430,7 +430,7 @@ button:focus, input[type="button"]:focus {
     position: absolute;
   }
   .minusIcon{
-    left: 48px;
+    left: 40px;
     top: 0;
     width: 40px;
     height: 40px;
@@ -1485,16 +1485,48 @@ button:focus, input[type="button"]:focus {
   border-radius: 20px;
   visibility: hidden;
 }
+#nameDisplay{
+  margin-top: 5px;
+  font-size: 30px;
+  padding-right: 5px;
+  font-weight: lighter;
+  text-align: end;
+}
 #bodyFunc{
-  top: 20%;
-  height: 80%;
+  top: 16%;
+  height: 34%;
+  width: calc(100% - 10px);
+  left: 5px;
 }
 #equtDisplayFunc{
   text-align: start;
-  width: 90%;
-  margin-top: 8px;
+  width: 95%;
+  margin-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2.5px;
+  padding-bottom: 2.5px;
   margin-left: 2.5%;
   font-size: 15px;
+  border-radius: 7px;
+  background-color: var(--numbersColor);
+}
+#bodyCalc{
+  top: calc(50% + 10px);
+  height: calc(50% - 15px);
+  width: calc(100% - 10px);
+  left: 5px;
+}
+#resultDisplay{
+  text-align: start;
+  width: fit-content;
+  margin-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 2.5%;
+  font-size: 15px;
+  border-radius: 7px;
+  background-color: var(--numbersColor);
 }
 .displayBase{
   background-color: var(--displayColor);
