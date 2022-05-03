@@ -219,38 +219,6 @@
             </div>
             <div class="function-item" style="grid-area: e;"><button class="funcbutton">e</button></div>
         </div>
-        <div id="varsDiv">
-            <button class="varItem"><img src="Images/MoreFuncArrowWhite.svg" class="arrows" id="arrowVarIcon"
-                    width="40px"></button>
-            <button class="varItem">a</button>
-            <button class="varItem">b</button>
-            <button class="varItem">c</button>
-            <button class="varItem">d</button>
-            <button class="varItem">f</button>
-            <button class="varItem">g</button>
-            <button class="varItem">h</button>
-            <button class="varItem">i</button>
-            <button class="varItem">j</button>
-            <button class="varItem">k</button>
-            <button class="varItem">l</button>
-            <button class="varItem">m</button>
-            <button class="varItem">n</button>
-            <button class="varItem">o</button>
-            <button class="varItem">p</button>
-            <button class="varItem">q</button>
-            <button class="varItem">r</button>
-            <button class="varItem">s</button>
-            <button class="varItem">t</button>
-            <button class="varItem">u</button>
-            <button class="varItem">v</button>
-            <button class="varItem">h</button>
-            <button class="varItem">i</button>
-            <button class="varItem">j</button>
-            <button class="varItem">k</button>
-            <button class="varItem">w</button>
-            <button class="varItem">x</button>
-            <button class="varItem">z</button>
-        </div>
         <div id="customFuncDisplay">
             <img id="backExMini" class="arrows" src="Images/MoreFuncArrowWhite.svg" width="40" height="40"
                 style="transform: rotate(180deg);">
@@ -322,7 +290,7 @@
                     <button class="modeButton" id="functionMode">Function</button>
                     <button class="modeButton" id="graphMode">Graph</button>
                     <button class="modeButton" id="tableMode">Table</button>
-                    <div id="selectorUnder"></div>
+                    <div id="selectorUnder" class="selectorSlider"></div>
                 </div>
                 <div id='FunctionDiv'>
                     <div id="resultDiv">
@@ -402,6 +370,34 @@
             </div>
         </div>
     </template>
+    <div id="custCreator">
+        <img src="Images/MoreFuncArrowWhite.svg" width="45px" style="transform: rotate(180deg);">
+        <input type="text" id="nameCreator" placeholder="Name">
+        <div id="mainCreator">
+            <div id=modeSwitcher>
+                <button class="modeButton" id="funcCreatorButton">Function</button>
+                <button class="modeButton" id="hybdCreatorButton" style="left: 75px">Hybrid</button>
+                <button class="modeButton" id="codeCreatorButton" style="left: 150px">Code</button>
+                <div id="custCreatorUnder" class="selectorSlider"></div>
+            </div>
+            <button id="saveCreator">Save</button>
+            <div class="creatorPage" style="visibility: hidden;">
+                <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
+            </div>
+            <div class="creatorPage">
+                <div class="creatorDiv" id="creatorEditor" style="padding: 0; padding-top: 25px;">
+                    <div class="codeLine" style="background-color: #00000033;"><h3 class="numberedHeader">1</h3><input type="text" class="codeInput" id="firstLine"></div>
+                    <template id="lineTemplate">
+                        <div class="codeLine" style="background-color: #00000033;"><h3 class="numberedHeader" id="lineNumber"></h3><input type="text" class="codeInput" id="lineCode"></div>
+                    </template>
+                </div>
+            </div>
+            <div class="creatorPage" style="visibility: hidden;">
+
+            </div>
+        </div>
+        
+    </div>
     <script src="load.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

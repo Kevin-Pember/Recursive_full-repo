@@ -832,6 +832,7 @@ button:focus, input[type="button"]:focus {
     background-color: var(--displayColor);
     width: 100%;
     height: 100%;
+    bottom: 100%;
     position: absolute;
   }
   #nameCreator{
@@ -870,7 +871,7 @@ button:focus, input[type="button"]:focus {
     bottom: 0px;
     position: absolute;
   }
-  #creatorEquationFunc{
+  .creatorDiv{
     width: calc(100% - 20px);
     left: 10px;
     height: calc(100% - 10px);
@@ -879,6 +880,32 @@ button:focus, input[type="button"]:focus {
     font-size: 35px;
     border-radius: 25px;
     position: absolute;
+  }
+  #creatorEditor{
+    display: grid;
+    grid-auto-rows: 40px;
+  }
+  .numberedHeader{
+    margin-left: 5px;
+    font-size: 25px;
+    width:fit-content;
+    font-weight:700;
+  }
+  .codeInput{
+    height: 29px;
+    background-color: transparent;
+    border: none;
+    font-size: 25;
+    margin-left: 5px;
+    min-width: 50px;
+    width: fit-content;
+    overflow-x: none;
+  }
+  .codeLine{
+    width: 100%;
+    height: fit-content;
+    display:flex;
+    flex-wrap: wrap;
   }
   #varsDiv{
     display: grid;
@@ -974,6 +1001,14 @@ button:focus, input[type="button"]:focus {
     }
     100% {
       left: 150px
+    }
+  }
+  @keyframes pageup{
+    0%{
+      bottom: 100%
+    }
+    100%{
+      bottom: 0px;
     }
   }
   #primaryColorPicker{
@@ -2167,6 +2202,9 @@ button:focus, input[type="button"]:focus {
   position: absolute;
 }
 #selectorUnder{
+  
+}
+.selectorSlider{
   top: 0px;
   height: 40px;
   width: 70px;

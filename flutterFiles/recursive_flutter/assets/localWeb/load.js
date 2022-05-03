@@ -238,7 +238,12 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
-    openPopup();
+    if(document.getElementById('enterHeader').innerHTML != "‎"){
+      openPopup();
+    }else{
+      openPage("custCreator")
+    }
+    
   });
   document.getElementById('minusIconPopup').addEventListener("click", function () { });
   document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
@@ -272,6 +277,25 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('nameEntry').style.animation = null;
     document.getElementById('nameEntryArea').value = "";
   });
+
+  let movable = document.getElementById("custCreatorUnder");
+  movable.dataset.pos = 0;
+  document.getElementById('funcCreatorButton').addEventListener("click", function (){
+    console.log("things")
+    animateModes(parseInt(movable.dataset.pos), 0, movable);
+  });
+  document.getElementById('hybdCreatorButton').addEventListener("click", function (){
+    animateModes(parseInt(movable.dataset.pos), 75, movable);
+  });
+  document.getElementById('codeCreatorButton').addEventListener("click", function (){
+    animateModes(parseInt(movable.dataset.pos), 150, movable);
+  });
+
+  document.getElementById('firstLine').addEventListener("keyup", function (){
+    if (e.key === 'Enter') {
+      console.log('ENTER');
+    }
+  })
 
   const elem = document.getElementById("memoryTextBoarder");
   let isDown = false;
@@ -537,6 +561,18 @@ function openPopup() {
   console.log("open popup ran")
   sessionStorage.setItem("facing", "createNaming");
   document.getElementById('nameEntry').style.visibility = "visible";
+}
+function openPage(id){
+  let element = document.getElementById(id);
+  element.style.zIndex = 5;
+  element.style.animation = "0.15s ease-in 0s 1 normal forwards running pageup";
+  setTimeout(function () {
+    element.style.animation = undefined;
+    element.style.bottom = "0px";
+  }, 150);
+}
+function createNewLine(element){
+  let temp = document.getElementById('lineTemplate'), clon = temp.content.cloneNode(true);
 }
 function frontButtonPressed(input) {
   let display = document.getElementById('enterHeader');
