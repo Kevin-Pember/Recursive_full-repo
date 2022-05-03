@@ -291,11 +291,7 @@ if (document.getElementById("mainBody") != null) {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
   });
 
-  document.getElementById('firstLine').addEventListener("keyup", function (e){
-    if (e.key === 'Enter') {
-      createNewLine('creatorEditor');
-    }
-  })
+  createNewLine('creatorEditor');
 
   const elem = document.getElementById("memoryTextBoarder");
   let isDown = false;
@@ -606,7 +602,13 @@ function navigateLines(element, upDown){
   for(let line of lines){
     console.log(`${line.querySelector("#lineNumber").innerHTML} vs. ${nextNum}`)
     if(line.querySelector("#lineNumber").innerHTML == nextNum){
-      line.focus();
+      if(nextNum != 1){
+        line.querySelector('#lineCode').focus();
+        break;
+      }else {
+        line.querySelector('#firstLine').focus();
+        break;
+      }
     }
   }
 }
