@@ -14,6 +14,12 @@
   color: var(--textColor);
   -webkit-tap-highlight-color:transparent;
 }
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  pointer-events: none;
+  color: grey;
+  display: block;
+}
 body{
   overflow-x: hidden;
   overflow-y: hidden;
@@ -861,7 +867,17 @@ button:focus, input[type="button"]:focus {
   .creatorPage{
     width: 100%;
     top: 60px;
-    bottom:10px;
+    bottom: 0px;
+    position: absolute;
+  }
+  #creatorEquationFunc{
+    width: calc(100% - 20px);
+    left: 10px;
+    height: calc(100% - 10px);
+    background-color: var(--displayColor);
+    padding: 10px;
+    font-size: 35px;
+    border-radius: 25px;
     position: absolute;
   }
   #varsDiv{
@@ -1222,6 +1238,14 @@ button:focus, input[type="button"]:focus {
   }
   #customFuncDisplayRecentText{
     color: transparent;
+  }
+  #nameCreator{
+    width: 20%
+  }
+  #mainCreator{
+    width: calc(80% - 30px);
+    left: calc(20% + 20px); 
+    top: 50px;
   }
 }
 @media only screen and (max-width: 451px){
