@@ -883,7 +883,7 @@ button:focus, input[type="button"]:focus {
   }
   #creatorEditor{
     display: grid;
-    grid-auto-rows: 40px;
+    grid-auto-rows: 29px;
   }
   .numberedHeader{
     margin-left: 5px;

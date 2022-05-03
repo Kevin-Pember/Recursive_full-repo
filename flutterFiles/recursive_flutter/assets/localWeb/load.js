@@ -291,9 +291,9 @@ if (document.getElementById("mainBody") != null) {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
   });
 
-  document.getElementById('firstLine').addEventListener("keyup", function (){
+  document.getElementById('firstLine').addEventListener("keyup", function (e){
     if (e.key === 'Enter') {
-      console.log('ENTER');
+      createNewLine('creatorEditor');
     }
   })
 
@@ -573,6 +573,38 @@ function openPage(id){
 }
 function createNewLine(element){
   let temp = document.getElementById('lineTemplate'), clon = temp.content.cloneNode(true);
+  let parentElem = document.getElementById(element);
+  let lines = parentElem.querySelectorAll(".codeLine")
+  let code = clon.getElementById('lineCode');
+  clon.getElementById('lineNumber').innerHTML = lines.length+1;
+  code.addEventListener("keyup", function (e){
+    if (e.key === 'Enter') {
+      createNewLine('creatorEditor');
+    }else if (e.key === "ArrowDown"){
+      navigateLines(e.target, false)
+    }else if (e.key === "ArrowUp"){
+      navigateLines(e.target, true)
+    }
+  })
+  
+  parentElem.appendChild(clon);
+  code.focus();
+}
+function navigateLines(element, upDown){
+  let lineElem = element.parentNode;
+  let parentElem = element.parentElem.parentElem;
+  let lines = parentElem.querySelectorAll('.codeLine');
+  let nextNum = 1;
+  if(upDown){
+    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) -1;
+  }else{
+    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) +1;
+  }
+  for(let line of lines){
+    if(line.querySelector("#lineNumber").innerHTML == nextNum){
+      line.focus();
+    }
+  }
 }
 function frontButtonPressed(input) {
   let display = document.getElementById('enterHeader');
