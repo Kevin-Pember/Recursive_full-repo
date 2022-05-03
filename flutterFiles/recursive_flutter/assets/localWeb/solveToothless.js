@@ -562,14 +562,15 @@ function containsTrig(string){
   console.log(var + var2)
 }*/
 function stringFunction(name, string){
-  string = `var ${name} = Function ${string}`;
+  string = `var ${name} = function ${string}`;
+  console.log(string)
   eval(string);
 }
 function parseFunction(StringFunction){
-  StringFunction = StringFunction.substring(StringFunction.indexOf("Function")+8)
-  let name = StringFunction.substring(0, StringFunction.indexOf("("));
-  StringFunction = StringFunction.substring(StringFunction.indexOf("(")+1)
-  let variableDefs = StringFunction.substring(0, string.indexOf(")"));
+  StringFunction = StringFunction.substring(StringFunction.indexOf("Function")+9)
+  let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
+  StringFunction = StringFunction.substring(StringFunction.indexOf("("))
+  let variableDefs = StringFunction.substring(1, StringFunction.indexOf(")")).trim();
   let variables = [];
   while(variableDefs.length > 0){
     if(variableDefs.includes(',')){
@@ -580,4 +581,14 @@ function parseFunction(StringFunction){
       variableDefs = 0;
     }
   }
+  let finalObject = {
+    "name": name,
+    "type": "Function",
+    "string": StringFunction,
+    "inputs": variables.length,
+    "funcRadDeg": false,
+    "funcLength": name.length
+  }
+  stringFunction(name, StringFunction)
+  funcList.push(finalObject)
 }

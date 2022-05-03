@@ -3,6 +3,9 @@ let BackgroundColorGlobal = "";
 let state = {};
 var settings;
 console.log();
+//parseFunction("function thing(s){ console.log(s); };");
+//eval("var thing = function (s) { console.log(s);};")
+//thing("hello")
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log("settings got");
@@ -940,11 +943,12 @@ function funcRemove(e) {
   let buttonName = link.querySelector("#nameLabel").innerHTML;
   removeFunc(link.querySelector("#nameLabel").innerHTML);
   let names = document.getElementsByClassName("custFuncNames");
-  for (let name of names) {
+  for (let i = 0; i < names.length; i++) {
     console.log("looping")
-    if (name.innerHTML == buttonName) {
-      let parent = name.parentNode;
+    if (names[i].innerHTML == buttonName) {
+      let parent = names[i].parentNode;
       parent.remove();
+      i--;
     }
   }
   //document.getElementById('custFuncGridPopup').removeChild(link);
