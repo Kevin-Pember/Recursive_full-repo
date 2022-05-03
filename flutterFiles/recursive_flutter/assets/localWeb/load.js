@@ -592,15 +592,19 @@ function createNewLine(element){
 }
 function navigateLines(element, upDown){
   let lineElem = element.parentNode;
-  let parentElem = element.parentElem.parentElem;
+  let parentElem = element.parentNode.parentNode;
+  console.log(parentElem)
   let lines = parentElem.querySelectorAll('.codeLine');
+  console.log(lines)
   let nextNum = 1;
   if(upDown){
     nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) -1;
   }else{
     nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) +1;
   }
+  console.log(`next lines is ${nextNum}`)
   for(let line of lines){
+    console.log(`${line.querySelector("#lineNumber").innerHTML} vs. ${nextNum}`)
     if(line.querySelector("#lineNumber").innerHTML == nextNum){
       line.focus();
     }
