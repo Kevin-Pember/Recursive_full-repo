@@ -126,11 +126,13 @@ function solveInpr(equation, degRad) {
       );
       let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
       let funcTemp = findMethod(func, degRad);
-      console.log(`functemp ${funcTemp}`)
-      let parsedFunc = assembly(func, funcTemp, values);
-      console.log(`Parsed func is ${parsedFunc}`)
-      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
-      i = i + parsedFunc.length - 1;
+      if(funcTemp.type == "Equation"){
+        let parsedFunc = assembly(func, funcTemp, values);
+        equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+        i = i + parsedFunc.length - 1;
+      }else if (funcTemp.type == "Function"){
+        
+      }
     }
   }
   equation = builtInFunc(equation);
@@ -554,5 +556,28 @@ let trigDef = [
 function containsTrig(string){
   for(let statement of trigDef){
     return string.includes(statement);
+  }
+}
+/*(var, var2){
+  console.log(var + var2)
+}*/
+function stringFunction(name, string){
+  string = `var ${name} = Function ${string}`;
+  eval(string);
+}
+function parseFunction(StringFunction){
+  StringFunction = StringFunction.substring(StringFunction.indexOf("Function")+8)
+  let name = StringFunction.substring(0, StringFunction.indexOf("("));
+  StringFunction = StringFunction.substring(StringFunction.indexOf("(")+1)
+  let variableDefs = StringFunction.substring(0, string.indexOf(")"));
+  let variables = [];
+  while(variableDefs.length > 0){
+    if(variableDefs.includes(',')){
+      variables.push(variableDefs.substring(0, variableDefs.indexOf(',')));
+      variableDefs = variableDefs.substring(variableDefs.indexOf(',')+1)
+    }else{
+      variables.push(variableDefs);
+      variableDefs = 0;
+    }
   }
 }
