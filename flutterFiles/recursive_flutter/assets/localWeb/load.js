@@ -172,7 +172,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); console.log(JSON.stringify({"func": function(input){},"name": "hello"}))});
+  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); console.log(JSON.stringify({ "func": function (input) { }, "name": "hello" })) });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { document.location = 'moreFunctions.html'; });
@@ -238,12 +238,12 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
-    if(document.getElementById('enterHeader').innerHTML != "‎"){
+    if (document.getElementById('enterHeader').innerHTML != "‎") {
       openPopup();
-    }else{
+    } else {
       openPage("custCreator")
     }
-    
+
   });
   document.getElementById('minusIconPopup').addEventListener("click", function () { });
   document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
@@ -280,14 +280,14 @@ if (document.getElementById("mainBody") != null) {
 
   let movable = document.getElementById("custCreatorUnder");
   movable.dataset.pos = 0;
-  document.getElementById('funcCreatorButton').addEventListener("click", function (){
+  document.getElementById('funcCreatorButton').addEventListener("click", function () {
     console.log("things")
     animateModes(parseInt(movable.dataset.pos), 0, movable);
   });
-  document.getElementById('hybdCreatorButton').addEventListener("click", function (){
+  document.getElementById('hybdCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 75, movable);
   });
-  document.getElementById('codeCreatorButton').addEventListener("click", function (){
+  document.getElementById('codeCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
   });
 
@@ -549,7 +549,7 @@ function createFunc(type) {
     }
     funcList.push(object);
     addImplemented(object)
-    console.log(`%c resulting funcList is ${funcList}`,"color: green;");
+    console.log(`%c resulting funcList is ${funcList}`, "color: green;");
     setFuncList(funcList);
   }
 }
@@ -558,7 +558,7 @@ function openPopup() {
   sessionStorage.setItem("facing", "createNaming");
   document.getElementById('nameEntry').style.visibility = "visible";
 }
-function openPage(id){
+function openPage(id) {
   let element = document.getElementById(id);
   element.style.zIndex = 5;
   element.style.animation = "0.15s ease-in 0s 1 normal forwards running pageup";
@@ -567,48 +567,43 @@ function openPage(id){
     element.style.bottom = "0px";
   }, 150);
 }
-function createNewLine(element){
+function createNewLine(element) {
   let temp = document.getElementById('lineTemplate'), clon = temp.content.cloneNode(true);
   let parentElem = document.getElementById(element);
   let lines = parentElem.querySelectorAll(".codeLine")
   let code = clon.getElementById('lineCode');
-  clon.getElementById('lineNumber').innerHTML = lines.length+1;
-  code.addEventListener("keyup", function (e){
+  clon.getElementById('lineNumber').innerHTML = lines.length + 1;
+  code.addEventListener("keyup", function (e) {
     if (e.key === 'Enter') {
       createNewLine('creatorEditor');
-    }else if (e.key === "ArrowDown"){
+    } else if (e.key === "ArrowDown") {
       navigateLines(e.target, false)
-    }else if (e.key === "ArrowUp"){
+    } else if (e.key === "ArrowUp") {
       navigateLines(e.target, true)
     }
   })
-  
+
   parentElem.appendChild(clon);
   code.focus();
 }
-function navigateLines(element, upDown){
+function navigateLines(element, upDown) {
   let lineElem = element.parentNode;
   let parentElem = element.parentNode.parentNode;
   console.log(parentElem)
   let lines = parentElem.querySelectorAll('.codeLine');
   console.log(lines)
   let nextNum = 1;
-  if(upDown){
-    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) -1;
-  }else{
-    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) +1;
+  if (upDown) {
+    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) - 1;
+  } else {
+    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) + 1;
   }
   console.log(`next lines is ${nextNum}`)
-  for(let line of lines){
+  for (let line of lines) {
     console.log(`${line.querySelector("#lineNumber").innerHTML} vs. ${nextNum}`)
-    if(line.querySelector("#lineNumber").innerHTML == nextNum){
-      if(nextNum != 1){
-        line.querySelector('#lineCode').focus();
-        break;
-      }else {
-        line.querySelector('#firstLine').focus();
-        break;
-      }
+    if (line.querySelector("#lineNumber").innerHTML == nextNum) {
+      line.querySelector('#lineCode').focus();
+      break;
     }
   }
 }
@@ -1600,19 +1595,19 @@ function changeImplemented(oldConfig, newConfig) {
       "funcRadDeg": containsTrig(oldConfig.equation),
       "funcLength": oldConfig.name.length
     };
-    
-  }else if(oldConfig.type == "Code"){
 
-  }else if(oldConfig.type == "Hybrid"){
+  } else if (oldConfig.type == "Code") {
+
+  } else if (oldConfig.type == "Hybrid") {
 
   }
   let indexOf = -1;
-  for(let i = 0; i < funcList.length; i++){
-    if(JSON.stringify(object) == JSON.stringify(funcList[i])){
+  for (let i = 0; i < funcList.length; i++) {
+    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
       indexOf = i;
     }
   }
-  if(oldConfig.type == "Function"){
+  if (oldConfig.type == "Function") {
     let parseable = createParseable(solveInpr(newConfig.equation, settings.degRad))
     let newObject = {
       "func": newConfig.name,
@@ -1622,9 +1617,9 @@ function changeImplemented(oldConfig, newConfig) {
       "funcLength": newConfig.name.length
     };
     funcList[i] = newObject;
-  }else if (oldConfig.type == "Code"){
+  } else if (oldConfig.type == "Code") {
 
-  }else if (oldConfig.type == "Hybrid"){
+  } else if (oldConfig.type == "Hybrid") {
 
   }
 }
@@ -1639,13 +1634,13 @@ function addImplemented(funcConfig) {
       "funcLength": funcConfig.name.length
     };
     funcList.push(object);
-  }else if(funcConfig.type == "Code"){
+  } else if (funcConfig.type == "Code") {
 
-  }else if(funcConfig.type == "Hybrid"){
+  } else if (funcConfig.type == "Hybrid") {
 
   }
 }
-function removeImplemented(oldConfig){
+function removeImplemented(oldConfig) {
   let object = {};
   if (oldConfig.type == "Function") {
     let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
@@ -1656,14 +1651,14 @@ function removeImplemented(oldConfig){
       "funcRadDeg": containsTrig(oldConfig.equation),
       "funcLength": oldConfig.name.length
     };
-    
-  }else if(oldConfig.type == "Code"){
 
-  }else if(oldConfig.type == "Hybrid"){
+  } else if (oldConfig.type == "Code") {
+
+  } else if (oldConfig.type == "Hybrid") {
 
   }
-  for(let i = 0; i < funcList.length; i++){
-    if(JSON.stringify(object) == JSON.stringify(funcList[i])){
+  for (let i = 0; i < funcList.length; i++) {
+    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
       funcList.splice(i, 1)
     }
   }
