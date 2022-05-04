@@ -881,10 +881,6 @@ button:focus, input[type="button"]:focus {
     border-radius: 25px;
     position: absolute;
   }
-  #creatorEditor{
-    display: grid;
-    grid-auto-rows: 29px;
-  }
   .numberedHeader{
     margin-left: 5px;
     font-size: 25px;
@@ -2200,9 +2196,6 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
   z-index: 2;
   position: absolute;
-}
-#selectorUnder{
-  
 }
 .selectorSlider{
   top: 0px;
