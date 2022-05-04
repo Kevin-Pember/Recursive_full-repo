@@ -238,7 +238,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
-    if (document.getElementById('enterHeader').innerHTML != "‎") {
+    if (document.getElementById('enterHeader').innerHTML != "‎" && document.getElementById('enterHeader').innerHTML != "") {
       openPopup();
     } else {
       openPage("custCreator")
