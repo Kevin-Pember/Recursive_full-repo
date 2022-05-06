@@ -7,8 +7,6 @@
     <script src="js-solver.js"></script>
     <script src="chart.js"></script>
     <script src="solveToothless.js"></script>
-    <script src="codemirror/lib/codemirror.js"></script>
-    <link rel="stylesheet" href="codemirror/lib/">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-icon-180.png">
 
@@ -387,11 +385,8 @@
                 <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
             </div>
             <div class="creatorPage">
-                <div class="creatorDiv" id="creatorEditor" style="padding: 0; padding-top: 25px;">
+                <div  id="creatorEditor">
                     
-                    <template id="lineTemplate">
-                        <div id="codeDiv" class="codeLine" style="background-color: #00000033;"><h3 class="numberedHeader" id="lineNumber"></h3><input type="text" class="codeInput" id="lineCode"></div>
-                    </template>
                 </div>
             </div>
             <div class="creatorPage" style="visibility: hidden;">

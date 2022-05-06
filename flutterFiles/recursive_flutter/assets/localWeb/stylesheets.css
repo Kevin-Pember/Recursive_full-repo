@@ -20,6 +20,17 @@
   color: grey;
   display: block;
 }
+textarea {
+  border: none;
+  overflow: auto;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  resize: none; /*remove the resize handle on the bottom right*/
+}
 body{
   overflow-x: hidden;
   overflow-y: hidden;
@@ -887,21 +898,14 @@ button:focus, input[type="button"]:focus {
     width:fit-content;
     font-weight:700;
   }
-  .codeInput{
-    height: 29px;
+  #creatorEditor{
+    display: grid;
+    grid-template-columns: 20px calc(100% - 14px);
+  }
+  #codeEditor{
+    font-size: 25px;
     background-color: transparent;
     border: none;
-    font-size: 25;
-    margin-left: 5px;
-    min-width: 50px;
-    width: fit-content;
-    overflow-x: none;
-  }
-  .codeLine{
-    width: 100%;
-    height: fit-content;
-    display:flex;
-    flex-wrap: wrap;
   }
   #varsDiv{
     display: grid;

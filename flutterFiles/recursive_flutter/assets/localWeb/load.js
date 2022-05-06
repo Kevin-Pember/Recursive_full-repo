@@ -291,7 +291,7 @@ if (document.getElementById("mainBody") != null) {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
   });
 
-  createNewLine('creatorEditor');
+  createCodeTerminal(document.getElementById('creatorEditor'))
 
   const elem = document.getElementById("memoryTextBoarder");
   let isDown = false;
@@ -558,6 +558,26 @@ function openPopup() {
   sessionStorage.setItem("facing", "createNaming");
   document.getElementById('nameEntry').style.visibility = "visible";
 }
+function switchTabCreator(next){
+  i
+}
+function isHidden(el) {
+  return (el.offsetParent === null)
+}
+function hideElement(element){
+  element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
+  setTimeout(function () {
+    element.style.animation = undefined;
+    element.style.visibility = "hidden";
+  }, 150);
+}
+function pullUpElement(element){
+  element.style.visibility = "visible";
+  element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
+  setTimeout(function () {
+    element.style.animation = undefined;
+  }, 150);
+}
 function openPage(id) {
   let element = document.getElementById(id);
   element.style.zIndex = 5;
@@ -567,7 +587,51 @@ function openPage(id) {
     element.style.bottom = "0px";
   }, 150);
 }
-function createNewLine(element) {
+function createCodeTerminal(element){
+  let container = document.createElement("div")
+  container.id = "creatorEditor";
+  container.className = "creatorDiv";
+
+  let numberIndex = document.createElement("div")
+  numberIndex.id = "lineLabel";
+  container.appendChild(numberIndex)
+
+  let textarea = document.createElement('textarea')
+  textarea.id = "codeEditor";
+  textarea.addEventListener("input", function (e){
+      recaculateNums(numberIndex, textarea.value)
+  })
+  container.appendChild(textarea)
+
+  createNumHeader(numberIndex, 1);
+
+  element.appendChild(container);
+}
+function recaculateNums(parentElem, text){
+  console.log("reacalcuate")
+  let numOfO = (text.match(/\n/g) || []).length;
+  numOfO++;
+  let childern = parentElem.querySelectorAll('.numberedHeader');
+  console.log(childern)
+  console.log(`Childern: ${childern.length} vs Number of lines: ${numOfO}`)
+  if(childern.length > numOfO){
+    for(let i = childern.length-1; i > numOfO-1; i--){
+      childern[i].remove();
+    }
+  }else {
+    for (let i = 0; i < numOfO - childern.length; i++){
+      createNumHeader(parentElem, numOfO)
+    }
+  }
+}
+function createNumHeader(parentElem, num){
+  let initial = document.createElement('h3');
+  initial.className = "numberedHeader";
+  initial.innerHTML = num;
+  console.log()
+  parentElem.appendChild(initial)
+}
+/*function createNewLine(element) {
   let temp = document.getElementById('lineTemplate'), clon = temp.content.cloneNode(true);
   let parentElem = document.getElementById(element);
   let lines = parentElem.querySelectorAll(".codeLine")
@@ -606,7 +670,7 @@ function navigateLines(element, upDown) {
       break;
     }
   }
-}
+}*/
 function frontButtonPressed(input) {
   let display = document.getElementById('enterHeader');
   let sel = window.getSelection();
