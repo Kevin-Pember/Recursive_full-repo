@@ -241,6 +241,7 @@ if (document.getElementById("mainBody") != null) {
     if (document.getElementById('enterHeader').innerHTML != "‎" && document.getElementById('enterHeader').innerHTML != "") {
       openPopup();
     } else {
+      sessionStorage.setItem("facing", "creatorPage")
       openPage("custCreator")
     }
 
@@ -278,30 +279,41 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('nameEntryArea').value = "";
   });
 
+  document.getElementById('backCreator').addEventListener("click", function(){
+    universalBack();
+  });
   let movable = document.getElementById("custCreatorUnder");
   movable.dataset.pos = 0;
   document.getElementById('funcCreatorButton').addEventListener("click", function () {
     console.log("things")
     animateModes(parseInt(movable.dataset.pos), 0, movable);
     funcCreatorPages("funcTypePage")
+    document.getElementById('nameCreator').placeholder = "Name"
+    document.getElementById('nameCreator').readOnly = false;
   });
   document.getElementById('hybdCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 75, movable);
     funcCreatorPages("hybridCodeTypePage")
+    document.getElementById('nameCreator').placeholder = "defined by function"
+    document.getElementById('nameCreator').readOnly = true;
   });
   document.getElementById('codeCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
     funcCreatorPages("hybridCodeTypePage")
+    document.getElementById('nameCreator').placeholder = "Name"
+    document.getElementById('nameCreator').readOnly = false;
   });
   document.getElementById('saveCreator').addEventListener("click", function (){
     if(movable.dataset.pos == 0){
       createFunc("Function", document.getElementById('nameCreator').value, document.getElementById('creatorEquationFunc').innerHTML)
     }else if (movable.dataset.pos == 75){
+      console.log(document.getElementById('hybridEditor').value)
       let object = parseFunction(document.getElementById('hybridEditor').value)
-      createFunc("Hybrid", object.func, object.string)
+      createFunc("Hybrid", object.func, document.getElementById('hybridEditor').value)
     }else if (movable.dataset.pos == 150){
       createFunc("Code", document.getElementById('nameCreator').value, document.getElementById('hybridEditor').value)
     }
+    universalBack();
   });
   createCodeTerminal(document.getElementById('creatorEditor'),"hybridEditor")
 
@@ -594,11 +606,20 @@ function pullUpElement(element){
 function openPage(id) {
   let element = document.getElementById(id);
   element.style.zIndex = 5;
-  element.style.animation = "0.15s ease-in 0s 1 normal forwards running pageup";
+  element.style.animation = "0.1s ease-in 0s 1 normal forwards running pageup";
   setTimeout(function () {
     element.style.animation = undefined;
     element.style.bottom = "0px";
-  }, 150);
+  }, 100);
+}
+function closePage(id){
+  let element = document.getElementById(id);
+  element.style.animation = "0.1s ease-in 0s 1 reverse forwards running pageup"
+  setTimeout(function (){
+    element.style.animation = undefined;
+    element.style.bottom = "100%";
+    element.style.zIndex = 1;
+  }, 100)
 }
 function createCodeTerminal(element,name){
   let container = document.createElement("div")
@@ -829,6 +850,14 @@ let facingBack = [
     "mth": function () {
       helpBack('settingsHelp')
     }
+  },
+  {
+    "elm": "creatorPage",
+    "backElm": '',
+    "prtCont": 'main',
+    "mth": function () {
+      closePage('custCreator');
+    },
   }
 ];
 function universalBack() {

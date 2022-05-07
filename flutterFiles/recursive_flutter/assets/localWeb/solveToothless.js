@@ -583,12 +583,13 @@ function containsTrig(string) {
   console.log(var + var2)
 }*/
 function stringFunction(name, string) {
-  string = `var ${name} = function ${string}`;
+  string = `var ${name} = function ${string};  return ${name};`;
   console.log(string)
-  eval(string);
+  return eval(string);
 }
 function parseFunction(StringFunction) {
-  StringFunction = StringFunction.substring(StringFunction.indexOf("Function") + 9)
+  console.log(StringFunction)
+  StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   StringFunction = StringFunction.substring(StringFunction.indexOf("("))
   let variableDefs = StringFunction.substring(1, StringFunction.indexOf(")")).trim();
@@ -628,9 +629,9 @@ function createNewFunction(){
     object.funcLength = name.length
     funcList.push(object);
   }else if (arguments[0] == "method"){
-    let funcString = [1];
+    let funcString = arguments[1];
     let funcObject = parseFunction(funcString);
-    stringFunction(funcObject.func, funcObject.string)
+    funcObject.mth = stringFunction(funcObject.func, funcObject.string)
     funcList.push(funcObject);
   }
 }
