@@ -1,5 +1,7 @@
+let defaultAngle = true;
 let funcList = [
   {
+    'type': "function",
     'func': "acsc",
     'funcParse': ["Math.asin(1/", "v1", ")", "toRad"],
     'inputs': 1,
@@ -7,6 +9,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "asec",
     'funcParse': ["Math.acos(1/", "v1", ")", "toRad"],
     'inputs': 1,
@@ -14,6 +17,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "acot",
     'funcParse': ["Math.atan(1/", "v1", ")", "toRad"],
     'inputs': 1,
@@ -21,6 +25,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "asin",
     'funcParse': ["Math.asin(", "v1", ")", "toRad"],
     'inputs': 1,
@@ -28,6 +33,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "acos",
     'funcParse': ["Math.acos(", "v1", ")", "toRad"],
     'inputs': 1,
@@ -35,6 +41,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "atan",
     'funcParse': ["Math.atan(", "v1", ")", "toRad"],
     'inputs': 1,
@@ -42,6 +49,7 @@ let funcList = [
     'funcLength': 4,
   },
   {
+    'type': "function",
     'func': "sin",
     'funcParse': ["Math.sin(", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -49,6 +57,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "cos",
     'funcParse': ["Math.cos(", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -56,6 +65,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "tan",
     'funcParse': ["Math.tan(", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -63,6 +73,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "csc",
     'funcParse': ["1/Math.sin(", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -70,6 +81,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "sec",
     'funcParse': ["1/Math.cos(1/", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -77,6 +89,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "cot",
     'funcParse': ["1/Math.tan(1/", "v1", "toDeg", ")"],
     'inputs': 1,
@@ -84,6 +97,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "ln",
     'funcParse': ["Math.log(", "v1", ")"],
     'inputs': 1,
@@ -91,6 +105,7 @@ let funcList = [
     'funcLength': 2,
   },
   {
+    'type': "function",
     'func': "log",
     'funcParse': ["Math.log10(", "v1", ")"],
     'inputs': 1,
@@ -98,6 +113,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     'func': "mod",
     'funcParse': ["v1", "%", "v2"],
     'inputs': 2,
@@ -105,6 +121,7 @@ let funcList = [
     'funcLength': 3,
   },
   {
+    'type': "function",
     "func": "abs",
     "funcParse": ["Math.abs(", "v1", ")"],
     "inputs": 1,
@@ -124,14 +141,18 @@ function solveInpr(equation, degRad) {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
       );
-      let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
-      let funcTemp = findMethod(func, degRad);
-      if(funcTemp.type == "Equation"){
-        let parsedFunc = assembly(func, funcTemp, values);
-        equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
-        i = i + parsedFunc.length - 1;
-      }else if (funcTemp.type == "Function"){
-        
+      if (func.type == "function") {
+        let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
+        let funcTemp = findMethod(func, degRad);
+        if (funcTemp.type == "Equation") {
+          let parsedFunc = assembly(func, funcTemp, values);
+          equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+          i = i + parsedFunc.length - 1;
+        } else if (funcTemp.type == "Function") {
+
+        }
+      }else if (func.type == "method"){
+
       }
     }
   }
@@ -152,7 +173,7 @@ function funcMatch(equation) {
   for (let func of funcList) {
     let check = equation.substring(0, (func.funcLength));
     if (check == func.func) {
-      console.log(`%c func matched ${func.func}`,"color: yellow;")
+      console.log(`%c func matched ${func.func}`, "color: yellow;")
       return func.func;
     }
   }
@@ -169,7 +190,7 @@ function funcMatch(equation) {
 function findMethod(funcUn, degRad) {
   let func = JSON.parse(JSON.stringify(funcUn));
   let array = func.funcParse;
-  console.log(`%cfunc Parse ${array}`,"color: blue")
+  console.log(`%cfunc Parse ${array}`, "color: blue")
   if (func.funcRadDeg) {
     if (degRad) {
       if (array.includes("toDeg")) {
@@ -363,9 +384,9 @@ function builtInFunc(equation) {
       equation = equation.substring(0, i) + parseString + equation.substring(i + 1);
     } else if (equation.charAt(i) == "|") {
       let sub = "";
-      if(equation.charAt(i-1) == "("){
-        sub = equation.substring(i-1);
-      }else{
+      if (equation.charAt(i - 1) == "(") {
+        sub = equation.substring(i - 1);
+      } else {
         sub = equation.substring(i);
       }
       let type = false;
@@ -480,53 +501,53 @@ function getNameList() {
   }
 }*/
 //Takes string and returns an array for funclist
-function createParseable(equation){
+function createParseable(equation) {
   let equationArray = [];
   let variablesInOrder = [];
   let varArray = varInEquat(equation);
-  for(let i = 0; i < varArray.length; i++){
-    varArray[i].letter = "v" + (i+1);
+  for (let i = 0; i < varArray.length; i++) {
+    varArray[i].letter = "v" + (i + 1);
   }
   console.log(varArray);
-  variablesInOrder.push({"name": varArray[0].letter, "index": varArray[0].positions[0]});
+  variablesInOrder.push({ "name": varArray[0].letter, "index": varArray[0].positions[0] });
   varArray.shift();
-  for(item of varArray){
-    for(let postion of item.positions){
-      for(let j = variablesInOrder.length-1; j >= 0; j--){
-        if(postion > variablesInOrder[j].index){
-          variablesInOrder.splice(j+1, 0, {"name": item.letter, "index": postion});
+  for (item of varArray) {
+    for (let postion of item.positions) {
+      for (let j = variablesInOrder.length - 1; j >= 0; j--) {
+        if (postion > variablesInOrder[j].index) {
+          variablesInOrder.splice(j + 1, 0, { "name": item.letter, "index": postion });
           break;
         }
       }
     }
   }
-  for(let i = 0; i < variablesInOrder.length; i++){
+  for (let i = 0; i < variablesInOrder.length; i++) {
     let index = variablesInOrder[i].index;
     let pre = "";
     let vard = "";
-    if(i == 0){
-      pre = equation.substring(0,index);
+    if (i == 0) {
+      pre = equation.substring(0, index);
       vard = variablesInOrder[i].name;
-    }else{
-      let prevIndex = variablesInOrder[i-1].index;
-      pre = equation.substring(prevIndex+1, index);
+    } else {
+      let prevIndex = variablesInOrder[i - 1].index;
+      pre = equation.substring(prevIndex + 1, index);
       vard = variablesInOrder[i].name;
     }
-    if(pre != ""){
+    if (pre != "") {
       equationArray.push(pre);
     }
     equationArray.push(vard);
-    if(i == variablesInOrder.length-1 && equation.substring(index+1) != ''){
-      equationArray.push(equation.substring(index+1));
+    if (i == variablesInOrder.length - 1 && equation.substring(index + 1) != '') {
+      equationArray.push(equation.substring(index + 1));
     }
   }
   return equationArray;
 }
 //calculate inputs
-function cacInputs(array){
+function cacInputs(array) {
   let num = 0;
-  for(let item of array){
-    if(item.charAt(0) == 'v'){
+  for (let item of array) {
+    if (item.charAt(0) == 'v') {
       num++;
     }
   }
@@ -553,42 +574,68 @@ let trigDef = [
   'arccot',
 ];
 //searches an equation string for any trig and returns a true or false question
-function containsTrig(string){
-  for(let statement of trigDef){
+function containsTrig(string) {
+  for (let statement of trigDef) {
     return string.includes(statement);
   }
 }
 /*(var, var2){
   console.log(var + var2)
 }*/
-function stringFunction(name, string){
+function stringFunction(name, string) {
   string = `var ${name} = function ${string}`;
   console.log(string)
   eval(string);
 }
-function parseFunction(StringFunction){
-  StringFunction = StringFunction.substring(StringFunction.indexOf("Function")+9)
+function parseFunction(StringFunction) {
+  StringFunction = StringFunction.substring(StringFunction.indexOf("Function") + 9)
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   StringFunction = StringFunction.substring(StringFunction.indexOf("("))
   let variableDefs = StringFunction.substring(1, StringFunction.indexOf(")")).trim();
   let variables = [];
-  while(variableDefs.length > 0){
-    if(variableDefs.includes(',')){
+  while (variableDefs.length > 0) {
+    if (variableDefs.includes(',')) {
       variables.push(variableDefs.substring(0, variableDefs.indexOf(',')));
-      variableDefs = variableDefs.substring(variableDefs.indexOf(',')+1)
-    }else{
+      variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
+    } else {
       variables.push(variableDefs);
       variableDefs = 0;
     }
   }
   let finalObject = {
-    "name": name,
-    "type": "Function",
+    "func": name,
+    "type": "method",
     "string": StringFunction,
     "inputs": variables.length,
     "funcRadDeg": false,
     "funcLength": name.length
   }
-  stringFunction(name, StringFunction)
-  funcList.push(finalObject)
+  //stringFunction(name, StringFunction)
+  //funcList.push(finalObject)
+  return finalObject;
+}
+function createNewFunction(){
+  let object = {};
+  if(arguments[0] == "function"){
+    let name = arguments[1];
+    let func = arguments[2];
+    let parseable = createParseable(solveInpr(func),defaultAngle)
+    object.type = arguments[0];
+    object.func = name;
+    object.funcParse = parseable;
+    object.inputs = cacInputs(parseable);
+    object.funcRadDeg = containsTrig(func)
+    object.funcLength = name.length
+    funcList.push(object);
+  }else if (arguments[0] == "method"){
+    let funcString = [1];
+    let funcObject = parseFunction(funcString);
+    stringFunction(funcObject.func, funcObject.string)
+    funcList.push(funcObject);
+  }
+}
+function removeFunction(name){
+  funcList = funcList.filter(function(value, index, arr){ 
+    return value.func != name;
+})
 }

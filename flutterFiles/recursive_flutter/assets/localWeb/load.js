@@ -268,7 +268,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc('Function');
+    createFunc('Function',document.getElementById('nameEntryArea').value,document.getElementById('enterHeader').innerHTML);
     document.getElementById('nameEntry').style.visibility = "hidden";
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
@@ -283,15 +283,27 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('funcCreatorButton').addEventListener("click", function () {
     console.log("things")
     animateModes(parseInt(movable.dataset.pos), 0, movable);
+    funcCreatorPages("funcTypePage")
   });
   document.getElementById('hybdCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 75, movable);
+    funcCreatorPages("hybridCodeTypePage")
   });
   document.getElementById('codeCreatorButton').addEventListener("click", function () {
     animateModes(parseInt(movable.dataset.pos), 150, movable);
+    funcCreatorPages("hybridCodeTypePage")
   });
-
-  createCodeTerminal(document.getElementById('creatorEditor'))
+  document.getElementById('saveCreator').addEventListener("click", function (){
+    if(movable.dataset.pos == 0){
+      createFunc("Function", document.getElementById('nameCreator').value, document.getElementById('creatorEquationFunc').innerHTML)
+    }else if (movable.dataset.pos == 75){
+      let object = parseFunction(document.getElementById('hybridEditor').value)
+      createFunc("Hybrid", object.func, object.string)
+    }else if (movable.dataset.pos == 150){
+      createFunc("Code", document.getElementById('nameCreator').value, document.getElementById('hybridEditor').value)
+    }
+  });
+  createCodeTerminal(document.getElementById('creatorEditor'),"hybridEditor")
 
   const elem = document.getElementById("memoryTextBoarder");
   let isDown = false;
@@ -529,22 +541,23 @@ function inputSolver(equation, errorStatement) {
     report(errorStatement, false);
   }
 }
-function createFunc(type) {
-  let name = document.getElementById('nameEntryArea').value;
-  let text = document.getElementById('enterHeader').innerHTML;
+function createFunc(type, name, text) {
   var funcList = getFuncList();
   if (!custFuncExisting(name, false)) {
-    custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+    
     let object = { "name": name, "type": type };
     switch (type) {
       case "Function":
         object.equation = text;
+        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
       case "Code":
         object.code = text;
+        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
       case "Hybrid":
         object.code = text;
+        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
         break;
     }
     funcList.push(object);
@@ -558,11 +571,11 @@ function openPopup() {
   sessionStorage.setItem("facing", "createNaming");
   document.getElementById('nameEntry').style.visibility = "visible";
 }
-function switchTabCreator(next){
-  i
-}
-function isHidden(el) {
-  return (el.offsetParent === null)
+function funcCreatorPages(elemID){
+  for(let elem of document.getElementsByClassName('creatorPage')){
+    elem.style.visibility = "hidden";
+  }
+  document.getElementById(elemID).style.visibility = "visible";
 }
 function hideElement(element){
   element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
@@ -587,7 +600,7 @@ function openPage(id) {
     element.style.bottom = "0px";
   }, 150);
 }
-function createCodeTerminal(element){
+function createCodeTerminal(element,name){
   let container = document.createElement("div")
   container.id = "creatorEditor";
   container.className = "creatorDiv";
@@ -597,7 +610,8 @@ function createCodeTerminal(element){
   container.appendChild(numberIndex)
 
   let textarea = document.createElement('textarea')
-  textarea.id = "codeEditor";
+  textarea.className = "codeEditor";
+  textarea.id = name;
   textarea.addEventListener("input", function (e){
       recaculateNums(numberIndex, textarea.value)
   })
@@ -1689,43 +1703,13 @@ function changeImplemented(oldConfig, newConfig) {
 }
 function addImplemented(funcConfig) {
   if (funcConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(funcConfig.equation, settings.degRad))
-    let object = {
-      "func": funcConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(funcConfig.equation),
-      "funcLength": funcConfig.name.length
-    };
-    funcList.push(object);
-  } else if (funcConfig.type == "Code") {
-
+    createNewFunction("function", funcConfig.name, solveInpr(funcConfig.equation, settings.degRad));
   } else if (funcConfig.type == "Hybrid") {
-
+    createNewFunction("method", funcConfig.code)
   }
 }
 function removeImplemented(oldConfig) {
-  let object = {};
-  if (oldConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
-    object = {
-      "func": oldConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(oldConfig.equation),
-      "funcLength": oldConfig.name.length
-    };
-
-  } else if (oldConfig.type == "Code") {
-
-  } else if (oldConfig.type == "Hybrid") {
-
-  }
-  for (let i = 0; i < funcList.length; i++) {
-    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
-      funcList.splice(i, 1)
-    }
-  }
+  removeFunction(oldConfig.name);
 }
 function hidModes(num, tabs) {
   if (num == 0) {

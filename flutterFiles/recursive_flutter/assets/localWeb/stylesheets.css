@@ -902,7 +902,7 @@ button:focus, input[type="button"]:focus {
     display: grid;
     grid-template-columns: 20px calc(100% - 14px);
   }
-  #codeEditor{
+  .codeEditor{
     font-size: 25px;
     background-color: transparent;
     border: none;
