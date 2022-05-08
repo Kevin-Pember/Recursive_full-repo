@@ -1530,23 +1530,20 @@ function newCustFuncTab(config) {
   }
   if (!exist) {
     clon = defaultSetup(clon);
+    let name = config.name;
+    let varGrid = clon.getElementById("varGrid");
+    let equationDIV = clon.getElementById("EquationFunc");
+    let movable = clon.getElementById("selectorUnder");
+    movable.dataset.pos = 0;
+    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+
+    clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
+    clon.getElementById("nameFunc").value = name;
+
     switch (config.type) {
       case ('Function'):
-        let name = config.name;
         let equation = config.equation;
-        let currentTab = JSON.stringify(config);
-        let varGrid = clon.getElementById("varGrid");
-        let equationDIV = clon.getElementById("EquationFunc");
-        let movable = clon.getElementById("selectorUnder");
-        let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-        movable.dataset.pos = 0;
 
-        console.log("%c config is", "color: red;");
-        console.log(config)
-
-        clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
-        console.log(clon.getElementById('customFuncTab').dataset.tab)
-        clon.getElementById("nameFunc").value = name;
         clon.getElementById("EquationFunc").innerHTML = equation;
         clon.getElementById("EquationFunc").dataset.baseE = equation;
 
@@ -1555,9 +1552,7 @@ function newCustFuncTab(config) {
           let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
           let matchPage = matchTab(e.target.parentNode.dataset.tab, true);
           let newVal = JSON.parse(e.target.parentNode.dataset.tab);
-
           newVal.name = e.target.value;
-
           matchPage.querySelector("#newTabName").innerHTML = e.target.value;
           matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
           changeFunc(oldVal, newVal, matchPage, liveTab);
@@ -1589,8 +1584,19 @@ function newCustFuncTab(config) {
         }
         break;
       case ("Hybrid"):
-
-        break;
+        let nameElem = clon.getElementById('nameFunc');
+        let subElem = clon.getElementById("EquationFunc");
+        subElem.innerHTML = "Hybrid";
+        subElem.contentEditable = false;
+        
+        nameElem.addEventListener("input", function(){
+          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
+          removeImplemented(oldVal.name)
+          removeFunc(oldVal.name)
+          let oldParse = parseFunction(oldVal.code)
+          
+        });
+      break;
     }
     //adding event listeners
 

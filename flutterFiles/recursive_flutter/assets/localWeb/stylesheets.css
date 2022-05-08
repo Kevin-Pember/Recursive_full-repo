@@ -1795,6 +1795,8 @@ button:focus, input[type="button"]:focus {
   margin-top: 15px;
   left: 2.5%;
   width: 95%;
+  overflow-y: hidden;
+  padding: -30px;
 }
 #aboutTag{
   padding-top: 10px;
