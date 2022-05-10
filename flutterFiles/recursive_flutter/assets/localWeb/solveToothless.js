@@ -583,9 +583,9 @@ function containsTrig(string) {
   console.log(var + var2)
 }*/
 function stringFunction(name, string) {
-  string = `var ${name} = function ${string};  return ${name};`;
+  string = `var ${name} = function ${string} \n return ${name};`;
   console.log(string)
-  return eval(string);
+  return Function(string);
 }
 function parseFunction(StringFunction) {
   console.log(StringFunction)
@@ -631,7 +631,9 @@ function createNewFunction(){
   }else if (arguments[0] == "method"){
     let funcString = arguments[1];
     let funcObject = parseFunction(funcString);
-    funcObject.mth = stringFunction(funcObject.func, funcObject.string)
+    funcObject.mth = stringFunction(funcObject.func, funcObject.string)()
+    console.log(funcObject.mth.toString())
+    console.log(funcObject.mth(2))
     funcList.push(funcObject);
   }
 }

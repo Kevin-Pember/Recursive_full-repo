@@ -104,6 +104,7 @@ if (document.getElementById("mainBody") != null) {
   var funcs = getFuncList();
   console.log(funcs)
   for (let funcObject of funcs) {
+    console.log(funcObject);
     addImplemented(funcObject);
     switch (funcObject.type) {
       case "Function":
