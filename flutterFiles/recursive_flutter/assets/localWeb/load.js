@@ -2,10 +2,6 @@ let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let state = {};
 var settings;
-console.log();
-//parseFunction("function thing(s){ console.log(s); };");
-//eval("var thing = function (s) { console.log(s);};")
-//thing("hello")
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log("settings got");
@@ -23,16 +19,6 @@ for (let theme of themes) {
     themeElem = theme;
   }
 }
-//Deprecated method for web apps
-/*
-BackgroundColorGlobal = settings.func;
-var allMetaElements = document.getElementsByTagName('meta');
-for (var i = 0; i < allMetaElements.length; i++) {
-  if (allMetaElements[i].getAttribute("name") == "theme-color") {
-    allMetaElements[i].setAttribute('content', BackgroundColorGlobal);
-    break;
-  }
-}*/
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
   if (!settings.degRad) {
@@ -534,76 +520,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('customFuncBack').addEventListener("click", function () { helpBack('customFuncHelp') });
   document.getElementById('settingsBack').addEventListener("click", function () { helpBack('settingsHelp') });
 }
-function degRadSwitch(mode) {
-  document.getElementById('degModeBut').className = "settingsButton";
-  document.getElementById('radModeBut').className = "settingsButton";
-  if (mode) {
-    document.getElementById('degModeBut').className = "settingsButton active";
-  } else {
-    document.getElementById('radModeBut').className = "settingsButton active";
-  }
-}
-function inputSolver(equation, errorStatement) {
-  equation = solveInpr(equation, settings.degRad)
-  try {
-    var mySolver = new Solver({
-      s: equation,
-    })
-    return mySolver.solve({})["s"];
-  } catch (e) {
-    report(errorStatement, false);
-  }
-}
-function createFunc(type, name, text) {
-  var funcList = getFuncList();
-  if (!custFuncExisting(name, false)) {
-    
-    let object = { "name": name, "type": type };
-    switch (type) {
-      case "Function":
-        object.equation = text;
-        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        break;
-      case "Code":
-        object.code = text;
-        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        break;
-      case "Hybrid":
-        object.code = text;
-        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
-        break;
-    }
-    funcList.push(object);
-    addImplemented(object)
-    console.log(`%c resulting funcList is ${funcList}`, "color: green;");
-    setFuncList(funcList);
-  }
-}
-function openPopup() {
-  console.log("open popup ran")
-  sessionStorage.setItem("facing", "createNaming");
-  document.getElementById('nameEntry').style.visibility = "visible";
-}
-function funcCreatorPages(elemID){
-  for(let elem of document.getElementsByClassName('creatorPage')){
-    elem.style.visibility = "hidden";
-  }
-  document.getElementById(elemID).style.visibility = "visible";
-}
-function hideElement(element){
-  element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
-  setTimeout(function () {
-    element.style.animation = undefined;
-    element.style.visibility = "hidden";
-  }, 150);
-}
-function pullUpElement(element){
-  element.style.visibility = "visible";
-  element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
-  setTimeout(function () {
-    element.style.animation = undefined;
-  }, 150);
-}
+/**********************************************|Main Page UI|*********************************************************/
+//Responsible for animating pages on top of the main calculator (currently only used for creator page)
 function openPage(id) {
   let element = document.getElementById(id);
   element.style.zIndex = 5;
@@ -613,6 +531,7 @@ function openPage(id) {
     element.style.bottom = "0px";
   }, 100);
 }
+//Responsible for hiding pages that where placed on top of the main calculator
 function closePage(id){
   let element = document.getElementById(id);
   element.style.animation = "0.1s ease-in 0s 1 reverse forwards running pageup"
@@ -622,91 +541,64 @@ function closePage(id){
     element.style.zIndex = 1;
   }, 100)
 }
-function createCodeTerminal(element,name){
-  let container = document.createElement("div")
-  container.id = "creatorEditor";
-  container.className = "creatorDiv";
-
-  let numberIndex = document.createElement("div")
-  numberIndex.id = "lineLabel";
-  container.appendChild(numberIndex)
-
-  let textarea = document.createElement('textarea')
-  textarea.className = "codeEditor";
-  textarea.id = name;
-  textarea.addEventListener("input", function (e){
-      recaculateNums(numberIndex, textarea.value)
-  })
-  container.appendChild(textarea)
-
-  createNumHeader(numberIndex, 1);
-
-  element.appendChild(container);
-}
-function recaculateNums(parentElem, text){
-  console.log("reacalcuate")
-  let numOfO = (text.match(/\n/g) || []).length;
-  numOfO++;
-  let childern = parentElem.querySelectorAll('.numberedHeader');
-  console.log(childern)
-  console.log(`Childern: ${childern.length} vs Number of lines: ${numOfO}`)
-  if(childern.length > numOfO){
-    for(let i = childern.length-1; i > numOfO-1; i--){
-      childern[i].remove();
-    }
-  }else {
-    for (let i = 0; i < numOfO - childern.length; i++){
-      createNumHeader(parentElem, numOfO)
-    }
-  }
-}
-function createNumHeader(parentElem, num){
-  let initial = document.createElement('h3');
-  initial.className = "numberedHeader";
-  initial.innerHTML = num;
-  console.log()
-  parentElem.appendChild(initial)
-}
-/*function createNewLine(element) {
-  let temp = document.getElementById('lineTemplate'), clon = temp.content.cloneNode(true);
-  let parentElem = document.getElementById(element);
-  let lines = parentElem.querySelectorAll(".codeLine")
-  let code = clon.getElementById('lineCode');
-  clon.getElementById('lineNumber').innerHTML = lines.length + 1;
-  code.addEventListener("keyup", function (e) {
-    if (e.key === 'Enter') {
-      createNewLine('creatorEditor');
-    } else if (e.key === "ArrowDown") {
-      navigateLines(e.target, false)
-    } else if (e.key === "ArrowUp") {
-      navigateLines(e.target, true)
-    }
-  })
-
-  parentElem.appendChild(clon);
-  code.focus();
-}
-function navigateLines(element, upDown) {
-  let lineElem = element.parentNode;
-  let parentElem = element.parentNode.parentNode;
-  console.log(parentElem)
-  let lines = parentElem.querySelectorAll('.codeLine');
-  console.log(lines)
-  let nextNum = 1;
-  if (upDown) {
-    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) - 1;
+//Responsible for handling the popup part of the virtKeyboard on the page
+function popup() {
+  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
+    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
+    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideDown";
+    setTimeout(donothing, 500);
+    document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
   } else {
-    nextNum = Number(lineElem.querySelector("#lineNumber").innerHTML) + 1;
+    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toUp";
+    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideUp";
+    setTimeout(donothing, 500);
+    document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
   }
-  console.log(`next lines is ${nextNum}`)
-  for (let line of lines) {
-    console.log(`${line.querySelector("#lineNumber").innerHTML} vs. ${nextNum}`)
-    if (line.querySelector("#lineNumber").innerHTML == nextNum) {
-      line.querySelector('#lineCode').focus();
-      break;
+
+}
+//Responsible for hiding elements on main screen
+function hideAllTabs() {
+  let tabs = document.getElementsByClassName('tabcontent');
+  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
+    popup();
+  }
+  for (let tab of tabs) {
+    tab.style.visibility = "hidden";
+  }
+}
+//Responsible for hiding and bring up tab elements
+function changeTabAs(change) {
+  let visibility = "", bases = document.getElementsByClassName('displayBase'), tabstyle = "", tablinks = document.getElementsByClassName('tablinks');
+  if (change) {
+    visibility = "visible";
+    tabstyle = "visibility: visible; left: 5%; width: 90%; height: 90%; border-radius: 20px; text-align: center;";
+    document.getElementById("tab").style = "display: block; height:100%;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: 50% 50%; grid-auto-rows: 300px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: 100%; background-color: var(--translucent); border-radius: 25px 25px 0 0;";
+  } else {
+    visibility = "hidden";
+    tabstyle = undefined;
+    document.getElementById("tab").style = undefined;
+    document.getElementById('tabContainer').style = undefined;
+  }
+  for (let i = 0; i < bases.length; i++) {
+    bases[i].style.visibility = visibility;
+    tablinks[i].style = tabstyle;
+    if (change) {
+      let parse = tablinks[i].dataset.tabmap;
+      parse = parse.substring(parse.indexOf('»') + 1);
+      parse = parse.substring(0, parse.indexOf('»'));
+      setShowEquat(tablinks[i], parse);
     }
   }
-}*/
+}
+//Responsible for handling the tab number for mobile tabs
+function setNumOfTabs() {
+  let tabs = document.getElementsByClassName('tablinks');
+  document.getElementById("tabNum").innerHTML = tabs.length;
+}
+//END
+/********************************************|Main Page Button Handling|*********************************************/
+//Responsible for most keypresses on main input. Handles focus and adding of characters to method
 function frontButtonPressed(input) {
   let display = document.getElementById('enterHeader');
   let sel = window.getSelection();
@@ -734,10 +626,1398 @@ function frontButtonPressed(input) {
   sel.addRange(range);
   document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
 }
-function preventFocus() {
-  var ae = document.activeElement;
-  setTimeout(function () { ae.focus() }, 1);
+//Responsible for handling the pars button on main calc buttons
+function parsMethod() {
+  let badIdea = document.getElementById("enterHeader").selectionStart;
+  let lazyAfterthought = 0;
+  for (let i = 0; i < document.getElementById("enterHeader").innerHTML.length; i++) {
+    if (document.getElementById("enterHeader").innerHTML.charAt(i) == '(') {
+      lazyAfterthought = lazyAfterthought + 1;
+    }
+    if (document.getElementById("enterHeader").innerHTML.charAt(i) == ')') {
+      lazyAfterthought = lazyAfterthought - 1;
+    }
+  }
+  if (lazyAfterthought >= 1 && document.getElementById("enterHeader").innerHTML.charAt(badIdea - 1) != '(') {
+    frontButtonPressed(')');
+  } else {
+    frontButtonPressed('(');
+  }
 }
+//Responsible (I Think) for handling all power of event for main calc buttons
+function pow(type) {
+  let display = document.getElementById('enterHeader');
+  let sel = window.getSelection();
+  let range = document.createRange();
+  let index = 0;
+  let higher = 0;
+  let lower = 0;
+  if (sel.anchorOffset > sel.focusOffset) {
+    higher = sel.anchorOffset;
+    lower = sel.focusOffset;
+  } else {
+    higher = sel.focusOffset;
+    lower = sel.anchorOffset;
+  }
+  for (let i = 0; i < display.childNodes.length; i++) {
+    if (sel.focusNode == display.childNodes[i]) {
+      index = i;
+      break;
+    }
+  }
+  let backend = sel.focusNode.nodeValue.substring(higher);
+  sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
+  let superSr = document.createElement("sup");
+  if (type == "2") {
+    superSr.appendChild(document.createTextNode('‎2'));
+  } else {
+    superSr.appendChild(document.createTextNode('‎'));
+  }
+  if (backend == '') {
+    backend = '‎';
+  }
+  if (index == display.childNodes.length) {
+    display.appendChild(document.createTextNode(backend));
+  } else {
+    display.insertBefore(document.createTextNode(backend), display.childNodes[index + 1]);
+  }
+  window.addEventListener('keydown', keepBlank);
+  display.insertBefore(superSr, display.childNodes[index + 1]);
+  if (type == "2") {
+    range.setStart(display.childNodes[index + 2], 1);
+  } else {
+    range.setStart(superSr.childNodes[0], 1);
+  }
+  range.collapse(true);
+  sel.removeAllRanges()
+  sel.addRange(range);
+}
+//Responsible (I Think) for handling trig button presses (needs update to work with new elements)
+function trigPressed(input) {
+  if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
+    frontButtonPressed("a" + input);
+  } else {
+    frontButtonPressed(input);
+  }
+}
+//Responsible (I Think) to patch weird behavior with default HTML behavior SUP
+function keepBlank(eve) {
+  let sel = window.getSelection();
+  let range = document.createRange();
+  let higher = 0;
+  let lower = 0;
+  if (sel.anchorOffset > sel.focusOffset) {
+    higher = sel.anchorOffset;
+    lower = sel.focusOffset;
+  } else {
+    higher = sel.focusOffset;
+    lower = sel.anchorOffset;
+  }
+  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == document.getElementById('enterHeader')) {
+    eve.preventDefault();
+    let childNodes = document.getElementById('enterHeader').childNodes;
+    for (let i = 0; i < childNodes.length; i++) {
+      if (childNodes[i] == sel.focusNode) {
+        range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }
+}
+//Responsible for controlling the angle mode switch in settings
+function degRadSwitch(mode) {
+  document.getElementById('degModeBut').className = "settingsButton";
+  document.getElementById('radModeBut').className = "settingsButton";
+  if (mode) {
+    document.getElementById('degModeBut').className = "settingsButton active";
+  } else {
+    document.getElementById('radModeBut').className = "settingsButton active";
+  }
+}
+//Responsible for inverse settings on main calc bittons (main input)
+function setInverse() {
+  let trig = [{ "base": "sin", "inverse": "csc" }, { "base": "cos", "inverse": "sec" }, { "base": "tan", "inverse": "cot" }];
+  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
+  let invButtons = ['invPopup', 'invEx'];
+  let arc = false;
+  let text = "";
+  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
+    arc = true;
+  }
+  //sets the text of inv buttons and sets the state value
+  if (document.getElementById('invPopup').innerHTML == "inv") {
+    text = "reg"
+    state.tS[0] = true;
+  } else {
+    text = "inv"
+    state.tS[0] = false;
+  }
+  for (let elem of invButtons) {
+    document.getElementById(elem).innerHTML = text;
+  }
+  //sets the text of trig buttons based on values
+  for (let elem of elements) {
+    let elemText = document.getElementById(elem).innerHTML;
+    let outText = "";
+    if (arc) {
+      elemText = elemText.substring(1);
+    }
+    for (let tr of trig) {
+      if (elemText == tr.base) {
+        outText = tr.inverse;
+      } else if (elemText == tr.inverse) {
+        outText = tr.base;
+      }
+    }
+    if (arc) {
+      outText = "a" + outText;
+    }
+    document.getElementById(elem).innerHTML = outText;
+  }
+}
+//Responsible for arc settings on main calc buttons (main input)
+function setArc() {
+  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
+  let invButtons = ['arcPopup', 'arcEx'];
+  let arc = false;
+  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
+    arc = true;
+  }
+  for (let elem of elements) {
+    let text = document.getElementById(elem).innerHTML;
+    if (!arc) {
+      document.getElementById(elem).innerHTML = "a" + text;
+      state.tS[1] = true;
+    } else {
+      document.getElementById(elem).innerHTML = text.substring(1);
+      state.tS[1] = false;
+    }
+  }
+}
+//Responsible for the backspace button on the main calc buttons
+function backPressed() {
+  let uifCalculator = document.getElementById('enterHeader');
+  let sel = window.getSelection();
+  let range = document.createRange();
+  let index = 0;
+  let higher = 0;
+  let lower = 0;
+  if (sel.anchorOffset > sel.focusOffset) {
+    higher = sel.anchorOffset;
+    lower = sel.focusOffset;
+  } else {
+    higher = sel.focusOffset;
+    lower = sel.anchorOffset;
+  }
+  if (!(plainSup(sel) && sel.focusNode.nodeValue.length <= 1)) {
+    if (sel.anchorOffset == sel.focusOffset) {
+      if (sel.focusNode.nodeValue.charAt(sel.anchorOffset - 1) != '‎' && uifCalculator.childNodes[1] != sel.focusNode) {
+        let short = sel.focusNode.nodeValue.substring(0, sel.anchorOffset - 1);
+        sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(sel.focusOffset);
+        range.setStart(sel.focusNode, short.length);
+        range.collapse(true);
+        sel.removeAllRanges()
+        sel.addRange(range);
+      } else {
+        let childNodes = document.getElementById('enterHeader').childNodes;
+        for (let i = 0; i < childNodes.length; i++) {
+          if (childNodes[i] == sel.focusNode) {
+            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      }
+    } else {
+      let short = sel.focusNode.nodeValue.substring(0, lower);
+      sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(higher);
+      range.setStart(sel.focusNode, short.length);
+      range.collapse(true);
+      sel.removeAllRanges()
+      sel.addRange(range);
+    }
+  } else {
+    let childNodes = sel.focusNode.parentNode.parentNode.childNodes;
+    for (let i = 0; i < childNodes.length; i++) {
+      if (childNodes[i] == sel.focusNode.parentNode) {
+        range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length)
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
+        document.getElementById('uifCalculator').childNodes[1].removeChild(childNodes[i]);
+      }
+    }
+  }
+  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+}
+//Responsible for the ac button clearing all text from the enter header
+function clearMain() {
+  let enterHeader = document.getElementById("enterHeader");
+  let range = document.createRange();
+  let sel = document.getSelection();
+  enterHeader.innerHTML = '‎';
+  range.setStart(enterHeader.lastChild, enterHeader.firstChild.data.length);
+  range.collapse(true);
+  sel.removeAllRanges()
+  sel.addRange(range);
+}
+//Responsible for removing all element form the history header and the local storage element
+function deleteHistory() {
+  document.getElementById('historyHeader').innerHTML = "";
+  localStorage.setItem("historyOut", "");
+}
+//Responsible for handling enter events on main cac button
+function enterPressed(input) {
+  let display = document.getElementById('enterHeader');
+  let nonparse = input;
+  display.innerHTML = inputSolver(input, "Couldn't calculate");
+  historyMethod(nonparse)
+  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  setSelect(display, display.lastChild.length);
+}
+//Responsible for handling the navigation buttons on the main calc tab
+function navigateButtons(direction) {
+  let parentElement;
+  let sel = window.getSelection();
+  let isSup = false;
+  let range = document.createRange();
+  let higher = 0;
+  let lower = 0;
+  if (sel.anchorOffset > sel.focusOffset) {
+    higher = sel.anchorOffset;
+    lower = sel.focusOffset;
+  } else {
+    higher = sel.focusOffset;
+    lower = sel.anchorOffset;
+  }
+  if (sel.focusNode.parentNode.tagName == 'SUP') {
+    parentElement = sel.focusNode.parentNode.parentNode;
+    isSup = true;
+  } else {
+    parentElement = sel.focusNode.parentNode;
+  }
+  let childNodes = parentElement.childNodes;
+  if (!direction) {
+    if (lower == 0 || sel.focusNode.nodeValue.charAt(lower - 1) == '‎') {
+      for (let i = 0; i < childNodes.length; i++) {
+        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
+          if (childNodes[i - 1].tagName != 'SUP') {
+            range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            break;
+          } else {
+            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            break;
+          }
+
+        }
+      }
+    } else {
+      range.setStart(sel.focusNode, lower - 1);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  } else {
+    if (lower == sel.focusNode.nodeValue.length) {
+      for (let i = 0; i < childNodes.length; i++) {
+        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
+          if (childNodes[i + 1].tagName != 'SUP') {
+            range.setStart(childNodes[i + 1], 1);
+          } else {
+            range.setStart(childNodes[i + 1].childNodes[0], 1);
+          }
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          break;
+        }
+      }
+    } else {
+      range.setStart(sel.focusNode, lower + 1);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+}
+
+//END
+/*******************************************|Main Page Custom Func Editing|*******************************************/
+//Responsible for the naming page for when a new func is typed in the enter header but needs a name
+function openPopup() {
+  console.log("open popup ran")
+  sessionStorage.setItem("facing", "createNaming");
+  document.getElementById('nameEntry').style.visibility = "visible";
+}
+//Respinsible for the visible of pages on creator page. Takes the id and that is the page that becomes visible
+function funcCreatorPages(elemID){
+  for(let elem of document.getElementsByClassName('creatorPage')){
+    elem.style.visibility = "hidden";
+  }
+  document.getElementById(elemID).style.visibility = "visible";
+}
+//END
+/***********************************************|Main Page Backend|*************************************************/
+//Responsible for adding current equation to history header
+function historyMethod(equation) {
+  console.log(document.getElementsByClassName("historyDateHeader"));
+  let historyHeader = document.getElementById('historyHeader');
+  let solved = inputSolver(equation, "Couldn't Calculate")
+  /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
+  let dates = document.getElementsByClassName('historyDateHeader');
+  if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
+    let clon = document.getElementsByClassName("historyDateTemp")[0].content.cloneNode(true);
+    clon.getElementById('header').innerHTML = getDate();
+    historyHeader.appendChild(clon);
+  }
+  let clon = document.getElementsByClassName("historyHeaders")[0].content.cloneNode(true);
+  clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
+  clon.getElementById('previousEquation').innerHTML = equation + "=" + inputSolver(equation);
+  historyHeader.appendChild(clon);
+  localStorage.setItem("historyOut", historyHeader.innerHTML);
+}
+//Responsible for handling the focusing certain elements on main calc page
+function setSelect(node, index) {
+  let sel = window.getSelection();
+  let range = document.createRange();
+  let higher = 0;
+  let lower = 0;
+  range.setStart(node.lastChild, index);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+//Responsible for getting the funclist from local Storage
+function getFuncList() {
+  let parseString = localStorage.getItem("funcList");
+  let array = [];
+  let finalArray = [];
+  if (parseString == undefined) {
+    array = [];
+  } else {
+    //array = parseString.split('⥾');
+    while (parseString.includes('⥾')) {
+      array.push(parseString.substring(0, parseString.indexOf('⥾')));
+      parseString = parseString.substring(parseString.indexOf('⥾') + 1);
+    }
+
+  }
+  console.log(array);
+  for (let func of array) {
+    let funcJSON = {};
+    switch (func.substring(0, 1)) {
+      case "F":
+        funcJSON.type = "Function";
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.name = func.substring(0, func.indexOf('»'));
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.equation = func.substring(0, func.indexOf('»'));
+
+        break;
+      case "H":
+        funcJSON.type = "Hybrid";
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.name = func.substring(0, func.indexOf('»'));
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.code = func.substring(0, func.indexOf('»'));
+        break;
+      case "C":
+        funcJSON.type = "Code";
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.name = func.substring(0, func.indexOf('»'));
+        func = func.substring(func.indexOf('»') + 1);
+        funcJSON.code = func.substring(0, func.indexOf('»'));
+        break;
+      default:
+        console.log("Defa")
+        break;
+    }
+    finalArray.push(funcJSON);
+  }
+  return finalArray;
+}
+//Responsible for setting global angle mode main calc buttons (main input)
+function setDegMode() {
+  let text = "";
+  let elements = ['degEx', 'degPopup'];
+  if (document.getElementById('degPopup').innerHTML == "deg") {
+    text = "rad"
+    settings.degRad = false;
+  } else {
+    text = "deg"
+    settings.degRad = true;
+  }
+  for (let elem of elements) {
+    document.getElementById(elem).innerHTML = text;
+  }
+}
+//END
+/************************************************|Custom Func UI|****************************************************/
+//Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
+function createFunc(type, name, text) {
+  var funcList = getFuncList();
+  if (!custFuncExisting(name, false)) {
+    
+    let object = { "name": name, "type": type };
+    switch (type) {
+      case "Function":
+        object.equation = text;
+        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        break;
+      case "Code":
+        object.code = text;
+        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        break;
+      case "Hybrid":
+        object.code = text;
+        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        break;
+    }
+    funcList.push(object);
+    addImplemented(object)
+    setFuncList(funcList);
+  }
+}
+//Responsible for creating the cust func buttons and adding them to the elements in target array
+function custButton(funcConfig, target) {
+  let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
+  let type = funcConfig.type;
+  let name = funcConfig.name;
+  let equation = "";
+  switch (funcConfig.type) {
+    case ("Function"):
+      equation = funcConfig.equation;
+      break;
+    case ("Code"):
+      equation = "Coded";
+      break;
+    case ("Hybrid"):
+      equation = "Hybrid";
+      break;
+  }
+  clon.getElementById('equationLabel').innerHTML = equation;
+  clon.getElementById('nameLabel').innerHTML = name;
+  for (let i = 0; i < target.length; i++) {
+    let clonClone = clon.cloneNode(true);
+    let buttonNode = clonClone.getElementById("customFuncButton");
+    if (TextColorGlobal == "#000000") {
+      buttonNode.querySelector('#removeFunc').src = "Images/xIcon.svg";
+    }
+    buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
+      console.log("Remove Func ran")
+      funcRemove(e);
+    });
+    buttonNode.addEventListener('click', function (e) {
+      let elem = e.target;
+      if (e.target.tagName != "BUTTON") {
+        elem = e.target.parentNode
+      }
+      let funcName = elem.querySelector("#nameLabel").innerHTML;
+      let funcParse = findFuncConfig(name);
+      console.log(funcParse)
+      if (e.target.tagName != "IMG") {
+        createTab(funcParse)
+      }
+    });
+    document.getElementById(target[i]).appendChild(clonClone);
+    setNumOfTabs();
+  }
+
+}
+//Responsible for removing the cust func button from page after remove func is pressed
+function funcRemove(e) {
+  let link = e.target.parentNode
+  let buttonName = link.querySelector("#nameLabel").innerHTML;
+  removeFunc(link.querySelector("#nameLabel").innerHTML);
+  let names = document.getElementsByClassName("custFuncNames");
+  for (let i = 0; i < names.length; i++) {
+    console.log("looping")
+    if (names[i].innerHTML == buttonName) {
+      let parent = names[i].parentNode;
+      parent.remove();
+      i--;
+    }
+  }
+  //document.getElementById('custFuncGridPopup').removeChild(link);
+}
+//Responsible for the creation of tab and tab page of the given config
+function createTab(config) {
+  let name = config.name;
+  let type = config.type;
+  document.getElementById('extraFuncPopUp').visibility = 'hidden';
+  document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
+  document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
+  document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
+  document.getElementById('customFuncDisplay').style.visibility = "hidden";
+  if (type == "Function") {
+    if (!tabOpen(name)) {
+      let tabs = document.getElementsByClassName('tabcontent');
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.visibility = 'hidden';
+      }
+      newCustFuncTab(config);
+
+      let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
+      tabClon.getElementById('newTabName').innerHTML = name;
+      tabClon.getElementById('nameDisplay').innerHTML = name;
+      tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
+      tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
+      if (TextColorGlobal == "#000000") {
+        tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
+      }
+      let highlight = tabClon.getElementById('tabButton');
+      tabClon.getElementById('tabButton').addEventListener("click", function (e) {
+        if (e.target.id != "tabRemove") {
+          if (window.innerWidth / window.innerHeight < 3 / 4) {
+            changeTabAs(false);
+          }
+          if (e.target != highlight.querySelector("IMG")) {
+            openElement(highlight)
+            sessionStorage.setItem("facing", "custFunc");
+          }
+        }
+
+      });
+      tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
+        removeCustFunc(e);
+        setNumOfTabs();
+      })
+      document.getElementById('tabContainer').appendChild(tabClon);
+      setNumOfTabs();
+      highlightTab(highlight);
+    }
+
+  } else if (type = "Code") {
+
+  } else if (type = "Hybrid") {
+
+  }
+}
+//Responsible for the creation of the default tab page with the given config
+function newCustFuncTab(config) {
+  let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true), exist = false, existing = document.getElementsByClassName("tabcontent");
+  for (i = 1; i < existing.length; i++) {
+    if (existing[i].dataset.tab === JSON.stringify(config)) {
+      exist = true;
+      break;
+    }
+  }
+  if (!exist) {
+    clon = defaultSetup(clon);
+    let name = config.name;
+    let varGrid = clon.getElementById("varGrid");
+    let equationDIV = clon.getElementById("EquationFunc");
+    let movable = clon.getElementById("selectorUnder");
+    movable.dataset.pos = 0;
+    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+
+    clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
+    clon.getElementById("nameFunc").value = name;
+
+    switch (config.type) {
+      case ('Function'):
+        let equation = config.equation;
+
+        clon.getElementById("EquationFunc").innerHTML = equation;
+        clon.getElementById("EquationFunc").dataset.baseE = equation;
+
+        clon.getElementById('nameFunc').addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode;
+          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
+          let matchPage = matchTab(e.target.parentNode.dataset.tab, true);
+          let newVal = JSON.parse(e.target.parentNode.dataset.tab);
+          newVal.name = e.target.value;
+          matchPage.querySelector("#newTabName").innerHTML = e.target.value;
+          matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+        });
+        clon.getElementById("EquationFunc").addEventListener("focus", function (e) {
+          let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+          equationDIV.innerHTML = initEquation.equation;
+          setSelect(equationDIV, equationDIV.innerHTML.length);
+        });
+        clon.getElementById('EquationFunc').addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newValue = JSON.parse(liveTab.dataset.tab);
+
+          //Test this method with a sup subclass
+          console.log("%c EquationFunc input", "color: red;");
+          checkVar(varGrid, equationDIV, funcTabs);
+          newValue.equation = e.target.innerHTML
+          equationDIV.dataset.baseE = equationDIV.innerHTML;
+          changeFunc(oldVal, newValue, matchPage, liveTab);
+        });
+        document.getElementById("mainBody").appendChild(clon);
+        checkVar(varGrid, equationDIV, funcTabs);
+        try {
+          parseVariables(varGrid, equationDIV, funcTabs);
+        } catch (e) {
+          report("Couldn't Calculate", false);
+        }
+        break;
+      case ("Hybrid"):
+        let nameElem = clon.getElementById('nameFunc');
+        let subElem = clon.getElementById("EquationFunc");
+        subElem.innerHTML = "Hybrid";
+        subElem.contentEditable = false;
+        
+        nameElem.addEventListener("input", function(){
+          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
+          removeFunction(oldVal.name);
+          removeFunc(oldVal.name)
+          let oldParse = parseFunction(oldVal.code)
+          
+        });
+      break;
+    }
+    //adding event listeners
+
+  }
+}
+//Responsible for handing the intial setup of a cust func default tab page
+function defaultSetup(clon) {
+  clon.getElementById("minDomainGraph").value = settings.gDMin;
+  clon.getElementById("maxDomainGraph").value = settings.gDMax;
+  clon.getElementById("stepDomainGraph").value = settings.gDS;
+  clon.getElementById("minRangeGraph").value = settings.gRMin;
+  clon.getElementById("maxRangeGraph").value = settings.gRMax;
+  clon.getElementById("stepRangeGraph").value = settings.gRS;
+  clon.getElementById("cellsTable").value = settings.tC;
+  clon.getElementById('stepTable').value = settings.tS;
+  let chart = clon.getElementById("funcChart");
+  var cfcg = new Chart(chart, {
+    type: 'line',
+    data: {
+      labels: [-2, 4],
+      datasets: [{
+        data: [10, 20],
+        label: 'x',
+        fontColor: '#FFFFFF',
+        borderColor: "#FFFFFF",
+        backgroundColor: "#FFFFFF",
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+          }
+        }
+      }
+    }
+  })
+
+  let movable = clon.getElementById("selectorUnder");
+  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+  movable.dataset.pos = 0;
+  clon.getElementById('functionMode').addEventListener("click", function () {
+    funcTabs[0].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 0, movable);
+  });
+  clon.getElementById("graphMode").addEventListener("click", function () {
+    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
+    funcTabs[1].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 75, movable);
+  });
+  clon.getElementById("tableMode").addEventListener("click", function () {
+    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
+    funcTabs[2].style.visibility = "inherit";
+    hidModes(parseInt(movable.dataset.pos), funcTabs);
+    animateModes(parseInt(movable.dataset.pos), 150, movable);
+  });
+  let updateElements = [
+    "stepTable",
+    "cellsTable"
+  ];
+  for (let element of updateElements) {
+    clon.getElementById(element).addEventListener("input", function (e) {
+      try {
+        parseVariables(varGrid, equationDIV, funcTabs);
+      } catch (e) {
+        report("Couldn't Calculate", false);
+      }
+
+    });
+  }
+  return clon;
+}
+//Responsible for creating a variable element 
+function newVariable(name, varGrid, equationArea, funcTabs, equation) {
+  let tempvar = document.getElementsByClassName("variableTemplate")[0];
+  let varClon = tempvar.content.cloneNode(true);
+  varClon.getElementById('variableName').innerHTML = name;
+  varClon.getElementById('variableEntry').addEventListener('input', function (e) {
+    if (varClon.getElementById('variableEntry') != '') {
+      equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
+      try {
+        parseVariables(varGrid, equationArea, funcTabs);
+      } catch (e) { }
+    }
+  });
+  varGrid.appendChild(varClon)
+}
+//Responsible for handling which pages are visible on cust func default (Deprecated the creator page methods need implementing here)
+function hidModes(num, tabs) {
+  if (num == 0) {
+    tabs[0].style.visibility = "hidden";
+  } else if (num == 75) {
+    tabs[1].style.visibility = "hidden";
+  } else if (num == 150) {
+    tabs[2].style.visibility = "hidden";
+  }
+}
+//Responsible for handling animations between the default cust func pages (also somewhat deprecated) 
+function animateModes(from, to, element) {
+  if (from == 0 && to == 75) {
+    //0 to 75
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 0.5 normal forwards running modeSwitch";
+    setTimeout(function () { element.style.left = "75px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 75;
+  } else if (from == 0 && to == 150) {
+    //0 to 150
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 1 normal forwards running modeSwitch"
+    setTimeout(function () { element.style.left = "150px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 150;
+  } else if (from == 75 && to == 150) {
+    //75 to 150
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 1 normal forwards running sveBacSwitch"
+    setTimeout(function () { element.style.left = "150px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 150;
+  } else if (from == 75 && to == 0) {
+    //75 to 0
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 1 normal forwards running sveForSwitch"
+    setTimeout(function () { element.style.left = "0px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 0;
+  } else if (from == 150 && to == 75) {
+    //150 to 75
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 0.5 reverse forwards running modeSwitch"
+    setTimeout(function () { element.style.left = "75px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 75;
+  } else if (from == 150 && to == 0) {
+    //150 to 0
+    element.style.animation = undefined;
+    element.style.animation = "0.15s ease-in 0s 1 reverse forwards running modeSwitch"
+    setTimeout(function () { element.style.left = "0px"; element.style.animation = undefined }, 150);
+    element.dataset.pos = 0;
+  } else {
+    console.log(same)
+  }
+}
+//Responsible for changing the color of the tab that is currently open
+function highlightTab(element) {
+  let activeTabs = document.getElementsByClassName('tablinks active')
+  for (let i = 0; i < activeTabs.length; i++) {
+    activeTabs[i].className = activeTabs[i].className.replace(" active", "");
+  }
+  element.className += " active"
+}
+//Responsible for the handling of tab opens whenever a tab button is pressed 
+function openElement(evt) {
+  let evtElement = evt;
+  let match;
+  let tabs = document.getElementsByClassName('tabcontent');
+  if (evtElement.dataset.tabmap != "mainTab") {
+    if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
+      document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
+      document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
+      setTimeout(donothing, 500);
+      document.getElementById('extraFuncPopUp').style.visibility = "hidden";
+    }
+    document.getElementById('customFuncDisplay').style.visibility = "hidden";
+  } else {
+    document.getElementById('customFuncDisplay').style.visibility = "";
+  }
+  match = matchTab(evtElement.dataset.tabmap, false);
+  for (let i = 0; i < tabs.length; i++) {
+    if (match != tabs[i]) {
+      tabs[i].style.visibility = 'hidden';
+    }
+  }
+  highlightTab(evtElement);
+  match.style.visibility = 'visible';
+}
+//Responsible for matching a tab with its tab page
+function matchTab(info, type) {
+  let elements = [];
+  if (type) {
+    elements = document.getElementsByClassName('tablinks');
+  } else {
+    elements = document.getElementsByClassName('tabcontent');
+  }
+  for (let i = 0; i < elements.length; i++) {
+    if (type) {
+      if (elements[i].dataset.tabmap == info) {
+        return elements[i];
+      }
+    } else {
+      if (elements[i].dataset.tab == info) {
+        return elements[i];
+      }
+    }
+  }
+}
+//Responsible for the closing of a tab and its tabpage by removing it from the html
+function removeCustFunc(event) {
+  let tabLink = event.target.parentNode;
+  console.log(tabLink.parentNode);
+  document.getElementById('mainBody').removeChild(matchTab(tabLink.dataset.tabmap, false));
+  document.getElementById('tabContainer').removeChild(tabLink);
+  if (window.innerWidth / window.innerHeight > 3 / 4) {
+    openElement(document.getElementById('mainTab'));
+  }
+
+}
+//Responsible for setting equation of defualt cust func
+function setShowEquat(tablink, equation) {
+  if (equation != "") {
+    let childern = tablink.childNodes;
+    console.log(childern);
+    tablink.querySelector("#equtDisplayFunc").innerHTML = equation;
+  }
+}
+//END
+/*********************************************|Custom Func Updating|************************************************/
+//Responsible for handing the changing of a cust func on the default tab page
+function changeFunc(og, newString, tab, page) {
+  console.log(og)
+  var funcList = getFuncList();
+  for (let i = 0; i < funcList.length; i++) {
+    console.log(`${JSON.stringify(funcList[i])} vs. ${JSON.stringify(og)}`);
+    if (JSON.stringify(funcList[i]) == JSON.stringify(og)) {
+      console.log("matched")
+      funcList[i] = newString;
+    }
+  }
+  changeImplemented(og, newString);
+  console.log(funcList);
+  setFuncList(funcList);
+  console.log(tab)
+  tab.dataset.tabmap = JSON.stringify(newString);
+  page.dataset.tab = JSON.stringify(newString);
+  updateCustomButtons(og, newString);
+}
+//Responsible for changing the name and equation value on the a cust func link 
+function updateCustomButtons(oldVal, newValue) {
+  console.log('Old Val is ' + oldVal + " New Value is " + newValue);
+  let functionLinks = document.getElementsByClassName('customFuncLinks');
+  let Name = oldVal.name;
+  let newName = newValue.name;
+  let newFunction = "";
+  switch (oldVal.type) {
+    case ("Function"):
+      newFunction = newValue.equation;
+      break;
+    case ("Code"):
+      newFunction = "Code";
+      break;
+    case ("Hybrid"):
+      newFunction = "Hybrid";
+      break;
+  }
+  for (let i = 0; i < functionLinks.length; i++) {
+    console.log("Checking " + functionLinks[i].childNodes[1].data + " and " + functionLinks[i].childNodes[0].innerHTML);
+    if (functionLinks[i].querySelector("#nameLabel").innerHTML == Name) {
+      console.log("Matching Found");
+      functionLinks[i].querySelector("#equationLabel").innerHTML = newFunction;
+      functionLinks[i].querySelector("#nameLabel").innerHTML = newName;
+      //functionLinks[i].data.
+    }
+  }
+}
+//Responsible for changing a cust func entry in the interpreter 
+function changeImplemented(oldConfig, newConfig) {
+  let object = {};
+  if (oldConfig.type == "Function") {
+    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
+    object = {
+      "func": oldConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(oldConfig.equation),
+      "funcLength": oldConfig.name.length
+    };
+
+  } else if (oldConfig.type == "Code") {
+
+  } else if (oldConfig.type == "Hybrid") {
+
+  }
+  let indexOf = -1;
+  for (let i = 0; i < funcList.length; i++) {
+    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
+      indexOf = i;
+    }
+  }
+  if (oldConfig.type == "Function") {
+    let parseable = createParseable(solveInpr(newConfig.equation, settings.degRad))
+    let newObject = {
+      "func": newConfig.name,
+      "funcParse": parseable,
+      "inputs": cacInputs(parseable),
+      "funcRadDeg": containsTrig(newConfig.equation),
+      "funcLength": newConfig.name.length
+    };
+    funcList[i] = newObject;
+  } else if (oldConfig.type == "Code") {
+
+  } else if (oldConfig.type == "Hybrid") {
+
+  }
+}
+//Responsible for adding a cust func entry into interpreter
+function addImplemented(funcConfig) {
+  if (funcConfig.type == "Function") {
+    createNewFunction("function", funcConfig.name, solveInpr(funcConfig.equation, settings.degRad));
+  } else if (funcConfig.type == "Hybrid") {
+    createNewFunction("method", funcConfig.code)
+  }
+}
+//Responsible for taking the funclist and making it into a localStorage value (main backend)
+function setFuncList(array) {
+  let parseString = "";
+  console.log(array);
+  for (let i = 0; i < array.length; i++) {
+    let parsedString = "";
+    switch (array[i].type) {
+      case "Function":
+        parsedString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
+        break;
+      case "Hybrid":
+        parsedString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
+        break;
+      case "Code":
+        parsedString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
+        break;
+    }
+    parseString += parsedString + "⥾";
+  }
+  console.log(`parsedString: ${parseString}`);
+  localStorage.setItem("funcList", parseString);
+}
+//Responsible for removing a value for the funcList (main backend)
+function removeFunc(funcName) {
+  let array = getFuncList();
+  console.log(funcName)
+  for (let item of array) {
+    if (item.name == funcName) {
+      //removeImplemented(item);
+      array.splice(array.indexOf(item), 1);
+    }
+  }
+  setFuncList(array);
+}
+//END
+/**********************************************|Custom Func backend|*************************************************/
+//Responsible for checking if a cust func page is open with a certain name (seeming a dupilicate method)
+function tabOpen(name) {
+  let tabs = document.getElementsByClassName('tablinks')
+
+  for (let i = 1; i < tabs.length; i++) {
+
+    if (name == JSON.parse(tabs[i].dataset.tabmap).name) {
+      return true;
+    }
+  }
+  return false;
+}
+//Responsible for checking wheather a custom function is already opened (seeming a dupilicate method)
+function custFuncExisting(name, duplicates) {
+  let exist = false, existing = document.getElementsByClassName("customFuncLinks");
+  for (i = 0; i < existing.length; i++) {
+    if (existing[i].querySelector("#nameLabel").innerHTML == name && !duplicates) {
+      exist = true;
+      break;
+    }
+  }
+  return exist;
+}
+//Responsible for creating an array of the variables in a variable container and the value it has
+function varListAssbely(element) {
+  let variables = element.getElementsByClassName("variableContainer");
+  let varData = [];
+  for (i = 0; i < variables.length; i++) {
+    let temp = {
+      "Name": variables[i].querySelector('h3').innerHTML,
+      "Value": variables[i].querySelector('input').value
+    };
+    varData.push(temp);
+  }
+  console.log("retruned Variable list")
+  console.log(varData)
+  return varData;
+}
+//Responsible for handling the parsing of string equations with the variables on in the var container
+function parseVar(parsedEquation, data) {
+  console.log("Parse var types")
+  console.log(typeof data.Value)
+  for (let i = 0; i < parsedEquation.length; i++) {
+    if (funcMatch(parsedEquation.substring(i)) != "") {
+      i += funcMatch(parsedEquation.substring(i)).length;
+    } else if (parsedEquation.charAt(i) == data.Name) {
+      parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
+    }
+  }
+  return parsedEquation;
+}
+//Responsible for checking and solving for varables on defaut cust func page depending on how many variables are filled
+function parseVariables(element, equationDIV, funcTabs) {
+  let varData = varListAssbely(element);
+  let parsedEquation = equationDIV.dataset.baseE
+  console.log("%c parsedEquation: " + parsedEquation, "color:red");
+  let all = true;
+  let first = undefined;
+  for (let Vars of varData) {
+    if (all) {
+      if (Vars.Value == '') {
+        all = false;
+        first = Vars;
+      }
+    } else if (Vars.Value == '') {
+      first = undefined;
+    }
+  }
+  for (let data of varData) {
+    parsedEquation = parseVar(parsedEquation, data);
+  }
+  console.log(equationDIV.dataset.baseE);
+  if (all) {
+    solveEquation(parsedEquation, funcTabs);
+    solveGraph(varData, equationDIV.innerHTML, first);
+    solveTable(parsedEquation, first);
+  } else if (first != undefined) {
+    solveGraph();
+    solveTable(equationDIV.innerHTML, first);
+  }
+}
+//Responsible for solving the parsedEquation on the default cust func page
+function solveEquation(parsedEquation, funcTabs) {
+  let result = "=" + inputSolver(parsedEquation, "Couldn't Calculate");
+  funcTabs[0].querySelector('#equalsHeader').innerHTML = result;
+}
+//Responsible for solving the parsedEquation with one open vairable graphically
+function solveGraph(varData, parsedEquation, data) {
+
+}
+//Responsible for solving the parsedEquation with one open variable table wise
+function solveTable(parsedEquation, data) {
+  console.log("solve table ran")
+  /*
+  needs to get the settings table step and number of steps
+  then it will run a loop the number of values there are and for each it will
+     will run the equation on the designated step by mutiplying the step by number of values
+     then insert the number which is the result of mutipling values by loop and step 
+     and the value resulted by runing that number in the eqaution into the table
+  end method
+  */
+  let numValue = Number(document.getElementById('cellsTable').value);
+  let step = Number(document.getElementById('stepTable').value);
+  document.getElementById("funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
+  for (let i = 1; i <= numValue; i++) {
+    // missing the code that will parse and solve equation
+    console.log("Loop " + i);
+    let result;
+    let currentVal = i * step;
+    var newData = data;
+    let loopEqua = parsedEquation;
+    newData.Value = "" + currentVal;
+    result = inputSolver(parseVar(loopEqua, newData), "Error Making Table");
+    var newRow = document.getElementById('funcTable').insertRow(i);
+    var newXCell = newRow.insertCell(0);
+    var newYCell = newRow.insertCell(1);
+    newXCell.innerHTML = "" + currentVal;
+    newXCell.id = "shit"
+    console.log(i * step)
+    newYCell.innerHTML = result;
+    newYCell.id = "other shit"
+  }
+}
+//Responsible for (IDFK work on this later)
+function checkVar(varGrid, equationArea, funcTabs) {
+  let tabVarContainers = varGrid.getElementsByClassName("variableContainer");
+  let varExisting = [];
+  let equation = equationArea.innerHTML;
+  for (let cont of tabVarContainers) {
+    let name = cont.querySelector('h3').innerHTML;
+    varExisting.push({
+      "name": name,
+      "element": cont
+    });
+  }
+  let varEquation = varInEquat(equationArea.innerHTML);
+  let newVars = [];
+  for (let eVar of varEquation) {
+    matching = false;
+    for (let cVar of varExisting) {
+      if (eVar.letter == cVar.name) {
+        let indexOfVar = varExisting.indexOf(cVar);
+        varExisting.splice(indexOfVar, 1);
+        matching = true;
+        break;
+      }
+    }
+    if (!matching) {
+      newVars.push(eVar.letter);
+    }
+  }
+  for (let oldVar of varExisting) {
+    varGrid.removeChild(oldVar.element);
+  }
+  for (let newVar of newVars) {
+    newVariable(newVar, varGrid, equationArea, funcTabs, equation);
+  }
+}
+//Matches a funcConfig from funclist with a name
+function findFuncConfig(name) {
+  let funcList = getFuncList();
+  for (let func of funcList) {
+    if (func.name == name) {
+      return func;
+    }
+  }
+}
+//Responsible for taking inputs and parsing them into the funclist
+function funcAssebly(type, name, text) {
+  let object = {};
+  switch (type) {
+    case "Function":
+      object.type = "Function";
+      object.name = name;
+      object.equation = text;
+      break;
+    case "Hybrid":
+      object.type = "Hybrid";
+      object.name = name;
+      object.code = text;
+      break;
+    case "Code":
+      object.type = "Code";
+      object.name = name;
+      object.code = text;
+      break;
+  }
+  return object;
+}
+//END
+/***********************************************|Settings basic UI|*************************************************/
+//Responsible for handling tab changes on settings page
+function settingsTabChange(name) {
+  var tabs = document.getElementsByClassName("settingTabContent");
+  if (window.innerWidth / window.innerHeight > 3 / 4) {
+    for (i = 0; i < tabs.length; i++) {
+      tabs[i].style.visibility = "hidden";
+    }
+    if (name == 'colorsTab') {
+      document.getElementById("colorsTab").style.visibility = "visible";
+    } else if (name == 'PreferencesTab') {
+      document.getElementById('PreferencesTab').style.visibility = "visible";
+    } else if (name == 'AboutTab') {
+      document.getElementById('AboutTab').style.visibility = "visible";
+    } else {
+      console.log("nothing")
+    }
+  } else {
+    for (i = 0; i < tabs.length; i++) {
+      tabs[i].style.visibility = "hidden";
+    }
+    if (name == 'colorsTab') {
+      document.getElementById("colorsTab").style.visibility = "visible";
+      document.getElementById("colorsTab").style.width = "100%";
+      document.getElementById("colorsBack").style.visibility = "visible";
+      document.getElementById("colorsTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
+      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
+      sessionStorage.setItem("facing", "themePageOut");
+    } else if (name == 'PreferencesTab') {
+      document.getElementById("PreferencesTab").style.visibility = "visible";
+      document.getElementById("PreferencesTab").style.width = "100%";
+      document.getElementById("PreferencesBack").style.visibility = "visible";
+      document.getElementById("PreferencesTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
+      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
+      sessionStorage.setItem("facing", "prefPageOut");
+    } else if (name == 'AboutTab') {
+      document.getElementById("AboutTab").style.visibility = "visible";
+      document.getElementById("AboutTab").style.width = "100%";
+      document.getElementById("AboutBack").style.visibility = "visible";
+      document.getElementById("AboutTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
+      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
+      sessionStorage.setItem("facing", "aboutPageOut");
+    } else {
+      console.log("nothing")
+    }
+  }
+}
+//Responsible for handling back buttons in settings (I think its only used once so might be roled into uni back)
+function SettingsBack(tab) {
+  if (tab == "colorsTab") {
+    document.getElementById("colorsBack").style.visibility = "hidden";
+    if (window.innerWidth / window.innerHeight > 3 / 4) {
+      document.getElementById("colorsTab").style.animation = null;
+      document.getElementById('colorsTab').style.width = undefined;
+    } else {
+      document.getElementById("colorsTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
+      setTimeout(function () { document.getElementById("colorsTab").style = undefined; }, 150);
+    }
+    document.getElementById("navColumn").style.visibility = "visible";
+  } else if (tab == "PreferencesTab") {
+    document.getElementById("PreferencesBack").style.visibility = "hidden";
+    if (window.innerWidth / window.innerHeight > 3 / 4) {
+      document.getElementById("PreferencesTab").style.animation = null;
+    } else {
+      document.getElementById("PreferencesTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
+      setTimeout(function () { document.getElementById("PreferencesTab").style = undefined; }, 150);
+    }
+    document.getElementById("navColumn").style.visibility = "visible";
+  } else if (tab == "AboutTab") {
+    document.getElementById("AboutBack").style.visibility = "hidden";
+    if (window.innerWidth / window.innerHeight > 3 / 4) {
+      document.getElementById("AboutTab").style.animation = null;
+    } else {
+      document.getElementById("AboutTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
+      setTimeout(function () { document.getElementById("AboutTab").style = undefined; }, 150);
+    }
+    document.getElementById("navColumn").style.visibility = "visible";
+  }
+}
+//Responsible for handling the color changes on color input for cust theme DLC
+function updatePreview(event) {
+  if (event.target.id == "secondaryColorPicker") {
+    document.getElementById("displayPreview").style.backgroundColor = event.target.value;
+  } else if (event.target.id == "accentColorPicker") {
+    document.getElementById("numsPreview").style.backgroundColor = event.target.value;
+  } else {
+    document.getElementById("funcPreview").style.backgroundColor = event.target.value;
+  }
+}
+//Responsible for handling the text color dropdown on the cust theme DLC
+function dropPressed(color) {
+  if (color == "Black") {
+    document.getElementById("showcaseTextColor").style.color = "#000000";
+    document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
+    settings.t = "#000000";
+  } else {
+    document.getElementById("showcaseTextColor").style.color = "#FFFFFF";
+    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+    settings.t = "#FFFFFF";
+  }
+}
+//Responsible for unlocking the custom theme on settings
+function unlockCustomTheme() {
+  document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
+  document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
+  let colors = themeElem.getMth();
+  settings.p = colors[0];
+  settings.s = colors[2];
+  settings.a = colors[1];
+  settings.t = colors[3];
+  document.getElementById('primaryColorPicker').value = settings.p
+  document.getElementById('secondaryColorPicker').value = settings.s
+  document.getElementById('accentColorPicker').value = settings.a
+}
+//Responsible for handling a click event on cust themes
+function toggleCustTheme() {
+  if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
+    document.getElementById('ColorsDiv').style = "visibility: hidden; position: absolute;";
+    document.getElementById('accentColorDiv').style = "visibility: visible; position: relative;";
+  } else {
+    document.getElementById('ColorsDiv').style = "visibility: visible; position: relative;";
+    document.getElementById('accentColorDiv').style = "visibility: hidden; position: absolute;";
+  }
+}
+//END
+/************************************************|Settings Backend|**************************************************/
+//Responsible for handling settings exit on settings page
+function settingExit() {
+  let defaultThemes = getThemes();
+  let newSettings = settings;
+  let selTheme = document.getElementsByClassName("themeElem active")[0];
+  if (selTheme.id == "darkMode" || selTheme.id == "lightMode") {
+    newSettings.theme = selTheme.id;
+    let selAcc = document.getElementsByClassName("accButton active")[0];
+    newSettings.acc = selAcc.id;
+  } else if (selTheme.id == "custPurchasable") {
+    newSettings.theme = selTheme.id;
+    newSettings.p = document.getElementById("primaryColorPicker").value;
+    newSettings.s = document.getElementById("secondaryColorPicker").value;
+    newSettings.a = document.getElementById("accentColorPicker").value;
+  }
+  newSettings.gDS = Number(document.getElementById("graphDStep").value);
+  newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
+  newSettings.gDMax = Number(document.getElementById("domainTopG").value);
+  newSettings.gRS = Number(document.getElementById("graphRStep").value);
+  newSettings.gRMin = Number(document.getElementById("rangeBottomG").value);
+  newSettings.gRMax = Number(document.getElementById("rangeTopG").value);
+  if (document.getElementById("degModeBut").className == "settingsButton active") {
+    newSettings.degRad = true;
+  } else {
+    newSettings.degRad = false;
+  }
+  localStorage.setItem("settings", JSON.stringify(newSettings));
+  document.location = 'Recursive.html';
+}
+//Responsible for handling if purchases have been completed by the user
+function queryPurchase(item) {
+  let queryList = getPurshaseList();
+  let defaultPurchases = ["darkMode", "lightMode"];
+  for (let normal of defaultPurchases) {
+    if (normal == item) {
+      return true;
+    }
+  }
+  for (let purchased of queryList) {
+    if (purchased == item) {
+      return true;
+    }
+  }
+  return false;
+}
+//Responsible for reporting the purchased list for items that have been purchased
+function getPurshaseList() {
+  let list = [];
+  if (localStorage.getItem('purchased') != undefined) {
+    list = JSON.parse(localStorage.getItem('purchased')).purchaseList;
+  }
+  return list;
+}
+//Responsible for seting a purchase as purchased on purchase list
+function setPurchase(name) {
+  if (localStorage.getItem('purchased') != undefined) {
+    let purchased = JSON.parse(localStorage.getItem('purchased'));
+    purchased.purchaseList.push(name)
+    localStorage.setItem('purchased', JSON.stringify(purchased));
+  } else {
+    localStorage.setItem('purchased', JSON.stringify({ "purchaseList": [name] }));
+  }
+}
+//END
+/************************************************|General Backend|**************************************************/
+//Array of all facing situations and what to do when the back button is pressed
 let facingBack = [
   {
     "elm": "custFunc",
@@ -861,6 +2141,7 @@ let facingBack = [
     },
   }
 ];
+//Responsible for all back buttons and back in android 
 function universalBack() {
   let currentElement = sessionStorage.getItem("facing");
   for (let elem of facingBack) {
@@ -871,63 +2152,227 @@ function universalBack() {
     }
   }
 }
-function backPressed() {
-  let uifCalculator = document.getElementById('enterHeader');
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
+//Responsible for state sessionStorage (deprecated in a few updates soon to be deleted)
+function setState() {
+  state.eT = document.getElementById('enterHeader').innerHTML;
+  let tabs = document.getElementsByClassName('tablinks');
+  for (let tab of tabs) {
+    let tabmap = tab.dataset.tabmap;
+    if (tabmap != "mainTab") {
+      console.log(tabmap);
+      let object = JSON.parse(tabmap);
+      state.fO.push(object.name)
+    }
   }
-  if (!(plainSup(sel) && sel.focusNode.nodeValue.length <= 1)) {
-    if (sel.anchorOffset == sel.focusOffset) {
-      if (sel.focusNode.nodeValue.charAt(sel.anchorOffset - 1) != '‎' && uifCalculator.childNodes[1] != sel.focusNode) {
-        let short = sel.focusNode.nodeValue.substring(0, sel.anchorOffset - 1);
-        sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(sel.focusOffset);
-        range.setStart(sel.focusNode, short.length);
-        range.collapse(true);
-        sel.removeAllRanges()
-        sel.addRange(range);
-      } else {
-        let childNodes = document.getElementById('enterHeader').childNodes;
-        for (let i = 0; i < childNodes.length; i++) {
-          if (childNodes[i] == sel.focusNode) {
-            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        }
+  sessionStorage.setItem("state", JSON.stringify(state));
+}
+//Responsible for giving out the list of purchasable items
+function getCatalog() {
+  return [
+    {
+      "name": "custTheme",
+      "price": "0.99",
+      "have": queryPurchase()
+    }
+  ];
+}
+//Responsible for geting a list of avable themes and how to get the theme colors for them
+function getThemes() {
+  return [
+    {
+      "name": "lightMode",
+      "primary": "#ffffff",
+      "secondary": "#dedede",
+      'text': '#000000',
+      'getMth': function () {
+        return ["#ffffff", getColorAcc(settings.acc), "#dedede", "#000000"];
+      }
+    },
+    {
+      "name": "darkMode",
+      "primary": "#000000",
+      "secondary": "#1f1f1f",
+      'text': '#FFFFFF',
+      'getMth': function () {
+        return ["#000000", getColorAcc(settings.acc), "#1f1f1f", '#FFFFFF'];
+      }
+    },
+    {
+      "name": "custPurchasable",
+      "primary": settings.p,
+      "secondary": settings.s,
+      "text": settings.t,
+      'getMth': function () {
+        return [settings.p, settings.a, settings.s, settings.t]
+      }
+    }
+  ];
+}
+//Responsible for geting the colors for whatever theme is listed in the settings
+function getColors() {
+  let themes = getThemes();
+  for (let theme of themes) {
+    if (theme.name == settings.theme) {
+      return theme.getMth();
+    }
+  }
+}
+//Responsible for getting a list of accent colors
+function getAccents() {
+  return [
+    {
+      "id": 'red',
+      "val": '#d6564d'
+    },
+    {
+      "id": 'orange',
+      "val": '#fca31e'
+    },
+    {
+      "id": 'yellow',
+      "val": '#e9e455'
+    },
+    {
+      "id": 'green',
+      "val": '#68c43e'
+    },
+    {
+      "id": 'blue',
+      "val": '#4193ff'
+    },
+    {
+      "id": 'purple',
+      "val": '#6a2bfd'
+    },
+    {
+      "id": 'grey',
+      "val": '#b8b8b8'
+    }
+  ];
+}
+//Responsible for matching its respected accent name with its color
+function getColorAcc(acc) {
+  let accents = getAccents();
+  for (let accent of accents) {
+    if (accent.id == acc) {
+      return accent.val;
+    }
+  }
+}
+//Responsible for setting the root values of a page which controll all color styling
+function setRoot(colorArray) {
+  let rootCss = document.querySelector(':root');
+  rootCss.style.setProperty('--displayColor', colorArray[2]);
+  rootCss.style.setProperty('--numbersColor', colorArray[1]);
+  rootCss.style.setProperty('--functionsColor', colorArray[0]);
+  rootCss.style.setProperty('--textColor', colorArray[3]);
+  TextColorGlobal = colorArray[3];
+  /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    colorMessager.postMessage(colorArray[0]);
+  }*/
+}
+//Responsible for setting images to match the text color value with a list of images and their elements
+function setImages(imgList) {
+  for (let img of imgList) {
+    if (img.type == "mutiple") {
+      let elems = document.getElementsByClassName(img.class);
+      for (elem of elems) {
+        elem.src = img.src;
       }
     } else {
-      let short = sel.focusNode.nodeValue.substring(0, lower);
-      sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(higher);
-      range.setStart(sel.focusNode, short.length);
-      range.collapse(true);
-      sel.removeAllRanges()
-      sel.addRange(range);
-    }
-  } else {
-    let childNodes = sel.focusNode.parentNode.parentNode.childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-      if (childNodes[i] == sel.focusNode.parentNode) {
-        range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length)
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-        childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
-        document.getElementById('uifCalculator').childNodes[1].removeChild(childNodes[i]);
-      }
+      document.getElementById(img.id).src = img.src;
     }
   }
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
 }
+//Responsible for handling popup console. Animates, sets color, and sets text value
+function report(message, meaning) {
+  console.log("report")
+  let consoleD = document.getElementById("popupConsole");
+  consoleD.innerHTML = message;
+  consoleD.style.visibility = "visible";
+  consoleD.style.animation = "1.5s ease-in 0s 1 normal forwards running slideToUpFromBottom";
+  let width = consoleD.width / 2;
+  let vw = window.innerWidth;
+  consoleD.style.left = vw - width + "px";
+  if (meaning) {
+    consoleD.style.backgroundColor = "#71ec71";
+  } else {
+    consoleD.style.backgroundColor = "#f74646";
+  }
+  setTimeout(function () {
+    consoleD.style.animation = null;
+    consoleD.style.visibility = "hidden";
+  }, 1500);
+}
+//END
+/********************************************|Offloadable useful fluff|***********************************************/
+//Called when ever something needs solving
+/*errorStatement is what appears in the popup console */
+function inputSolver(equation, errorStatement) {
+  equation = solveInpr(equation, settings.degRad)
+  try {
+    var mySolver = new Solver({
+      s: equation,
+    })
+    return mySolver.solve({})["s"];
+  } catch (e) {
+    report(errorStatement, false);
+  }
+}
+//Responsible for assebiling the code terminal throughout the program
+function createCodeTerminal(element,name){
+  let container = document.createElement("div")
+  container.id = "creatorEditor";
+  container.className = "creatorDiv";
+
+  let numberIndex = document.createElement("div")
+  numberIndex.id = "lineLabel";
+  container.appendChild(numberIndex)
+
+  let textarea = document.createElement('textarea')
+  textarea.className = "codeEditor";
+  textarea.id = name;
+  textarea.addEventListener("input", function (e){
+      recaculateNums(numberIndex, textarea.value)
+  })
+  container.appendChild(textarea)
+
+  createNumHeader(numberIndex, 1);
+
+  element.appendChild(container);
+}
+//Responsible for handling the numbering on the terminal 
+function recaculateNums(parentElem, text){
+  console.log("reacalcuate")
+  let numOfO = (text.match(/\n/g) || []).length;
+  numOfO++;
+  let childern = parentElem.querySelectorAll('.numberedHeader');
+  console.log(childern)
+  console.log(`Childern: ${childern.length} vs Number of lines: ${numOfO}`)
+  if(childern.length > numOfO){
+    for(let i = childern.length-1; i > numOfO-1; i--){
+      childern[i].remove();
+    }
+  }else {
+    for (let i = 0; i < numOfO - childern.length; i++){
+      createNumHeader(parentElem, numOfO)
+    }
+  }
+}
+//Responsible for the individual numbering headers in the code terminal
+function createNumHeader(parentElem, num){
+  let initial = document.createElement('h3');
+  initial.className = "numberedHeader";
+  initial.innerHTML = num;
+  console.log()
+  parentElem.appendChild(initial)
+}
+//Responsible (I think) for preventing focus being lost while other element on a page are being clicked
+function preventFocus() {
+  var ae = document.activeElement;
+  setTimeout(function () { ae.focus() }, 1);
+}
+//Method for fining whether or not the focus is on a superscript element (might be implemented in back pressed because that is the only refrence)
 function plainSup(sel) {
   if (sel.focusNode.parentElement.tagName == "SUP") {
     return true;
@@ -935,344 +2380,7 @@ function plainSup(sel) {
     return false;
   }
 }
-function pow(type) {
-  let display = document.getElementById('enterHeader');
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  for (let i = 0; i < display.childNodes.length; i++) {
-    if (sel.focusNode == display.childNodes[i]) {
-      index = i;
-      break;
-    }
-  }
-  let backend = sel.focusNode.nodeValue.substring(higher);
-  sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
-  let superSr = document.createElement("sup");
-  if (type == "2") {
-    superSr.appendChild(document.createTextNode('‎2'));
-  } else {
-    superSr.appendChild(document.createTextNode('‎'));
-  }
-  if (backend == '') {
-    backend = '‎';
-  }
-  if (index == display.childNodes.length) {
-    display.appendChild(document.createTextNode(backend));
-  } else {
-    display.insertBefore(document.createTextNode(backend), display.childNodes[index + 1]);
-  }
-  window.addEventListener('keydown', keepBlank);
-  display.insertBefore(superSr, display.childNodes[index + 1]);
-  if (type == "2") {
-    range.setStart(display.childNodes[index + 2], 1);
-  } else {
-    range.setStart(superSr.childNodes[0], 1);
-  }
-  range.collapse(true);
-  sel.removeAllRanges()
-  sel.addRange(range);
-}
-function keepBlank(eve) {
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == document.getElementById('enterHeader')) {
-    eve.preventDefault();
-    let childNodes = document.getElementById('enterHeader').childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-      if (childNodes[i] == sel.focusNode) {
-        range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    }
-  }
-}
-function navigateButtons(direction) {
-  let parentElement;
-  let sel = window.getSelection();
-  let isSup = false;
-  let range = document.createRange();
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (sel.focusNode.parentNode.tagName == 'SUP') {
-    parentElement = sel.focusNode.parentNode.parentNode;
-    isSup = true;
-  } else {
-    parentElement = sel.focusNode.parentNode;
-  }
-  let childNodes = parentElement.childNodes;
-  if (!direction) {
-    if (lower == 0 || sel.focusNode.nodeValue.charAt(lower - 1) == '‎') {
-      for (let i = 0; i < childNodes.length; i++) {
-        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
-          if (childNodes[i - 1].tagName != 'SUP') {
-            range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            break;
-          } else {
-            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            break;
-          }
-
-        }
-      }
-    } else {
-      range.setStart(sel.focusNode, lower - 1);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  } else {
-    if (lower == sel.focusNode.nodeValue.length) {
-      for (let i = 0; i < childNodes.length; i++) {
-        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
-          if (childNodes[i + 1].tagName != 'SUP') {
-            range.setStart(childNodes[i + 1], 1);
-          } else {
-            range.setStart(childNodes[i + 1].childNodes[0], 1);
-          }
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-          break;
-        }
-      }
-    } else {
-      range.setStart(sel.focusNode, lower + 1);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }
-}
-function clearMain() {
-  let enterHeader = document.getElementById("enterHeader");
-  let range = document.createRange();
-  let sel = document.getSelection();
-  enterHeader.innerHTML = '‎';
-  range.setStart(enterHeader.lastChild, enterHeader.firstChild.data.length);
-  range.collapse(true);
-  sel.removeAllRanges()
-  sel.addRange(range);
-}
-function parsMethod() {
-  let badIdea = document.getElementById("enterHeader").selectionStart;
-  let lazyAfterthought = 0;
-  for (let i = 0; i < document.getElementById("enterHeader").innerHTML.length; i++) {
-    if (document.getElementById("enterHeader").innerHTML.charAt(i) == '(') {
-      lazyAfterthought = lazyAfterthought + 1;
-    }
-    if (document.getElementById("enterHeader").innerHTML.charAt(i) == ')') {
-      lazyAfterthought = lazyAfterthought - 1;
-    }
-  }
-  if (lazyAfterthought >= 1 && document.getElementById("enterHeader").innerHTML.charAt(badIdea - 1) != '(') {
-    frontButtonPressed(')');
-  } else {
-    frontButtonPressed('(');
-  }
-}
-function custFuncExisting(name, duplicates) {
-  let exist = false, existing = document.getElementsByClassName("customFuncLinks");
-  for (i = 0; i < existing.length; i++) {
-    if (existing[i].querySelector("#nameLabel").innerHTML == name && !duplicates) {
-      exist = true;
-      break;
-    }
-  }
-  return exist;
-}
-function funcRemove(e) {
-  console.log("helllooooooooo")
-  let link = e.target.parentNode
-  let buttonName = link.querySelector("#nameLabel").innerHTML;
-  removeFunc(link.querySelector("#nameLabel").innerHTML);
-  let names = document.getElementsByClassName("custFuncNames");
-  for (let i = 0; i < names.length; i++) {
-    console.log("looping")
-    if (names[i].innerHTML == buttonName) {
-      let parent = names[i].parentNode;
-      parent.remove();
-      i--;
-    }
-  }
-  //document.getElementById('custFuncGridPopup').removeChild(link);
-}
-function custButton(funcConfig, target) {
-  let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
-  let type = funcConfig.type;
-  let name = funcConfig.name;
-  let equation = "";
-  switch (funcConfig.type) {
-    case ("Function"):
-      equation = funcConfig.equation;
-      break;
-    case ("Code"):
-      equation = "Coded";
-      break;
-    case ("Hybrid"):
-      equation = "Hybrid";
-      break;
-  }
-  clon.getElementById('equationLabel').innerHTML = equation;
-  clon.getElementById('nameLabel').innerHTML = name;
-  for (let i = 0; i < target.length; i++) {
-    let clonClone = clon.cloneNode(true);
-    let buttonNode = clonClone.getElementById("customFuncButton");
-    if (TextColorGlobal == "#000000") {
-      buttonNode.querySelector('#removeFunc').src = "Images/xIcon.svg";
-    }
-    buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
-      console.log("Remove Func ran")
-      funcRemove(e);
-    });
-    buttonNode.addEventListener('click', function (e) {
-      let elem = e.target;
-      if (e.target.tagName != "BUTTON") {
-        elem = e.target.parentNode
-      }
-      let funcName = elem.querySelector("#nameLabel").innerHTML;
-      let funcParse = findFuncConfig(name);
-      console.log(funcParse)
-      if (e.target.tagName != "IMG") {
-        createTab(funcParse)
-      }
-    });
-    document.getElementById(target[i]).appendChild(clonClone);
-    setNumOfTabs();
-  }
-
-}
-function createTab(config) {
-  let name = config.name;
-  let type = config.type;
-  document.getElementById('extraFuncPopUp').visibility = 'hidden';
-  document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
-  document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
-  document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-  document.getElementById('customFuncDisplay').style.visibility = "hidden";
-  if (type == "Function") {
-    if (!tabOpen(name)) {
-      let tabs = document.getElementsByClassName('tabcontent');
-      for (let i = 0; i < tabs.length; i++) {
-        tabs[i].style.visibility = 'hidden';
-      }
-      newCustFuncTab(config);
-
-      let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
-      tabClon.getElementById('newTabName').innerHTML = name;
-      tabClon.getElementById('nameDisplay').innerHTML = name;
-      tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
-      tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
-      if (TextColorGlobal == "#000000") {
-        tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
-      }
-      let highlight = tabClon.getElementById('tabButton');
-      tabClon.getElementById('tabButton').addEventListener("click", function (e) {
-        if (e.target.id != "tabRemove") {
-          if (window.innerWidth / window.innerHeight < 3 / 4) {
-            changeTabAs(false);
-          }
-          if (e.target != highlight.querySelector("IMG")) {
-            openElement(highlight)
-            sessionStorage.setItem("facing", "custFunc");
-          }
-        }
-
-      });
-      tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-        removeCustFunc(e);
-        setNumOfTabs();
-      })
-      document.getElementById('tabContainer').appendChild(tabClon);
-      setNumOfTabs();
-      highlightTab(highlight);
-    }
-
-  } else if (type = "Code") {
-
-  } else if (type = "Hybrid") {
-
-  }
-}
-function removeCustFunc(event) {
-  let tabLink = event.target.parentNode;
-  console.log(tabLink.parentNode);
-  document.getElementById('mainBody').removeChild(matchTab(tabLink.dataset.tabmap, false));
-  document.getElementById('tabContainer').removeChild(tabLink);
-  if (window.innerWidth / window.innerHeight > 3 / 4) {
-    openElement(document.getElementById('mainTab'));
-  }
-
-}
-function tabOpen(name) {
-  let tabs = document.getElementsByClassName('tablinks')
-
-  for (let i = 1; i < tabs.length; i++) {
-
-    if (name == JSON.parse(tabs[i].dataset.tabmap).name) {
-      return true;
-    }
-  }
-  return false;
-}
-function enterPressed(input) {
-  let display = document.getElementById('enterHeader');
-  let nonparse = input;
-  display.innerHTML = inputSolver(input, "Couldn't calculate");
-  historyMethod(nonparse)
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
-  setSelect(display, display.lastChild.length);
-}
-function historyMethod(equation) {
-  console.log(document.getElementsByClassName("historyDateHeader"));
-  let historyHeader = document.getElementById('historyHeader');
-  let solved = inputSolver(equation, "Couldn't Calculate")
-  /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
-  let dates = document.getElementsByClassName('historyDateHeader');
-  if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
-    let clon = document.getElementsByClassName("historyDateTemp")[0].content.cloneNode(true);
-    clon.getElementById('header').innerHTML = getDate();
-    historyHeader.appendChild(clon);
-  }
-  let clon = document.getElementsByClassName("historyHeaders")[0].content.cloneNode(true);
-  clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
-  clon.getElementById('previousEquation').innerHTML = equation + "=" + inputSolver(equation);
-  historyHeader.appendChild(clon);
-  localStorage.setItem("historyOut", historyHeader.innerHTML);
-}
+//Responsible for geting the time for the time enter in new history header entries
 function getTime() {
   const d = new Date();
   let hours = d.getHours();
@@ -1285,714 +2393,29 @@ function getTime() {
   }
   return hours + ":" + minutes;
 }
+//Responsible for getting the current date for the history header
 function getDate() {
   const d = new Date();
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
 }
-function deleteHistory() {
-  document.getElementById('historyHeader').innerHTML = "";
-  localStorage.setItem("historyOut", "");
-}
-function setSelect(node, index) {
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let higher = 0;
-  let lower = 0;
-  range.setStart(node.lastChild, index);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-function openElement(evt) {
-  let evtElement = evt;
-  let match;
-  let tabs = document.getElementsByClassName('tabcontent');
-  if (evtElement.dataset.tabmap != "mainTab") {
-    if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-      document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
-      document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
-      setTimeout(donothing, 500);
-      document.getElementById('extraFuncPopUp').style.visibility = "hidden";
-    }
-    document.getElementById('customFuncDisplay').style.visibility = "hidden";
-  } else {
-    document.getElementById('customFuncDisplay').style.visibility = "";
-  }
-  match = matchTab(evtElement.dataset.tabmap, false);
-  for (let i = 0; i < tabs.length; i++) {
-    if (match != tabs[i]) {
-      tabs[i].style.visibility = 'hidden';
-    }
-  }
-  highlightTab(evtElement);
-  match.style.visibility = 'visible';
-}
-function highlightTab(element) {
-  let activeTabs = document.getElementsByClassName('tablinks active')
-  for (let i = 0; i < activeTabs.length; i++) {
-    activeTabs[i].className = activeTabs[i].className.replace(" active", "");
-  }
-  element.className += " active"
-}
-/*function arcSwitch() {
-  if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
-    for (let i = 0; i < document.getElementsByClassName('arcText').length; i++) {
-      document.getElementsByClassName('arcText')[i].innerHTML = 'arc';
-    }
-    for (let i = 0; i < document.getElementsByClassName('trigButton').length; i++) {
-      document.getElementsByClassName('trigButton')[i].innerHTML = document.getElementsByClassName('trigButton')[i].innerHTML.substring(1);
-    }
-  } else {
-    for (let i = 0; i < document.getElementsByClassName('arcText').length; i++) {
-      document.getElementsByClassName('arcText')[i].innerHTML = 'reg';
-    }
-    for (let i = 0; i < document.getElementsByClassName('trigButton').length; i++) {
-      document.getElementsByClassName('trigButton')[i].innerHTML = "a" + document.getElementsByClassName('trigButton')[i].innerHTML;
-    }
-  }
-}*/
-function trigPressed(input) {
-  if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
-    frontButtonPressed("a" + input);
-  } else {
-    frontButtonPressed(input);
-  }
-}
-function popup() {
-  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
-    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideDown";
-    setTimeout(donothing, 500);
-    document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-  } else {
-    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toUp";
-    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideUp";
-    setTimeout(donothing, 500);
-    document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
-  }
-
-}
-function donothing() { }
-function settingsTabChange(name) {
-  var tabs = document.getElementsByClassName("settingTabContent");
-  if (window.innerWidth / window.innerHeight > 3 / 4) {
-    for (i = 0; i < tabs.length; i++) {
-      tabs[i].style.visibility = "hidden";
-    }
-    if (name == 'colorsTab') {
-      document.getElementById("colorsTab").style.visibility = "visible";
-    } else if (name == 'PreferencesTab') {
-      document.getElementById('PreferencesTab').style.visibility = "visible";
-    } else if (name == 'AboutTab') {
-      document.getElementById('AboutTab').style.visibility = "visible";
-    } else {
-      console.log("nothing")
-    }
-  } else {
-    for (i = 0; i < tabs.length; i++) {
-      tabs[i].style.visibility = "hidden";
-    }
-    if (name == 'colorsTab') {
-      document.getElementById("colorsTab").style.visibility = "visible";
-      document.getElementById("colorsTab").style.width = "100%";
-      document.getElementById("colorsBack").style.visibility = "visible";
-      document.getElementById("colorsTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
-      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
-      sessionStorage.setItem("facing", "themePageOut");
-    } else if (name == 'PreferencesTab') {
-      document.getElementById("PreferencesTab").style.visibility = "visible";
-      document.getElementById("PreferencesTab").style.width = "100%";
-      document.getElementById("PreferencesBack").style.visibility = "visible";
-      document.getElementById("PreferencesTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
-      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
-      sessionStorage.setItem("facing", "prefPageOut");
-    } else if (name == 'AboutTab') {
-      document.getElementById("AboutTab").style.visibility = "visible";
-      document.getElementById("AboutTab").style.width = "100%";
-      document.getElementById("AboutBack").style.visibility = "visible";
-      document.getElementById("AboutTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideLeft";
-      setTimeout(function () { document.getElementById("navColumn").style.visibility = "hidden"; }, 150);
-      sessionStorage.setItem("facing", "aboutPageOut");
-    } else {
-      console.log("nothing")
-    }
-  }
-}
-function SettingsBack(tab) {
-  if (tab == "colorsTab") {
-    document.getElementById("colorsBack").style.visibility = "hidden";
-    if (window.innerWidth / window.innerHeight > 3 / 4) {
-      document.getElementById("colorsTab").style.animation = null;
-      document.getElementById('colorsTab').style.width = undefined;
-    } else {
-      document.getElementById("colorsTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
-      setTimeout(function () { document.getElementById("colorsTab").style = undefined; }, 150);
-    }
-    document.getElementById("navColumn").style.visibility = "visible";
-  } else if (tab == "PreferencesTab") {
-    document.getElementById("PreferencesBack").style.visibility = "hidden";
-    if (window.innerWidth / window.innerHeight > 3 / 4) {
-      document.getElementById("PreferencesTab").style.animation = null;
-    } else {
-      document.getElementById("PreferencesTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
-      setTimeout(function () { document.getElementById("PreferencesTab").style = undefined; }, 150);
-    }
-    document.getElementById("navColumn").style.visibility = "visible";
-  } else if (tab == "AboutTab") {
-    document.getElementById("AboutBack").style.visibility = "hidden";
-    if (window.innerWidth / window.innerHeight > 3 / 4) {
-      document.getElementById("AboutTab").style.animation = null;
-    } else {
-      document.getElementById("AboutTab").style.animation = "0.15s ease-in 0s 1 normal forwards running toSlideRight";
-      setTimeout(function () { document.getElementById("AboutTab").style = undefined; }, 150);
-    }
-    document.getElementById("navColumn").style.visibility = "visible";
-  }
-}
-function settingExit() {
-  let defaultThemes = getThemes();
-  let newSettings = settings;
-  let selTheme = document.getElementsByClassName("themeElem active")[0];
-  if (selTheme.id == "darkMode" || selTheme.id == "lightMode") {
-    newSettings.theme = selTheme.id;
-    let selAcc = document.getElementsByClassName("accButton active")[0];
-    newSettings.acc = selAcc.id;
-  } else if (selTheme.id == "custPurchasable") {
-    newSettings.theme = selTheme.id;
-    newSettings.p = document.getElementById("primaryColorPicker").value;
-    newSettings.s = document.getElementById("secondaryColorPicker").value;
-    newSettings.a = document.getElementById("accentColorPicker").value;
-  }
-  newSettings.gDS = Number(document.getElementById("graphDStep").value);
-  newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
-  newSettings.gDMax = Number(document.getElementById("domainTopG").value);
-  newSettings.gRS = Number(document.getElementById("graphRStep").value);
-  newSettings.gRMin = Number(document.getElementById("rangeBottomG").value);
-  newSettings.gRMax = Number(document.getElementById("rangeTopG").value);
-  if (document.getElementById("degModeBut").className == "settingsButton active") {
-    newSettings.degRad = true;
-  } else {
-    newSettings.degRad = false;
-  }
-  localStorage.setItem("settings", JSON.stringify(newSettings));
-  document.location = 'Recursive.html';
-}
-/*function openNewFunc() {
-  if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
-    document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
-  } else {
-    document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideLeft";
-    document.getElementById('newFunctionsPage').style.visibility = "visible";
-  }
-}*/
-function backMoreFunction() {
-  if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
-    document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
-    setTimeout(function () { document.getElementById('nameArea').value = ""; document.getElementById('equationArea').value = ""; document.getElementById('newFunctionsPage').style.visibility = "hidden"; }, 250);
-  } else {
-    document.location = 'Recursive.html';
-  }
-}
-//needs work because deprecatiated
-function updatePreview(event) {
-  if (event.target.id == "secondaryColorPicker") {
-    document.getElementById("displayPreview").style.backgroundColor = event.target.value;
-  } else if (event.target.id == "accentColorPicker") {
-    document.getElementById("numsPreview").style.backgroundColor = event.target.value;
-  } else {
-    document.getElementById("funcPreview").style.backgroundColor = event.target.value;
-  }
-}
-/*function customFunctionPress() {
-  document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
-  custButton(document.getElementById('equationArea').value, document.getElementById('nameArea').value, 'funcGrid', false);
-  setTimeout(function () { document.getElementById('nameArea').value = ""; document.getElementById('equationArea').value = ""; document.getElementById('newFunctionsPage').style.visibility = "hidden"; }, 250);
-}*/
-function dropPressed(color) {
-  if (color == "Black") {
-    document.getElementById("showcaseTextColor").style.color = "#000000";
-    document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
-    settings.t = "#000000";
-  } else {
-    document.getElementById("showcaseTextColor").style.color = "#FFFFFF";
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-    settings.t = "#FFFFFF";
-  }
-}
-//Method that creates the tab page
-function newCustFuncTab(config) {
-  let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true), exist = false, existing = document.getElementsByClassName("tabcontent");
-  for (i = 1; i < existing.length; i++) {
-    if (existing[i].dataset.tab === JSON.stringify(config)) {
-      exist = true;
-      break;
-    }
-  }
-  if (!exist) {
-    clon = defaultSetup(clon);
-    let name = config.name;
-    let varGrid = clon.getElementById("varGrid");
-    let equationDIV = clon.getElementById("EquationFunc");
-    let movable = clon.getElementById("selectorUnder");
-    movable.dataset.pos = 0;
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-
-    clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
-    clon.getElementById("nameFunc").value = name;
-
-    switch (config.type) {
-      case ('Function'):
-        let equation = config.equation;
-
-        clon.getElementById("EquationFunc").innerHTML = equation;
-        clon.getElementById("EquationFunc").dataset.baseE = equation;
-
-        clon.getElementById('nameFunc').addEventListener("input", function (e) {
-          let liveTab = e.target.parentNode;
-          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
-          let matchPage = matchTab(e.target.parentNode.dataset.tab, true);
-          let newVal = JSON.parse(e.target.parentNode.dataset.tab);
-          newVal.name = e.target.value;
-          matchPage.querySelector("#newTabName").innerHTML = e.target.value;
-          matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
-          changeFunc(oldVal, newVal, matchPage, liveTab);
-        });
-        clon.getElementById("EquationFunc").addEventListener("focus", function (e) {
-          let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
-          equationDIV.innerHTML = initEquation.equation;
-          setSelect(equationDIV, equationDIV.innerHTML.length);
-        });
-        clon.getElementById('EquationFunc').addEventListener("input", function (e) {
-          let liveTab = e.target.parentNode.parentNode;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(liveTab.dataset.tab, true);
-          let newValue = JSON.parse(liveTab.dataset.tab);
-
-          //Test this method with a sup subclass
-          console.log("%c EquationFunc input", "color: red;");
-          checkVar(varGrid, equationDIV, funcTabs);
-          newValue.equation = e.target.innerHTML
-          equationDIV.dataset.baseE = equationDIV.innerHTML;
-          changeFunc(oldVal, newValue, matchPage, liveTab);
-        });
-        document.getElementById("mainBody").appendChild(clon);
-        checkVar(varGrid, equationDIV, funcTabs);
-        try {
-          parseVariables(varGrid, equationDIV, funcTabs);
-        } catch (e) {
-          report("Couldn't Calculate", false);
-        }
-        break;
-      case ("Hybrid"):
-        let nameElem = clon.getElementById('nameFunc');
-        let subElem = clon.getElementById("EquationFunc");
-        subElem.innerHTML = "Hybrid";
-        subElem.contentEditable = false;
-        
-        nameElem.addEventListener("input", function(){
-          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
-          removeImplemented(oldVal.name)
-          removeFunc(oldVal.name)
-          let oldParse = parseFunction(oldVal.code)
-          
-        });
-      break;
-    }
-    //adding event listeners
-
-  }
-}
-function defaultSetup(clon) {
-  clon.getElementById("minDomainGraph").value = settings.gDMin;
-  clon.getElementById("maxDomainGraph").value = settings.gDMax;
-  clon.getElementById("stepDomainGraph").value = settings.gDS;
-  clon.getElementById("minRangeGraph").value = settings.gRMin;
-  clon.getElementById("maxRangeGraph").value = settings.gRMax;
-  clon.getElementById("stepRangeGraph").value = settings.gRS;
-  clon.getElementById("cellsTable").value = settings.tC;
-  clon.getElementById('stepTable').value = settings.tS;
-  let chart = clon.getElementById("funcChart");
-  var cfcg = new Chart(chart, {
-    type: 'line',
-    data: {
-      labels: [-2, 4],
-      datasets: [{
-        data: [10, 20],
-        label: 'x',
-        fontColor: '#FFFFFF',
-        borderColor: "#FFFFFF",
-        backgroundColor: "#FFFFFF",
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            usePointStyle: true,
-            pointStyle: 'circle',
-          }
-        }
-      }
-    }
-  })
-
-  let movable = clon.getElementById("selectorUnder");
-  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-  movable.dataset.pos = 0;
-  clon.getElementById('functionMode').addEventListener("click", function () {
-    funcTabs[0].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 0, movable);
-  });
-  clon.getElementById("graphMode").addEventListener("click", function () {
-    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
-    funcTabs[1].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 75, movable);
-  });
-  clon.getElementById("tableMode").addEventListener("click", function () {
-    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
-    funcTabs[2].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 150, movable);
-  });
-  let updateElements = [
-    "stepTable",
-    "cellsTable"
-  ];
-  for (let element of updateElements) {
-    clon.getElementById(element).addEventListener("input", function (e) {
-      try {
-        parseVariables(varGrid, equationDIV, funcTabs);
-      } catch (e) {
-        report("Couldn't Calculate", false);
-      }
-
-    });
-  }
-  return clon;
-}
-function changeFunc(og, newString, tab, page) {
-  console.log(og)
-  var funcList = getFuncList();
-  for (let i = 0; i < funcList.length; i++) {
-    console.log(`${JSON.stringify(funcList[i])} vs. ${JSON.stringify(og)}`);
-    if (JSON.stringify(funcList[i]) == JSON.stringify(og)) {
-      console.log("matched")
-      funcList[i] = newString;
-    }
-  }
-  changeImplemented(og, newString);
-  console.log(funcList);
-  setFuncList(funcList);
-  console.log(tab)
-  tab.dataset.tabmap = JSON.stringify(newString);
-  page.dataset.tab = JSON.stringify(newString);
-  updateCustomButtons(og, newString);
-}
-function changeImplemented(oldConfig, newConfig) {
-  let object = {};
-  if (oldConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
-    object = {
-      "func": oldConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(oldConfig.equation),
-      "funcLength": oldConfig.name.length
-    };
-
-  } else if (oldConfig.type == "Code") {
-
-  } else if (oldConfig.type == "Hybrid") {
-
-  }
-  let indexOf = -1;
-  for (let i = 0; i < funcList.length; i++) {
-    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
-      indexOf = i;
-    }
-  }
-  if (oldConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(newConfig.equation, settings.degRad))
-    let newObject = {
-      "func": newConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(newConfig.equation),
-      "funcLength": newConfig.name.length
-    };
-    funcList[i] = newObject;
-  } else if (oldConfig.type == "Code") {
-
-  } else if (oldConfig.type == "Hybrid") {
-
-  }
-}
-function addImplemented(funcConfig) {
-  if (funcConfig.type == "Function") {
-    createNewFunction("function", funcConfig.name, solveInpr(funcConfig.equation, settings.degRad));
-  } else if (funcConfig.type == "Hybrid") {
-    createNewFunction("method", funcConfig.code)
-  }
-}
-function removeImplemented(oldConfig) {
-  removeFunction(oldConfig.name);
-}
-function hidModes(num, tabs) {
-  if (num == 0) {
-    tabs[0].style.visibility = "hidden";
-  } else if (num == 75) {
-    tabs[1].style.visibility = "hidden";
-  } else if (num == 150) {
-    tabs[2].style.visibility = "hidden";
-  }
-}
-function animateModes(from, to, element) {
-  if (from == 0 && to == 75) {
-    //0 to 75
+//Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
+function hideElement(element){
+  element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
+  setTimeout(function () {
     element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 0.5 normal forwards running modeSwitch";
-    setTimeout(function () { element.style.left = "75px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 75;
-  } else if (from == 0 && to == 150) {
-    //0 to 150
+    element.style.visibility = "hidden";
+  }, 150);
+}
+//Intended for animating the enter of an element to the page but again im lazy and may not get implemented
+function pullUpElement(element){
+  element.style.visibility = "visible";
+  element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
+  setTimeout(function () {
     element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 1 normal forwards running modeSwitch"
-    setTimeout(function () { element.style.left = "150px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 150;
-  } else if (from == 75 && to == 150) {
-    //75 to 150
-    element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 1 normal forwards running sveBacSwitch"
-    setTimeout(function () { element.style.left = "150px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 150;
-  } else if (from == 75 && to == 0) {
-    //75 to 0
-    element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 1 normal forwards running sveForSwitch"
-    setTimeout(function () { element.style.left = "0px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 0;
-  } else if (from == 150 && to == 75) {
-    //150 to 75
-    element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 0.5 reverse forwards running modeSwitch"
-    setTimeout(function () { element.style.left = "75px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 75;
-  } else if (from == 150 && to == 0) {
-    //150 to 0
-    element.style.animation = undefined;
-    element.style.animation = "0.15s ease-in 0s 1 reverse forwards running modeSwitch"
-    setTimeout(function () { element.style.left = "0px"; element.style.animation = undefined }, 150);
-    element.dataset.pos = 0;
-  } else {
-    console.log(same)
-  }
+  }, 150);
 }
-function varListAssbely(element) {
-  let variables = element.getElementsByClassName("variableContainer");
-  let varData = [];
-  for (i = 0; i < variables.length; i++) {
-    let temp = {
-      "Name": variables[i].querySelector('h3').innerHTML,
-      "Value": variables[i].querySelector('input').value
-    };
-    varData.push(temp);
-  }
-  console.log("retruned Variable list")
-  console.log(varData)
-  return varData;
-}
-function parseVar(parsedEquation, data) {
-  console.log("Parse var types")
-  console.log(typeof data.Value)
-  for (let i = 0; i < parsedEquation.length; i++) {
-    if (funcMatch(parsedEquation.substring(i)) != "") {
-      i += funcMatch(parsedEquation.substring(i)).length;
-    } else if (parsedEquation.charAt(i) == data.Name) {
-      parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
-    }
-  }
-  return parsedEquation;
-}
-//Takes a tab element and returns the variables in the tab with their data in json format
-function parseVariables(element, equationDIV, funcTabs) {
-  console.log("Parse Variables ran");
-  let varData = varListAssbely(element);
-  let parsedEquation = equationDIV.dataset.baseE
-  console.log("%c parsedEquation: " + parsedEquation, "color:red");
-  let all = true;
-  let first = undefined;
-  for (let Vars of varData) {
-    if (all) {
-      if (Vars.Value == '') {
-        all = false;
-        first = Vars;
-      }
-    } else if (Vars.Value == '') {
-      first = undefined;
-    }
-  }
-  console.log("first = " + first);
-  for (let data of varData) {
-    parsedEquation = parseVar(parsedEquation, data);
-  }
-  console.log(equationDIV.dataset.baseE);
-  if (all) {
-    solveEquation(parsedEquation, funcTabs);
-    solveGraph(varData, equationDIV.innerHTML, first);
-    solveTable(parsedEquation, first);
-  } else if (first != undefined) {
-    solveGraph();
-    solveTable(equationDIV.innerHTML, first);
-  }
-  console.log("%c Check method ran", "color:green")
-}
-function solveEquation(parsedEquation, funcTabs) {
-  console.log("Parsed Equation is " + parsedEquation);
-  let result = "=" + inputSolver(parsedEquation, "Couldn't Calculate");
-  console.log("%c result: " + result, "color:green");
-  funcTabs[0].querySelector('#equalsHeader').innerHTML = result;
-}
-function solveGraph(varData, parsedEquation, data) {
-
-}
-function solveTable(parsedEquation, data) {
-  console.log("solve table ran")
-  /*
-  needs to get the settings table step and number of steps
-  then it will run a loop the number of values there are and for each it will
-     will run the equation on the designated step by mutiplying the step by number of values
-     then insert the number which is the result of mutipling values by loop and step 
-     and the value resulted by runing that number in the eqaution into the table
-  end method
-  */
-  let numValue = Number(document.getElementById('cellsTable').value);
-  let step = Number(document.getElementById('stepTable').value);
-  document.getElementById("funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
-  for (let i = 1; i <= numValue; i++) {
-    // missing the code that will parse and solve equation
-    console.log("Loop " + i);
-    let result;
-    let currentVal = i * step;
-    var newData = data;
-    let loopEqua = parsedEquation;
-    newData.Value = "" + currentVal;
-    result = inputSolver(parseVar(loopEqua, newData), "Error Making Table");
-    var newRow = document.getElementById('funcTable').insertRow(i);
-    var newXCell = newRow.insertCell(0);
-    var newYCell = newRow.insertCell(1);
-    newXCell.innerHTML = "" + currentVal;
-    newXCell.id = "shit"
-    console.log(i * step)
-    newYCell.innerHTML = result;
-    newYCell.id = "other shit"
-  }
-}
-//Method that finds all instances of the defined function value in buttons and 
-function updateCustomButtons(oldVal, newValue) {
-  console.log('Old Val is ' + oldVal + " New Value is " + newValue);
-  let functionLinks = document.getElementsByClassName('customFuncLinks');
-  let Name = oldVal.name;
-  let newName = newValue.name;
-  let newFunction = "";
-  switch (oldVal.type) {
-    case ("Function"):
-      newFunction = newValue.equation;
-      break;
-    case ("Code"):
-      newFunction = "Code";
-      break;
-    case ("Hybrid"):
-      newFunction = "Hybrid";
-      break;
-  }
-  for (let i = 0; i < functionLinks.length; i++) {
-    console.log("Checking " + functionLinks[i].childNodes[1].data + " and " + functionLinks[i].childNodes[0].innerHTML);
-    if (functionLinks[i].querySelector("#nameLabel").innerHTML == Name) {
-      console.log("Matching Found");
-      functionLinks[i].querySelector("#equationLabel").innerHTML = newFunction;
-      functionLinks[i].querySelector("#nameLabel").innerHTML = newName;
-      //functionLinks[i].data.
-    }
-  }
-}
-//Method To Match a tab button in the tab directory to its tab page
-function matchTab(info, type) {
-  let elements = [];
-  if (type) {
-    elements = document.getElementsByClassName('tablinks');
-  } else {
-    elements = document.getElementsByClassName('tabcontent');
-  }
-  for (let i = 0; i < elements.length; i++) {
-    if (type) {
-      if (elements[i].dataset.tabmap == info) {
-        return elements[i];
-      }
-    } else {
-      if (elements[i].dataset.tab == info) {
-        return elements[i];
-      }
-    }
-  }
-}
-function checkVar(varGrid, equationArea, funcTabs) {
-  let tabVarContainers = varGrid.getElementsByClassName("variableContainer");
-  let varExisting = [];
-  let equation = equationArea.innerHTML;
-  for (let cont of tabVarContainers) {
-    let name = cont.querySelector('h3').innerHTML;
-    varExisting.push({
-      "name": name,
-      "element": cont
-    });
-  }
-  let varEquation = varInEquat(equationArea.innerHTML);
-  let newVars = [];
-  for (let eVar of varEquation) {
-    matching = false;
-    for (let cVar of varExisting) {
-      if (eVar.letter == cVar.name) {
-        let indexOfVar = varExisting.indexOf(cVar);
-        varExisting.splice(indexOfVar, 1);
-        matching = true;
-        break;
-      }
-    }
-    if (!matching) {
-      newVars.push(eVar.letter);
-    }
-  }
-  for (let oldVar of varExisting) {
-    varGrid.removeChild(oldVar.element);
-  }
-  for (let newVar of newVars) {
-    newVariable(newVar, varGrid, equationArea, funcTabs, equation);
-  }
-}
-function newVariable(name, varGrid, equationArea, funcTabs, equation) {
-  let tempvar = document.getElementsByClassName("variableTemplate")[0];
-  let varClon = tempvar.content.cloneNode(true);
-  varClon.getElementById('variableName').innerHTML = name;
-  varClon.getElementById('variableEntry').addEventListener('input', function (e) {
-    if (varClon.getElementById('variableEntry') != '') {
-      equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
-      try {
-        parseVariables(varGrid, equationArea, funcTabs);
-      } catch (e) { }
-    }
-  });
-  varGrid.appendChild(varClon)
-}
+//Responsible for finding where variables are in a given equation
 function varInEquat(equation) {
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
@@ -2016,6 +2439,7 @@ function varInEquat(equation) {
   }
   return varArray;
 }
+//Responsible for matching a var name with its value in a list
 function varInList(list, varLetter) {
   for (let item of list) {
     if (item.letter == varLetter) {
@@ -2024,6 +2448,7 @@ function varInList(list, varLetter) {
   }
   return null;
 }
+//Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
   let func = funcMatch(entry);
   if (func != "") {
@@ -2037,10 +2462,9 @@ function isVar(entry) {
     return 0;
   }
 }
+//Responsible for parsing a variable to its value in an equation 
 function setVar(element, equation) {
-  console.log("Parse Variables ran");
   let varData = varListAssbely(element);
-  console.log("%c parsedEquation: " + equation, "color:red");
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
       if (funcMatch(equation.substring(i)) != "") {
@@ -2056,6 +2480,24 @@ function setVar(element, equation) {
   console.log(varData)
   return equation;
 }
+//Deprecated method for rgb to hex
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+//deprecated method for rgb conversion
+function rgbToHex(rgb) {
+  let first = rgb.substring(rgb.indexOf('(') + 1, rgb.indexOf(','));
+  console.log(first);
+  rgb = rgb.substring(rgb.indexOf(', ') + 2);
+  let second = rgb.substring(0, rgb.indexOf(','));
+  rgb = rgb.substring(rgb.indexOf(', ') + 2);
+  let thrid = rgb.substring(0, rgb.indexOf(')'));
+  return "#" + componentToHex(Number(first)) + componentToHex(Number(second)) + componentToHex(Number(thrid));
+}
+//END
+/************************************************|help page|**************************************************/
+//Responsible for handling tab changes in help page (deprecated like everything on help page)
 function helpTabChange(name) {
   var tabs = document.getElementsByClassName("settingTabContent");
   if (window.innerWidth / window.innerHeight > 3 / 4) {
@@ -2103,19 +2545,7 @@ function helpTabChange(name) {
     }
   }
 }
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
-}
-function rgbToHex(rgb) {
-  let first = rgb.substring(rgb.indexOf('(') + 1, rgb.indexOf(','));
-  console.log(first);
-  rgb = rgb.substring(rgb.indexOf(', ') + 2);
-  let second = rgb.substring(0, rgb.indexOf(','));
-  rgb = rgb.substring(rgb.indexOf(', ') + 2);
-  let thrid = rgb.substring(0, rgb.indexOf(')'));
-  return "#" + componentToHex(Number(first)) + componentToHex(Number(second)) + componentToHex(Number(thrid));
-}
+//Responsible for handing help back (currently not linked to anything because deprecated like everything on help page)
 function helpBack(tab) {
   if (tab == "mainCalculatorHelp") {
     document.getElementById("mainCalBack").style.visibility = "hidden";
@@ -2146,102 +2576,24 @@ function helpBack(tab) {
     document.getElementById("navColumn").style.visibility = "visible";
   }
 }
+//END
+/*********************************************|Deprecated Beyond use|**************************************************/
+//Probably should delete this but I think I breaks everthing if I remember right
+function donothing() { }
+//Seemingly deprecated method that will soon be deleted
+function backMoreFunction() {
+  if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {
+    document.getElementById('newFunctionsPage').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideRight";
+    setTimeout(function () { document.getElementById('nameArea').value = ""; document.getElementById('equationArea').value = ""; document.getElementById('newFunctionsPage').style.visibility = "hidden"; }, 250);
+  } else {
+    document.location = 'Recursive.html';
+  }
+}
+//idk probably will delete
 function mobileTabMethod() {
   hideAllTabs();
   changeTabAs(true);
 
-}
-function hideAllTabs() {
-  let tabs = document.getElementsByClassName('tabcontent');
-  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-    popup();
-  }
-  for (let tab of tabs) {
-    tab.style.visibility = "hidden";
-  }
-}
-function changeTabAs(change) {
-  let visibility = "", bases = document.getElementsByClassName('displayBase'), tabstyle = "", tablinks = document.getElementsByClassName('tablinks');
-  if (change) {
-    visibility = "visible";
-    tabstyle = "visibility: visible; left: 5%; width: 90%; height: 90%; border-radius: 20px; text-align: center;";
-    document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: 50% 50%; grid-auto-rows: 300px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: 100%; background-color: var(--translucent); border-radius: 25px 25px 0 0;";
-  } else {
-    visibility = "hidden";
-    tabstyle = undefined;
-    document.getElementById("tab").style = undefined;
-    document.getElementById('tabContainer').style = undefined;
-  }
-  for (let i = 0; i < bases.length; i++) {
-    bases[i].style.visibility = visibility;
-    tablinks[i].style = tabstyle;
-    if (change) {
-      let parse = tablinks[i].dataset.tabmap;
-      parse = parse.substring(parse.indexOf('»') + 1);
-      parse = parse.substring(0, parse.indexOf('»'));
-      setShowEquat(tablinks[i], parse);
-    }
-  }
-}
-function setShowEquat(tablink, equation) {
-  if (equation != "") {
-    let childern = tablink.childNodes;
-    console.log(childern);
-    tablink.querySelector("#equtDisplayFunc").innerHTML = equation;
-  }
-}
-function setNumOfTabs() {
-  let tabs = document.getElementsByClassName('tablinks');
-  document.getElementById("tabNum").innerHTML = tabs.length;
-}
-function getFuncList() {
-  let parseString = localStorage.getItem("funcList");
-  let array = [];
-  let finalArray = [];
-  if (parseString == undefined) {
-    array = [];
-  } else {
-    //array = parseString.split('⥾');
-    while (parseString.includes('⥾')) {
-      array.push(parseString.substring(0, parseString.indexOf('⥾')));
-      parseString = parseString.substring(parseString.indexOf('⥾') + 1);
-    }
-
-  }
-  console.log(array);
-  for (let func of array) {
-    let funcJSON = {};
-    switch (func.substring(0, 1)) {
-      case "F":
-        funcJSON.type = "Function";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.equation = func.substring(0, func.indexOf('»'));
-
-        break;
-      case "H":
-        funcJSON.type = "Hybrid";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.code = func.substring(0, func.indexOf('»'));
-        break;
-      case "C":
-        funcJSON.type = "Code";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.code = func.substring(0, func.indexOf('»'));
-        break;
-      default:
-        console.log("Defa")
-        break;
-    }
-    finalArray.push(funcJSON);
-  }
-  return finalArray;
 }
 /*function createParseable(equation){
   let equationArray = [];
@@ -2287,333 +2639,4 @@ function getFuncList() {
   }
   return equationArray;
 }*/
-function findFuncConfig(name) {
-  let funcList = getFuncList();
-  for (let func of funcList) {
-    if (func.name == name) {
-      return func;
-    }
-  }
-}
-function setFuncList(array) {
-  let parseString = "";
-  console.log(array);
-  for (let i = 0; i < array.length; i++) {
-    let parsedString = "";
-    switch (array[i].type) {
-      case "Function":
-        parsedString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
-        break;
-      case "Hybrid":
-        parsedString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
-        break;
-      case "Code":
-        parsedString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
-        break;
-    }
-    parseString += parsedString + "⥾";
-  }
-  console.log(`parsedString: ${parseString}`);
-  localStorage.setItem("funcList", parseString);
-}
-function removeFunc(funcName) {
-  let array = getFuncList();
-  console.log(funcName)
-  for (let item of array) {
-    if (item.name == funcName) {
-      //removeImplemented(item);
-      array.splice(array.indexOf(item), 1);
-    }
-  }
-  setFuncList(array);
-}
-function funcAssebly(type, name, text) {
-  let object = {};
-  switch (type) {
-    case "Function":
-      object.type = "Function";
-      object.name = name;
-      object.equation = text;
-      break;
-    case "Hybrid":
-      object.type = "Hybrid";
-      object.name = name;
-      object.code = text;
-      break;
-    case "Code":
-      object.type = "Code";
-      object.name = name;
-      object.code = text;
-      break;
-  }
-  return object;
-}
-function setInverse() {
-  let trig = [{ "base": "sin", "inverse": "csc" }, { "base": "cos", "inverse": "sec" }, { "base": "tan", "inverse": "cot" }];
-  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
-  let invButtons = ['invPopup', 'invEx'];
-  let arc = false;
-  let text = "";
-  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
-    arc = true;
-  }
-  //sets the text of inv buttons and sets the state value
-  if (document.getElementById('invPopup').innerHTML == "inv") {
-    text = "reg"
-    state.tS[0] = true;
-  } else {
-    text = "inv"
-    state.tS[0] = false;
-  }
-  for (let elem of invButtons) {
-    document.getElementById(elem).innerHTML = text;
-  }
-  //sets the text of trig buttons based on values
-  for (let elem of elements) {
-    let elemText = document.getElementById(elem).innerHTML;
-    let outText = "";
-    if (arc) {
-      elemText = elemText.substring(1);
-    }
-    for (let tr of trig) {
-      if (elemText == tr.base) {
-        outText = tr.inverse;
-      } else if (elemText == tr.inverse) {
-        outText = tr.base;
-      }
-    }
-    if (arc) {
-      outText = "a" + outText;
-    }
-    document.getElementById(elem).innerHTML = outText;
-  }
-}
-function setArc() {
-  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
-  let invButtons = ['arcPopup', 'arcEx'];
-  let arc = false;
-  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
-    arc = true;
-  }
-  for (let elem of elements) {
-    let text = document.getElementById(elem).innerHTML;
-    if (!arc) {
-      document.getElementById(elem).innerHTML = "a" + text;
-      state.tS[1] = true;
-    } else {
-      document.getElementById(elem).innerHTML = text.substring(1);
-      state.tS[1] = false;
-    }
-  }
-}
-function setDegMode() {
-  let text = "";
-  let elements = ['degEx', 'degPopup'];
-  if (document.getElementById('degPopup').innerHTML == "deg") {
-    text = "rad"
-    settings.degRad = false;
-  } else {
-    text = "deg"
-    settings.degRad = true;
-  }
-  for (let elem of elements) {
-    document.getElementById(elem).innerHTML = text;
-  }
-}
-function setState() {
-  state.eT = document.getElementById('enterHeader').innerHTML;
-  let tabs = document.getElementsByClassName('tablinks');
-  for (let tab of tabs) {
-    let tabmap = tab.dataset.tabmap;
-    if (tabmap != "mainTab") {
-      console.log(tabmap);
-      let object = JSON.parse(tabmap);
-      state.fO.push(object.name)
-    }
-  }
-  sessionStorage.setItem("state", JSON.stringify(state));
-}
-function queryPurchase(item) {
-  let queryList = getPurshaseList();
-  let defaultPurchases = ["darkMode", "lightMode"];
-  for (let normal of defaultPurchases) {
-    if (normal == item) {
-      return true;
-    }
-  }
-  for (let purchased of queryList) {
-    if (purchased == item) {
-      return true;
-    }
-  }
-  return false;
-}
-function getPurshaseList() {
-  let list = [];
-  if (localStorage.getItem('purchased') != undefined) {
-    list = JSON.parse(localStorage.getItem('purchased')).purchaseList;
-  }
-  return list;
-}
-function setPurchase(name) {
-  if (localStorage.getItem('purchased') != undefined) {
-    let purchased = JSON.parse(localStorage.getItem('purchased'));
-    purchased.purchaseList.push(name)
-    localStorage.setItem('purchased', JSON.stringify(purchased));
-  } else {
-    localStorage.setItem('purchased', JSON.stringify({ "purchaseList": [name] }));
-  }
-}
-function unlockCustomTheme() {
-  document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
-  document.getElementById('custLabel').style = "margin-top: unset; margin-bottom: unset;";
-  let colors = themeElem.getMth();
-  settings.p = colors[0];
-  settings.s = colors[2];
-  settings.a = colors[1];
-  settings.t = colors[3];
-  document.getElementById('primaryColorPicker').value = settings.p
-  document.getElementById('secondaryColorPicker').value = settings.s
-  document.getElementById('accentColorPicker').value = settings.a
-}
-function toggleCustTheme() {
-  if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
-    document.getElementById('ColorsDiv').style = "visibility: hidden; position: absolute;";
-    document.getElementById('accentColorDiv').style = "visibility: visible; position: relative;";
-  } else {
-    document.getElementById('ColorsDiv').style = "visibility: visible; position: relative;";
-    document.getElementById('accentColorDiv').style = "visibility: hidden; position: absolute;";
-  }
-}
-function getCatalog() {
-  return [
-    {
-      "name": "custTheme",
-      "price": "0.99",
-      "have": queryPurchase()
-    }
-  ];
-}
-function getThemes() {
-  return [
-    {
-      "name": "lightMode",
-      "primary": "#ffffff",
-      "secondary": "#dedede",
-      'text': '#000000',
-      'getMth': function () {
-        return ["#ffffff", getColorAcc(settings.acc), "#dedede", "#000000"];
-      }
-    },
-    {
-      "name": "darkMode",
-      "primary": "#000000",
-      "secondary": "#1f1f1f",
-      'text': '#FFFFFF',
-      'getMth': function () {
-        return ["#000000", getColorAcc(settings.acc), "#1f1f1f", '#FFFFFF'];
-      }
-    },
-    {
-      "name": "custPurchasable",
-      "primary": settings.p,
-      "secondary": settings.s,
-      "text": settings.t,
-      'getMth': function () {
-        return [settings.p, settings.a, settings.s, settings.t]
-      }
-    }
-  ];
-}
-function getColors() {
-  console.log("you dick")
-  let themes = getThemes();
-  for (let theme of themes) {
-    if (theme.name == settings.theme) {
-      return theme.getMth();
-    }
-  }
-}
-function getAccents() {
-  return [
-    {
-      "id": 'red',
-      "val": '#d6564d'
-    },
-    {
-      "id": 'orange',
-      "val": '#fca31e'
-    },
-    {
-      "id": 'yellow',
-      "val": '#e9e455'
-    },
-    {
-      "id": 'green',
-      "val": '#68c43e'
-    },
-    {
-      "id": 'blue',
-      "val": '#4193ff'
-    },
-    {
-      "id": 'purple',
-      "val": '#6a2bfd'
-    },
-    {
-      "id": 'grey',
-      "val": '#b8b8b8'
-    }
-  ];
-}
-function getColorAcc(acc) {
-  let accents = getAccents();
-  for (let accent of accents) {
-    if (accent.id == acc) {
-      console.log(`accent is ${accent.val}`);
-      return accent.val;
-    }
-  }
-}
-function setRoot(colorArray) {
-  let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', colorArray[2]);
-  rootCss.style.setProperty('--numbersColor', colorArray[1]);
-  rootCss.style.setProperty('--functionsColor', colorArray[0]);
-  rootCss.style.setProperty('--textColor', colorArray[3]);
-  TextColorGlobal = colorArray[3];
-  /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    colorMessager.postMessage(colorArray[0]);
-  }*/
-}
-function setImages(imgList) {
-  for (let img of imgList) {
-    if (img.type == "mutiple") {
-      let elems = document.getElementsByClassName(img.class);
-      for (elem of elems) {
-        elem.src = img.src;
-      }
-    } else {
-      document.getElementById(img.id).src = img.src;
-    }
-  }
-}
-function report(message, meaning) {
-  console.log("report")
-  let consoleD = document.getElementById("popupConsole");
-  consoleD.innerHTML = message;
-  consoleD.style.visibility = "visible";
-  consoleD.style.animation = "1.5s ease-in 0s 1 normal forwards running slideToUpFromBottom";
-  let width = consoleD.width / 2;
-  let vw = window.innerWidth;
-  consoleD.style.left = vw - width + "px";
-  if (meaning) {
-    consoleD.style.backgroundColor = "#71ec71";
-  } else {
-    consoleD.style.backgroundColor = "#f74646";
-  }
-  setTimeout(function () {
-    consoleD.style.animation = null;
-    consoleD.style.visibility = "hidden";
-  }, 1500);
-}
+//END
