@@ -1681,8 +1681,10 @@ function defaultSetup(clon) {
   return clon;
 }
 function changeFunc(og, newString, tab, page) {
+  console.log(og)
   var funcList = getFuncList();
   for (let i = 0; i < funcList.length; i++) {
+    console.log(`${JSON.stringify(funcList[i])} vs. ${JSON.stringify(og)}`);
     if (JSON.stringify(funcList[i]) == JSON.stringify(og)) {
       console.log("matched")
       funcList[i] = newString;
