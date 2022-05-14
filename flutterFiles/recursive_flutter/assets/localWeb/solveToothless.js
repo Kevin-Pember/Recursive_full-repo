@@ -132,6 +132,7 @@ let funcList = [
 let secondList = [
   "sup>",
 ];
+parseFunction("function hello(var,shit){}")
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
   console.log('Inpr ran');
@@ -141,8 +142,8 @@ function solveInpr(equation, degRad) {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
       );
+      let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
       if (func.type == "function") {
-        let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
         let funcTemp = findMethod(func, degRad);
         if (funcTemp.type == "Equation") {
           let parsedFunc = assembly(func, funcTemp, values);
@@ -582,8 +583,14 @@ function containsTrig(string) {
 /*(var, var2){
   console.log(var + var2)
 }*/
-function stringFunction(name, string) {
-  string = `var ${name} = function ${string} \n return ${name};`;
+function stringFunction(object) {
+  let name = object.func;
+  let string = object.string;
+  let vars = object.variables;
+  for(let i =vars.length-1; i >= 0; i--){
+    string = string.substring(0,1) + `var ${vars[i]} = array[${i}];`+ string.substring(1);
+  }
+  string = `var ${name} = function (array)${string} \n return ${name};`;
   console.log(string)
   return Function(string);
 }
@@ -603,10 +610,13 @@ function parseFunction(StringFunction) {
       variableDefs = 0;
     }
   }
+  StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
+  console.log(`%c ${variables[0]}`,"color: green;")
   let finalObject = {
     "func": name,
     "type": "method",
     "string": StringFunction,
+    "variables": variables,
     "inputs": variables.length,
     "funcRadDeg": false,
     "funcLength": name.length
@@ -631,7 +641,7 @@ function createNewFunction(){
   }else if (arguments[0] == "method"){
     let funcString = arguments[1];
     let funcObject = parseFunction(funcString);
-    funcObject.mth = stringFunction(funcObject.func, funcObject.string)()
+    funcObject.mth = stringFunction(funcObject)()
     console.log(funcObject.mth.toString())
     console.log(funcObject.mth(2))
     funcList.push(funcObject);
@@ -641,4 +651,14 @@ function removeFunction(name){
   funcList = funcList.filter(function(value, index, arr){ 
     return value.func != name;
 })
+}
+function indexOfAll(string, value){
+  let index = 0;
+  let array = [];
+  while(string.indexOf(value,index) != -1){
+    let newIndex = string.indexOf(value,index);
+    array.push(newIndex);
+    index = newIndex+1;
+  }
+  return array;
 }

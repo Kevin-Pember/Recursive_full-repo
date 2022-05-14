@@ -2180,6 +2180,12 @@ button:focus, input[type="button"]:focus {
   font-size: 4.5vh;
   position: relative;
 }
+#editIcon{
+  margin-top: 16px;
+  position: absolute;
+  top: 0;
+  right: 10px;
+}
 #modeSwitcher{
   top:10px;
   left: 10px;

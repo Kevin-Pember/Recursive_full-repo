@@ -204,9 +204,9 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('arcEx').addEventListener("click", function () { setArc(); });
   document.getElementById('invEx').addEventListener("click", function () { setInverse(); });
-  document.getElementById('sinEx').addEventListener("click", function () { trigPressed('sin('); });
-  document.getElementById('cosEx').addEventListener("click", function () { trigPressed('cos('); });
-  document.getElementById('tanEx').addEventListener("click", function () { trigPressed('tan('); });
+  document.getElementById('sinEx').addEventListener("click", function (e) { trigPressed(e); });
+  document.getElementById('cosEx').addEventListener("click", function (e) { trigPressed(e); });
+  document.getElementById('tanEx').addEventListener("click", function (e) { trigPressed(e); });
   document.getElementById('factorialEx').addEventListener("click", function () { frontButtonPressed('!'); });
   document.getElementById('log10Ex').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
   document.getElementById('lnEx').addEventListener("click", function () { frontButtonPressed('ln('); });
@@ -250,14 +250,14 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('invPopup').addEventListener("click", function () {
     setInverse();
   })
-  document.getElementById('sinPopup').addEventListener("click", function () { trigPressed('sin('); });
-  document.getElementById('cosPopup').addEventListener("click", function () { trigPressed('cos('); });
-  document.getElementById('tanPopup').addEventListener("click", function () { trigPressed('tan('); });
+  document.getElementById('sinPopup').addEventListener("click", function (e) { trigPressed(e); });
+  document.getElementById('cosPopup').addEventListener("click", function (e) { trigPressed(e); });
+  document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
   document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc('Function',document.getElementById('nameEntryArea').value,document.getElementById('enterHeader').innerHTML);
+    createFunc('Function', document.getElementById('nameEntryArea').value, document.getElementById('enterHeader').innerHTML);
     document.getElementById('nameEntry').style.visibility = "hidden";
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
@@ -267,7 +267,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('nameEntryArea').value = "";
   });
 
-  document.getElementById('backCreator').addEventListener("click", function(){
+  document.getElementById('backCreator').addEventListener("click", function () {
     universalBack();
   });
   let movable = document.getElementById("custCreatorUnder");
@@ -291,19 +291,19 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('nameCreator').placeholder = "Name"
     document.getElementById('nameCreator').readOnly = false;
   });
-  document.getElementById('saveCreator').addEventListener("click", function (){
-    if(movable.dataset.pos == 0){
+  document.getElementById('saveCreator').addEventListener("click", function () {
+    if (movable.dataset.pos == 0) {
       createFunc("Function", document.getElementById('nameCreator').value, document.getElementById('creatorEquationFunc').innerHTML)
-    }else if (movable.dataset.pos == 75){
+    } else if (movable.dataset.pos == 75) {
       console.log(document.getElementById('hybridEditor').value)
       let object = parseFunction(document.getElementById('hybridEditor').value)
       createFunc("Hybrid", object.func, document.getElementById('hybridEditor').value)
-    }else if (movable.dataset.pos == 150){
+    } else if (movable.dataset.pos == 150) {
       createFunc("Code", document.getElementById('nameCreator').value, document.getElementById('hybridEditor').value)
     }
     universalBack();
   });
-  createCodeTerminal(document.getElementById('creatorEditor'),"hybridEditor")
+  createCodeTerminal(document.getElementById('creatorEditor'), "hybridEditor")
 
   const elem = document.getElementById("memoryTextBoarder");
   let isDown = false;
@@ -533,10 +533,10 @@ function openPage(id) {
   }, 100);
 }
 //Responsible for hiding pages that where placed on top of the main calculator
-function closePage(id){
+function closePage(id) {
   let element = document.getElementById(id);
   element.style.animation = "0.1s ease-in 0s 1 reverse forwards running pageup"
-  setTimeout(function (){
+  setTimeout(function () {
     element.style.animation = undefined;
     element.style.bottom = "100%";
     element.style.zIndex = 1;
@@ -693,13 +693,10 @@ function pow(type) {
   sel.removeAllRanges()
   sel.addRange(range);
 }
-//Responsible (I Think) for handling trig button presses (needs update to work with new elements)
-function trigPressed(input) {
-  if (document.getElementsByClassName('trigButton')[0].innerHTML.charAt(0) == 'a') {
-    frontButtonPressed("a" + input);
-  } else {
-    frontButtonPressed(input);
-  }
+//Responsible for handling trig button presses
+function trigPressed(event) {
+  let eventTarget = event.target;
+  frontButtonPressed(eventTarget.innerHTML + "(");
 }
 //Responsible (I Think) to patch weird behavior with default HTML behavior SUP
 function keepBlank(eve) {
@@ -961,8 +958,8 @@ function openPopup() {
   document.getElementById('nameEntry').style.visibility = "visible";
 }
 //Respinsible for the visible of pages on creator page. Takes the id and that is the page that becomes visible
-function funcCreatorPages(elemID){
-  for(let elem of document.getElementsByClassName('creatorPage')){
+function funcCreatorPages(elemID) {
+  for (let elem of document.getElementsByClassName('creatorPage')) {
     elem.style.visibility = "hidden";
   }
   document.getElementById(elemID).style.visibility = "visible";
@@ -1066,7 +1063,7 @@ function setDegMode() {
 function createFunc(type, name, text) {
   var funcList = getFuncList();
   if (findFuncConfig(name) === false) {
-    
+
     let object = { "name": name, "type": type };
     switch (type) {
       case "Function":
@@ -1123,6 +1120,7 @@ function custButton(funcConfig, target) {
       }
       let funcName = elem.querySelector("#nameLabel").innerHTML;
       let funcParse = findFuncConfig(name);
+      console.log(`funcparse is ${funcParse}`)
       console.log(funcParse)
       if (e.target.tagName != "IMG") {
         createTab(funcParse)
@@ -1158,48 +1156,47 @@ function createTab(config) {
   document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
   document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
   document.getElementById('customFuncDisplay').style.visibility = "hidden";
-  if (type == "Function") {
-    if (!tabOpen(name)) {
-      let tabs = document.getElementsByClassName('tabcontent');
-      for (let i = 0; i < tabs.length; i++) {
-        tabs[i].style.visibility = 'hidden';
-      }
-      newCustFuncTab(config);
-
-      let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
-      tabClon.getElementById('newTabName').innerHTML = name;
-      tabClon.getElementById('nameDisplay').innerHTML = name;
-      tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
-      tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
-      if (TextColorGlobal == "#000000") {
-        tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
-      }
-      let highlight = tabClon.getElementById('tabButton');
-      tabClon.getElementById('tabButton').addEventListener("click", function (e) {
-        if (e.target.id != "tabRemove") {
-          if (window.innerWidth / window.innerHeight < 3 / 4) {
-            changeTabAs(false);
-          }
-          if (e.target != highlight.querySelector("IMG")) {
-            openElement(highlight)
-            sessionStorage.setItem("facing", "custFunc");
-          }
+  if (!tabOpen(name)) {
+    if (type == "Function") {
+        let tabs = document.getElementsByClassName('tabcontent');
+        for (let i = 0; i < tabs.length; i++) {
+          tabs[i].style.visibility = 'hidden';
         }
+        newCustFuncTab(config);
 
-      });
-      tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-        removeCustFunc(e);
+        let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
+        tabClon.getElementById('newTabName').innerHTML = name;
+        tabClon.getElementById('nameDisplay').innerHTML = name;
+        tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
+        tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
+        if (TextColorGlobal == "#000000") {
+          tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
+        }
+        let highlight = tabClon.getElementById('tabButton');
+        tabClon.getElementById('tabButton').addEventListener("click", function (e) {
+          if (e.target.id != "tabRemove") {
+            if (window.innerWidth / window.innerHeight < 3 / 4) {
+              changeTabAs(false);
+            }
+            if (e.target != highlight.querySelector("IMG")) {
+              openElement(highlight)
+              sessionStorage.setItem("facing", "custFunc");
+            }
+          }
+
+        });
+        tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
+          removeCustFunc(e);
+          setNumOfTabs();
+        })
+        document.getElementById('tabContainer').appendChild(tabClon);
         setNumOfTabs();
-      })
-      document.getElementById('tabContainer').appendChild(tabClon);
-      setNumOfTabs();
-      highlightTab(highlight);
+        highlightTab(highlight);
+    } else if (type = "Code") {
+
+    } else if (type = "Hybrid") {
+
     }
-
-  } else if (type = "Code") {
-
-  } else if (type = "Hybrid") {
-
   }
 }
 //Responsible for the creation of the default tab page with the given config
@@ -1222,7 +1219,7 @@ function newCustFuncTab(config) {
 
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
-
+    console.log(`type is ${config.type}`)
     switch (config.type) {
       case ('Function'):
         let equation = config.equation;
@@ -1250,8 +1247,6 @@ function newCustFuncTab(config) {
           let oldVal = JSON.parse(liveTab.dataset.tab);
           let matchPage = matchTab(liveTab.dataset.tab, true);
           let newValue = JSON.parse(liveTab.dataset.tab);
-
-          //Test this method with a sup subclass
           console.log("%c EquationFunc input", "color: red;");
           checkVar(varGrid, equationDIV, funcTabs);
           newValue.equation = e.target.innerHTML
@@ -1267,19 +1262,22 @@ function newCustFuncTab(config) {
         }
         break;
       case ("Hybrid"):
+        clon.getElementById("editIcon").visibility = "visible";
         let nameElem = clon.getElementById('nameFunc');
         let subElem = clon.getElementById("EquationFunc");
         subElem.innerHTML = "Hybrid";
         subElem.contentEditable = false;
-        
-        nameElem.addEventListener("input", function(){
+
+        nameElem.addEventListener("input", function () {
           let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
           removeFunction(oldVal.name);
           removeFunc(oldVal.name)
           let oldParse = parseFunction(oldVal.code)
-          
+
         });
-      break;
+        console.log("adding to main")
+        document.getElementById("mainBody").appendChild(clon);
+        break;
     }
     //adding event listeners
 
@@ -1287,6 +1285,9 @@ function newCustFuncTab(config) {
 }
 //Responsible for handing the intial setup of a cust func default tab page
 function defaultSetup(clon) {
+  if(TextColorGlobal == "#000000"){
+    clon.getElementById("editIcon").src = "Images/EditIcon.svg"
+  }
   clon.getElementById("minDomainGraph").value = settings.gDMin;
   clon.getElementById("maxDomainGraph").value = settings.gDMax;
   clon.getElementById("stepDomainGraph").value = settings.gDS;
@@ -2307,7 +2308,7 @@ function inputSolver(equation, errorStatement) {
   }
 }
 //Responsible for assebiling the code terminal throughout the program
-function createCodeTerminal(element,name){
+function createCodeTerminal(element, name) {
   let container = document.createElement("div")
   container.id = "creatorEditor";
   container.className = "creatorDiv";
@@ -2319,8 +2320,8 @@ function createCodeTerminal(element,name){
   let textarea = document.createElement('textarea')
   textarea.className = "codeEditor";
   textarea.id = name;
-  textarea.addEventListener("input", function (e){
-      recaculateNums(numberIndex, textarea.value)
+  textarea.addEventListener("input", function (e) {
+    recaculateNums(numberIndex, textarea.value)
   })
   container.appendChild(textarea)
 
@@ -2329,25 +2330,25 @@ function createCodeTerminal(element,name){
   element.appendChild(container);
 }
 //Responsible for handling the numbering on the terminal 
-function recaculateNums(parentElem, text){
+function recaculateNums(parentElem, text) {
   console.log("reacalcuate")
   let numOfO = (text.match(/\n/g) || []).length;
   numOfO++;
   let childern = parentElem.querySelectorAll('.numberedHeader');
   console.log(childern)
   console.log(`Childern: ${childern.length} vs Number of lines: ${numOfO}`)
-  if(childern.length > numOfO){
-    for(let i = childern.length-1; i > numOfO-1; i--){
+  if (childern.length > numOfO) {
+    for (let i = childern.length - 1; i > numOfO - 1; i--) {
       childern[i].remove();
     }
-  }else {
-    for (let i = 0; i < numOfO - childern.length; i++){
+  } else {
+    for (let i = 0; i < numOfO - childern.length; i++) {
       createNumHeader(parentElem, numOfO)
     }
   }
 }
 //Responsible for the individual numbering headers in the code terminal
-function createNumHeader(parentElem, num){
+function createNumHeader(parentElem, num) {
   let initial = document.createElement('h3');
   initial.className = "numberedHeader";
   initial.innerHTML = num;
@@ -2387,7 +2388,7 @@ function getDate() {
   return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
 }
 //Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
-function hideElement(element){
+function hideElement(element) {
   element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
   setTimeout(function () {
     element.style.animation = undefined;
@@ -2395,7 +2396,7 @@ function hideElement(element){
   }, 150);
 }
 //Intended for animating the enter of an element to the page but again im lazy and may not get implemented
-function pullUpElement(element){
+function pullUpElement(element) {
   element.style.visibility = "visible";
   element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
   setTimeout(function () {
