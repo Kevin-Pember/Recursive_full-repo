@@ -1,5 +1,6 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
+let custFuncList = [];
 let state = {};
 var settings;
 if (localStorage.getItem("settings") != undefined) {
@@ -159,7 +160,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); console.log(JSON.stringify({ "func": function (input) { }, "name": "hello" })) });
+  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { document.location = 'moreFunctions.html'; });
@@ -1005,7 +1006,6 @@ function getFuncList() {
   if (parseString == undefined) {
     array = [];
   } else {
-    //array = parseString.split('⥾');
     while (parseString.includes('⥾')) {
       array.push(parseString.substring(0, parseString.indexOf('⥾')));
       parseString = parseString.substring(parseString.indexOf('⥾') + 1);
@@ -1022,7 +1022,6 @@ function getFuncList() {
         funcJSON.name = func.substring(0, func.indexOf('»'));
         func = func.substring(func.indexOf('»') + 1);
         funcJSON.equation = func.substring(0, func.indexOf('»'));
-
         break;
       case "H":
         funcJSON.type = "Hybrid";
@@ -1039,7 +1038,7 @@ function getFuncList() {
         funcJSON.code = func.substring(0, func.indexOf('»'));
         break;
       default:
-        console.log("Defa")
+        report("Non-parsable Func found", false);
         break;
     }
     finalArray.push(funcJSON);
@@ -1066,7 +1065,7 @@ function setDegMode() {
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
 function createFunc(type, name, text) {
   var funcList = getFuncList();
-  if (!custFuncExisting(name, false)) {
+  if (findFuncConfig(name) === false) {
     
     let object = { "name": name, "type": type };
     switch (type) {
@@ -1603,7 +1602,6 @@ function addImplemented(funcConfig) {
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
 function setFuncList(array) {
   let parseString = "";
-  console.log(array);
   for (let i = 0; i < array.length; i++) {
     let parsedString = "";
     switch (array[i].type) {
@@ -1619,7 +1617,6 @@ function setFuncList(array) {
     }
     parseString += parsedString + "⥾";
   }
-  console.log(`parsedString: ${parseString}`);
   localStorage.setItem("funcList", parseString);
 }
 //Responsible for removing a value for the funcList (main backend)
@@ -1647,17 +1644,6 @@ function tabOpen(name) {
     }
   }
   return false;
-}
-//Responsible for checking wheather a custom function is already opened (seeming a dupilicate method)
-function custFuncExisting(name, duplicates) {
-  let exist = false, existing = document.getElementsByClassName("customFuncLinks");
-  for (i = 0; i < existing.length; i++) {
-    if (existing[i].querySelector("#nameLabel").innerHTML == name && !duplicates) {
-      exist = true;
-      break;
-    }
-  }
-  return exist;
 }
 //Responsible for creating an array of the variables in a variable container and the value it has
 function varListAssbely(element) {
@@ -1802,6 +1788,7 @@ function findFuncConfig(name) {
       return func;
     }
   }
+  return false;
 }
 //Responsible for taking inputs and parsing them into the funclist
 function funcAssebly(type, name, text) {
@@ -2594,6 +2581,17 @@ function mobileTabMethod() {
   hideAllTabs();
   changeTabAs(true);
 
+}
+//Responsible for checking wheather a custom function is already opened (seeming a dupilicate method)
+function custFuncExisting(name, duplicates) {
+  let exist = false, existing = document.getElementsByClassName("customFuncLinks");
+  for (i = 0; i < existing.length; i++) {
+    if (existing[i].querySelector("#nameLabel").innerHTML == name && !duplicates) {
+      exist = true;
+      break;
+    }
+  }
+  return exist;
 }
 /*function createParseable(equation){
   let equationArray = [];
