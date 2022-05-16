@@ -588,7 +588,7 @@ function stringFunction(object) {
   let string = object.string;
   let vars = object.variables;
   for(let i =vars.length-1; i >= 0; i--){
-    string = string.substring(0,1) + `var ${vars[i]} = array[${i}];`+ string.substring(1);
+    string = string.substring(0,1) + `var ${vars[i].letter} = array[${i}];`+ string.substring(1);
   }
   string = `var ${name} = function (array)${string} \n return ${name};`;
   console.log(string)
@@ -603,10 +603,10 @@ function parseFunction(StringFunction) {
   let variables = [];
   while (variableDefs.length > 0) {
     if (variableDefs.includes(',')) {
-      variables.push(variableDefs.substring(0, variableDefs.indexOf(',')));
+      variables.push({"letter":variableDefs.substring(0, variableDefs.indexOf(','))});
       variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
     } else {
-      variables.push(variableDefs);
+      variables.push({"letter":variableDefs});
       variableDefs = 0;
     }
   }
@@ -642,8 +642,6 @@ function createNewFunction(){
     let funcString = arguments[1];
     let funcObject = parseFunction(funcString);
     funcObject.mth = stringFunction(funcObject)()
-    console.log(funcObject.mth.toString())
-    console.log(funcObject.mth(2))
     funcList.push(funcObject);
   }
 }
