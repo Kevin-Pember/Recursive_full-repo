@@ -1220,7 +1220,6 @@ function newCustFuncTab(config) {
     let equationDIV = clon.getElementById("EquationFunc");
     let movable = clon.getElementById("selectorUnder");
     movable.dataset.pos = 0;
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
 
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
@@ -1258,11 +1257,11 @@ function newCustFuncTab(config) {
         });
         document.getElementById("mainBody").appendChild(clon);
         checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
-        try {
-          parseVariables(varGrid, equationDIV, funcTabs);
-        } catch (e) {
+        //try {
+          parseVariables(varGrid, tabCopy);
+        /*} catch (e) {
           report("Couldn't Calculate", false);
-        }
+        }*/
         break;
       case ("Hybrid"):
         clon.getElementById("editIcon").style = "";
@@ -1309,6 +1308,7 @@ function defaultSetup(clon) {
   clon.getElementById("stepRangeGraph").value = settings.gRS;
   clon.getElementById("cellsTable").value = settings.tC;
   clon.getElementById('stepTable').value = settings.tS;
+  let parent = clon.getElementById('customFuncTab');
   let chart = clon.getElementById("funcChart");
   var cfcg = new Chart(chart, {
     type: 'line',
@@ -1342,7 +1342,6 @@ function defaultSetup(clon) {
   })
 
   let movable = clon.getElementById("selectorUnder");
-  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
   movable.dataset.pos = 0;
   clon.getElementById('functionMode').addEventListener("click", function () {
     funcTabs[0].style.visibility = "inherit";
@@ -1367,11 +1366,11 @@ function defaultSetup(clon) {
   ];
   for (let element of updateElements) {
     clon.getElementById(element).addEventListener("input", function (e) {
-      try {
-        parseVariables(varGrid, equationDIV, funcTabs);
-      } catch (e) {
+      //try {
+        parseVariables(varGrid, parent);
+      /*} catch (e) {
         report("Couldn't Calculate", false);
-      }
+      }*/
 
     });
   }
@@ -1660,11 +1659,19 @@ function parseVar(parsedEquation, data) {
   }
   return parsedEquation;
 }
+function parseVarFunc(name, varData){
+  let innerVars = varData[0].Value;
+  for(let i = 1; i < varData.length; i++){
+    innerVars += "," + varData[i].Value;
+  }
+  return `${name}(${innerVars})`;
+}
 //Responsible for checking and solving for varables on defaut cust func page depending on how many variables are filled
-function parseVariables(element, equationDIV, funcTabs) {
+function parseVariables(element, clon) {
   let varData = varListAssbely(element);
-  let parsedEquation = equationDIV.dataset.baseE
-  console.log("%c parsedEquation: " + parsedEquation, "color:red");
+  console.log(clon)
+  let name = clon.querySelector('#nameFunc').innerHTML
+  let method = "";
   let all = true;
   let first = undefined;
   for (let Vars of varData) {
@@ -1672,35 +1679,37 @@ function parseVariables(element, equationDIV, funcTabs) {
       if (Vars.Value == '') {
         all = false;
         first = Vars;
+        Vars.Value = "Æ";
       }
     } else if (Vars.Value == '') {
       first = undefined;
     }
   }
-  for (let data of varData) {
+  /*for (let data of varData) {
     parsedEquation = parseVar(parsedEquation, data);
-  }
-  console.log(equationDIV.dataset.baseE);
+  }*/
+  method = parseVarFunc(name, varData);
   if (all) {
-    solveEquation(parsedEquation, funcTabs);
-    solveGraph(varData, equationDIV.innerHTML, first);
-    solveTable(parsedEquation, first);
+    solveEquation(method, clon);
+    solveGraph(varData,method, first);
+    solveTable(method, first, clon);
   } else if (first != undefined) {
     solveGraph();
-    solveTable(equationDIV.innerHTML, first);
+    solveTable(method, first, clon);
   }
 }
 //Responsible for solving the parsedEquation on the default cust func page
-function solveEquation(parsedEquation, funcTabs) {
-  let result = "=" + inputSolver(parsedEquation, "Couldn't Calculate");
-  funcTabs[0].querySelector('#equalsHeader').innerHTML = result;
+function solveEquation(method, clon) {
+  console.log("Solve Equation ran")
+  let result = "=" + inputSolver(method, "Couldn't Calculate");
+  clon.querySelector('#equalsHeader').innerHTML = result;
 }
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(varData, parsedEquation, data) {
 
 }
 //Responsible for solving the parsedEquation with one open variable table wise
-function solveTable(parsedEquation, data) {
+function solveTable(parsedEquation, data,clon) {
   console.log("solve table ran")
   /*
   needs to get the settings table step and number of steps
@@ -1710,19 +1719,16 @@ function solveTable(parsedEquation, data) {
      and the value resulted by runing that number in the eqaution into the table
   end method
   */
-  let numValue = Number(document.getElementById('cellsTable').value);
-  let step = Number(document.getElementById('stepTable').value);
-  document.getElementById("funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
+  let numValue = Number(clon.querySelector('#cellsTable').value);
+  let step = Number(clon.querySelector('#stepTable').value);
+  clon.querySelector("#funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
   for (let i = 1; i <= numValue; i++) {
-    // missing the code that will parse and solve equation
-    console.log("Loop " + i);
     let result;
     let currentVal = i * step;
     var newData = data;
-    let loopEqua = parsedEquation;
     newData.Value = "" + currentVal;
-    result = inputSolver(parseVar(loopEqua, newData), "Error Making Table");
-    var newRow = document.getElementById('funcTable').insertRow(i);
+    result = inputSolver(parsedEquation.replace('Æ',currentVal), "Error Making Table");
+    var newRow = clon.querySelector('#funcTable').insertRow(i);
     var newXCell = newRow.insertCell(0);
     var newYCell = newRow.insertCell(1);
     newXCell.innerHTML = "" + currentVal;
@@ -1760,7 +1766,6 @@ function checkVar(type, clon, checkList) {
   for (let newVar of newVars) {
     let name = newVar;
     let varGrid = clon.querySelector("#varGrid");
-    let funcTabs = [clon.querySelector('#resultDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
 
     let tempvar = document.getElementsByClassName("variableTemplate")[0];
     let varClon = tempvar.content.cloneNode(true);
@@ -1771,11 +1776,15 @@ function checkVar(type, clon, checkList) {
         if (varClon.getElementById('variableEntry') != '') {
           equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
           try {
-            parseVariables(varGrid, equationArea, funcTabs);
+            parseVariables(varGrid, clon);
           } catch (e) { }
         }
       } else if (type == "hybrid") {
-
+        if (varClon.getElementById('variableEntry') != '') {
+          try {
+            parseVariables(varGrid, clon);
+          } catch (e) { }
+        }
       }
     });
     varGrid.appendChild(varClon);
