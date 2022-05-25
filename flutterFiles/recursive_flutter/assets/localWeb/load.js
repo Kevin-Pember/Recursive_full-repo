@@ -1234,9 +1234,9 @@ function newCustFuncTab(config) {
 
         clon.getElementById('nameFunc').addEventListener("input", function (e) {
           let liveTab = e.target.parentNode;
-          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
-          let matchPage = matchTab(e.target.parentNode.dataset.tab, true);
-          let newVal = JSON.parse(e.target.parentNode.dataset.tab);
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newVal = JSON.parse(liveTab.dataset.tab);
           newVal.name = e.target.value;
           matchPage.querySelector("#newTabName").innerHTML = e.target.value;
           matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
@@ -1273,12 +1273,21 @@ function newCustFuncTab(config) {
         subElem.innerHTML = "Hybrid";
         subElem.contentEditable = false;
 
-        nameElem.addEventListener("input", function () {
-          let oldVal = JSON.parse(e.target.parentNode.dataset.tab);
-          removeFunction(oldVal.name);
-          removeFunc(oldVal.name)
+        nameElem.addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let newVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          //removeFunction(oldVal.name);
+          //removeFunc(oldVal.name)
+          
           let oldParse = parseFunction(oldVal.code)
-
+          oldParse.func = e.target.value;
+          let newStringifyFunc = stringifyMethod(oldParse);
+          newVal.code = newStringifyFunc;
+          //createNewFunction("method", newStringifyFunc);
+          console.log();
+          changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         document.getElementById("mainBody").appendChild(clon);
         checkVar("hybrid", tabCopy, funcConfig.variables)
@@ -1509,7 +1518,6 @@ function changeFunc(og, newString, tab, page) {
   changeImplemented(og, newString);
   console.log(funcList);
   setFuncList(funcList);
-  console.log(tab)
   tab.dataset.tabmap = JSON.stringify(newString);
   page.dataset.tab = JSON.stringify(newString);
   updateCustomButtons(og, newString);
@@ -1543,22 +1551,20 @@ function updateCustomButtons(oldVal, newValue) {
   }
 }
 //Responsible for changing a cust func entry in the interpreter 
-function changeImplemented(oldConfig, newConfig) {
+function changeImplemented(oldConfig, newObject) {
   let object = {};
   if (oldConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
+    /*let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
     object = {
       "func": oldConfig.name,
       "funcParse": parseable,
       "inputs": cacInputs(parseable),
       "funcRadDeg": containsTrig(oldConfig.equation),
       "funcLength": oldConfig.name.length
-    };
-
-  } else if (oldConfig.type == "Code") {
-
+    };*/
+    object = parseFuncEntry("function", oldConfig.name, oldConfig.equation);
   } else if (oldConfig.type == "Hybrid") {
-
+    object = parseFuncEntry("method", oldConfig.code)
   }
   let indexOf = -1;
   for (let i = 0; i < funcList.length; i++) {
@@ -1567,20 +1573,11 @@ function changeImplemented(oldConfig, newConfig) {
     }
   }
   if (oldConfig.type == "Function") {
-    let parseable = createParseable(solveInpr(newConfig.equation, settings.degRad))
-    let newObject = {
-      "func": newConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(newConfig.equation),
-      "funcLength": newConfig.name.length
-    };
-    funcList[i] = newObject;
-  } else if (oldConfig.type == "Code") {
-
+    newObject = parseFuncEntry("function", newObject.name, newObject.equation);
   } else if (oldConfig.type == "Hybrid") {
-
+    newObject = parseFuncEntry("method", newObject.code);
   }
+  funcList[i] = newObject;
 }
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {

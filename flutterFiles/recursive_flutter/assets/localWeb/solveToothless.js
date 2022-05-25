@@ -143,21 +143,19 @@ function solveInpr(equation, degRad) {
         equation.substring(i + func.funcLength)
       );
       let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
+      let parsedFunc = "";
       if (func.type == "function") {
         let funcTemp = findMethod(func, degRad);
-        if (funcTemp.type == "Equation") {
-          let parsedFunc = assembly(func, funcTemp, values);
-          equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
-          i = i + parsedFunc.length - 1;
-        } else if (funcTemp.type == "Function") {
-
-        }
-      }else if (func.type == "method"){
-
+        parsedFunc = assembly(func, funcTemp, values);
+      } else if (func.type == "method") {
+        parsedFunc = func.mth(values)
       }
+      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+      i = i + parsedFunc.length - 1;
     }
   }
   equation = builtInFunc(equation);
+  console.log(`Equation: ${equation}`);
   return equation;
 }
 //Func method to find if the current postion has a function defined in the funclist
@@ -583,12 +581,26 @@ function containsTrig(string) {
 /*(var, var2){
   console.log(var + var2)
 }*/
+function stringifyMethod(object){
+  let name = object.func;
+  let string = object.string;
+  let vars = object.variables;
+  let parsedVariables = "";
+  for (let i = 0; i < vars.length; i++) {
+    if(i == 0){
+      parsedVariables += vars[i].letter;
+    }else{
+      parsedVariables += "," + vars[i].letter;
+    }
+  }
+  return `function ${name}(${parsedVariables}) ${string}`;
+}
 function stringFunction(object) {
   let name = object.func;
   let string = object.string;
   let vars = object.variables;
-  for(let i =vars.length-1; i >= 0; i--){
-    string = string.substring(0,1) + `var ${vars[i].letter} = array[${i}];`+ string.substring(1);
+  for (let i = vars.length - 1; i >= 0; i--) {
+    string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
   }
   string = `var ${name} = function (array)${string} \n return ${name};`;
   console.log(string)
@@ -603,15 +615,15 @@ function parseFunction(StringFunction) {
   let variables = [];
   while (variableDefs.length > 0) {
     if (variableDefs.includes(',')) {
-      variables.push({"letter":variableDefs.substring(0, variableDefs.indexOf(','))});
+      variables.push({ "letter": variableDefs.substring(0, variableDefs.indexOf(',')) });
       variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
     } else {
-      variables.push({"letter":variableDefs});
+      variables.push({ "letter": variableDefs });
       variableDefs = 0;
     }
   }
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
-  console.log(`%c ${variables[0]}`,"color: green;")
+  console.log(`%c ${variables[0]}`, "color: green;")
   let finalObject = {
     "func": name,
     "type": "method",
@@ -625,38 +637,61 @@ function parseFunction(StringFunction) {
   //funcList.push(finalObject)
   return finalObject;
 }
-function createNewFunction(){
+function createNewFunction() {
   let object = {};
-  if(arguments[0] == "function"){
-    let name = arguments[1];
+  if (arguments[0] == "function") {
+    object = parseFuncEntry(arguments[0], arguments[1], arguments[2]);
+    /*let name = arguments[1];
     let func = arguments[2];
-    let parseable = createParseable(solveInpr(func),defaultAngle)
+    let parseable = createParseable(solveInpr(func), defaultAngle);
     object.type = arguments[0];
     object.func = name;
     object.funcParse = parseable;
     object.inputs = cacInputs(parseable);
-    object.funcRadDeg = containsTrig(func)
-    object.funcLength = name.length
-    funcList.push(object);
-  }else if (arguments[0] == "method"){
-    let funcString = arguments[1];
+    object.funcRadDeg = containsTrig(func);
+    object.funcLength = name.length;
+    funcList.push(object);*/
+  } else if (arguments[0] == "method") {
+    object = parseFuncEntry(arguments[0], arguments[1]);
+    /*let funcString = arguments[1];
     let funcObject = parseFunction(funcString);
-    funcObject.mth = stringFunction(funcObject)()
-    funcList.push(funcObject);
+    funcObject.mth = stringFunction(funcObject)();
+    funcList.push(funcObject);*/
   }
+  console.log(object)
+  funcList.push(object);
 }
-function removeFunction(name){
-  funcList = funcList.filter(function(value, index, arr){ 
+function parseFuncEntry() {
+  let returnedObject = {}
+  if (arguments[0] == "function") {
+    let name = arguments[1];
+    let func = arguments[2];
+    let parseable = createParseable(solveInpr(func), defaultAngle);
+    returnedObject.type = arguments[0];
+    returnedObject.func = name;
+    returnedObject.funcParse = parseable;
+    returnedObject.inputs = cacInputs(parseable);
+    returnedObject.funcRadDeg = containsTrig(func);
+    returnedObject.funcLength = name.length;
+  } else if (arguments[0] == "method") {
+    let funcString = arguments[1];
+    returnedObject = parseFunction(funcString);
+    returnedObject.mth = stringFunction(returnedObject)();
+  }
+  return returnedObject;
+}
+function removeFunction(name) {
+  funcList = funcList.filter(function (value, index, arr) {
     return value.func != name;
-})
+  })
 }
-function indexOfAll(string, value){
+function indexOfAll(string, value) {
   let index = 0;
   let array = [];
-  while(string.indexOf(value,index) != -1){
-    let newIndex = string.indexOf(value,index);
+  while (string.indexOf(value, index) != -1) {
+    let newIndex = string.indexOf(value, index);
     array.push(newIndex);
-    index = newIndex+1;
+    index = newIndex + 1;
   }
   return array;
 }

@@ -2137,9 +2137,10 @@ button:focus, input[type="button"]:focus {
   width: 100%;
 }
 #variableName{
-  border-radius: 50%;
+  border-radius: 25px;
   height: 25px;
-  width: 25px;
+  padding-left: 7.5px;
+  padding-right: 7.5px;
   flex-shrink: 0;
   text-align: center;
   background-color: var(--numbersColor);
