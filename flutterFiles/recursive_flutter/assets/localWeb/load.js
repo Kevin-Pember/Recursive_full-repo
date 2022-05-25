@@ -1009,7 +1009,6 @@ function getFuncList() {
     }
 
   }
-  console.log(array);
   for (let func of array) {
     let funcJSON = {};
     switch (func.substring(0, 1)) {
@@ -1103,6 +1102,7 @@ function custButton(funcConfig, target) {
   }
   clon.getElementById('equationLabel').innerHTML = equation;
   clon.getElementById('nameLabel').innerHTML = name;
+  let button = clon.getElementById('customFuncButton');
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
@@ -1119,7 +1119,7 @@ function custButton(funcConfig, target) {
         elem = e.target.parentNode
       }
       let funcName = elem.querySelector("#nameLabel").innerHTML;
-      let funcParse = findFuncConfig(name);
+      let funcParse = findFuncConfig(funcName);
       console.log(`funcparse is ${funcParse}`)
       console.log(funcParse)
       if (e.target.tagName != "IMG") {
@@ -1485,7 +1485,7 @@ function matchTab(info, type) {
 //Responsible for the closing of a tab and its tabpage by removing it from the html
 function removeCustFunc(event) {
   let tabLink = event.target.parentNode;
-  console.log(tabLink.parentNode);
+  console.log(tabLink.dataset.tabmap);
   document.getElementById('mainBody').removeChild(matchTab(tabLink.dataset.tabmap, false));
   document.getElementById('tabContainer').removeChild(tabLink);
   if (window.innerWidth / window.innerHeight > 3 / 4) {
@@ -1509,9 +1509,10 @@ function changeFunc(og, newString, tab, page) {
   var funcList = getFuncList();
   for (let i = 0; i < funcList.length; i++) {
     console.log(`${JSON.stringify(funcList[i])} vs. ${JSON.stringify(og)}`);
-    if (JSON.stringify(funcList[i]) == JSON.stringify(og)) {
+    if (funcList[i].name == og.name) {
       console.log("matched")
       funcList[i] = newString;
+      console.log(funcList)
     }
   }
   changeImplemented(og, newString);
@@ -1520,7 +1521,6 @@ function changeFunc(og, newString, tab, page) {
   tab.dataset.tabmap = JSON.stringify(newString);
   page.dataset.tab = JSON.stringify(newString);
   tab.querySelector("#newTabName").innerHTML = newString.name;
-  tab.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
   tab.querySelector('#nameDisplay').innerHTML = newString.name;
   if(og.type == "Function"){
     tab.querySelector('#equtDisplayFunc').innerHTML = newString.equation;
