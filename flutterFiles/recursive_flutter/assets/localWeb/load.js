@@ -1238,8 +1238,7 @@ function newCustFuncTab(config) {
           let matchPage = matchTab(liveTab.dataset.tab, true);
           let newVal = JSON.parse(liveTab.dataset.tab);
           newVal.name = e.target.value;
-          matchPage.querySelector("#newTabName").innerHTML = e.target.value;
-          matchPage.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
+          
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         equationDIV.addEventListener("focus", function (e) {
@@ -1284,9 +1283,9 @@ function newCustFuncTab(config) {
           let oldParse = parseFunction(oldVal.code)
           oldParse.func = e.target.value;
           let newStringifyFunc = stringifyMethod(oldParse);
+          newVal.name = e.target.value;
           newVal.code = newStringifyFunc;
           //createNewFunction("method", newStringifyFunc);
-          console.log();
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         document.getElementById("mainBody").appendChild(clon);
@@ -1520,6 +1519,13 @@ function changeFunc(og, newString, tab, page) {
   setFuncList(funcList);
   tab.dataset.tabmap = JSON.stringify(newString);
   page.dataset.tab = JSON.stringify(newString);
+  tab.querySelector("#newTabName").innerHTML = newString.name;
+  tab.querySelector("IMG").addEventListener('click', function (e) { removeCustFunc(e); });
+  tab.querySelector('#nameDisplay').innerHTML = newString.name;
+  if(og.type == "Function"){
+    tab.querySelector('#equtDisplayFunc').innerHTML = newString.equation;
+  }
+  
   updateCustomButtons(og, newString);
 }
 //Responsible for changing the name and equation value on the a cust func link 
@@ -1554,14 +1560,6 @@ function updateCustomButtons(oldVal, newValue) {
 function changeImplemented(oldConfig, newObject) {
   let object = {};
   if (oldConfig.type == "Function") {
-    /*let parseable = createParseable(solveInpr(oldConfig.equation, settings.degRad))
-    object = {
-      "func": oldConfig.name,
-      "funcParse": parseable,
-      "inputs": cacInputs(parseable),
-      "funcRadDeg": containsTrig(oldConfig.equation),
-      "funcLength": oldConfig.name.length
-    };*/
     object = parseFuncEntry("function", oldConfig.name, oldConfig.equation);
   } else if (oldConfig.type == "Hybrid") {
     object = parseFuncEntry("method", oldConfig.code)
