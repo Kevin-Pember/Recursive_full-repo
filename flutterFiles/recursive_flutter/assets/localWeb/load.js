@@ -1280,8 +1280,8 @@ function newCustFuncTab(config) {
           let oldParse = parseFunction(oldVal.code)
 
         });
-        checkVar("hybrid", tabCopy, funcConfig.variables)
         document.getElementById("mainBody").appendChild(clon);
+        checkVar("hybrid", tabCopy, funcConfig.variables)
         break;
     }
     //adding event listeners
