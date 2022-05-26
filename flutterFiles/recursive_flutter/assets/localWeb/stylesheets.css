@@ -20,6 +20,12 @@
   color: grey;
   display: block;
 }
+.page{
+  width: 100%;
+  height: 100%;
+  left: 0;
+  position: absolute;
+}
 textarea {
   border: none;
   overflow: auto;
@@ -839,7 +845,7 @@ button:focus, input[type="button"]:focus {
     left: 10px;
     border-radius: 25px;
   }
-  #custCreator{
+  #custCreatorPage{
     background-color: var(--displayColor);
     width: 100%;
     height: 100%;

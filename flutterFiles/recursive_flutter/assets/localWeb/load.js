@@ -25,48 +25,7 @@ if (document.getElementById("mainBody") != null) {
   if (!settings.degRad) {
     setDegMode();
   }
-  let images = [
-    {
-      "type": "single",
-      "id": "settingsCogIcon",
-      "src": "Images/SettingsCog.svg"
-    },
-    {
-      "type": "single",
-      "id": "backspcaeIcon",
-      "src": "Images/backIcon.svg"
-    },
-    {
-      "type": "single",
-      "id": "mobileTabIcon",
-      "src": "Images/mobileTabsIcon.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "helpIcon",
-      "src": "Images/help.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "historyIcon",
-      "src": "Images/historyIcon.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "addIcon",
-      "src": "Images/addObject.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "minusIcon",
-      "src": "Images/minusIcon.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "arrows",
-      "src": "Images/MoreFuncArrow.svg"
-    }
-  ];
+  
   if (TextColorGlobal == "#000000") {
     setImages(images);
   }
@@ -230,7 +189,7 @@ if (document.getElementById("mainBody") != null) {
       openPopup();
     } else {
       sessionStorage.setItem("facing", "creatorPage")
-      openPage("custCreator")
+      openPage("custCreatorPage")
     }
 
   });
@@ -369,31 +328,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
   //coloring UI elements that are images but need sytling
-  if (TextColorGlobal == "#000000") {
-    let images = [
-      {
-        "type": "single",
-        "id": "ColorsIcon",
-        "src": "Images/Colors.svg"
-      },
-      {
-        "type": "single",
-        "id": "PreferencesIcon",
-        "src": "Images/Calipiers.svg"
-      },
-      {
-        "type": "single",
-        "id": "AboutIcon",
-        "src": "Images/aboutUS.svg"
-      },
-      {
-        "type": "mutiple",
-        "class": "backIcon",
-        "src": "Images/MoreFuncArrow.svg"
-      },
-    ];
-    setImages(images);
-  } else {
+  if (TextColorGlobal != "#000000") {
     //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
 
@@ -596,6 +531,110 @@ function changeTabAs(change) {
 function setNumOfTabs() {
   let tabs = document.getElementsByClassName('tablinks');
   document.getElementById("tabNum").innerHTML = tabs.length;
+}
+function setImages(color){
+  let type = true;
+  if(color == "#FFFFFF" || color == "#ffffff"){
+    type = false;
+  }
+  let images = [
+    {
+      "type": "single",
+      "id": "settingsCogIcon",
+      "black": "Images/SettingsCog.svg",
+      "white": "Images/SettingsCogWhite.svg"
+    },
+    {
+      "type": "single",
+      "id": "backspcaeIcon",
+      "black": "Images/backIcon.svg",
+      "white": "Images/backIconWhite.svg"
+    },
+    {
+      "type": "single",
+      "id": "mobileTabIcon",
+      "black": "Images/mobileTabsIcon.svg",
+      "white": "Images/mobileTabsIconWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "removeFuncIcons",
+      "black": "Images/xIcon.svg",
+      "white": "Images/xIconWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "helpIcon",
+      "black": "Images/help.svg",
+      "white": "Images/helpWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "historyIcon",
+      "black": "Images/historyIcon.svg",
+      "white": "Images/historyIconWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "addIcon",
+      "black": "Images/addObject.svg",
+      "white": "Images/addObjectWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "minusIcon",
+      "black": "Images/minusIcon.svg",
+      "white": "Images/minusIconWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "arrows",
+      "black": "Images/MoreFuncArrow.svg",
+      "white": "Images/MoreFuncArrowWhite.svg"
+    },
+    {
+      "type": "single",
+      "id": "ColorsIcon",
+      "black": "Images/Colors.svg",
+      "white": "Images/ColorsWhite.svg"
+    },
+    {
+      "type": "single",
+      "id": "PreferencesIcon",
+      "black": "Images/Calipiers.svg",
+      "white": "Images/CalipiersWhite.svg"
+    },
+    {
+      "type": "single",
+      "id": "AboutIcon",
+      "black": "Images/aboutUS.svg",
+      "white": "Images/aboutUSWhite.svg"
+    },
+    {
+      "type": "mutiple",
+      "class": "backIcon",
+      "black": "Images/MoreFuncArrow.svg",
+      "white": "Images/MoreFuncArrowWhite.svg"
+    },
+  ];
+  for (let img of images) {
+    let source = "";
+    if(type){
+      source = img.black;
+    }else {
+      source = img.white;
+    }
+    if (img.type == "mutiple") {
+      let elems = document.getElementsByClassName(img.class);
+      for (let elem of elems) {
+        elem.src = source;
+      }
+    } else {
+      if(document.getElementById(img.id) != undefined){
+        document.getElementById(img.id).src = source;
+      }
+    }
+  }
 }
 //END
 /********************************************|Main Page Button Handling|*********************************************/
@@ -1106,8 +1145,8 @@ function custButton(funcConfig, target) {
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
-    if (TextColorGlobal == "#000000") {
-      buttonNode.querySelector('#removeFunc').src = "Images/xIcon.svg";
+    if (TextColorGlobal == "#FFFFFF") {
+      buttonNode.querySelector('#removeFunc').src = "Images/xIconWhite.svg";
     }
     buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
       console.log("Remove Func ran")
@@ -1255,7 +1294,7 @@ function newCustFuncTab(config) {
           equationDIV.dataset.baseE = equationDIV.innerHTML;
           changeFunc(oldVal, newValue, matchPage, liveTab);
         });
-        document.getElementById("mainBody").appendChild(clon);
+        document.getElementById("mainPage").appendChild(clon);
         checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
         //try {
           parseVariables(varGrid, tabCopy);
@@ -1287,7 +1326,7 @@ function newCustFuncTab(config) {
           //createNewFunction("method", newStringifyFunc);
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
-        document.getElementById("mainBody").appendChild(clon);
+        document.getElementById("mainPage").appendChild(clon);
         checkVar("hybrid", tabCopy, funcConfig.variables)
         break;
     }
@@ -1485,7 +1524,7 @@ function matchTab(info, type) {
 function removeCustFunc(event) {
   let tabLink = event.target.parentNode;
   console.log(tabLink.dataset.tabmap);
-  document.getElementById('mainBody').removeChild(matchTab(tabLink.dataset.tabmap, false));
+  document.getElementById('mainPage').removeChild(matchTab(tabLink.dataset.tabmap, false));
   document.getElementById('tabContainer').removeChild(tabLink);
   if (window.innerWidth / window.innerHeight > 3 / 4) {
     openElement(document.getElementById('mainTab'));
@@ -2134,7 +2173,7 @@ let facingBack = [
     "backElm": '',
     "prtCont": 'main',
     "mth": function () {
-      closePage('custCreator');
+      closePage('custCreatorPage');
     },
   }
 ];
@@ -2263,13 +2302,14 @@ function setRoot(colorArray) {
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
+  setImages(colorArray[3]);
   TextColorGlobal = colorArray[3];
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/
 }
 //Responsible for setting images to match the text color value with a list of images and their elements
-function setImages(imgList) {
+/*function setImages(imgList) {
   for (let img of imgList) {
     if (img.type == "mutiple") {
       let elems = document.getElementsByClassName(img.class);
@@ -2280,7 +2320,7 @@ function setImages(imgList) {
       document.getElementById(img.id).src = img.src;
     }
   }
-}
+}*/
 //Responsible for handling popup console. Animates, sets color, and sets text value
 function report(message, meaning) {
   console.log("report")
