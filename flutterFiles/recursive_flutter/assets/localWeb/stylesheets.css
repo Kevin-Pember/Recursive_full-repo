@@ -846,10 +846,16 @@ button:focus, input[type="button"]:focus {
     left: 10px;
     border-radius: 25px;
   }
+  #mainPage{
+    background-color: var(--functionsColor);
+  }
   #custCreatorPage{
     background-color: var(--displayColor);
     bottom: 100%;
     position: absolute;
+  }
+  #settingsPage{
+    bottom: 100%;
   }
   #nameCreator{
     background-color: var(--numbersColor);

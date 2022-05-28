@@ -25,7 +25,7 @@ if (document.getElementById("mainBody") != null) {
   if (!settings.degRad) {
     setDegMode();
   }
-  
+
   if (TextColorGlobal == "#000000") {
     setImages(images);
   }
@@ -88,7 +88,7 @@ if (document.getElementById("mainBody") != null) {
     if (window.innerWidth / window.innerHeight < 3 / 4) {
       changeTabAs(false);
     }
-    openElement(document.getElementById('mainTab'))
+    openElement("mainTab")
   });
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -97,7 +97,7 @@ if (document.getElementById("mainBody") != null) {
       changeTabAs(true);
     } else {
       console.log("toggled other")
-      openElement(document.getElementById('mainTab'))
+      openElement("mainTab")
       changeTabAs(false);
     }
   });
@@ -317,7 +317,7 @@ if (document.getElementById("mainBody") != null) {
       }
     }
   });
-} else if (document.getElementById("settingsBody") != null) {
+  //point of half assed settings merge
   if (settings.theme == "custPurchasable") {
     document.getElementById('primaryColorPicker').value = settings.p
     document.getElementById('secondaryColorPicker').value = settings.s
@@ -431,6 +431,8 @@ if (document.getElementById("mainBody") != null) {
     });
   }
   let themes = document.getElementsByClassName('themeButton');
+} else if (document.getElementById("settingsBody") != null) {
+
 } else if (document.getElementById('helpBody') != null) {
   /*&let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', localStorage.getItem('displayColor'));
@@ -505,6 +507,7 @@ function hideAllTabs() {
 //Responsible for hiding and bring up tab elements
 function changeTabAs(change) {
   let visibility = "", bases = document.getElementsByClassName('displayBase'), tabstyle = "", tablinks = document.getElementsByClassName('tablinks');
+  console.log(bases)
   if (change) {
     visibility = "visible";
     tabstyle = "visibility: visible; left: 5%; width: 90%; height: 90%; border-radius: 20px; text-align: center;";
@@ -516,7 +519,7 @@ function changeTabAs(change) {
     document.getElementById("tab").style = undefined;
     document.getElementById('tabContainer').style = undefined;
   }
-  for (let i = 0; i < bases.length; i++) {
+  for (let i = 0; i < bases.length - 1; i++) {
     bases[i].style.visibility = visibility;
     tablinks[i].style = tabstyle;
     if (change) {
@@ -532,9 +535,9 @@ function setNumOfTabs() {
   let tabs = document.getElementsByClassName('tablinks');
   document.getElementById("tabNum").innerHTML = tabs.length;
 }
-function setImages(color){
+function setImages(color) {
   let type = true;
-  if(color == "#FFFFFF" || color == "#ffffff"){
+  if (color == "#FFFFFF" || color == "#ffffff") {
     type = false;
   }
   let images = [
@@ -619,9 +622,9 @@ function setImages(color){
   ];
   for (let img of images) {
     let source = "";
-    if(type){
+    if (type) {
       source = img.black;
-    }else {
+    } else {
       source = img.white;
     }
     if (img.type == "mutiple") {
@@ -630,7 +633,7 @@ function setImages(color){
         elem.src = source;
       }
     } else {
-      if(document.getElementById(img.id) != undefined){
+      if (document.getElementById(img.id) != undefined) {
         document.getElementById(img.id).src = source;
       }
     }
@@ -1159,10 +1162,15 @@ function custButton(funcConfig, target) {
       }
       let funcName = elem.querySelector("#nameLabel").innerHTML;
       let funcParse = findFuncConfig(funcName);
-      console.log(`funcparse is ${funcParse}`)
-      console.log(funcParse)
-      if (e.target.tagName != "IMG") {
+      document.getElementById('extraFuncPopUp').visibility = 'hidden';
+      document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
+      document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
+      document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
+      document.getElementById('customFuncDisplay').style.visibility = "hidden";
+      if (e.target.tagName != "IMG" && !tabOpen(funcName)) {
         createTab(funcParse)
+      } else if (e.target.tagName != "IMG") {
+        openElement(JSON.stringify(findFuncConfig(funcName)));
       }
     });
     document.getElementById(target[i]).appendChild(clonClone);
@@ -1188,21 +1196,13 @@ function funcRemove(e) {
 }
 //Responsible for the creation of tab and tab page of the given config
 function createTab(config) {
-  let name = config.name;
-  let type = config.type;
-  document.getElementById('extraFuncPopUp').visibility = 'hidden';
-  document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
-  document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
-  document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-  document.getElementById('customFuncDisplay').style.visibility = "hidden";
-  if (!tabOpen(name)) {
-    let tabs = document.getElementsByClassName('tabcontent');
-    for (let i = 0; i < tabs.length; i++) {
-      tabs[i].style.visibility = 'hidden';
-    }
-    newCustFuncTab(config);
-    newTabButton(config);
+
+  let tabs = document.getElementsByClassName('tabcontent');
+  for (let i = 0; i < tabs.length; i++) {
+    tabs[i].style.visibility = 'hidden';
   }
+  newCustFuncTab(config);
+  newTabButton(config);
 }
 //Responsible for the creation of a tab button that links to the tab
 function newTabButton(config) {
@@ -1229,7 +1229,7 @@ function newTabButton(config) {
         changeTabAs(false);
       }
       if (e.target != highlight.querySelector("IMG")) {
-        openElement(highlight)
+        openElement(JSON.stringify(findFuncConfig(highlight.querySelector("#newTabName").innerHTML)));
         sessionStorage.setItem("facing", "custFunc");
       }
     }
@@ -1276,7 +1276,7 @@ function newCustFuncTab(config) {
           let matchPage = matchTab(liveTab.dataset.tab, true);
           let newVal = JSON.parse(liveTab.dataset.tab);
           newVal.name = e.target.value;
-          
+
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         equationDIV.addEventListener("focus", function (e) {
@@ -1297,7 +1297,7 @@ function newCustFuncTab(config) {
         document.getElementById("mainPage").appendChild(clon);
         checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
         //try {
-          parseVariables(varGrid, tabCopy);
+        parseVariables(varGrid, tabCopy);
         /*} catch (e) {
           report("Couldn't Calculate", false);
         }*/
@@ -1317,7 +1317,7 @@ function newCustFuncTab(config) {
           let matchPage = matchTab(liveTab.dataset.tab, true);
           //removeFunction(oldVal.name);
           //removeFunc(oldVal.name)
-          
+
           let oldParse = parseFunction(oldVal.code)
           oldParse.func = e.target.value;
           let newStringifyFunc = stringifyMethod(oldParse);
@@ -1406,7 +1406,7 @@ function defaultSetup(clon) {
   for (let element of updateElements) {
     clon.getElementById(element).addEventListener("input", function (e) {
       //try {
-        parseVariables(varGrid, parent);
+      parseVariables(varGrid, parent);
       /*} catch (e) {
         report("Couldn't Calculate", false);
       }*/
@@ -1476,11 +1476,10 @@ function highlightTab(element) {
   element.className += " active"
 }
 //Responsible for the handling of tab opens whenever a tab button is pressed 
-function openElement(evt) {
-  let evtElement = evt;
+function openElement(config) {
   let match;
   let tabs = document.getElementsByClassName('tabcontent');
-  if (evtElement.dataset.tabmap != "mainTab") {
+  if (config != "mainTab") {
     if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
       document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
       document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
@@ -1491,13 +1490,15 @@ function openElement(evt) {
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
   }
-  match = matchTab(evtElement.dataset.tabmap, false);
+  match = matchTab(config, false);
+  console.log(config)
   for (let i = 0; i < tabs.length; i++) {
     if (match != tabs[i]) {
       tabs[i].style.visibility = 'hidden';
     }
   }
-  highlightTab(evtElement);
+  console.log(matchTab(config, true))
+  highlightTab(matchTab(config, true));
   match.style.visibility = 'visible';
 }
 //Responsible for matching a tab with its tab page
@@ -1527,7 +1528,7 @@ function removeCustFunc(event) {
   document.getElementById('mainPage').removeChild(matchTab(tabLink.dataset.tabmap, false));
   document.getElementById('tabContainer').removeChild(tabLink);
   if (window.innerWidth / window.innerHeight > 3 / 4) {
-    openElement(document.getElementById('mainTab'));
+    openElement("mainTab");
   }
 
 }
@@ -1560,10 +1561,10 @@ function changeFunc(og, newString, tab, page) {
   page.dataset.tab = JSON.stringify(newString);
   tab.querySelector("#newTabName").innerHTML = newString.name;
   tab.querySelector('#nameDisplay').innerHTML = newString.name;
-  if(og.type == "Function"){
+  if (og.type == "Function") {
     tab.querySelector('#equtDisplayFunc').innerHTML = newString.equation;
   }
-  
+
   updateCustomButtons(og, newString);
 }
 //Responsible for changing the name and equation value on the a cust func link 
@@ -1698,9 +1699,9 @@ function parseVar(parsedEquation, data) {
   }
   return parsedEquation;
 }
-function parseVarFunc(name, varData){
+function parseVarFunc(name, varData) {
   let innerVars = varData[0].Value;
-  for(let i = 1; i < varData.length; i++){
+  for (let i = 1; i < varData.length; i++) {
     innerVars += "," + varData[i].Value;
   }
   return `${name}(${innerVars})`;
@@ -1730,7 +1731,7 @@ function parseVariables(element, clon) {
   method = parseVarFunc(name, varData);
   if (all) {
     solveEquation(method, clon);
-    solveGraph(varData,method, first);
+    solveGraph(varData, method, first);
     solveTable(method, first, clon);
   } else if (first != undefined) {
     solveGraph();
@@ -1748,7 +1749,7 @@ function solveGraph(varData, parsedEquation, data) {
 
 }
 //Responsible for solving the parsedEquation with one open variable table wise
-function solveTable(parsedEquation, data,clon) {
+function solveTable(parsedEquation, data, clon) {
   console.log("solve table ran")
   /*
   needs to get the settings table step and number of steps
@@ -1766,7 +1767,7 @@ function solveTable(parsedEquation, data,clon) {
     let currentVal = i * step;
     var newData = data;
     newData.Value = "" + currentVal;
-    result = inputSolver(parsedEquation.replace('Æ',currentVal), "Error Making Table");
+    result = inputSolver(parsedEquation.replace('Æ', currentVal), "Error Making Table");
     var newRow = clon.querySelector('#funcTable').insertRow(i);
     var newXCell = newRow.insertCell(0);
     var newYCell = newRow.insertCell(1);
@@ -2060,7 +2061,7 @@ let facingBack = [
     "backElm": "",
     "prtCont": 'main',
     "mth": function () {
-      openElement(document.getElementById('mainTab'))
+      openElement("mainTab")
     },
   },
   {
@@ -2625,12 +2626,6 @@ function backMoreFunction() {
   } else {
     document.location = 'Recursive.html';
   }
-}
-//idk probably will delete
-function mobileTabMethod() {
-  hideAllTabs();
-  changeTabAs(true);
-
 }
 //Responsible for checking wheather a custom function is already opened (seeming a dupilicate method)
 function custFuncExisting(name, duplicates) {
