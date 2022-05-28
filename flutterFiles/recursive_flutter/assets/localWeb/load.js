@@ -13,18 +13,10 @@ if (localStorage.getItem("settings") != undefined) {
   console.log(settings);
 }
 let themeElem = {};
-let themes = getThemes();
-for (let theme of themes) {
-  if (theme.name == settings.theme) {
-    setRoot(theme.getMth());
-    themeElem = theme;
-  }
-}
+setSettings();
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
-  if (!settings.degRad) {
-    setDegMode();
-  }
+  
 
   if (TextColorGlobal == "#000000") {
     setImages(images);
@@ -101,7 +93,7 @@ if (document.getElementById("mainBody") != null) {
       changeTabAs(false);
     }
   });
-  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); setState(); document.location = 'Settings.html' });
+  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -2016,7 +2008,10 @@ function settingExit() {
     newSettings.degRad = false;
   }
   localStorage.setItem("settings", JSON.stringify(newSettings));
-  document.location = 'Recursive.html';
+  settings = JSON.parse(localStorage.getItem("settings"));
+  setSettings();
+  
+  closePage('settingsPage')
 }
 //Responsible for handling if purchases have been completed by the user
 function queryPurchase(item) {
@@ -2297,7 +2292,15 @@ function getColorAcc(acc) {
   }
 }
 //Responsible for setting the root values of a page which controll all color styling
-function setRoot(colorArray) {
+function setSettings() {
+  let themes = getThemes();
+  let colorArray = [];
+for (let theme of themes) {
+  if (theme.name == settings.theme) {
+    colorArray = theme.getMth();
+    themeElem = theme;
+  }
+}
   let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
@@ -2305,6 +2308,9 @@ function setRoot(colorArray) {
   rootCss.style.setProperty('--textColor', colorArray[3]);
   setImages(colorArray[3]);
   TextColorGlobal = colorArray[3];
+  if (!settings.degRad) {
+    setDegMode();
+  }
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/

@@ -14,6 +14,30 @@
   color: var(--textColor);
   -webkit-tap-highlight-color:transparent;
 }
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  pointer-events: none;
+  color: grey;
+  display: block;
+}
+.page{
+  width: 100%;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  background-color: var(--displayColor);
+}
+textarea {
+  border: none;
+  overflow: auto;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  resize: none; /*remove the resize handle on the bottom right*/
+}
 body{
   overflow-x: hidden;
   overflow-y: hidden;
@@ -65,7 +89,8 @@ input:focus, #EquationFunc:focus, select:focus{
   height: 35px;
   width: 100%;
   display: inline-flex;
-  z-index: 1;
+  z-index: 2;
+  background-color: var(--functionsColor);
 }
 #mobileTabs{
   visibility: hidden;
@@ -268,6 +293,9 @@ button:focus, input[type="button"]:focus {
     font-size: 15px;
     color: var(--functionsColor);
   }
+  #previousEquation{
+    color: var(--functionsColor);
+  }
   #enterHeader{
     width: 100%;
     font-weight: lighter;
@@ -418,7 +446,7 @@ button:focus, input[type="button"]:focus {
   }
   .addIcon{
     top: 0;
-    left: 10px;
+    left: 0;
     width: 40px;
     height: 40px;
     background-color: transparent;
@@ -426,7 +454,7 @@ button:focus, input[type="button"]:focus {
     position: absolute;
   }
   .minusIcon{
-    left: 48px;
+    left: 40px;
     top: 0;
     width: 40px;
     height: 40px;
@@ -531,6 +559,22 @@ button:focus, input[type="button"]:focus {
     background-color: var(--functionsColor);
     position: relative;
     z-index: 1;
+  }
+  #popupConsole{
+    visibility: visible;
+    height: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 15px;
+    font-size: 25px;
+    top: 0;
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
   }
   #customFuncDisplay::-webkit-scrollbar {
     width: 2vh;
@@ -802,6 +846,78 @@ button:focus, input[type="button"]:focus {
     left: 10px;
     border-radius: 25px;
   }
+  #mainPage{
+    background-color: var(--functionsColor);
+  }
+  #custCreatorPage{
+    background-color: var(--displayColor);
+    bottom: 100%;
+    position: absolute;
+  }
+  #settingsPage{
+    bottom: 100%;
+  }
+  #nameCreator{
+    background-color: var(--numbersColor);
+    border: none;
+    font-size: 50px;
+    width: calc(100% - 20px);
+    left: 10px;
+    padding: 5px;
+    border-radius: 15px;
+    top: 50px;
+    position: absolute;
+  }
+  #mainCreator{
+    background-color: var(--functionsColor);
+    top: 135px;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    left: 10px;
+    position: absolute;
+    border-radius: 20px;
+  }
+  #saveCreator{
+    height: 40px;
+    top: 10px;
+    right: 10px;
+    width: 60px;
+    border: none;
+    background-color: var(--numbersColor);
+    position:absolute;
+    border-radius: 50px;
+  }
+  .creatorPage{
+    width: 100%;
+    top: 60px;
+    bottom: 0px;
+    position: absolute;
+  }
+  .creatorDiv{
+    width: calc(100% - 20px);
+    left: 10px;
+    height: calc(100% - 10px);
+    background-color: var(--displayColor);
+    padding: 10px;
+    font-size: 35px;
+    border-radius: 25px;
+    position: absolute;
+  }
+  .numberedHeader{
+    margin-left: 5px;
+    font-size: 25px;
+    width:fit-content;
+    font-weight:700;
+  }
+  #creatorEditor{
+    display: grid;
+    grid-template-columns: 20px calc(100% - 14px);
+  }
+  .codeEditor{
+    font-size: 25px;
+    background-color: transparent;
+    border: none;
+  }
   #varsDiv{
     display: grid;
     position: absolute;
@@ -868,6 +984,20 @@ button:focus, input[type="button"]:focus {
       left: 150px
     }
   }
+  @keyframes slideToUpFromBottom{
+    0%{
+      top: 0%;
+    }
+    6.5217%{
+      top: 80px;
+    }
+    93.478%{
+      top: 80px;
+    }
+    100%{
+      top: 0%;
+    }
+  }
   @keyframes sveForSwitch{
     0%{
       left: 75px;
@@ -884,7 +1014,15 @@ button:focus, input[type="button"]:focus {
       left: 150px
     }
   }
-  #DisplayColorPicker{
+  @keyframes pageup{
+    0%{
+      bottom: 100%
+    }
+    100%{
+      bottom: 0px;
+    }
+  }
+  #primaryColorPicker{
     initial-value: var(--displayColor);
   }
   @media only screen and (max-aspect-ratio: 3/4) {
@@ -1146,6 +1284,14 @@ button:focus, input[type="button"]:focus {
   }
   #customFuncDisplayRecentText{
     color: transparent;
+  }
+  #nameCreator{
+    width: 20%
+  }
+  #mainCreator{
+    width: calc(80% - 30px);
+    left: calc(20% + 20px); 
+    top: 50px;
   }
 }
 @media only screen and (max-width: 451px){
@@ -1451,16 +1597,48 @@ button:focus, input[type="button"]:focus {
   border-radius: 20px;
   visibility: hidden;
 }
+#nameDisplay{
+  margin-top: 5px;
+  font-size: 30px;
+  padding-right: 5px;
+  font-weight: lighter;
+  text-align: end;
+}
 #bodyFunc{
-  top: 20%;
-  height: 80%;
+  top: 16%;
+  height: 34%;
+  width: calc(100% - 10px);
+  left: 5px;
 }
 #equtDisplayFunc{
   text-align: start;
-  width: 90%;
-  margin-top: 8px;
+  width: 95%;
+  margin-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2.5px;
+  padding-bottom: 2.5px;
   margin-left: 2.5%;
   font-size: 15px;
+  border-radius: 7px;
+  background-color: var(--numbersColor);
+}
+#bodyCalc{
+  top: calc(50% + 10px);
+  height: calc(50% - 15px);
+  width: calc(100% - 10px);
+  left: 5px;
+}
+#resultDisplay{
+  text-align: start;
+  width: fit-content;
+  margin-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 2.5%;
+  font-size: 15px;
+  border-radius: 7px;
+  background-color: var(--numbersColor);
 }
 .displayBase{
   background-color: var(--displayColor);
@@ -1628,6 +1806,8 @@ button:focus, input[type="button"]:focus {
   margin-top: 15px;
   left: 2.5%;
   width: 95%;
+  overflow-y: hidden;
+  padding: -30px;
 }
 #aboutTag{
   padding-top: 10px;
@@ -1968,9 +2148,10 @@ button:focus, input[type="button"]:focus {
   width: 100%;
 }
 #variableName{
-  border-radius: 50%;
+  border-radius: 25px;
   height: 25px;
-  width: 25px;
+  padding-left: 7.5px;
+  padding-right: 7.5px;
   flex-shrink: 0;
   text-align: center;
   background-color: var(--numbersColor);
@@ -2011,6 +2192,12 @@ button:focus, input[type="button"]:focus {
   font-size: 4.5vh;
   position: relative;
 }
+#editIcon{
+  margin-top: 16px;
+  position: absolute;
+  top: 0;
+  right: 10px;
+}
 #modeSwitcher{
   top:10px;
   left: 10px;
@@ -2034,7 +2221,7 @@ button:focus, input[type="button"]:focus {
   z-index: 2;
   position: absolute;
 }
-#selectorUnder{
+.selectorSlider{
   top: 0px;
   height: 40px;
   width: 70px;

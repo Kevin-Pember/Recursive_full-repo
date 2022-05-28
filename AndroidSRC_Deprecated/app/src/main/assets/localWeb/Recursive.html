@@ -70,321 +70,511 @@
 <meta name="theme-color" content="#000000">
 
 <body id="mainBody">
-    <div id="nameEntry">
-        <div id="entryDiv">
-            <h2 id="entryNameHeader">Name</h2>
-            <img src="Images/checkmarkWhite.svg" width="40px" id="confirmNameEntry">
-            <img src="Images/xIconWhite.svg" width="40px" id="exitNameEntry">
-            <textarea id="nameEntryArea" placeholder="Enter Name"></textarea>
-        </div>
-    </div>
-    <div id="tab">
-        <button id="mobileTabs"><img src="Images/mobileTabsIconWhite.svg" id="mobileTabIcon" width="50px"><h3 id="tabNum">1</h3></button>
-        <div id="tabContainer">
-            <button class="tablinks active" id="mainTab" data-tabMap="mainTab" name="Main Tab">
-                <h3>Main</h3>
-                <div class="displayBase" id="displayMain">
-                    <div id="numsPreview" class="numsBase"></div>
-                    <div id="funcPreview" class="functionBase"></div>
-                </div>
-            </button>
-            <template class="newTab">
-                <button id="tabButton" class="tablinks" data-tabMap="custFunc">
-                    <h3 id="newTabName"></h3>
-                    <img id="tabRemove" src="Images/xIconWhite.svg" width="31.5px">
-                    <div class="displayBase" id="displayFunc">
-                        <div id="bodyFunc" class="functionBase">
-                            <h2 id="equtDisplayFunc"></h2>
-                        </div>
+    <div class="page" id="mainPage">
+        <div id="tab">
+            <button id="mobileTabs"><img src="Images/mobileTabsIcon.svg" id="mobileTabIcon" width="50px"><h3 id="tabNum">1</h3></button>
+            <div id="tabContainer">
+                <button class="tablinks active" id="mainTab" data-tabMap="mainTab" name="Main Tab">
+                    <h3>Main</h3>
+                    <div class="displayBase" id="displayMain">
+                        <div id="numsPreview" class="numsBase"></div>
+                        <div id="funcPreview" class="functionBase"></div>
                     </div>
                 </button>
-            </template>
-        </div>
-        <img id="settingsCogIcon" src="Images/SettingsCogWhite.svg" height="100%" name="Open Settings">
-    </div>
-    <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
-        <div id="displayClip">
-            <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things" autocorrect="off">
-                <h3 contenteditable="false" id="historyHeader"></h3>
-                <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled>‎</h2>
-            </div>
-        </div>
-        <div id="overlayDiv">
-            <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
-                <div class="matchCircle">
-                    <h3 class="memText">MRC</h3>
-                </div>
-            </button>
-            <button id="MAddOverlay" class="textOverlay" name="Memory Add">
-                <div class="matchCircle">
-                    <h3 class="memText">M+</h3>
-                </div>
-            </button>
-            <div id="memoryDiv" name="Recorded Text">
-                <div id="memoryTextBoarder">
-                    <h2 id=memoryText></h2>
-                </div>
-            </div>
-            <img img id="leftOverlayNav" name="backward" class="arrows" src="Images/MoreFuncArrowWhite.svg" width="40"
-                height="40" style="transform: rotate(180deg);">
-            <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
-                src="Images/MoreFuncArrowWhite.svg" width="40" height="40">
-        </div>
-        <div class="mainCacGrid">
-            <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
-                    id="num1">1</button></div>
-            <div class="button-item" name="2" style="grid-area: num2;"><button class="numsbutton" id="num2">2</button>
-            </div>
-            <div class="specialElements" style="grid-area: num3;"><button class="numsbutton" id="num3">3</button></div>
-            <div class="function-item" style="grid-area: moreFuncBut;"><button
-                    id="moreFunctionsButton">More<br>Functions</button><img src="Images/MoreFuncArrowWhite.svg"
-                    class="arrows" id="arrowIcon" width="40px"></div>
-            <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button></div>
-            <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button></div>
-            <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button></div>
-            <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button class="funcbutton"
-                    id="backspace"><img src="Images/backIconWhite.svg" id="backspcaeIcon" width="40"
-                        height="20"></button><button class="textOverlay" id="ac">
-                    <div class="matchCircle">
-                        <h3 class="memText">ac</h3>
-                    </div>
-                </button></div>
-            <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button></div>
-            <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button></div>
-            <div class="button-item" style="grid-area: num9;"><button class="numsbutton" id="num9">9</button></div>
-            <div class="function-item" style="grid-area: plus;"><button class="funcbutton" id="plus">+</button></div>
-            <div class="specialElements" style="grid-area: pi;"><button class="numsbutton" id="piButton">π</button>
-            </div>
-            <div class="button-item" style="grid-area: num0;"><button class="numsbutton" id="num0">0</button></div>
-            <div class="specialElements" style="grid-area: point;"><button class="numsbutton"
-                    id="pointButton">.</button>
-            </div>
-            <div class="function-item" style="grid-area: minus;"><button class="funcbutton" id="minus">-</button></div>
-            <div class="function-item" style="grid-area: percent;"><button class="funcbutton" id="percent">%</button>
-            </div>
-            <div class="function-item" style="grid-area: pars;"><button class="funcbutton" id="pars">( )</button></div>
-            <div class="function-item" style="grid-area: pow;"><button class="funcbutton" id="pow">^</button></div>
-            <div class="function-item" style="grid-area: mutiplication;"><button class="funcbutton"
-                    id="mutiplication">×</button>
-            </div>
-            <div class="function-item" style="grid-area: enter;"><button class="funcbutton" id="enter">enter</button>
-            </div>
-            <div class="function-item" style="grid-area: pow2;"><button class="funcbutton" id="pow2">x²</button></div>
-            <div class="function-item" style="grid-area: sqrt;"><button class="funcbutton" id="sqrt">√x</button></div>
-            <div class="function-item" style="grid-area: division;"><button class="funcbutton" id="divison">÷</button>
-            </div>
-        </div>
-        <div id="extendedFuncGrid">
-            <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
-                        class="helpIcon" src="Images/helpWhite.svg" height="40px"></button></div>
-            <div class="function-item" style="grid-area: func;"><button class="funcbutton" id="functionEx">Func</button>
-            </div>
-            <div class="function-item" style="grid-area: his;"><button class="funcbutton" id="historyEx"><img
-                        class="historyIcon" src="Images/historyIconWhite.svg" width="30" height="35"></button></div>
-            <div class="function-item" style="grid-area: vars;"><button class="funcbutton" id="varEx">xyz</button></div>
-            <div class="function-item" style="grid-area: arc;"><button class="funcbutton" id="arcEx">arc</button></div>
-            <div class="function-item" style="grid-area: inv;"><button class="funcbutton" id="invEx">inv</button>
-            </div>
-            <div class="function-item" style="grid-area: sin;"><button class="trigButton" id="sinEx">sin</button></div>
-            <div class="function-item" style="grid-area: deg;"><button class="funcbutton" id="degEx">deg</button></div>
-            <div class="function-item" style="grid-area: cos;"><button class="trigButton" id="cosEx">cos</button></div>
-            <div class="function-item" style="grid-area: mod;"><button class="funcbutton" id="modEx">mod</button></div>
-            <div class="function-item" style="grid-area: tan;"><button class="trigButton" id="tanEx">tan</button></div>
-            <div class="function-item" style="grid-area: abs;"><button class="funcbutton" id="absEx">| |</button></div>
-            <div class="function-item" style="grid-area: d-f;"><button class="funcbutton" id="deciToFracEx">d→f</button>
-            </div>
-            <div class="function-item" style="grid-area: fact;"><button class="funcbutton" id="factorialEx">n!</button>
-            </div>
-            <div class="function-item" style="grid-area: ln;"><button class="funcbutton" id="lnEx">ln</button></div>
-            <div class="function-item" style="grid-area: log;"><button class="funcbutton" id="log10Ex">log</button>
-            </div>
-            <div class="function-item" style="grid-area: log10;"><button class="funcbutton">log<sub>10</sub></button>
-            </div>
-            <div class="function-item" style="grid-area: e;"><button class="funcbutton">e</button></div>
-        </div>
-        <div id="varsDiv">
-            <button class="varItem"><img src="Images/MoreFuncArrowWhite.svg" class="arrows" id="arrowVarIcon"
-                    width="40px"></button>
-            <button class="varItem">a</button>
-            <button class="varItem">b</button>
-            <button class="varItem">c</button>
-            <button class="varItem">d</button>
-            <button class="varItem">f</button>
-            <button class="varItem">g</button>
-            <button class="varItem">h</button>
-            <button class="varItem">i</button>
-            <button class="varItem">j</button>
-            <button class="varItem">k</button>
-            <button class="varItem">l</button>
-            <button class="varItem">m</button>
-            <button class="varItem">n</button>
-            <button class="varItem">o</button>
-            <button class="varItem">p</button>
-            <button class="varItem">q</button>
-            <button class="varItem">r</button>
-            <button class="varItem">s</button>
-            <button class="varItem">t</button>
-            <button class="varItem">u</button>
-            <button class="varItem">v</button>
-            <button class="varItem">h</button>
-            <button class="varItem">i</button>
-            <button class="varItem">j</button>
-            <button class="varItem">k</button>
-            <button class="varItem">w</button>
-            <button class="varItem">x</button>
-            <button class="varItem">z</button>
-        </div>
-        <div id="customFuncDisplay">
-            <img id="backExMini" class="arrows" src="Images/MoreFuncArrowWhite.svg" width="40" height="40"
-                style="transform: rotate(180deg);">
-            <img class="addIcon" id="addFunctionEx" src="Images/addObjectWhite.svg" width="40" height="40">
-            <img class="minusIcon" id="minusFunctionEx" src="Images/minusIconWhite.svg" width="40" height="40">
-            <h1 id="customFuncDisplayRecentText">Recent</h1>
-            <div id="customFuncDisplayGrid">
-                <template class="customFuncTemplate">
-                    <button class="customFuncLinks" id="customFuncButton">
-                        <img id="removeFunc" src="Images/xIconWhite.svg" width="40" style="right: 5px; top:5px; position: absolute;">
-                        <h2 id="equationLabel">Equation</h2>
-                        <h5 id="nameLabel" class="custFuncNames">New Function</h5>
+                <template class="newTab">
+                    <button id="tabButton" class="tablinks" data-tabMap="custFunc">
+                        <h3 id="newTabName"></h3>
+                        <img id="tabRemove" src="Images/xIcon.svg" width="31.5px">
+                        <div class="displayBase" id="displayFunc">
+                            <h2 id="nameDisplay"></h2>
+                            <div id="bodyFunc" class="functionBase">
+                                <h2 id="equtDisplayFunc"></h2>
+                            </div>
+                            <div id="bodyCalc" class="functionBase">
+                                <h2 id="resultDisplay">=</h2>
+                            </div>
+                        </div>
                     </button>
                 </template>
             </div>
+            <img id="settingsCogIcon" src="Images/SettingsCog.svg" height="100%" name="Open Settings">
         </div>
-        <div id="extraFuncPopUp">
-            <div id="customFuncDisplayPopup" data-element="popup">
-                <img class="addIcon" id="addIconPopup" src="Images/addObjectWhite.svg" width="40" height="40">
-                <img class="minusIcon" id="minusIconPopup" src="Images/minusIconWhite.svg" width="40" height="40">
-                <div id="custFuncGridPopup">
-
+        <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
+            <div id="displayClip">
+                <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things" autocorrect="off">
+                    <h3 contenteditable="false" id="historyHeader">
+                    </h3>
+                    <template class="historyDateTemp">
+                        <h3 class='historyDateHeader' id="header"></h3>
+                        <br>
+                    </template>
+                    <template class="historyHeaders">
+                        <h3 id='historyTimeSubHeader'></h3>
+                        <h4 id='previousEquation'></h4>
+                        <br>
+                    </template>
+                    <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled>‎</h2>
                 </div>
             </div>
-            <div class="customFuncDisplayBackgroundPopup" width="100%">
-            </div>
-            <div class="extraFuncPopUpGrid">
-                <div class="button-item"><button class="funcbutton" id="historyPopup"><img class="historyIcon"
-                            src="Images/historyIconWhite.svg" width="30" height="35"></button></div>
-                <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
-                <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
-                <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
-                            src="Images/helpWhite.svg" width="30" height="30"></button></div>
-                <div class="button-item"><button class="funcbutton" id="log10Popup">log₁₀</button></div>
-                <div class="button-item"><button class="funcbutton" id="lnPopup">ln</button>
+            
+            <div id="overlayDiv">
+                <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
+                    <div class="matchCircle">
+                        <h3 class="memText">MRC</h3>
+                    </div>
+                </button>
+                <button id="MAddOverlay" class="textOverlay" name="Memory Add">
+                    <div class="matchCircle">
+                        <h3 class="memText">M+</h3>
+                    </div>
+                </button>
+                <div id="memoryDiv" name="Recorded Text">
+                    <div id="memoryTextBoarder">
+                        <h2 id=memoryText></h2>
+                    </div>
                 </div>
-                <div class="button-item"><button class="funcbutton" id="ePopup">e</button>
-                </div>
-                <div class="function-item"><button class="funcbutton" id="factorialPopup">n!</button></div>
-                <div class="function-item"><button class="funcbutton" id="degPopup">deg</button></div>
-                <div class="function-item"><button class="funcbutton" id="arcPopup">arc</button></div>
-                <div class="function-item"><button class="funcbutton" id="invPopup">inv</button></div>
-                <div class="function-item"><button class="funcbutton" id="absPopup">| |</button></div>
-                <div class="function-item"><button class="trigButton" id="sinPopup">sin</button></div>
-                <div class="function-item"><button class="trigButton" id="cosPopup">cos</button></div>
-                <div class="function-item"><button class="trigButton" id="tanPopup">tan</button></div>
-                <div class="function-item"><button class="funcbutton" id="modPopup">mod</button></div>
+                <img img id="leftOverlayNav" name="backward" class="arrows" src="Images/MoreFuncArrow.svg" width="40"
+                    height="40" style="transform: rotate(180deg);">
+                <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
+                    src="Images/MoreFuncArrow.svg" width="40" height="40">
             </div>
-        </div>
-    </div>
-    <template class="custFuncTabTemp">
-        <div class="tabcontent" id="customFuncTab">
-            <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
-            <div id="varEquationContainer" value="">
-                <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
-                <div id="varGrid">
-                    <template class="variableTemplate">
-                        <div class="variableContainer">
-                            <label id="varLabel">
-                                <h3 id="variableName"></h3>
-                                <input id="variableEntry" type="text" placeholder="value">
-                            </label>
+            <div class="mainCacGrid">
+                <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
+                        id="num1">1</button></div>
+                <div class="button-item" name="2" style="grid-area: num2;"><button class="numsbutton" id="num2">2</button>
+                </div>
+                <div class="specialElements" style="grid-area: num3;"><button class="numsbutton" id="num3">3</button></div>
+                <div class="function-item" style="grid-area: moreFuncBut;"><button
+                        id="moreFunctionsButton">More<br>Functions</button><img src="Images/MoreFuncArrow.svg"
+                        class="arrows" id="arrowIcon" width="40px"></div>
+                <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button></div>
+                <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button></div>
+                <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button></div>
+                <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button class="funcbutton"
+                        id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon" width="40"
+                            height="20"></button><button class="textOverlay" id="ac">
+                        <div class="matchCircle">
+                            <h3 class="memText">ac</h3>
                         </div>
+                    </button></div>
+                <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button></div>
+                <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button></div>
+                <div class="button-item" style="grid-area: num9;"><button class="numsbutton" id="num9">9</button></div>
+                <div class="function-item" style="grid-area: plus;"><button class="funcbutton" id="plus">+</button></div>
+                <div class="specialElements" style="grid-area: pi;"><button class="numsbutton" id="piButton">π</button>
+                </div>
+                <div class="button-item" style="grid-area: num0;"><button class="numsbutton" id="num0">0</button></div>
+                <div class="specialElements" style="grid-area: point;"><button class="numsbutton"
+                        id="pointButton">.</button>
+                </div>
+                <div class="function-item" style="grid-area: minus;"><button class="funcbutton" id="minus">-</button></div>
+                <div class="function-item" style="grid-area: percent;"><button class="funcbutton" id="percent">%</button>
+                </div>
+                <div class="function-item" style="grid-area: pars;"><button class="funcbutton" id="pars">( )</button></div>
+                <div class="function-item" style="grid-area: pow;"><button class="funcbutton" id="pow">^</button></div>
+                <div class="function-item" style="grid-area: mutiplication;"><button class="funcbutton"
+                        id="mutiplication">×</button>
+                </div>
+                <div class="function-item" style="grid-area: enter;"><button class="funcbutton" id="enter">enter</button>
+                </div>
+                <div class="function-item" style="grid-area: pow2;"><button class="funcbutton" id="pow2">x²</button></div>
+                <div class="function-item" style="grid-area: sqrt;"><button class="funcbutton" id="sqrt">√x</button></div>
+                <div class="function-item" style="grid-area: division;"><button class="funcbutton" id="divison">÷</button>
+                </div>
+            </div>
+            <div id="extendedFuncGrid">
+                <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
+                            class="helpIcon" src="Images/help.svg" height="40px"></button></div>
+                <div class="function-item" style="grid-area: func;"><button class="funcbutton" id="functionEx">Func</button>
+                </div>
+                <div class="function-item" style="grid-area: his;"><button class="funcbutton" id="historyEx"><img
+                            class="historyIcon" src="Images/historyIcon.svg" width="30" height="35"></button></div>
+                <div class="function-item" style="grid-area: vars;"><button class="funcbutton" id="varEx">xyz</button></div>
+                <div class="function-item" style="grid-area: arc;"><button class="funcbutton" id="arcEx">arc</button></div>
+                <div class="function-item" style="grid-area: inv;"><button class="funcbutton" id="invEx">inv</button>
+                </div>
+                <div class="function-item" style="grid-area: sin;"><button class="trigButton" id="sinEx">sin</button></div>
+                <div class="function-item" style="grid-area: deg;"><button class="funcbutton" id="degEx">deg</button></div>
+                <div class="function-item" style="grid-area: cos;"><button class="trigButton" id="cosEx">cos</button></div>
+                <div class="function-item" style="grid-area: mod;"><button class="funcbutton" id="modEx">mod</button></div>
+                <div class="function-item" style="grid-area: tan;"><button class="trigButton" id="tanEx">tan</button></div>
+                <div class="function-item" style="grid-area: abs;"><button class="funcbutton" id="absEx">| |</button></div>
+                <div class="function-item" style="grid-area: d-f;"><button class="funcbutton" id="deciToFracEx">d→f</button>
+                </div>
+                <div class="function-item" style="grid-area: fact;"><button class="funcbutton" id="factorialEx">n!</button>
+                </div>
+                <div class="function-item" style="grid-area: ln;"><button class="funcbutton" id="lnEx">ln</button></div>
+                <div class="function-item" style="grid-area: log;"><button class="funcbutton" id="log10Ex">log</button>
+                </div>
+                <div class="function-item" style="grid-area: log10;"><button class="funcbutton">log<sub>10</sub></button>
+                </div>
+                <div class="function-item" style="grid-area: e;"><button class="funcbutton">e</button></div>
+            </div>
+            <div id="customFuncDisplay">
+                <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40" height="40"
+                    style="transform: rotate(180deg);">
+                <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40" height="40">
+                <img class="minusIcon" id="minusFunctionEx" src="Images/minusIcon.svg" width="40" height="40">
+                <h1 id="customFuncDisplayRecentText">Recent</h1>
+                <div id="customFuncDisplayGrid">
+                    <template class="customFuncTemplate">
+                        <button class="customFuncLinks" id="customFuncButton">
+                            <img id="removeFunc" class="removeFuncIcons" src="Images/xIcon.svg" width="40" style="right: 5px; top:5px; position: absolute;">
+                            <h2 id="equationLabel">Equation</h2>
+                            <h5 id="nameLabel" class="custFuncNames">New Function</h5>
+                        </button>
                     </template>
                 </div>
             </div>
-            <div id="resultPane">
-                <div id=modeSwitcher>
-                    <button class="modeButton" id="functionMode">Function</button>
-                    <button class="modeButton" id="graphMode">Graph</button>
-                    <button class="modeButton" id="tableMode">Table</button>
-                    <div id="selectorUnder"></div>
+            <div id="extraFuncPopUp">
+                <div id="customFuncDisplayPopup" data-element="popup">
+                    <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="40" height="40">
+                    <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="40" height="40">
+                    <div id="custFuncGridPopup">
+    
+                    </div>
                 </div>
-                <div id='FunctionDiv'>
-                    <div id="resultDiv">
-                        <h2 id="equalsHeader">=</h2>
-                        <h2 id="functionResultHeader"></h2>
-                        <div id="funcModify">
-                            <button id="modBtn">deg</button>
-                            <div class="drop-cont">
-                                <a id="selectorRad">rad</a>
-                                <a id="selectorDeg">deg</a>
+                <div class="customFuncDisplayBackgroundPopup" width="100%">
+                </div>
+                <div class="extraFuncPopUpGrid">
+                    <div class="button-item"><button class="funcbutton" id="historyPopup"><img class="historyIcon"
+                                src="Images/historyIcon.svg" width="30" height="35"></button></div>
+                    <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
+                    <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
+                    <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
+                                src="Images/help.svg" width="30" height="30"></button></div>
+                    <div class="button-item"><button class="funcbutton" id="log10Popup">log₁₀</button></div>
+                    <div class="button-item"><button class="funcbutton" id="lnPopup">ln</button>
+                    </div>
+                    <div class="button-item"><button class="funcbutton" id="ePopup">e</button>
+                    </div>
+                    <div class="function-item"><button class="funcbutton" id="factorialPopup">n!</button></div>
+                    <div class="function-item"><button class="funcbutton" id="degPopup">deg</button></div>
+                    <div class="function-item"><button class="funcbutton" id="arcPopup">arc</button></div>
+                    <div class="function-item"><button class="funcbutton" id="invPopup">inv</button></div>
+                    <div class="function-item"><button class="funcbutton" id="absPopup">| |</button></div>
+                    <div class="function-item"><button class="trigButton" id="sinPopup">sin</button></div>
+                    <div class="function-item"><button class="trigButton" id="cosPopup">cos</button></div>
+                    <div class="function-item"><button class="trigButton" id="tanPopup">tan</button></div>
+                    <div class="function-item"><button class="funcbutton" id="modPopup">mod</button></div>
+                </div>
+            </div>
+        </div>
+        <template class="custFuncTabTemp">
+            <div class="tabcontent" id="customFuncTab">
+                <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
+                <div id="varEquationContainer" value="">
+                    <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
+                    <img id="editIcon" src="Images/EditIcon.svg" width="40px" style="visibility: hidden;">
+                    <div id="varGrid">
+                        <template class="variableTemplate">
+                            <div class="variableContainer">
+                                <label id="varLabel">
+                                    <h3 id="variableName"></h3>
+                                    <input id="variableEntry" type="text" placeholder="value">
+                                </label>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div id="resultPane">
+                    <div id=modeSwitcher>
+                        <button class="modeButton" id="functionMode">Function</button>
+                        <button class="modeButton" id="graphMode">Graph</button>
+                        <button class="modeButton" id="tableMode">Table</button>
+                        <div id="selectorUnder" class="selectorSlider"></div>
+                    </div>
+                    <div id='FunctionDiv'>
+                        <div id="resultDiv">
+                            <h2 id="equalsHeader">=</h2>
+                            <h2 id="functionResultHeader"></h2>
+                            <div id="funcModify">
+                                <button id="modBtn">deg</button>
+                                <div class="drop-cont">
+                                    <a id="selectorRad">rad</a>
+                                    <a id="selectorDeg">deg</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="graphDiv">
-                    <div id="graphContainer"><canvas id="funcChart"></canvas></div>
-                    <div id="rangingValues">
-                        <details class="funcDetails">
-                            <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
-                            <div class="selectorDiv">
-                                <h3 class="funcHeaders">min<input class="funcInputs" input type="number" id="minDomainGraph" type="text" ></h3>
-                                <h3 class="funcHeaders">max<input class="funcInputs" input type="number" id="maxDomainGraph" type="text"></h3>
-                                <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepDomainGraph" type="text"></h3>
-                            </div>
-                        </details>
-                        <details class="funcDetails">
-                            <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
-                            <div class="selectorDiv">
-                                <h3 class="funcHeaders">min<input class="funcInputs" input type="number" id="minRangeGraph" type="text"></h3>
-                                <h3 class="funcHeaders">max<input class="funcInputs" input type="number" id="maxRangeGraph" type="text"></h3>
-                                <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepRangeGraph" type="text"></h3>
-                            </div>
-                        </details>
-                        <details class="funcDetails" id="settingsSelector">
-                            <summary class="secondaryFuncHeaders">Settings</summary>
-                            <div class="selectorDiv">
-                            </div>
-                        </details>
+                    <div id="graphDiv">
+                        <div id="graphContainer"><canvas id="funcChart"></canvas></div>
+                        <div id="rangingValues">
+                            <details class="funcDetails">
+                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
+                                <div class="selectorDiv">
+                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number" id="minDomainGraph" type="text" ></h3>
+                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number" id="maxDomainGraph" type="text"></h3>
+                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepDomainGraph" type="text"></h3>
+                                </div>
+                            </details>
+                            <details class="funcDetails">
+                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
+                                <div class="selectorDiv">
+                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number" id="minRangeGraph" type="text"></h3>
+                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number" id="maxRangeGraph" type="text"></h3>
+                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepRangeGraph" type="text"></h3>
+                                </div>
+                            </details>
+                            <details class="funcDetails" id="settingsSelector">
+                                <summary class="secondaryFuncHeaders">Settings</summary>
+                                <div class="selectorDiv">
+                                </div>
+                            </details>
+                        </div>
+                        
                     </div>
+                    <div id="tableDiv">
+                        <div id="tableContainer">
+                            <table id="funcTable">
+                            <tr>
+                              <th>x</th>
+                              <th>y</th>
+                            </tr>
+                          </table>
+                        </div>
+                        <div id="rangingValues">
+                            <details class="funcDetails">
+                                <summary class="secondaryFuncHeaders">Settings</summary>
+                                <div class="selectorDiv">
+                                    <h3 class="funcHeaders">cells<input class="funcInputs" input type="number" id="cellsTable" type="text"></h3>
+                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepTable" type="text"></h3>
+                                </div>
+                            </details>
+                        </div>
+                        
+                    </div>
+    
+    
+                </div>
+            </div>
+        </template>
+        <template class="mainExample">
+            <div class="displayBase" id="displayMain">
+                <div id="numsPreview" class="numsBase"></div>
+                <div id="funcPreview" class="functionBase"></div>
+            </div>
+        </template>
+        <template class="funcExample">
+            <div class="displayBase" id="displayFunc">
+                <div id="bodyFunc" class="functionBase">
+                    <h2 id="equtDisplayFunc"></h2>
+                </div>
+            </div>
+        </template>
+    </div>
+    <div id="nameEntry">
+        <div id="entryDiv">
+            <h2 id="entryNameHeader">Name</h2>
+            <img src="Images/checkmark.svg" width="40px" id="confirmNameEntry">
+            <img src="Images/xIcon.svg" width="40px" id="exitNameEntry">
+            <textarea id="nameEntryArea" placeholder="Enter Name"></textarea>
+        </div>
+    </div>
+    <h1 id="popupConsole">
+    </h1>
+    <div class="page" id="custCreatorPage">
+        <img id="backCreator" src="Images/MoreFuncArrow.svg" width="45px" style="transform: rotate(180deg);">
+        <input type="text" id="nameCreator" placeholder="Name">
+        <div id="mainCreator">
+            <div id=modeSwitcher>
+                <button class="modeButton" id="funcCreatorButton">Function</button>
+                <button class="modeButton" id="hybdCreatorButton" style="left: 75px">Hybrid</button>
+                <button class="modeButton" id="codeCreatorButton" style="left: 150px">Code</button>
+                <div id="custCreatorUnder" class="selectorSlider"></div>
+            </div>
+            <button id="saveCreator">Save</button>
+            <div class="creatorPage" id="funcTypePage" >
+                <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
+            </div>
+            <div class="creatorPage" id="hybridCodeTypePage" style="visibility: hidden;">
+                <div  id="creatorEditor">
                     
                 </div>
-                <div id="tableDiv">
-                    <div id="tableContainer">
-                        <table id="funcTable">
-                        <tr>
-                          <th>x</th>
-                          <th>y</th>
-                        </tr>
-                      </table>
-                    </div>
-                    <div id="rangingValues">
-                        <details class="funcDetails">
-                            <summary class="secondaryFuncHeaders">Settings</summary>
-                            <div class="selectorDiv">
-                                <h3 class="funcHeaders">cells<input class="funcInputs" input type="number" id="cellsTable" type="text"></h3>
-                                <h3 class="funcHeaders">step<input class="stepInputs" input type="number" id="stepTable" type="text"></h3>
-                            </div>
-                        </details>
-                    </div>
-                    
+            </div>
+        </div>
+        
+    </div>
+    <div class="page" id="settingsPage">
+        <div id="buyScreen" style="visibility: hidden;">
+            <h1 class="settingsHeaders" id="buyTitle">Custom <br> Themes</h1>
+            <img id="buyExit" src="Images/xIconWhite.svg" width="50px">
+            <div id="imagesContainer">
+    
+            </div>
+            <div id="itemDescript">
+                <h2>Description</h2>
+                <h4>Allows full customization of Themes. </h4>
+            </div>
+            <button id="buyButton">$ 0.99</button>
+        </div>
+        <div id="navColumn">
+            <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="40"
+                    height="40"></button>
+            <h1 id="settingsTitle">Settings</h1>
+            <button id="LooknFeel" class="navButtons"><img id="ColorsIcon" src="Images/ColorsWhite.svg" class="settingsIcon"
+                    height="100%">Colors</button>
+            <button id="Preferences" class="navButtons"><img id="PreferencesIcon" src="Images/CalipiersWhite.svg"
+                    class="settingsIcon" height="100%">Calculations</button>
+            <button id="About" class="navButtons"><img id="AboutIcon" src="Images/aboutUSWhite.svg" class="settingsIcon"
+                    height="100%">About</button>
+        </div>
+        <div id="colorsTab" class="settingTabContent">
+            <button id="colorsBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                    class="backIcon"></button>
+            <h1 class="settingsHeaders">Colors</h1>
+            <div id="ColorsDiv" class="settingsDiv" style="visibility: hidden; position: absolute;">
+                <h2 class="h2Settings" id="colorsHeader">Colors</h2>
+                <div class="displayBase" id="displayPreview">
+                    <h2 id="showcaseTextColor" class="textDisplay">T</h2>
+                    <div id="numsPreview" class="numsBase"></div>
+                    <div id="funcPreview" class="functionBase"></div>
                 </div>
-
-
+                <div id="colorPickerGrid">
+                    <Label class="colorsLabels">
+                        <h5 class="h5Colors" id="DisplayLabel">Primary</h5>
+                        <input id="primaryColorPicker" class="colorPicker" type="color">
+                    </Label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Secondary</h5>
+                        <input id="secondaryColorPicker" class="colorPicker" value="#1a1a1a" type="color">
+                    </label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Accent</h5>
+                        <input id="accentColorPicker" class="colorPicker" value="#000000" type="color">
+                    </label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Text</h5>
+                        <div id="textdropdown">
+                            <button id="dropbtn">Black</button>
+                            <div class="dropdown-content">
+                                <a id="selectorBlack" value="#000000">Black</a>
+                                <a id="selectorWhite" value="#000000">White</a>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div id="accentColorDiv" class="settingsDiv">
+                <h2 class="h2Settings" id="colorsHeader">Accent</h2>
+                <div id="accentColorGrid" class="colorDiv">
+                    <button class="accButton" id="red"></button>
+                    <button class="accButton" id="orange"></button>
+                    <button class="accButton" id="yellow"></button>
+                    <button class="accButton" id="green" ></button>
+                    <button class="accButton" id="blue"></button>
+                    <button class="accButton" id="purple"></button>
+                    <button class="accButton" id="grey"></button>
+                </div>
+            </div>
+            <div id="themeDiv" class="settingsDiv">
+                <h2 class="h2Settings" id="colorsHeader">Themes</h2>
+                <div id="themeCont">
+                    <div class="themeElem" id="darkMode" unselectable="on">
+                        <div class="firstHalf" style="background-color: #000000">
+    
+                        </div>
+                        <div class="secondHalf" style="background-color: #1f1f1f;">
+    
+                        </div>
+                        <h3 class="themeLabel">Dark</h3>
+                    </div>
+                    <div class="themeElem" id="lightMode" unselectable="on">
+                        <div class="firstHalf" style="background-color: #ffffff">
+    
+                        </div>
+                        <div class="secondHalf" style="background-color: #dedede;">
+    
+                        </div>
+                        <h3 class="themeLabel">Light</h3>
+                    </div>
+                    <div class="themeElem" id="custPurchasable" unselectable="on">
+                        <div class="firstHalf" style="background-color: #707070">
+    
+                        </div>
+                        <div class="secondHalf" style="background-color: #525252;">
+    
+                        </div>
+                        <h3 id="custLabel" class="themeLabel">Custom</h3>
+                        <button id="buyCustTheme"> Buy</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </template>
-    <template class="mainExample">
-        <div class="displayBase" id="displayMain">
-            <div id="numsPreview" class="numsBase"></div>
-            <div id="funcPreview" class="functionBase"></div>
-        </div>
-    </template>
-    <template class="funcExample">
-        <div class="displayBase" id="displayFunc">
-            <div id="bodyFunc" class="functionBase">
-                <h2 id="equtDisplayFunc">keep it that way now</h2>
+        
+        <div id="PreferencesTab" class="settingTabContent">
+            <button id="PreferencesBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                    class="backIcon"></button>
+            <h1 class="settingsHeaders">Calculations</h1>
+            <div class="settingsDiv">
+                <h2 class="h2Settings" id="colorsHeader">General</h2>
+                <div id="PreferencesGrid">
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Angle Mode</h5>
+                        <button class="settingsButton" id="degModeBut" style="right: 55px;">deg</button>
+                        <button class="settingsButton" id="radModeBut">rad</button>
+                    </label>
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Output Length</h5>
+                        <input type="text" id="outputLength" class="settingsTextInput">
+                    </label>
+                </div>
+            </div>
+            <div class="settingsDiv">
+                <h2 class="h2Settings" id="colorsHeader">Graph</h2>
+                <div id="PreferencesGrid">
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Domain Steps</h5>
+                        <input type="text" id="graphDStep" class="settingsTextInput">
+                    </label>
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Default Domain</h5>
+                        <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 70px;">
+                        <input type="text" id="domainTopG" class="settingsTextInput">
+                    </label>
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Range Steps</h5>
+                        <input type="text" id="graphRStep" class="settingsTextInput">
+                    </label>
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Default Range</h5>
+                        <input type="text" id="rangeBottomG" class="settingsTextInput" style="right: 70px;">
+                        <input type="text" id="rangeTopG" class="settingsTextInput">
+                    </label>
+                </div>
+            </div>
+            <div class="settingsDiv">
+                <h2 class="h2Settings" id="colorsHeader">Table</h2>
+                <div id="PreferencesGrid">
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Default Cell Step</h5>
+                        <input type="text" id="tableStep" class="settingsTextInput">
+                    </label>
+                    <label class="calculationsLabels">
+                        <h5 class="h5Settings">Default Cells</h5>
+                        <input type="text" id="tableCells" class="settingsTextInput">
+                    </label>
+                </div>
             </div>
         </div>
-    </template>
+        <div id="AboutTab" class="settingTabContent">
+            <button id="AboutBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
+                    class="backIcon"></button>
+            <h1 class="settingsHeaders">About</h1>
+            <div id="VersionDiv">
+                <h2 class="h2Settings" id="versionHeader" style="border-radius: 25px;">Version</h2>
+                <h1 style="position: absolute; right: 7px; top: 3.5px; ">V2</h1>
+            </div>
+            <div id="AboutUsDiv" >
+                <h2 class="h2Settings">About Us</h2>
+                <h2 class="h5Settings" id="aboutTag">We are a team that works to make the lives of our customers easier & to make apps that we believe in.</h2>
+                <img width="100%" src="Images/simpilisAbout.svg" style="bottom: 0px;">
+            </div>
+            
+            <p id="copyright">©2022, Kevin Pember</p>
+        </div>
+        </div>
+    </div>
     <script src="load.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
