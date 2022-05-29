@@ -219,7 +219,7 @@
                 <div id="customFuncDisplayGrid">
                     <template class="customFuncTemplate">
                         <button class="customFuncLinks" id="customFuncButton">
-                            <img id="removeFunc" class="removeFuncIcons" src="Images/xIcon.svg" width="40" style="right: 5px; top:5px; position: absolute;">
+                            <img id="removeFunc" class="removeFuncIcons" src="Images/xIcon.svg" width="40" style="right: 5px; border-radius: 25px; top:5px; position: absolute;">
                             <h2 id="equationLabel">Equation</h2>
                             <h5 id="nameLabel" class="custFuncNames">New Function</h5>
                         </button>
@@ -371,6 +371,14 @@
             <textarea id="nameEntryArea" placeholder="Enter Name"></textarea>
         </div>
     </div>
+    <div id="confirmPage">
+        <div id="confirmDiv">
+            <h2 id="confirmHeader">Confirm</h2>
+            <h3 id="confirmMessage"></h3>
+            <img src="Images/checkmark.svg" width="40px" id="confirmButton">
+            <img src="Images/xIcon.svg" width="40px" id="exitConfirmPage">
+        </div>
+    </div>
     <h1 id="popupConsole">
     </h1>
     <div class="page" id="custCreatorPage">
@@ -409,8 +417,8 @@
             <button id="buyButton">$ 0.99</button>
         </div>
         <div id="navColumn">
-            <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="40"
-                    height="40"></button>
+            <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="50"
+                    height="50"></button>
             <h1 id="settingsTitle">Settings</h1>
             <button id="LooknFeel" class="navButtons"><img id="ColorsIcon" src="Images/ColorsWhite.svg" class="settingsIcon"
                     height="100%">Colors</button>

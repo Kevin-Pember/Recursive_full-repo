@@ -790,6 +790,58 @@ button:focus, input[type="button"]:focus {
     right: 20px;
     top: 8.5px;
   }
+  #confirmPage{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--translucent);
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    visibility: hidden;
+  }
+  #confirmDiv{
+    width:80%;
+    max-width: 400px;
+    height: 190px;
+    border-radius: 25px;
+    background-color: var(--functionsColor);
+    position: absolute;
+  }
+  #confirmHeader{
+    right : 10px;
+    top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 25px;
+    background-color: var(--numbersColor);
+    position: absolute;
+  }
+  #confirmMessage{
+    height: 82px;
+    width: calc(100% - 10px);
+    top: 58px;
+    left: 5px;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: var(--displayColor);
+    position: absolute;
+  }
+  #confirmButton{
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+  }
+  #exitConfirmPage{
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+  }
   #nameEntry{
     position: absolute;
     background-color: #00000075;
@@ -817,7 +869,7 @@ button:focus, input[type="button"]:focus {
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 25px;
-    background-color: var(--displayColor);
+    background-color: var(--numbersColor);
     position: absolute;
   }
   #confirmNameEntry{
@@ -837,7 +889,7 @@ button:focus, input[type="button"]:focus {
     resize: none;
     border: none;
     position: absolute;
-    background-color: var(--numbersColor);
+    background-color: var(--displayColor);
     padding: 10px;
     font-size: 30px;
     height: calc(100% - 67.2px);

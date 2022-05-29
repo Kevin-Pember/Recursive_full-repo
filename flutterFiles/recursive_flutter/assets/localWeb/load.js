@@ -2,6 +2,98 @@ let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let custFuncList = [];
 let state = {};
+let imgList = [
+  {
+    'name': 'aboutUs',
+    'white': 'Images/aboutUsWhite.svg',
+    'black': 'Images/aboutUs.svg'
+  },
+  {
+    'name': 'addObject',
+    'white': 'Images/addObjectWhite.svg',
+    'black': 'Images/addObject.svg'
+  },
+  {
+    'name': 'backIcon',
+    'white': 'Images/backIconWhite.svg',
+    'black': 'Images/backIcon.svg'
+  },
+  {
+    'name': 'calculatorIcon',
+    'white': 'Images/calculatorIconWhite.svg',
+    'black': 'Images/calculatorIcon.svg'
+  },
+  {
+    'name': 'Calipiers',
+    'white': 'Images/CalipiersWhite.svg',
+    'black': 'Images/Calipiers.svg'
+  },
+  {
+    'name': 'checkmark',
+    'white': 'Images/checkmarkWhite.svg',
+    'black': 'Images/checkmark.svg'
+  },
+  {
+    'name': 'Colors',
+    'white': 'Images/ColorsWhite.svg',
+    'black': 'Images/Colors.svg'
+  },
+  {
+    'name': 'customFunctionIcon',
+    'white': 'Images/customFunctionIconWhite.svg',
+    'black': 'Images/customFunctionIcon.svg'
+  },
+  {
+    'name': 'EditIcon',
+    'white': 'Images/EditIconWhite.svg',
+    'black': 'Images/EditIcon.svg'
+  },
+  {
+    'name': 'help',
+    'white': 'Images/helpWhite.svg',
+    'black': 'Images/help.svg'
+  },
+  {
+    'name': 'historyIcon',
+    'white': 'Images/historyIconWhite.svg',
+    'black': 'Images/historyIcon.svg'
+  },
+  {
+    'name': 'minusIcon',
+    'white': 'Images/minusIconWhite.svg',
+    'black': 'Images/minusIcon.svg'
+  },
+  {
+    'name': 'mobileTabsIcon',
+    'white': 'Images/mobileTabsIconWhite.svg',
+    'black': 'Images/mobileTabsIcon.svg'
+  },
+  {
+    'name': 'MoreFuncArrow',
+    'white': 'Images/MoreFuncArrowWhite.svg',
+    'black': 'Images/MoreFuncArrow.svg'
+  },
+  {
+    'name': 'resize',
+    'white': 'Images/resizeWhite.svg',
+    'black': 'Images/resize.svg'
+  },
+  {
+    'name': 'SettingsCog',
+    'white': 'Images/SettingsCogWhite.svg',
+    'black': 'Images/SettingsCog.svg'
+  },
+  {
+    'name': 'settingsPageIcon',
+    'white': 'Images/settingsPageIconWhite.svg',
+    'black': 'Images/settingsPageIcon.svg'
+  },
+  {
+    'name': 'xIcon',
+    'white': 'Images/xIconWhite.svg',
+    'black': 'Images/xIcon.svg'
+  }
+];
 var settings;
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
@@ -16,11 +108,7 @@ let themeElem = {};
 setSettings();
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
-  
 
-  if (TextColorGlobal == "#000000") {
-    setImages(images);
-  }
   if (sessionStorage.getItem("state") == undefined) {
     let object = { "eT": "", "tS": [false, false], "fO": [] }
     state = object;
@@ -216,6 +304,10 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('nameEntry').style.visibility = "hidden";
     document.getElementById('nameEntry').style.animation = null;
     document.getElementById('nameEntryArea').value = "";
+  });
+
+  document.getElementById('exitConfirmPage').addEventListener("click", function () {
+    closeConfirm();
   });
 
   document.getElementById('backCreator').addEventListener("click", function () {
@@ -434,13 +526,13 @@ if (document.getElementById("mainBody") != null) {
   if (TextColorGlobal == "#000000") {
     let addIcons = document.getElementsByClassName('backIcon');
     for (let item of addIcons) {
-      item.src = "Images/MoreFuncArrow.svg";
+      item.src = getSource('MoreFuncArrow');
     }
-    document.getElementById('calcIcon').src = "Images/CalculatorIconWhite.svg";
+    document.getElementById('calcIcon').src = getSource('CalculatorIcon');
 
-    document.getElementById('funcsIcon').src = "Images/customFunctionIconWhite.svg";
+    document.getElementById('funcsIcon').src = getSource('customFunctionIcon');
 
-    document.getElementById('setIcon').src = "Images/settingsPageIconWhite.svg";
+    document.getElementById('setIcon').src = getSource('settingsPageIcon');
   }
   document.getElementById('backButton').addEventListener("click", function () { document.location = 'Recursive.html'; });
   document.getElementById('LooknFeel').addEventListener("click", function () { helpTabChange('mainCalculatorHelp') });
@@ -527,12 +619,40 @@ function setNumOfTabs() {
   let tabs = document.getElementsByClassName('tablinks');
   document.getElementById("tabNum").innerHTML = tabs.length;
 }
+function getSource(name) {
+  if (TextColorGlobal == "#FFFFFF" || TextColorGlobal == "#ffffff") {
+    return "Images/" + name + "White.svg";
+  } else {
+    return "Images/" + name + ".svg";
+  }
+}
 function setImages(color) {
   let type = true;
   if (color == "#FFFFFF" || color == "#ffffff") {
     type = false;
   }
-  let images = [
+  let images = document.getElementsByTagName('img');
+  for (let elem of images) {
+    let image = elem.src;
+    if (image.includes("White.svg")) {
+      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('White.svg'));
+    } else {
+      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('.svg'));
+    }
+    console.log(image)
+    for (let item of imgList) {
+      if (image == item.name) {
+        if (type) {
+          elem.src = item.black;
+          break;
+        } else {
+          elem.src = item.white;
+          break;
+        }
+      }
+    }
+  }
+  /*let images = [
     {
       "type": "single",
       "id": "settingsCogIcon",
@@ -629,7 +749,7 @@ function setImages(color) {
         document.getElementById(img.id).src = source;
       }
     }
-  }
+  }*/
 }
 //END
 /********************************************|Main Page Button Handling|*********************************************/
@@ -998,6 +1118,21 @@ function funcCreatorPages(elemID) {
   }
   document.getElementById(elemID).style.visibility = "visible";
 }
+function openConfirm(message, method) {
+  document.getElementById('confirmPage').style.visibility = "visible";
+  document.getElementById('confirmMessage').innerHTML = message;
+  document.getElementById('confirmButton').addEventListener('click', function () {
+    method();
+    closeConfirm();
+  });
+}
+function closeConfirm() {
+  let elem = document.getElementById('confirmButton')
+  let newElem = elem.cloneNode(true);
+  elem.parentNode.replaceChild(newElem, elem);
+  document.getElementById('confirmMessage').innerHTML = "";
+  document.getElementById('confirmPage').style.visibility = "hidden";
+}
 //END
 /***********************************************|Main Page Backend|*************************************************/
 //Responsible for adding current equation to history header
@@ -1140,29 +1275,32 @@ function custButton(funcConfig, target) {
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
-    if (TextColorGlobal == "#FFFFFF") {
-      buttonNode.querySelector('#removeFunc').src = "Images/xIconWhite.svg";
-    }
+    buttonNode.querySelector('#removeFunc').src = getSource('xIcon');
+
     buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
-      console.log("Remove Func ran")
-      funcRemove(e);
+      openConfirm("Are you sure you want to delete this Function?", function () {
+        funcRemove(e);
+      });
+
     });
     buttonNode.addEventListener('click', function (e) {
-      let elem = e.target;
-      if (e.target.tagName != "BUTTON") {
-        elem = e.target.parentNode
-      }
-      let funcName = elem.querySelector("#nameLabel").innerHTML;
-      let funcParse = findFuncConfig(funcName);
-      document.getElementById('extraFuncPopUp').visibility = 'hidden';
-      document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
-      document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
-      document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-      document.getElementById('customFuncDisplay').style.visibility = "hidden";
-      if (e.target.tagName != "IMG" && !tabOpen(funcName)) {
-        createTab(funcParse)
-      } else if (e.target.tagName != "IMG") {
-        openElement(JSON.stringify(findFuncConfig(funcName)));
+      if (e.target.tagName != "IMG") {
+        let elem = e.target;
+        if (e.target.tagName != "BUTTON") {
+          elem = e.target.parentNode
+        }
+        let funcName = elem.querySelector("#nameLabel").innerHTML;
+        let funcParse = findFuncConfig(funcName);
+        document.getElementById('extraFuncPopUp').visibility = 'hidden';
+        document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
+        document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
+        document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
+        document.getElementById('customFuncDisplay').style.visibility = "hidden";
+        if ( !tabOpen(funcName)) {
+          createTab(funcParse)
+        } else {
+          openElement(JSON.stringify(findFuncConfig(funcName)));
+        }
       }
     });
     document.getElementById(target[i]).appendChild(clonClone);
@@ -1210,9 +1348,7 @@ function newTabButton(config) {
     tabClon.getElementById('equtDisplayFunc').innerHTML = "Hybrid";
   }
   tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
-  if (TextColorGlobal == "#000000") {
-    tabClon.getElementById('tabRemove').src = "Images/xIcon.svg";
-  }
+  tabClon.getElementById('tabRemove').src = getSource('xIcon');
 
   let highlight = tabClon.getElementById('tabButton');
   tabClon.getElementById('tabButton').addEventListener("click", function (e) {
@@ -1296,6 +1432,7 @@ function newCustFuncTab(config) {
         break;
       case ("Hybrid"):
         clon.getElementById("editIcon").style = "";
+        clon.getElementById("editIcon").src = getSource("EditIcon");
         let nameElem = clon.getElementById('nameFunc');
         let subElem = clon.getElementById("EquationFunc");
         let funcConfig = getByName(config.name)
@@ -1329,7 +1466,7 @@ function newCustFuncTab(config) {
 //Responsible for handing the intial setup of a cust func default tab page
 function defaultSetup(clon) {
   if (TextColorGlobal == "#000000") {
-    clon.getElementById("editIcon").src = "Images/EditIcon.svg"
+    clon.getElementById("editIcon").src = getSource('EditIcon');
   }
   clon.getElementById("minDomainGraph").value = settings.gDMin;
   clon.getElementById("maxDomainGraph").value = settings.gDMax;
@@ -1697,13 +1834,14 @@ function parseVarFunc(name, varData) {
   for (let i = 1; i < varData.length; i++) {
     innerVars += "," + varData[i].Value;
   }
+  console.log(`Parsed method is ${name}(${innerVars})`)
   return `${name}(${innerVars})`;
 }
 //Responsible for checking and solving for varables on defaut cust func page depending on how many variables are filled
 function parseVariables(element, clon) {
   let varData = varListAssbely(element);
   console.log(clon)
-  let name = clon.querySelector('#nameFunc').innerHTML
+  let name = clon.querySelector('#nameFunc').value;
   let method = "";
   let all = true;
   let first = undefined;
@@ -1808,16 +1946,12 @@ function checkVar(type, clon, checkList) {
         let equationArea = clon.querySelector('#EquationFunc')
         if (varClon.getElementById('variableEntry') != '') {
           equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
-          try {
-            parseVariables(varGrid, clon);
-          } catch (e) { }
         }
-      } else if (type == "hybrid") {
-        if (varClon.getElementById('variableEntry') != '') {
-          try {
-            parseVariables(varGrid, clon);
-          } catch (e) { }
-        }
+      }
+      if (varClon.getElementById('variableEntry') != '') {
+        try {
+          parseVariables(varGrid, clon);
+        } catch (e) { }
       }
     });
     varGrid.appendChild(varClon);
@@ -2011,7 +2145,7 @@ function settingExit() {
   localStorage.setItem("settings", JSON.stringify(newSettings));
   settings = JSON.parse(localStorage.getItem("settings"));
   setSettings();
-  
+
   closePage('settingsPage')
 }
 //Responsible for handling if purchases have been completed by the user
@@ -2296,12 +2430,12 @@ function getColorAcc(acc) {
 function setSettings() {
   let themes = getThemes();
   let colorArray = [];
-for (let theme of themes) {
-  if (theme.name == settings.theme) {
-    colorArray = theme.getMth();
-    themeElem = theme;
+  for (let theme of themes) {
+    if (theme.name == settings.theme) {
+      colorArray = theme.getMth();
+      themeElem = theme;
+    }
   }
-}
   let rootCss = document.querySelector(':root');
   rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
@@ -2316,19 +2450,6 @@ for (let theme of themes) {
     colorMessager.postMessage(colorArray[0]);
   }*/
 }
-//Responsible for setting images to match the text color value with a list of images and their elements
-/*function setImages(imgList) {
-  for (let img of imgList) {
-    if (img.type == "mutiple") {
-      let elems = document.getElementsByClassName(img.class);
-      for (elem of elems) {
-        elem.src = img.src;
-      }
-    } else {
-      document.getElementById(img.id).src = img.src;
-    }
-  }
-}*/
 //Responsible for handling popup console. Animates, sets color, and sets text value
 function report(message, meaning) {
   console.log("report")
