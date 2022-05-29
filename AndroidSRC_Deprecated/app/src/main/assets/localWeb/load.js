@@ -455,21 +455,21 @@ if (document.getElementById("mainBody") != null) {
 function openPage(id) {
   let element = document.getElementById(id);
   element.style.zIndex = 5;
-  element.style.animation = "0.1s ease-in 0s 1 normal forwards running pageup";
+  element.style.animation = "0.15s ease 0s 1 normal forwards running pageup";
   setTimeout(function () {
     element.style.animation = undefined;
     element.style.bottom = "0px";
-  }, 100);
+  }, 150);
 }
 //Responsible for hiding pages that where placed on top of the main calculator
 function closePage(id) {
   let element = document.getElementById(id);
-  element.style.animation = "0.1s ease-in 0s 1 reverse forwards running pageup"
+  element.style.animation = "0.15s ease 0s 1 reverse forwards running pageup"
   setTimeout(function () {
     element.style.animation = undefined;
     element.style.bottom = "100%";
     element.style.zIndex = 1;
-  }, 100)
+  }, 150)
 }
 //Responsible for handling the popup part of the virtKeyboard on the page
 function popup() {
@@ -1341,6 +1341,7 @@ function defaultSetup(clon) {
   clon.getElementById('stepTable').value = settings.tS;
   let parent = clon.getElementById('customFuncTab');
   let chart = clon.getElementById("funcChart");
+  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
   var cfcg = new Chart(chart, {
     type: 'line',
     data: {
