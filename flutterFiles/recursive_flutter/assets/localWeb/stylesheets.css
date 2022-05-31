@@ -2169,8 +2169,8 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
   top: 15%;
   height: 30%;
-  left: 2.5%;
-  right: 2.5%;
+  width: calc(100% - 20px);
+  left: 10px;
   overflow-y: scroll;
 }
 #varGrid{
@@ -2221,12 +2221,36 @@ button:focus, input[type="button"]:focus {
 }
 #resultPane{
   background-color: var(--functionsColor);
-  top: 47.5%;
-  bottom: 2.5%;
-  width: 95%;
-  left: 2.5%;
+  top: calc(45% + 10px);
+  bottom: 10px;
+  width: calc(100% - 20px);
+  left: 10px;
   position: absolute;
   border-radius: 25px;
+}
+#editDiv{
+  top: 15%;
+  left: 10px;
+  width: calc(100% - 20px);
+  bottom: 10px;
+  position: absolute;
+  border-radius: 25px;
+  background-color: var(--functionsColor);
+}
+#custFuncEditHeader{
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 6.5px;
+  padding-bottom: 6.5px;
+  border-radius: 25px;
+  background-color: var(--numbersColor);
+  width: fit-content;
+  left: 10px;
+  top: 10px;
+  position: absolute;
+}
+#confirmEdit{
+  
 }
 #EquationFunc{
   width: calc(101% - 20px);

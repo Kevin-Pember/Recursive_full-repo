@@ -1296,7 +1296,7 @@ function custButton(funcConfig, target) {
         document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
         document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
         document.getElementById('customFuncDisplay').style.visibility = "hidden";
-        if ( !tabOpen(funcName)) {
+        if (!tabOpen(funcName)) {
           createTab(funcParse)
         } else {
           openElement(JSON.stringify(findFuncConfig(funcName)));
@@ -1454,6 +1454,9 @@ function newCustFuncTab(config) {
           newVal.code = newStringifyFunc;
           //createNewFunction("method", newStringifyFunc);
           changeFunc(oldVal, newVal, matchPage, liveTab);
+        });
+        clon.getElementById('editIcon').addEventListener("click", function (e) {
+          openEdit(tabCopy,"filler Content");
         });
         document.getElementById("mainPage").appendChild(clon);
         checkVar("hybrid", tabCopy, funcConfig.variables)
@@ -1672,6 +1675,12 @@ function setShowEquat(tablink, equation) {
 }
 //END
 /*********************************************|Custom Func Updating|************************************************/
+//Responsible for handle UI changes in order to open the editor section of custom functions
+function openEdit(elem, definition) {
+  hideElements([elem.querySelector('#varEquationContainer'),elem.querySelector('#resultPane')]);
+  elem.querySelector('#varEquationContainer').visibility = "hidden";
+  elem.querySelector('#resultPane').visibility = "hidden";
+}
 //Responsible for handing the changing of a cust func on the default tab page
 function changeFunc(og, newString, tab, page) {
   console.log(og)
@@ -2566,20 +2575,24 @@ function getDate() {
   return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
 }
 //Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
-function hideElement(element) {
-  element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
-  setTimeout(function () {
-    element.style.animation = undefined;
-    element.style.visibility = "hidden";
-  }, 150);
+function hideElements(elements) {
+  for (let element of elements) {
+    element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
+    setTimeout(function () {
+      element.style.animation = undefined;
+      element.style.visibility = "hidden";
+    }, 150);
+  }
 }
 //Intended for animating the enter of an element to the page but again im lazy and may not get implemented
-function pullUpElement(element) {
-  element.style.visibility = "visible";
-  element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
-  setTimeout(function () {
-    element.style.animation = undefined;
-  }, 150);
+function pullUpElements(elements) {
+  for (let element of elements) {
+    element.style.visibility = "visible";
+    element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
+    setTimeout(function () {
+      element.style.animation = undefined;
+    }, 150);
+  }
 }
 //Responsible for finding where variables are in a given equation
 function varInEquat(equation) {
