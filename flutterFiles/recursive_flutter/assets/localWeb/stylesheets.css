@@ -909,6 +909,9 @@ button:focus, input[type="button"]:focus {
   #settingsPage{
     bottom: 100%;
   }
+  #moreFunctionsPage{
+    bottom: 100%;
+  }
   #nameCreator{
     background-color: var(--numbersColor);
     border: none;
@@ -961,14 +964,20 @@ button:focus, input[type="button"]:focus {
     width:fit-content;
     font-weight:700;
   }
+  #lineLabel{
+    width:fit-content;
+    overflow: visible;
+  }
   #creatorEditor{
     display: grid;
-    grid-template-columns: 20px calc(100% - 14px);
+    display:flex;
+    overflow: scroll;
   }
   .codeEditor{
     font-size: 25px;
     background-color: transparent;
     border: none;
+    padding-left: 5px;
   }
   #varsDiv{
     display: grid;
@@ -2229,13 +2238,10 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
 }
 #editDiv{
-  top: 15%;
-  left: 10px;
-  width: calc(100% - 20px);
+  top: 0px;
+  width: 100%;
   bottom: 10px;
   position: absolute;
-  border-radius: 25px;
-  background-color: var(--functionsColor);
 }
 #custFuncEditHeader{
   padding-left: 15px;
@@ -2248,9 +2254,29 @@ button:focus, input[type="button"]:focus {
   left: 10px;
   top: 10px;
   position: absolute;
+  font-size: 50px;
+}
+#editExit{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+#textEditorEdit{
+  position: absolute;
+  top: 91px;
+  background: var(--functionsColor);
+  bottom: 5px;
+  left: 10px;
+  width: calc(100% - 20px);
+  border-radius: 25px;
+  padding-top: 10px;
+  overflow: hidden;
 }
 #confirmEdit{
-  
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  bottom: 10px;
 }
 #EquationFunc{
   width: calc(101% - 20px);

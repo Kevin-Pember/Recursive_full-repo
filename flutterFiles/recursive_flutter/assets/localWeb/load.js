@@ -202,7 +202,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
-  document.getElementById('moreFunctionsButton').addEventListener("click", function () { document.location = 'moreFunctions.html'; });
+  document.getElementById('moreFunctionsButton').addEventListener("click", function () { openPage("moreFunctionsPage") });
   document.getElementById('arrowIcon').addEventListener("click", function () { popup(); preventFocus(); sessionStorage.setItem("facing", "mainPopup") });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
@@ -1433,6 +1433,10 @@ function newCustFuncTab(config) {
       case ("Hybrid"):
         clon.getElementById("editIcon").style = "";
         clon.getElementById("editIcon").src = getSource("EditIcon");
+        clon.getElementById('editExit').src = getSource("xIcon");
+        clon.getElementById('confirmEdit').src = getSource('checkmark')
+        createCodeTerminal(clon.getElementById('textEditorEdit'), "custEdit")
+        clon.getElementById('creatorEditor').style = "height: calc(100% - 20px); top: 10px; overflow: scroll;";
         let nameElem = clon.getElementById('nameFunc');
         let subElem = clon.getElementById("EquationFunc");
         let funcConfig = getByName(config.name)
@@ -1456,7 +1460,12 @@ function newCustFuncTab(config) {
           changeFunc(oldVal, newVal, matchPage, liveTab);
         });
         clon.getElementById('editIcon').addEventListener("click", function (e) {
-          openEdit(tabCopy,"filler Content");
+          let json = JSON.parse(tabCopy.dataset.tab)
+          openEdit(tabCopy,json.code);
+          recaculateNums(tabCopy.querySelector('#lineLabel'),json.code)
+        });
+        clon.getElementById('editExit').addEventListener('click', function (){
+          closeEdit(tabCopy)
         });
         document.getElementById("mainPage").appendChild(clon);
         checkVar("hybrid", tabCopy, funcConfig.variables)
@@ -1677,9 +1686,13 @@ function setShowEquat(tablink, equation) {
 /*********************************************|Custom Func Updating|************************************************/
 //Responsible for handle UI changes in order to open the editor section of custom functions
 function openEdit(elem, definition) {
-  hideElements([elem.querySelector('#varEquationContainer'),elem.querySelector('#resultPane')]);
-  elem.querySelector('#varEquationContainer').visibility = "hidden";
-  elem.querySelector('#resultPane').visibility = "hidden";
+  hideElements([elem.querySelector('#varEquationContainer'),elem.querySelector('#resultPane'),elem.querySelector('#nameFunc')]);
+  pullUpElements([elem.querySelector('#editDiv')])
+  elem.querySelector('#custEdit').value = definition;
+}
+function closeEdit(elem){
+  hideElements([elem.querySelector('#editDiv')]);
+  pullUpElements([elem.querySelector('#varEquationContainer'),elem.querySelector('#resultPane'),elem.querySelector('#nameFunc')]);
 }
 //Responsible for handing the changing of a cust func on the default tab page
 function changeFunc(og, newString, tab, page) {
@@ -2508,6 +2521,8 @@ function createCodeTerminal(element, name) {
   textarea.className = "codeEditor";
   textarea.id = name;
   textarea.addEventListener("input", function (e) {
+    this.style.height = "";
+    this.style.height = this.scrollHeight + "px"
     recaculateNums(numberIndex, textarea.value)
   })
   container.appendChild(textarea)
@@ -2587,7 +2602,7 @@ function hideElements(elements) {
 //Intended for animating the enter of an element to the page but again im lazy and may not get implemented
 function pullUpElements(elements) {
   for (let element of elements) {
-    element.style.visibility = "visible";
+    element.style.visibility = "inherit";
     element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
     setTimeout(function () {
       element.style.animation = undefined;
