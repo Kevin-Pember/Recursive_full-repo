@@ -422,6 +422,12 @@ button:focus, input[type="button"]:focus {
     top: 2.5%;
     height: 95%
   }
+  .custFuncNames{
+    margin-bottom: -40px;
+  }
+  .removeFuncIcons{
+    margin-right: -75%;
+  }
   #customFuncButton{
     width: 30.33333333333333333%;
     margin-left: 2.25%;
@@ -436,10 +442,8 @@ button:focus, input[type="button"]:focus {
     border-style: none;
   }
   .clearModifiers{
-    top: 0;
-    left: 10px;
-    width: 40px;
-    height: 40px;
+    z-index: 1;
+    top: 126px;
     background-color: transparent;
     border: none;
     position: absolute;
@@ -2116,19 +2120,32 @@ button:focus, input[type="button"]:focus {
   z-index: 0;
   position: absolute;
 }
+
 #funcGrid{
   position: absolute;
   border-radius: 25px 25px 0 0;
   background-color: var(--functionsColor);
   grid-template-columns: 33.3333% 33.3333% 33.3333%;
-  display: block;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-auto-rows: 120px;
   flex-wrap: wrap;
+  padding-top: 70px;
   top: 121px;
   bottom: 0px;
   left: 0;
   right: 0;
   overflow-y: scroll;
   
+}
+#funcGrid button{
+  width: calc(100% - 5px);
+  height: calc(100% - 5px);
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 25px;
+  border: none;
+  background-color: var(--numbersColor);
 }
 #backIconFunc{
   z-index: 1;

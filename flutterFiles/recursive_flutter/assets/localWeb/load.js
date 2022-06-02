@@ -134,13 +134,13 @@ if (document.getElementById("mainBody") != null) {
     addImplemented(funcObject);
     switch (funcObject.type) {
       case "Function":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
       case "Code":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
       case "Hybrid":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
     }
   }
