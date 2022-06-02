@@ -4,9 +4,9 @@ let custFuncList = [];
 let state = {};
 let imgList = [
   {
-    'name': 'aboutUs',
-    'white': 'Images/aboutUsWhite.svg',
-    'black': 'Images/aboutUs.svg'
+    'name': 'aboutUS',
+    'white': 'Images/aboutUSWhite.svg',
+    'black': 'Images/aboutUS.svg'
   },
   {
     'name': 'addObject',
