@@ -2583,3 +2583,10 @@ button:focus, input[type="button"]:focus {
     left: 100%;
   }
 }
+#newTabName{
+  width: calc(100% - 31.5px);
+  text-align: start;
+}
+#tabRemove{
+  right: 0;
+}

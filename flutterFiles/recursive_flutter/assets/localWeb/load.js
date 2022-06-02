@@ -1293,11 +1293,7 @@ function custButton(funcConfig, target) {
         }
         let funcName = elem.querySelector("#nameLabel").innerHTML;
         let funcParse = findFuncConfig(funcName);
-        document.getElementById('extraFuncPopUp').visibility = 'hidden';
-        document.getElementById('arrowIcon').style.animation = "0s ease-in 0s 1 normal forwards running toDown";
-        document.getElementById('extraFuncPopUp').style.animation = "0s ease-in 0s 1 normal forwards running toSlideDown";
-        document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-        document.getElementById('customFuncDisplay').style.visibility = "hidden";
+        universalBack();
         if (!tabOpen(funcName)) {
           createTab(funcParse)
         } else {
