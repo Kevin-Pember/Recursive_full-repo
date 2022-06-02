@@ -971,8 +971,30 @@ button:focus, input[type="button"]:focus {
   #creatorEditor{
     display: grid;
     display:flex;
-    overflow: scroll;
+    overflow: auto;
   }
+  #creatorEditor::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  #creatorEditor::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #creatorEditor::-webkit-scrollbar-thumb {
+    width: 5px;
+    background: #00000080; 
+    border-radius: 10px;
+  }
+  #creatorEditor::-webkit-scrollbar-button:end:increment {
+    height: 0px;
+    background: transparent;
+  }
+  #creatorEditor::-webkit-scrollbar-button:start:increment {
+    height: 0px;
+    background: transparent;
+    
+  }
+  #creatorEditor::-webkit-scrollbar-corner {background-color: transparent;}
   .codeEditor{
     font-size: 25px;
     background-color: transparent;
@@ -2090,14 +2112,14 @@ button:focus, input[type="button"]:focus {
   align-content: end;
   font-size: 75px;
   text-align: end;
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   z-index: 0;
   position: absolute;
 }
 #funcGrid{
   position: absolute;
   border-radius: 25px 25px 0 0;
-  background-color: var(--numbersColor);
+  background-color: var(--functionsColor);
   grid-template-columns: 33.3333% 33.3333% 33.3333%;
   display: block;
   flex-wrap: wrap;
@@ -2107,6 +2129,12 @@ button:focus, input[type="button"]:focus {
   right: 0;
   overflow-y: scroll;
   
+}
+#backIconFunc{
+  z-index: 1;
+  visibility: inherit;
+  position: absolute;
+  transform: rotate(180deg);
 }
 #newFunctionsPage{
   left: 100%;
@@ -2251,14 +2279,14 @@ button:focus, input[type="button"]:focus {
   border-radius: 25px;
   background-color: var(--numbersColor);
   width: fit-content;
-  left: 10px;
+  left: calc(50% - 62.22px);
   top: 10px;
   position: absolute;
   font-size: 50px;
 }
 #editExit{
   position: absolute;
-  right: 10px;
+  left: 10px;
   top: 10px;
 }
 #textEditorEdit{
@@ -2276,7 +2304,7 @@ button:focus, input[type="button"]:focus {
   position: absolute;
   z-index: 1;
   right: 10px;
-  bottom: 10px;
+  top: 10px;
 }
 #EquationFunc{
   width: calc(101% - 20px);

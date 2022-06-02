@@ -169,21 +169,21 @@ function getByName(name) {
 }
 //A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
 function funcMatch(equation) {
+  var returned = "";
   for (let func of funcList) {
     let check = equation.substring(0, (func.funcLength));
     if (check == func.func) {
       console.log(`%c func matched ${func.func}`, "color: yellow;")
-      return func.func;
+      returned = func.func;
     }
   }
   for (let func of secondList) {
     let check = equation.substring(0, (func.length));
     if (check == func) {
-      console.log("%cfuncG: " + func, "color: red");
-      return func;
+      returned =  "";
     }
   }
-  return "";
+  return returned;
 }
 //A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
 function findMethod(funcUn, degRad) {
@@ -325,18 +325,18 @@ function builtInFunc(equation) {
   equation = equation.replaceAll('÷', '/');
   for (let i = 0; i < equation.length; i++) {
     if (equation.substring(i, i + 5) == "<sup>") {
-      let exponent = equatInner(supEncap(equation.substring(i)).substringopenNewFunc(5, supEncap(equation.substring(i)).length - 6));
+      let exponent = equatInner(supEncap(equation.substring(i)).substring(5,supEncap(equation.substring(i)).length-6));
       let exponentRAW = supEncap(equation.substring(i));
       let base = "";
       let baseRAW = "";
-      if (equation.charAt(i - 1) == ")") {
-        base = equatInner(parEncap2(equation.substring(0, i)).substring(1, parEncap2(equation.substring(0, i)).length - 1));
-        baseRAW = parEncap2(equation.substring(0, i));
-      } else {
-        base = forward(equation.substring(0, i));
-        baseRAW = forward(equation.substring(0, i));
+      if(equation.charAt(i-1) == ")"){
+        base = equatInner(parEncap2(equation.substring(0,i)).substring(1,parEncap2(equation.substring(0,i)).length-1));
+        baseRAW = parEncap2(equation.substring(0,i));
+      }else{
+        base = forward(equation.substring(0,i));
+        baseRAW = forward(equation.substring(0,i));
       }
-      equation = equation.substring(0, i - baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i + exponentRAW.length);
+      equation = equation.substring(0,i-baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i+exponentRAW.length);
     } else if (equation.charAt(i) == "^") {
       let exponent = "";
       let exponentRAW = "";

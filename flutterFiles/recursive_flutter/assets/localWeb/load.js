@@ -202,7 +202,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
-  document.getElementById('moreFunctionsButton').addEventListener("click", function () { openPage("moreFunctionsPage") });
+  document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage");openPage("moreFunctionsPage") });
   document.getElementById('arrowIcon').addEventListener("click", function () { popup(); preventFocus(); sessionStorage.setItem("facing", "mainPopup") });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
@@ -515,6 +515,8 @@ if (document.getElementById("mainBody") != null) {
     });
   }
   let themes = document.getElementsByClassName('themeButton');
+
+  document.getElementById('backIconFunc').addEventListener("click", function () { universalBack(); });
 } else if (document.getElementById("settingsBody") != null) {
 
 } else if (document.getElementById('helpBody') != null) {
@@ -1436,7 +1438,7 @@ function newCustFuncTab(config) {
         clon.getElementById('editExit').src = getSource("xIcon");
         clon.getElementById('confirmEdit').src = getSource('checkmark')
         createCodeTerminal(clon.getElementById('textEditorEdit'), "custEdit")
-        clon.getElementById('creatorEditor').style = "height: calc(100% - 20px); top: 10px; overflow: scroll;";
+        clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
         let nameElem = clon.getElementById('nameFunc');
         let subElem = clon.getElementById("EquationFunc");
         let funcConfig = getByName(config.name)
@@ -2328,6 +2330,14 @@ let facingBack = [
     "mth": function () {
       closePage('custCreatorPage');
     },
+  },
+  {
+    "elm": "moreFunctionsPage",
+    "backElm": '',
+    "prtCont": 'main',
+    "mth": function () {
+      closePage('moreFunctionsPage');
+    }
   }
 ];
 //Responsible for all back buttons and back in android 
@@ -2533,12 +2543,9 @@ function createCodeTerminal(element, name) {
 }
 //Responsible for handling the numbering on the terminal 
 function recaculateNums(parentElem, text) {
-  console.log("reacalcuate")
   let numOfO = (text.match(/\n/g) || []).length;
   numOfO++;
   let childern = parentElem.querySelectorAll('.numberedHeader');
-  console.log(childern)
-  console.log(`Childern: ${childern.length} vs Number of lines: ${numOfO}`)
   if (childern.length > numOfO) {
     for (let i = childern.length - 1; i > numOfO - 1; i--) {
       childern[i].remove();
