@@ -517,6 +517,26 @@ if (document.getElementById("mainBody") != null) {
   let themes = document.getElementsByClassName('themeButton');
 
   document.getElementById('backIconFunc').addEventListener("click", function () { universalBack(); });
+  document.getElementById('addIcon').addEventListener('click', function(){
+    console.log('clicked')
+    openPage("custCreatorPage")
+    document.getElementById('moreFunctionsPage').style.zIndex = 3;
+    sessionStorage.setItem('facing','creatorMorePage')
+  })
+  document.getElementById('searchArea').addEventListener('input',function(){
+    let list = getFuncList();
+    let filtered = list.filter(function(value){
+      console.log(searchAlgo(value.name,document.getElementById('searchArea').value))
+
+      return searchAlgo(value.name,document.getElementById('searchArea').value)
+    })
+    console.log(filtered);
+    let funcGrid = document.getElementById('funcGrid');
+    removeAllChildNodes(funcGrid)
+    for(let item of filtered){
+      custButton(item, ['funcGrid']);
+    }
+  })
 } else if (document.getElementById("settingsBody") != null) {
 
 } else if (document.getElementById('helpBody') != null) {
@@ -1238,15 +1258,15 @@ function createFunc(type, name, text) {
     switch (type) {
       case "Function":
         object.equation = text;
-        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
       case "Code":
         object.code = text;
-        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
       case "Hybrid":
         object.code = text;
-        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup']);
+        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup','funcGrid']);
         break;
     }
     funcList.push(object);
@@ -1465,6 +1485,19 @@ function newCustFuncTab(config) {
         clon.getElementById('editExit').addEventListener('click', function (){
           closeEdit(tabCopy)
         });
+        clon.getElementById('confirmEdit').addEventListener('click', function(){
+          let liveTab = tabCopy;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let newVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newFunc = tabCopy.querySelector('#custEdit').value
+          
+          let oldParse = parseFunction(newFunc)
+          newVal.name = oldParse.func;
+          newVal.code = stringifyMethod(oldParse);
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+          closeEdit(tabCopy)
+        })
         document.getElementById("mainPage").appendChild(clon);
         checkVar("hybrid", tabCopy, funcConfig.variables)
         break;
@@ -2334,6 +2367,22 @@ let facingBack = [
     "mth": function () {
       closePage('moreFunctionsPage');
     }
+  },
+  {
+    'elm': 'creatorMain',
+    "backElm": '',
+    'prtCont': 'main',
+    "mth": function () {
+      closePage("custCreatorPage")
+    }
+  },
+  {
+    'elm': 'creatorMorePage',
+    "backElm": 'moreFunctionsPage',
+    'prtCont': 'main',
+    "mth": function () {
+      closePage("custCreatorPage")
+    }
   }
 ];
 //Responsible for all back buttons and back in android 
@@ -2691,6 +2740,21 @@ function rgbToHex(rgb) {
   rgb = rgb.substring(rgb.indexOf(', ') + 2);
   let thrid = rgb.substring(0, rgb.indexOf(')'));
   return "#" + componentToHex(Number(first)) + componentToHex(Number(second)) + componentToHex(Number(thrid));
+}
+function searchAlgo(string,checking){
+  let rawArray = checking.split('');
+  let charArray = [...new Set(rawArray)];
+  for(let char of charArray){
+    if(!(string.includes(char))){
+      return false
+    }
+  }
+  return true
+}
+function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+      parent.removeChild(parent.firstChild);
+  }
 }
 //END
 /************************************************|help page|**************************************************/
