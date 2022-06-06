@@ -1528,7 +1528,8 @@ button:focus, input[type="button"]:focus {
   top: 10px;
   background-color: var(--numbersColor);
   padding: 5px 10px;
-  border-radius:  25px 0 25px 0;
+  margin: 5px;
+  border-radius:  25px;
 }.h5Settings{
   color: var(--textColor);
   text-align: left;

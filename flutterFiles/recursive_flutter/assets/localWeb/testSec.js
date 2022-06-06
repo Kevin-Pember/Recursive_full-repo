@@ -238,6 +238,8 @@ function Graph(value, width, height, startx1, startx2, starty1, starty2) {
         return new Point(mouseX, mouseY);
     }.bind(this);
   
+  
+    /**************************************************************Navigation************************************************* */
     //Starts panning
     var startDrag = function(event) {
       document.addEventListener("mousemove", dragMouse, false);
