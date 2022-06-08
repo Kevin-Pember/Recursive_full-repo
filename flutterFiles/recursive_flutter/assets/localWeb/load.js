@@ -1548,6 +1548,24 @@ function defaultSetup(clon) {
             usePointStyle: true,
             pointStyle: 'circle',
           }
+        },
+        zoom: {
+          limits: {
+            x: {min: -200, max: 200, minRange: 50},
+            y: {min: -200, max: 200, minRange: 50}
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy',
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true
+            },
+          }
         }
       }
     }
