@@ -1523,18 +1523,24 @@ function defaultSetup(clon) {
   let chart = clon.getElementById("funcChart");
   let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
   var cfcg = new Chart(chart, {
-    type: 'line',
+    type: 'scatter',
     data: {
-      labels: [-2, 4],
       datasets: [{
-        data: [10, 20],
+        data: [{"x": 3, "y": 4},{"x": 4, "y": 3},{"x": 50, "y": 90}],
         label: 'x',
         fontColor: '#FFFFFF',
         borderColor: "#FFFFFF",
         backgroundColor: "#FFFFFF",
+        showLine: true,
       }]
     },
     options: {
+      scales: {
+      myScale: {
+        type: 'linear',
+        position: 'middle', // `axis` is determined by the position as `'y'`
+      }
+    },
       responsive: true,
       maintainAspectRatio: false,
       elements: {
@@ -1565,6 +1571,10 @@ function defaultSetup(clon) {
             pinch: {
               enabled: true
             },
+            mode: 'xy',
+            onZoomComplete({chart}) {
+              chart.update('none');
+            }
           }
         }
       }
