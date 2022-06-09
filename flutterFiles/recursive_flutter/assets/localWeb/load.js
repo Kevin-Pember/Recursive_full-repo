@@ -1349,13 +1349,17 @@ function createTab(config) {
   for (let i = 0; i < tabs.length; i++) {
     tabs[i].style.visibility = 'hidden';
   }
-  newCustFuncTab(config);
-  newTabButton(config);
+  if(config.type == "Function"){
+    let func = new EquatPage(config);
+  }else if (config.type == "Hybrid"){
+    let hyrd = new HybridPage(config);
+  }
 }
 //Responsible for the creation of a tab button that links to the tab
 function newTabButton(config) {
   let name = config.name;
   let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
+  let buttonCopy = tabClon.getElementById('tabButton');
   tabClon.getElementById('newTabName').innerHTML = name;
   tabClon.getElementById('nameDisplay').innerHTML = name;
   if (config.type == "Function") {
@@ -1387,234 +1391,7 @@ function newTabButton(config) {
   highlightTab(highlight);
   document.getElementById('tabContainer').appendChild(tabClon);
   setNumOfTabs();
-}
-//Responsible for the creation of the default tab page with the given config
-function newCustFuncTab(config) {
-  let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true), exist = false, existing = document.getElementsByClassName("tabcontent");
-  for (i = 1; i < existing.length; i++) {
-    if (existing[i].dataset.tab === JSON.stringify(config)) {
-      exist = true;
-      break;
-    }
-  }
-  if (!exist) {
-    clon = defaultSetup(clon);
-    let name = config.name;
-    let tabCopy = clon.getElementById('customFuncTab');
-    let varGrid = clon.getElementById("varGrid");
-    let equationDIV = clon.getElementById("EquationFunc");
-    let movable = clon.getElementById("selectorUnder");
-    movable.dataset.pos = 0;
-
-    clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
-    clon.getElementById("nameFunc").value = name;
-    console.log(`type is ${config.type}`)
-    switch (config.type) {
-      case ('Function'):
-        let equation = config.equation;
-
-        equationDIV.innerHTML = equation;
-        equationDIV.dataset.baseE = equation;
-
-        clon.getElementById('nameFunc').addEventListener("input", function (e) {
-          let liveTab = e.target.parentNode;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(liveTab.dataset.tab, true);
-          let newVal = JSON.parse(liveTab.dataset.tab);
-          newVal.name = e.target.value;
-
-          changeFunc(oldVal, newVal, matchPage, liveTab);
-        });
-        equationDIV.addEventListener("focus", function (e) {
-          let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
-          equationDIV.innerHTML = initEquation.equation;
-          setSelect(equationDIV, equationDIV.innerHTML.length);
-        });
-        equationDIV.addEventListener("input", function (e) {
-          let liveTab = e.target.parentNode.parentNode;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(liveTab.dataset.tab, true);
-          let newValue = JSON.parse(liveTab.dataset.tab);
-          checkVar("function", tabCopy, varInEquat(e.target.innerHTML));
-          newValue.equation = e.target.innerHTML;
-          equationDIV.dataset.baseE = equationDIV.innerHTML;
-          changeFunc(oldVal, newValue, matchPage, liveTab);
-        });
-        document.getElementById("mainPage").appendChild(clon);
-        checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
-        //try {
-        parseVariables(varGrid, tabCopy);
-        /*} catch (e) {
-          report("Couldn't Calculate", false);
-        }*/
-        break;
-      case ("Hybrid"):
-        clon.getElementById("editIcon").style = "";
-        clon.getElementById("editIcon").src = getSource("EditIcon");
-        clon.getElementById('editExit').src = getSource("xIcon");
-        clon.getElementById('confirmEdit').src = getSource('checkmark')
-        createCodeTerminal(clon.getElementById('textEditorEdit'), "custEdit")
-        clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
-        let nameElem = clon.getElementById('nameFunc');
-        let subElem = clon.getElementById("EquationFunc");
-        let funcConfig = getByName(config.name)
-        subElem.innerHTML = "Hybrid";
-        subElem.contentEditable = false;
-
-        nameElem.addEventListener("input", function (e) {
-          let liveTab = e.target.parentNode;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let newVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(liveTab.dataset.tab, true);
-          //removeFunction(oldVal.name);
-          //removeFunc(oldVal.name)
-
-          let oldParse = parseFunction(oldVal.code)
-          oldParse.func = e.target.value;
-          let newStringifyFunc = stringifyMethod(oldParse);
-          newVal.name = e.target.value;
-          newVal.code = newStringifyFunc;
-          //createNewFunction("method", newStringifyFunc);
-          changeFunc(oldVal, newVal, matchPage, liveTab);
-        });
-        clon.getElementById('editIcon').addEventListener("click", function (e) {
-          let json = JSON.parse(tabCopy.dataset.tab)
-          openEdit(tabCopy,json.code);
-          recaculateNums(tabCopy.querySelector('#lineLabel'),json.code)
-        });
-        clon.getElementById('editExit').addEventListener('click', function (){
-          closeEdit(tabCopy)
-        });
-        clon.getElementById('confirmEdit').addEventListener('click', function(){
-          let liveTab = tabCopy;
-          let oldVal = JSON.parse(liveTab.dataset.tab);
-          let newVal = JSON.parse(liveTab.dataset.tab);
-          let matchPage = matchTab(liveTab.dataset.tab, true);
-          let newFunc = tabCopy.querySelector('#custEdit').value
-          
-          let oldParse = parseFunction(newFunc)
-          newVal.name = oldParse.func;
-          newVal.code = stringifyMethod(oldParse);
-          changeFunc(oldVal, newVal, matchPage, liveTab);
-          closeEdit(tabCopy)
-        })
-        document.getElementById("mainPage").appendChild(clon);
-        checkVar("hybrid", tabCopy, funcConfig.variables)
-        break;
-    }
-    //adding event listeners
-
-  }
-}
-//Responsible for handing the intial setup of a cust func default tab page
-function defaultSetup(clon) {
-  if (TextColorGlobal == "#000000") {
-    clon.getElementById("editIcon").src = getSource('EditIcon');
-  }
-  clon.getElementById("minDomainGraph").value = settings.gDMin;
-  clon.getElementById("maxDomainGraph").value = settings.gDMax;
-  clon.getElementById("stepDomainGraph").value = settings.gDS;
-  clon.getElementById("minRangeGraph").value = settings.gRMin;
-  clon.getElementById("maxRangeGraph").value = settings.gRMax;
-  clon.getElementById("stepRangeGraph").value = settings.gRS;
-  clon.getElementById("cellsTable").value = settings.tC;
-  clon.getElementById('stepTable').value = settings.tS;
-  let parent = clon.getElementById('customFuncTab');
-  let chart = clon.getElementById("funcChart");
-  let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
-  var cfcg = new Chart(chart, {
-    type: 'scatter',
-    data: {
-      datasets: [{
-        data: [{"x": 3, "y": 4},{"x": 4, "y": 3},{"x": 50, "y": 90}],
-        label: 'x',
-        fontColor: '#FFFFFF',
-        borderColor: "#FFFFFF",
-        backgroundColor: "#FFFFFF",
-        showLine: true,
-      }]
-    },
-    options: {
-      scales: {
-      myScale: {
-        type: 'linear',
-        position: 'middle', // `axis` is determined by the position as `'y'`
-      }
-    },
-      responsive: true,
-      maintainAspectRatio: false,
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            usePointStyle: true,
-            pointStyle: 'circle',
-          }
-        },
-        zoom: {
-          limits: {
-            x: {min: -200, max: 200, minRange: 50},
-            y: {min: -200, max: 200, minRange: 50}
-          },
-          pan: {
-            enabled: true,
-            mode: 'xy',
-          },
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-            pinch: {
-              enabled: true
-            },
-            mode: 'xy',
-            onZoomComplete({chart}) {
-              chart.update('none');
-            }
-          }
-        }
-      }
-    }
-  })
-
-  let movable = clon.getElementById("selectorUnder");
-  movable.dataset.pos = 0;
-  clon.getElementById('functionMode').addEventListener("click", function () {
-    funcTabs[0].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 0, movable);
-  });
-  clon.getElementById("graphMode").addEventListener("click", function () {
-    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
-    funcTabs[1].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 75, movable);
-  });
-  clon.getElementById("tableMode").addEventListener("click", function () {
-    console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
-    funcTabs[2].style.visibility = "inherit";
-    hidModes(parseInt(movable.dataset.pos), funcTabs);
-    animateModes(parseInt(movable.dataset.pos), 150, movable);
-  });
-  let updateElements = [
-    "stepTable",
-    "cellsTable"
-  ];
-  for (let element of updateElements) {
-    clon.getElementById(element).addEventListener("input", function (e) {
-      //try {
-      parseVariables(varGrid, parent);
-      /*} catch (e) {
-        report("Couldn't Calculate", false);
-      }*/
-
-    });
-  }
-  return clon;
+  return buttonCopy;
 }
 //Responsible for handling which pages are visible on cust func default (Deprecated the creator page methods need implementing here)
 function hidModes(num, tabs) {
@@ -2934,3 +2711,232 @@ function custFuncExisting(name, duplicates) {
   return equationArray;
 }*/
 //END
+
+class FuncPage {
+  constructor(config){
+    this.def = config
+  }
+}
+class TemplatePage extends FuncPage{
+  constructor(config){
+    super(config)
+    this.def.tab = newTabButton(config);
+    let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true);
+    this.clone = clon;
+    let parent = clon.getElementById('customFuncTab');
+    let chart = clon.getElementById("funcChart");
+    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+    let name = config.name;
+    let tabCopy = clon.getElementById('customFuncTab');
+    this.def.tabPage = tabCopy;
+    let varGrid = clon.getElementById("varGrid");
+    let movable = clon.getElementById("selectorUnder");
+    let updateElements = [
+      "stepTable",
+      "cellsTable"
+    ];
+    movable.dataset.pos = 0;
+
+    if (TextColorGlobal == "#000000") {
+      clon.getElementById("editIcon").src = getSource('EditIcon');
+    }
+    clon.getElementById("minDomainGraph").value = settings.gDMin;
+    clon.getElementById("maxDomainGraph").value = settings.gDMax;
+    clon.getElementById("stepDomainGraph").value = settings.gDS;
+    clon.getElementById("minRangeGraph").value = settings.gRMin;
+    clon.getElementById("maxRangeGraph").value = settings.gRMax;
+    clon.getElementById("stepRangeGraph").value = settings.gRS;
+    clon.getElementById("cellsTable").value = settings.tC;
+    clon.getElementById('stepTable').value = settings.tS;
+    clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
+    clon.getElementById("nameFunc").value = name;
+
+    var cfcg = new Chart(chart, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          data: [{"x": 3, "y": 4},{"x": 4, "y": 3},{"x": 50, "y": 90}],
+          label: 'x',
+          fontColor: '#FFFFFF',
+          borderColor: "#FFFFFF",
+          backgroundColor: "#FFFFFF",
+          showLine: true,
+        }]
+      },
+      options: {
+        scales: {
+        myScale: {
+          type: 'linear',
+          position: 'middle', // `axis` is determined by the position as `'y'`
+        }
+      },
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+            }
+          },
+          zoom: {
+            limits: {
+              x: {min: -200, max: 200, minRange: 50},
+              y: {min: -200, max: 200, minRange: 50}
+            },
+            pan: {
+              enabled: true,
+              mode: 'xy',
+            },
+            zoom: {
+              wheel: {
+                enabled: true,
+              },
+              pinch: {
+                enabled: true
+              },
+              mode: 'xy',
+              onZoomComplete({chart}) {
+                chart.update('none');
+              }
+            }
+          }
+        }
+      }
+    })
+    clon.getElementById('functionMode').addEventListener("click", function () {
+      funcTabs[0].style.visibility = "inherit";
+      hidModes(parseInt(movable.dataset.pos), funcTabs);
+      animateModes(parseInt(movable.dataset.pos), 0, movable);
+    });
+    clon.getElementById("graphMode").addEventListener("click", function () {
+      console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 75);
+      funcTabs[1].style.visibility = "inherit";
+      hidModes(parseInt(movable.dataset.pos), funcTabs);
+      animateModes(parseInt(movable.dataset.pos), 75, movable);
+    });
+    clon.getElementById("tableMode").addEventListener("click", function () {
+      console.log("Mode Changed  pos: " + movable.dataset.pos + " futPos: " + 150);
+      funcTabs[2].style.visibility = "inherit";
+      hidModes(parseInt(movable.dataset.pos), funcTabs);
+      animateModes(parseInt(movable.dataset.pos), 150, movable);
+    });
+    for (let element of updateElements) {
+      clon.getElementById(element).addEventListener("input", function (e) {
+        //try {
+        parseVariables(varGrid, parent);
+        /*} catch (e) {
+          report("Couldn't Calculate", false);
+        }*/
+  
+      });
+    }
+  }
+}
+class HybridPage extends TemplatePage {
+  constructor (config) {
+    super(config)
+    let clon = this.clone;
+    let tabCopy = clon.getElementById('customFuncTab');
+    clon.getElementById("editIcon").style = "";
+        clon.getElementById("editIcon").src = getSource("EditIcon");
+        clon.getElementById('editExit').src = getSource("xIcon");
+        clon.getElementById('confirmEdit').src = getSource('checkmark')
+        createCodeTerminal(clon.getElementById('textEditorEdit'), "custEdit")
+        clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
+        let nameElem = clon.getElementById('nameFunc');
+        let subElem = clon.getElementById("EquationFunc");
+        let funcConfig = getByName(config.name)
+        subElem.innerHTML = "Hybrid";
+        subElem.contentEditable = false;
+
+        nameElem.addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let newVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          //removeFunction(oldVal.name);
+          //removeFunc(oldVal.name)
+
+          let oldParse = parseFunction(oldVal.code)
+          oldParse.func = e.target.value;
+          let newStringifyFunc = stringifyMethod(oldParse);
+          newVal.name = e.target.value;
+          newVal.code = newStringifyFunc;
+          //createNewFunction("method", newStringifyFunc);
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+        });
+        clon.getElementById('editIcon').addEventListener("click", function (e) {
+          let json = JSON.parse(tabCopy.dataset.tab)
+          openEdit(tabCopy,json.code);
+          recaculateNums(tabCopy.querySelector('#lineLabel'),json.code)
+        });
+        clon.getElementById('editExit').addEventListener('click', function (){
+          closeEdit(tabCopy)
+        });
+        clon.getElementById('confirmEdit').addEventListener('click', function(){
+          let liveTab = tabCopy;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let newVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newFunc = tabCopy.querySelector('#custEdit').value
+          
+          let oldParse = parseFunction(newFunc)
+          newVal.name = oldParse.func;
+          newVal.code = stringifyMethod(oldParse);
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+          closeEdit(tabCopy)
+        })
+        document.getElementById("mainPage").appendChild(clon);
+        checkVar("hybrid", tabCopy, funcConfig.variables)
+  }
+}
+class EquatPage extends TemplatePage{
+  constructor (config) {
+    super(config)
+    let clon = this.clone;
+    let tabCopy = clon.getElementById('customFuncTab');
+    let equation = config.equation;
+    let equationDIV = clon.getElementById("EquationFunc");
+
+        equationDIV.innerHTML = equation;
+        equationDIV.dataset.baseE = equation;
+
+        clon.getElementById('nameFunc').addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newVal = JSON.parse(liveTab.dataset.tab);
+          newVal.name = e.target.value;
+
+          changeFunc(oldVal, newVal, matchPage, liveTab);
+        });
+        equationDIV.addEventListener("focus", function (e) {
+          let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+          equationDIV.innerHTML = initEquation.equation;
+          setSelect(equationDIV, equationDIV.innerHTML.length);
+        });
+        equationDIV.addEventListener("input", function (e) {
+          let liveTab = e.target.parentNode.parentNode;
+          let oldVal = JSON.parse(liveTab.dataset.tab);
+          let matchPage = matchTab(liveTab.dataset.tab, true);
+          let newValue = JSON.parse(liveTab.dataset.tab);
+          checkVar("function", tabCopy, varInEquat(e.target.innerHTML));
+          newValue.equation = e.target.innerHTML;
+          equationDIV.dataset.baseE = equationDIV.innerHTML;
+          changeFunc(oldVal, newValue, matchPage, liveTab);
+        });
+        document.getElementById("mainPage").appendChild(clon);
+        checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
+        //try {
+        parseVariables(varGrid, tabCopy);
+        /*} catch (e) {
+          report("Couldn't Calculate", false);
+        }*/
+  }
+}
