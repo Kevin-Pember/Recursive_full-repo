@@ -1,7 +1,14 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
-let custFuncList = [];
-let state = {};
+let definedPages = [
+  {
+    "srtConfig": {
+      "name": "mainPage",
+    },
+    "tabPage": document.getElementById("MainContent"),
+    "tab": document.getElementById("mainTab"),
+  }
+];
 let imgList = [
   {
     'name': 'aboutUS',
@@ -109,24 +116,6 @@ setSettings();
 if (document.getElementById("mainBody") != null) {
   console.log(createParseable("8+v+9*9"))
 
-  if (sessionStorage.getItem("state") == undefined) {
-    let object = { "eT": "", "tS": [false, false], "fO": [] }
-    state = object;
-    sessionStorage.setItem("state", JSON.stringify(state));
-  } else {
-    state = JSON.parse(sessionStorage.getItem("state"));
-    document.getElementById('enterHeader').innerHTML = state.eT;
-    let funcAry = state.fO;
-    for (let item of funcAry) {
-      createTab(findFuncConfig(item))
-    }
-    if (state.tS[0]) {
-      setInverse();
-    }
-    if (state.tS[1]) {
-      setArc();
-    }
-  }
   var funcs = getFuncList();
   console.log(funcs)
   for (let funcObject of funcs) {
@@ -168,7 +157,7 @@ if (document.getElementById("mainBody") != null) {
     if (window.innerWidth / window.innerHeight < 3 / 4) {
       changeTabAs(false);
     }
-    openElement("mainTab")
+    openElement("mainPage")
   });
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -177,7 +166,7 @@ if (document.getElementById("mainBody") != null) {
       changeTabAs(true);
     } else {
       console.log("toggled other")
-      openElement("mainTab")
+      openElement("mainPage")
       changeTabAs(false);
     }
   });
@@ -920,13 +909,11 @@ function setInverse() {
   if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
     arc = true;
   }
-  //sets the text of inv buttons and sets the state value
+  //sets the text of inv buttons 
   if (document.getElementById('invPopup').innerHTML == "inv") {
     text = "reg"
-    state.tS[0] = true;
   } else {
     text = "inv"
-    state.tS[0] = false;
   }
   for (let elem of invButtons) {
     document.getElementById(elem).innerHTML = text;
@@ -963,10 +950,8 @@ function setArc() {
     let text = document.getElementById(elem).innerHTML;
     if (!arc) {
       document.getElementById(elem).innerHTML = "a" + text;
-      state.tS[1] = true;
     } else {
       document.getElementById(elem).innerHTML = text.substring(1);
-      state.tS[1] = false;
     }
   }
 }
@@ -1317,7 +1302,7 @@ function custButton(funcConfig, target) {
         if (!tabOpen(funcName)) {
           createTab(funcParse)
         } else {
-          openElement(JSON.stringify(findFuncConfig(funcName)));
+          openElement(funcName);
         }
       }
     });
@@ -1350,15 +1335,16 @@ function createTab(config) {
     tabs[i].style.visibility = 'hidden';
   }
   if (config.type == "Function") {
-    let func = new EquatPage(config);
+    definedPages.push((new EquatPage(config)).def);
   } else if (config.type == "Hybrid") {
-    let hyrd = new HybridPage(config);
+    definedPages.push((new HybridPage(config)).def);
   }
 }
 //Responsible for the creation of a tab button that links to the tab
-function newTabButton(config,tabPage) {
+function newTabButton(config, tabPage) {
   let name = config.name;
   let tabClon = document.getElementsByClassName('newTab')[0].content.cloneNode(true);
+  let nameElem = tabClon.getElementById('newTabName');
   let buttonCopy = tabClon.getElementById('tabButton');
   tabClon.getElementById('newTabName').innerHTML = name;
   tabClon.getElementById('nameDisplay').innerHTML = name;
@@ -1379,13 +1365,18 @@ function newTabButton(config,tabPage) {
         changeTabAs(false);
       }
       if (e.target != highlight.querySelector("IMG")) {
-        openElement(JSON.stringify(findFuncConfig(highlight.querySelector("#newTabName").innerHTML)));
+        openElement(nameElem.innerHTML);
         sessionStorage.setItem("facing", "custFunc");
       }
     }
   });
   tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-    removeCustFunc(e);
+    let tabLink = e.target.parentNode;
+    document.getElementById('mainPage').removeChild(tabPage);
+    document.getElementById('tabContainer').removeChild(tabLink);
+    if (window.innerWidth / window.innerHeight > 3 / 4) {
+      openElement("mainPage");
+    }
     setNumOfTabs();
   })
   highlightTab(highlight);
@@ -1442,7 +1433,7 @@ function animateModes(from, to, element) {
     setTimeout(function () { element.style.left = "0px"; element.style.animation = undefined }, 150);
     element.dataset.pos = 0;
   } else {
-    console.log(same)
+    console.log("same")
   }
 }
 //Responsible for changing the color of the tab that is currently open
@@ -1454,10 +1445,11 @@ function highlightTab(element) {
   element.className += " active"
 }
 //Responsible for the handling of tab opens whenever a tab button is pressed 
-function openElement(config) {
-  let match;
+function openElement(name) {
+  let match = matchPage(name);
+  console.log(match)
   let tabs = document.getElementsByClassName('tabcontent');
-  if (config != "mainTab") {
+  if (name != "mainPage") {
     if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
       document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
       document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
@@ -1468,48 +1460,26 @@ function openElement(config) {
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
   }
-  match = matchTab(config, false);
-  console.log(config)
   for (let i = 0; i < tabs.length; i++) {
-    if (match != tabs[i]) {
+    if (match.tabPage != tabs[i]) {
       tabs[i].style.visibility = 'hidden';
     }
   }
-  console.log(matchTab(config, true))
-  highlightTab(matchTab(config, true));
-  match.style.visibility = 'visible';
+  highlightTab(match.tab);
+  match.tabPage.style.visibility = 'visible';
 }
 //Responsible for matching a tab with its tab page
-function matchTab(info, type) {
-  let elements = [];
-  if (type) {
-    elements = document.getElementsByClassName('tablinks');
-  } else {
-    elements = document.getElementsByClassName('tabcontent');
-  }
-  for (let i = 0; i < elements.length; i++) {
-    if (type) {
-      if (elements[i].dataset.tabmap == info) {
-        return elements[i];
-      }
-    } else {
-      if (elements[i].dataset.tab == info) {
-        return elements[i];
-      }
+function matchPage(name) {
+  for (let pageObj of definedPages) {
+    console.log(pageObj)
+    console.log(name)
+    if (pageObj.srtConfig.name == name) {
+      return pageObj;
     }
   }
+  return null;
 }
 //Responsible for the closing of a tab and its tabpage by removing it from the html
-function removeCustFunc(event) {
-  let tabLink = event.target.parentNode;
-  console.log(tabLink.dataset.tabmap);
-  document.getElementById('mainPage').removeChild(matchTab(tabLink.dataset.tabmap, false));
-  document.getElementById('tabContainer').removeChild(tabLink);
-  if (window.innerWidth / window.innerHeight > 3 / 4) {
-    openElement("mainTab");
-  }
-
-}
 //Responsible for setting equation of defualt cust func
 function setShowEquat(tablink, equation) {
   if (equation != "") {
@@ -2050,7 +2020,7 @@ let facingBack = [
     "backElm": "",
     "prtCont": 'main',
     "mth": function () {
-      openElement("mainTab")
+      openElement("mainPage")
     },
   },
   {
@@ -2201,20 +2171,6 @@ function universalBack() {
       break;
     }
   }
-}
-//Responsible for state sessionStorage (deprecated in a few updates soon to be deleted)
-function setState() {
-  state.eT = document.getElementById('enterHeader').innerHTML;
-  let tabs = document.getElementsByClassName('tablinks');
-  for (let tab of tabs) {
-    let tabmap = tab.dataset.tabmap;
-    if (tabmap != "mainTab") {
-      console.log(tabmap);
-      let object = JSON.parse(tabmap);
-      state.fO.push(object.name)
-    }
-  }
-  sessionStorage.setItem("state", JSON.stringify(state));
 }
 //Responsible for giving out the list of purchasable items
 function getCatalog() {
@@ -2722,8 +2678,6 @@ class FuncPage {
 class TemplatePage extends FuncPage {
   constructor(config) {
     super(config)
-    console.log(this.def)
-    this.def.tab = newTabButton(config);
     let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true);
     this.clone = clon;
     let parent = clon.getElementById('customFuncTab');
@@ -2732,6 +2686,7 @@ class TemplatePage extends FuncPage {
     let name = config.name;
     let tabCopy = clon.getElementById('customFuncTab');
     this.def.tabPage = tabCopy;
+    this.def.tab = newTabButton(config, tabCopy);
     let varGrid = clon.getElementById("varGrid");
     let movable = clon.getElementById("selectorUnder");
     let updateElements = [
@@ -2832,7 +2787,7 @@ class TemplatePage extends FuncPage {
     for (let element of updateElements) {
       clon.getElementById(element).addEventListener("input", function (e) {
         try {
-        parseVariables(varGrid, parent);
+          parseVariables(varGrid, parent);
         } catch (e) {
           report("Couldn't Calculate", false);
         }
@@ -2842,7 +2797,7 @@ class TemplatePage extends FuncPage {
   }
 }
 class HybridPage extends TemplatePage {
-  
+
   constructor(config) {
     super(config)
     console.log(this.def)
@@ -2863,10 +2818,8 @@ class HybridPage extends TemplatePage {
     subElem.contentEditable = false;
 
     nameElem.addEventListener("input", function (e) {
-      let liveTab = e.target.parentNode;
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
-      let matchPage = fullConfig.tab;
       let oldParse = parseFunction(oldVal.code)
       oldParse.func = e.target.value;
       let newStringifyFunc = stringifyMethod(oldParse);
@@ -2885,10 +2838,8 @@ class HybridPage extends TemplatePage {
       closeEdit(tabCopy)
     });
     clon.getElementById('confirmEdit').addEventListener('click', function () {
-      let liveTab = tabCopy;
-      let oldVal = JSON.parse(liveTab.dataset.tab);
-      let newVal = JSON.parse(liveTab.dataset.tab);
-      let matchPage = matchTab(liveTab.dataset.tab, true);
+      let oldVal = fullConfig.srtConfig;
+      let newVal = JSON.parse(JSON.stringify(oldVal));
       let newFunc = tabCopy.querySelector('#custEdit').value
 
       let oldParse = parseFunction(newFunc)
@@ -2914,10 +2865,8 @@ class EquatPage extends TemplatePage {
     equationDIV.dataset.baseE = equation;
 
     clon.getElementById('nameFunc').addEventListener("input", function (e) {
-      let liveTab = e.target.parentNode;
-      let oldVal = JSON.parse(liveTab.dataset.tab);
-      let matchPage = fullConfig.tab;
-      let newVal = JSON.parse(liveTab.dataset.tab);
+      let oldVal = fullConfig.srtConfig;
+      let newVal = JSON.parse(JSON.stringify(oldVal));
       newVal.name = e.target.value;
 
       changeFunc(oldVal, newVal, fullConfig);
@@ -2928,14 +2877,12 @@ class EquatPage extends TemplatePage {
       setSelect(equationDIV, equationDIV.innerHTML.length);
     });
     equationDIV.addEventListener("input", function (e) {
-      let liveTab = e.target.parentNode.parentNode;
-      let oldVal = JSON.parse(liveTab.dataset.tab);
-      let matchPage = fullConfig.tab;
-      let newValue = JSON.parse(liveTab.dataset.tab);
+      let oldVal = fullConfig.srtConfig;
+      let newVal = JSON.parse(JSON.stringify(oldVal));
       checkVar("function", tabCopy, varInEquat(e.target.innerHTML));
-      newValue.equation = e.target.innerHTML;
+      newVal.equation = e.target.innerHTML;
       equationDIV.dataset.baseE = equationDIV.innerHTML;
-      changeFunc(oldVal, newValue, fullConfig);
+      changeFunc(oldVal, newVal, fullConfig);
     });
     document.getElementById("mainPage").appendChild(clon);
     checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML));
