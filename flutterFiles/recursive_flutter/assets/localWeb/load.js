@@ -663,104 +663,6 @@ function setImages(color) {
       }
     }
   }
-  /*let images = [
-    {
-      "type": "single",
-      "id": "settingsCogIcon",
-      "black": "Images/SettingsCog.svg",
-      "white": "Images/SettingsCogWhite.svg"
-    },
-    {
-      "type": "single",
-      "id": "backspcaeIcon",
-      "black": "Images/backIcon.svg",
-      "white": "Images/backIconWhite.svg"
-    },
-    {
-      "type": "single",
-      "id": "mobileTabIcon",
-      "black": "Images/mobileTabsIcon.svg",
-      "white": "Images/mobileTabsIconWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "removeFuncIcons",
-      "black": "Images/xIcon.svg",
-      "white": "Images/xIconWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "helpIcon",
-      "black": "Images/help.svg",
-      "white": "Images/helpWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "historyIcon",
-      "black": "Images/historyIcon.svg",
-      "white": "Images/historyIconWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "addIcon",
-      "black": "Images/addObject.svg",
-      "white": "Images/addObjectWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "minusIcon",
-      "black": "Images/minusIcon.svg",
-      "white": "Images/minusIconWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "arrows",
-      "black": "Images/MoreFuncArrow.svg",
-      "white": "Images/MoreFuncArrowWhite.svg"
-    },
-    {
-      "type": "single",
-      "id": "ColorsIcon",
-      "black": "Images/Colors.svg",
-      "white": "Images/ColorsWhite.svg"
-    },
-    {
-      "type": "single",
-      "id": "PreferencesIcon",
-      "black": "Images/Calipiers.svg",
-      "white": "Images/CalipiersWhite.svg"
-    },
-    {
-      "type": "single",
-      "id": "AboutIcon",
-      "black": "Images/aboutUS.svg",
-      "white": "Images/aboutUSWhite.svg"
-    },
-    {
-      "type": "mutiple",
-      "class": "backIcon",
-      "black": "Images/MoreFuncArrow.svg",
-      "white": "Images/MoreFuncArrowWhite.svg"
-    },
-  ];
-  for (let img of images) {
-    let source = "";
-    if (type) {
-      source = img.black;
-    } else {
-      source = img.white;
-    }
-    if (img.type == "mutiple") {
-      let elems = document.getElementsByClassName(img.class);
-      for (let elem of elems) {
-        elem.src = source;
-      }
-    } else {
-      if (document.getElementById(img.id) != undefined) {
-        document.getElementById(img.id).src = source;
-      }
-    }
-  }*/
 }
 //END
 /********************************************|Main Page Button Handling|*********************************************/
@@ -1299,7 +1201,7 @@ function custButton(funcConfig, target) {
         let funcName = elem.querySelector("#nameLabel").innerHTML;
         let funcParse = findFuncConfig(funcName);
         universalBack();
-        if (!tabOpen(funcName)) {
+        if (matchPage(funcName) == null) {
           createTab(funcParse)
         } else {
           openElement(funcName);
@@ -1617,18 +1519,6 @@ function removeFunc(funcName) {
 }
 //END
 /**********************************************|Custom Func backend|*************************************************/
-//Responsible for checking if a cust func page is open with a certain name (seeming a dupilicate method)
-function tabOpen(name) {
-  let tabs = document.getElementsByClassName('tablinks')
-
-  for (let i = 1; i < tabs.length; i++) {
-
-    if (name == JSON.parse(tabs[i].dataset.tabmap).name) {
-      return true;
-    }
-  }
-  return false;
-}
 //Responsible for creating an array of the variables in a variable container and the value it has
 function varListAssbely(element) {
   let variables = element.getElementsByClassName("variableContainer");
