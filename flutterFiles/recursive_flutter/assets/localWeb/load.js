@@ -1,4 +1,3 @@
-console.log(eval("(-2)+2"));
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let definedPages = [
@@ -1269,6 +1268,10 @@ function newTabButton(config, tabPage) {
   });
   tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
     let tabLink = e.target.parentNode;
+    definedPages = definedPages.filter(function (item) {
+      return !(item.srtConfig.name == config.name)
+    });
+    console.log(definedPages)
     document.getElementById('mainPage').removeChild(tabPage);
     document.getElementById('tabContainer').removeChild(tabLink);
     if (window.innerWidth / window.innerHeight > 3 / 4) {
@@ -1508,6 +1511,7 @@ function removeFunc(funcName) {
 /**********************************************|Custom Func backend|*************************************************/
 //Responsible for creating an array of the variables in a variable container and the value it has
 function varListAssbely(element) {
+  console.log(element)
   let variables = element.getElementsByClassName("variableContainer");
   let varData = [];
   for (i = 0; i < variables.length; i++) {
@@ -2569,6 +2573,7 @@ class TemplatePage extends FuncPage {
     this.def.tabPage = tabCopy;
     this.def.tab = newTabButton(config, tabCopy);
     let varGrid = clon.getElementById("varGrid");
+    console.log(varGrid)
     let movable = clon.getElementById("selectorUnder");
     let updateElements = [
       "stepTable",
@@ -2766,7 +2771,7 @@ class EquatPage extends TemplatePage {
     document.getElementById("mainPage").appendChild(clon);
     checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML), fullConfig);
     //try {
-    parseVariables(varGrid, fullConfig);
+    parseVariables(tabCopy.querySelector('#varGrid'), fullConfig);
     /*} catch (e) {
       report("Couldn't Calculate", false);
     }*/
