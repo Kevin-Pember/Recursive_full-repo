@@ -1,3 +1,4 @@
+console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
@@ -190,7 +191,10 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
-  document.getElementById('arrowIcon').addEventListener("click", function () { popup(); preventFocus(); sessionStorage.setItem("facing", "mainPopup") });
+  document.getElementById('arrowIcon').addEventListener("click", function () { 
+    popup(); 
+    preventFocus();
+  });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
   document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
@@ -284,13 +288,10 @@ if (document.getElementById("mainBody") != null) {
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, document.getElementById('enterHeader').innerHTML);
-    document.getElementById('nameEntry').style.visibility = "hidden";
+    universalBack();
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
-    console.log("things");
-    document.getElementById('nameEntry').style.visibility = "hidden";
-    document.getElementById('nameEntry').style.animation = null;
-    document.getElementById('nameEntryArea').value = "";
+    universalBack();
   });
 
   document.getElementById('exitConfirmPage').addEventListener("click", function () {
@@ -577,11 +578,13 @@ function popup() {
   if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
     document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
     document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideDown";
+    sessionStorage.setItem("facing", "");
     setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
   } else {
     document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toUp";
     document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideUp";
+    sessionStorage.setItem("facing", "mainPopup");
     setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
   }
@@ -642,7 +645,6 @@ function setImages(color) {
     } else {
       image = image.substring(image.indexOf('Images/') + 7, image.indexOf('.svg'));
     }
-    console.log(image)
     for (let item of imgList) {
       if (image == item.name) {
         if (type) {
@@ -1468,7 +1470,7 @@ function changeImplemented(oldConfig, newObject) {
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {
   if (funcConfig.type == "Function") {
-    createNewFunction("function", funcConfig.name, solveInpr(funcConfig.equation, settings.degRad));
+    createNewFunction("function", funcConfig.name, funcConfig.equation);
   } else if (funcConfig.type == "Hybrid") {
     createNewFunction("method", funcConfig.code)
   }
@@ -1933,7 +1935,7 @@ let facingBack = [
   },
   {
     "elm": "createNaming",
-    "backElm": "",
+    "backElm": "mainPopup",
     "prtCont": 'main',
     "mth": function () {
       document.getElementById('nameEntry').style.visibility = "hidden";
@@ -2015,7 +2017,7 @@ let facingBack = [
   },
   {
     "elm": "creatorPage",
-    "backElm": '',
+    "backElm": 'mainPopup',
     "prtCont": 'main',
     "mth": function () {
       closePage('custCreatorPage');
@@ -2356,6 +2358,8 @@ function isVar(entry) {
 //Responsible for parsing a variable to its value in an equation 
 function setVar(element, equation) {
   let varData = varListAssbely(element);
+  console.log(`%c seVar ran`, "color: red;");
+  console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
       if (funcMatch(equation.substring(i)) != "") {
@@ -2506,51 +2510,7 @@ function custFuncExisting(name, duplicates) {
   }
   return exist;
 }
-/*function createParseable(equation){
-  let equationArray = [];
-  let variablesInOrder = [];
-  let varArray = varInEquat(equation);
-  for(let i = 0; i < varArray.length; i++){
-    varArray[i].letter = "v" + (i+1);
-  }
-  console.log(varArray);
-  variablesInOrder.push({"name": varArray[0].letter, "index": varArray[0].positions[0]});
-  varArray.shift();
-  for(item of varArray){
-    for(let postion of item.positions){
-      for(let j = variablesInOrder.length-1; j >= 0; j--){
-        console.log(`${postion} vs. ${variablesInOrder[j].index} and ${postion > variablesInOrder[j].index}`)
-        if(postion > variablesInOrder[j].index){
-          variablesInOrder.splice(j+1, 0, {"name": item.letter, "index": postion});
-          break;
-        }
-      }
-    }
-  }
-  console.log(variablesInOrder)
-  for(let i = 0; i < variablesInOrder.length; i++){
-    let index = variablesInOrder[i].index;
-    let pre = "";
-    let vard = "";
-    if(i == 0){
-      pre = equation.substring(0,index);
-      vard = variablesInOrder[i].name;
-    }else{
-      let prevIndex = variablesInOrder[i-1].index;
-      pre = equation.substring(prevIndex+1, index);
-      vard = variablesInOrder[i].name;
-    }
-    if(pre != ""){
-      equationArray.push(pre);
-    }
-    equationArray.push(vard);
-    if(i == variablesInOrder.length-1 && equation.substring(index+1) != ''){
-      equationArray.push(equation.substring(index+1));
-    }
-  }
-  return equationArray;
-}*/
-//END
+
 
 class FuncPage {
   constructor(config) {
