@@ -1,5 +1,6 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
+let colorArray = [];
 let definedPages = [
   {
     "srtConfig": {
@@ -114,10 +115,7 @@ if (localStorage.getItem("settings") != undefined) {
 let themeElem = {};
 setSettings();
 if (document.getElementById("mainBody") != null) {
-  console.log(createParseable("8+v+9*9"))
-
   var funcs = getFuncList();
-  console.log(funcs)
   for (let funcObject of funcs) {
     console.log(funcObject);
     addImplemented(funcObject);
@@ -1575,7 +1573,7 @@ function parseVariables(element, def) {
     solveGraph(method, def);
     solveTable(method, clon);
   } else if (first != undefined) {
-    solveGraph(method,def);
+    solveGraph(method, def);
     solveTable(method, clon);
   }
 }
@@ -1588,7 +1586,7 @@ function solveEquation(method, clon) {
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
   console.log(def.chart.data.datasets[0].data)
-  let result = calculatePoints(parsedEquation, settings.gDMin,settings.gDMax, settings.gDS);
+  let result = calculatePoints(parsedEquation, settings.gDMin, settings.gDMax, settings.gDS);
   console.log(result)
   def.chart.data.datasets[0].data = result;
   console.log(def.chart.data.datasets[0])
@@ -1614,9 +1612,9 @@ function solveTable(parsedEquation, clon) {
     newYCell.id = "other shit"
   }
 }
-function calculatePoints(parsedEquation, start, end, step){
+function calculatePoints(parsedEquation, start, end, step) {
   let pointArray = [];
-  for(let i = start; i <= end; i += step){
+  for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
     console.log(parsedEquation.replace('Æ', i));
@@ -2155,7 +2153,7 @@ function getColorAcc(acc) {
 //Responsible for setting the root values of a page which controll all color styling
 function setSettings() {
   let themes = getThemes();
-  let colorArray = [];
+
   for (let theme of themes) {
     if (theme.name == settings.theme) {
       colorArray = theme.getMth();
@@ -2600,35 +2598,49 @@ class TemplatePage extends FuncPage {
       data: {
         datasets: [{
           data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
-          label: 'x',
+          label: "hidden",
           fontColor: '#FFFFFF',
-          borderColor: "#FFFFFF",
-          backgroundColor: "#FFFFFF",
+          borderColor: colorArray[1],
+          backgroundColor: colorArray[1],
           showLine: true,
         }]
       },
       options: {
         scales: {
-          myScale: {
-            type: 'linear',
-            position: 'middle', // `axis` is determined by the position as `'y'`
-          }
+          x: {
+            grid: {
+              drawBorder: false,
+              color: colorArray[0],
+            },
+            ticks: {
+              color: colorArray[0],
+            }
+          },
+          y: {
+            grid: {
+              drawBorder: false,
+              color: colorArray[0],
+            },
+            ticks: {
+              color: colorArray[0],
+            }
+          },
         },
         responsive: true,
         maintainAspectRatio: false,
         elements: {
+          point: {
+            radius: 0
+          }
         },
         plugins: {
           legend: {
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-            }
+            display: false
           },
           zoom: {
             limits: {
-              x: { min: -200, max: 200, minRange: 50 },
-              y: { min: -200, max: 200, minRange: 50 }
+              //x: { min: -200, max: 200, minRange: 50 },
+              //y: { min: -200, max: 200, minRange: 50 }
             },
             pan: {
               enabled: true,
@@ -2743,7 +2755,7 @@ class EquatPage extends TemplatePage {
     let tabCopy = fullConfig.tabPage;
     let equation = config.equation;
     let equationDIV = clon.getElementById("EquationFunc");
-    
+
 
     equationDIV.innerHTML = equation;
     equationDIV.dataset.baseE = equation;
