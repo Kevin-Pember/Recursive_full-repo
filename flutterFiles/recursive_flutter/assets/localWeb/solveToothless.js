@@ -134,7 +134,9 @@ let secondList = [
 ];
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
+  console.log(equation)
   console.log('Inpr ran');
+  defaultAngle = degRad;
   for (let i = 0; i < equation.length; i++) {
     if (funcMatch(equation.substring(i)) != "") {
       let func = getByName(funcMatch(equation.substring(i)));
@@ -208,10 +210,16 @@ function findMethod(funcUn, degRad) {
 }
 //A method to parse a function array into a string so it can be add to the equation string
 function assembly(func, parsedFunc, values) {
+  console.log(`equation ${parsedFunc}`)
+  console.log(`values ${values}`)
   inputs = func.inputs;
   for (let i = 1; i <= inputs; i++) {
-    let index = parsedFunc.indexOf("v" + i);
-    parsedFunc[index] = values[i - 1];
+    let numVar = "v" + i;
+    let vararray = parsedFunc.filter(elem => elem == numVar);
+    for(let vare of vararray){
+      let index = parsedFunc.indexOf(numVar);
+      parsedFunc[index] = values[i - 1];
+    }
   }
   let parsedString = parsedFunc.join("");
   return parsedString;
@@ -232,6 +240,7 @@ function recrSolve(equation, func, degRad) {
         break;
       }
     }
+    values = values.filter(e => e != "");
     return values
   }
 }
@@ -662,7 +671,7 @@ function parseFuncEntry() {
     returnedObject.func = name;
     returnedObject.funcParse = parseable;
     returnedObject.inputs = cacInputs(parseable);
-    returnedObject.funcRadDeg = containsTrig(func);
+    returnedObject.funcRadDeg = false;
     returnedObject.funcLength = name.length;
   } else if (arguments[0] == "method") {
     let funcString = arguments[1];
