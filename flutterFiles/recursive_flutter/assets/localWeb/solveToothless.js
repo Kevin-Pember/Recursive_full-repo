@@ -146,7 +146,6 @@ let secondList = [
 ];
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
-  console.log('Inpr ran');
   defaultAngle = degRad;
   for (let i = 0; i < equation.length; i++) {
     let func = funcMatch(equation.substring(i));
@@ -160,7 +159,6 @@ function solveInpr(equation, degRad) {
     }
   }
   equation = builtInFunc(equation);
-  console.log(`Equation: ${equation}`);
   return equation;
 }
 //Func method to find if the current postion has a function defined in the funclist
@@ -201,7 +199,6 @@ function ignoreTest(equation){
 function findMethod(funcUn, degRad) {
   let func = JSON.parse(JSON.stringify(funcUn));
   let array = func.funcParse;
-  console.log(`%cfunc Parse ${array}`, "color: blue")
   if (func.funcRadDeg) {
     if (degRad) {
       if (array.includes("toDeg")) {
@@ -221,8 +218,6 @@ function findMethod(funcUn, degRad) {
 }
 //A method to parse a function array into a string so it can be add to the equation string
 function assembly(func, parsedFunc, values) {
-  console.log(`equation ${parsedFunc}`)
-  console.log(`values ${values}`)
   inputs = func.inputs;
   for (let i = 1; i <= inputs; i++) {
     let numVar = "v" + i;
@@ -332,7 +327,6 @@ function supEncap(sub) {
       break;
     }
   }
-  console.log("Sub is " + sub);
   return sub;
 }
 //A deprecated Method to find the postion of a function in the equation string
@@ -509,7 +503,6 @@ function forward(sub) {
       break;
     }
   }
-  console.log("Outputsub is " + outputSub);
   return outputSub;
 }
 //A method that returns an array of the names of the funcs that are in the Funclist
@@ -536,7 +529,6 @@ function createParseable(equation) {
   }
   let equationArray = [equation];
   let variables = varInEquat(equation);
-  console.log(variables)
   let variableIndexes = [];
   for (let i = 0; i < variables.length; i++) {
     variables[i].numVar = 'v' + (i + 1);
@@ -627,11 +619,9 @@ function stringFunction(object) {
     string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
   }
   string = `var ${name} = function (array)${string} \n return ${name};`;
-  console.log(string)
   return Function(string);
 }
 function parseFunction(StringFunction) {
-  console.log(StringFunction)
   StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   StringFunction = StringFunction.substring(StringFunction.indexOf("("))
@@ -647,7 +637,6 @@ function parseFunction(StringFunction) {
     }
   }
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
-  console.log(`%c ${variables[0]}`, "color: green;")
   let finalObject = {
     "func": name,
     "type": "method",
@@ -682,7 +671,6 @@ function createNewFunction() {
     funcObject.mth = stringFunction(funcObject)();
     funcList.push(funcObject);*/
   }
-  console.log(object)
   funcList.push(object);
 }
 function parseFuncEntry() {
@@ -691,7 +679,6 @@ function parseFuncEntry() {
     let name = arguments[1];
     let func = arguments[2];
     let parseable = createParseable(func, defaultAngle);
-    console.log(parseable)
     returnedObject.type = arguments[0];
     returnedObject.func = name;
     returnedObject.funcParse = parseable;
@@ -703,7 +690,6 @@ function parseFuncEntry() {
     returnedObject = parseFunction(funcString);
     returnedObject.mth = stringFunction(returnedObject)();
   }
-  console.log(returnedObject)
   return returnedObject;
 }
 function removeFunction(name) {

@@ -1588,7 +1588,10 @@ function solveEquation(method, clon) {
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
   console.log(def.chart.data.datasets[0].data)
-  let result = calculatePoints(parsedEquation, settings.gDMin, settings.gDMax, settings.gDS);
+  let bottom = def.tabPage.querySelector('#minDomainGraph').value;
+  let top = def.tabPage.querySelector('#maxDomainGraph').value;
+  let step = def.tabPage.querySelector('#stepDomainGraph').value;
+  let result = calculatePoints(parsedEquation, Number(bottom), Number(top), Number(step));
   console.log(result)
   def.chart.data.datasets[0].data = result;
   console.log(def.chart.data.datasets[0])
@@ -1619,8 +1622,11 @@ function calculatePoints(parsedEquation, start, end, step) {
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
+    if(i < 0.00000001 && i > -0.00000001){
+      newPoint.x = Math.round(i);
+    }
     console.log(parsedEquation.replace('Æ', i));
-    newPoint.y = inputSolver(parsedEquation.replace('Æ', i), "Error Making Graph");
+    newPoint.y = inputSolver(parsedEquation.replace('Æ', newPoint.x), "Error Making Graph");
     pointArray.push(newPoint);
   }
   return pointArray;
@@ -2202,10 +2208,10 @@ function report(message, meaning) {
 /*errorStatement is what appears in the popup console */
 function inputSolver(equation, errorStatement) {
   equation = solveInpr(equation, settings.degRad)
-  console.log(`%c ${equation}`, "color: #f74646");
   try {
     return eval(equation);
   } catch (e) {
+    console.log(e)
     report(errorStatement, false);
   }
 }
@@ -2597,7 +2603,7 @@ class TemplatePage extends FuncPage {
         maintainAspectRatio: false,
         elements: {
           point: {
-            radius: 0
+            //radius: 0
           }
         },
         plugins: {
