@@ -2310,9 +2310,11 @@ function pullUpElements(elements) {
 }
 //Responsible for finding where variables are in a given equation
 function varInEquat(equation) {
+  console.log(`Equation is ${equation}`)
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
-    if (equation.charCodeAt(i) > 92 && equation.charCodeAt(i) < 123) {
+    if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
+      console.log(equation.charAt(i))
       if (isVar(equation.substring(i)) === 0) {
         if (varInList(varArray, equation.substring(i, i + 1)) == null) {
           varArray.push(
@@ -2326,7 +2328,8 @@ function varInEquat(equation) {
           func.positions.push(i);
         }
       } else {
-        i += isVar(equation.substring(i));
+        console.log(isVar(equation.substring(i)))
+        i += isVar(equation.substring(i)) - 1;
       }
     }
   }
@@ -2344,13 +2347,17 @@ function varInList(list, varLetter) {
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
   let func = funcMatch(entry);
+  let ignore = ignoreTest(entry);
+  console.log(ignore)
   if (func != "") {
     if (getByName(func) != null) {
       let object = getByName(func);
       return object.funcLength;
     } else {
-      return func.length
+      return func.func.length
     }
+  }else if(ignore != undefined){
+    return ignore
   } else {
     return 0;
   }

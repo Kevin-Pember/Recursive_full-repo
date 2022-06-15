@@ -129,28 +129,32 @@ let funcList = [
     "funcLength": 3,
   }
 ];
+let ignoreList = [
+  "Math.sin",
+  "Math.cos",
+  "Math.tan",
+  "Math.log",
+  "Math.log10",
+  "Math.abs",
+  "Math.sqrt",
+  "Math.pow",
+  "Math.PI"
+
+];
 let secondList = [
   "sup>",
 ];
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
-  console.log(equation)
   console.log('Inpr ran');
   defaultAngle = degRad;
   for (let i = 0; i < equation.length; i++) {
-    if (funcMatch(equation.substring(i)) != "") {
-      let func = getByName(funcMatch(equation.substring(i)));
+    let func = funcMatch(equation.substring(i));
+    if (func != "") {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
       );
-      let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
-      let parsedFunc = "";
-      if (func.type == "function") {
-        let funcTemp = findMethod(func, degRad);
-        parsedFunc = assembly(func, funcTemp, values);
-      } else if (func.type == "method") {
-        parsedFunc = func.mth(values)
-      }
+      let parsedFunc = solveFunc(equation, i)
       equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
       i = i + parsedFunc.length - 1;
     }
@@ -174,8 +178,7 @@ function funcMatch(equation) {
   for (let func of funcList) {
     let check = equation.substring(0, (func.funcLength));
     if (check == func.func) {
-      console.log(`%c func matched ${func.func}`, "color: yellow;")
-      returned = func.func;
+      returned = func;
     }
   }
   for (let func of secondList) {
@@ -185,6 +188,14 @@ function funcMatch(equation) {
     }
   }
   return returned;
+}
+function ignoreTest(equation){
+  const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
+  if(ignore != undefined){
+    return ignore.length;
+  }else{
+    return undefined;
+  }
 }
 //A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
 function findMethod(funcUn, degRad) {
@@ -216,7 +227,7 @@ function assembly(func, parsedFunc, values) {
   for (let i = 1; i <= inputs; i++) {
     let numVar = "v" + i;
     let vararray = parsedFunc.filter(elem => elem == numVar);
-    for(let vare of vararray){
+    for (let vare of vararray) {
       let index = parsedFunc.indexOf(numVar);
       parsedFunc[index] = values[i - 1];
     }
@@ -225,18 +236,18 @@ function assembly(func, parsedFunc, values) {
   return parsedString;
 }
 //A method which takes the inputs value from a func object in the funclist and gets how many inputs that function has and parses each
-function recrSolve(equation, func, degRad) {
+function recrSolve(equation, func) {
   let inputs = func.inputs;
   if (inputs == 1) {
-    return [equatInner(equation, degRad)];
+    return [equation];
   } else {
     let values = [];
     for (let i = 1; i <= inputs; i++) {
       if (i != inputs) {
-        values.push(equatInner(equation.substring(0, equation.indexOf(",")), degRad));
+        values.push(equation.substring(0, equation.indexOf(",")));
         equation = equation.substring(equation.indexOf(",") + 1);
       } else {
-        values.push(equatInner(equation, degRad));
+        values.push(equation);
         break;
       }
     }
@@ -249,6 +260,23 @@ function equatInner(equation, degRad) {
   equation = solveInpr(equation, degRad);
   //eval(equation)
   return equation;
+}
+function solveFunc(equation, index) {
+  let degRad = defaultAngle;
+  let i = index;
+  let func = funcMatch(equation.substring(i));
+  let innerRAW = parEncap(
+    equation.substring(i + func.funcLength)
+  );
+  let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func);
+  let parsedFunc = "";
+  if (func.type == "function") {
+    let funcTemp = findMethod(func, degRad);
+    parsedFunc = assembly(func, funcTemp, values);
+  } else if (func.type == "method") {
+    parsedFunc = func.mth(values)
+  }
+  return parsedFunc;
 }
 //A meothod for creating the end of a parenthesis
 function parComplete(input) {
@@ -492,24 +520,20 @@ function getNameList() {
   }
   return nameList;
 }
-/*function findSign(sub) {
-  let type = false;
-  if (sub.charAt(0) == "(") {
-    type = true;
-    sub = sub.substring(1);
-  }
-
-  for (let i = 1; i < sub.length; i++) {
-    if (sub.charAt(i) == "|" && sub.charAt(i + 1) != ")" && !type) {
-
-    } else if (sub.charAt(i) == "|" && sub.charAt(i + 1) == ")" && type) {
-
-    }
-  }
-}*/
 //Takes string and returns an array for funclist
 function createParseable(equation) {
-  console.log(equation)
+  
+  for (let i = equation.length - 1; i >= 0; i--) {
+    let func = funcMatch(equation.substring(i));
+    if (func != "") {
+      let innerRAW = parEncap(
+        equation.substring(i + func.funcLength)
+      );
+      let parsedFunc = solveFunc(equation, i)
+      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+      i = i - parsedFunc.length + 1;
+    }
+  }
   let equationArray = [equation];
   let variables = varInEquat(equation);
   console.log(variables)
@@ -519,8 +543,9 @@ function createParseable(equation) {
   }
   for (let data of variables) {
     for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i)) != "") {
-        i += funcMatch(equation.substring(i)).length;
+      let ignore = ignoreTest(equation.substring(i));
+      if (ignore != undefined) {
+        i += ignore-1;
       } else if (equation.charAt(i) == data.letter) {
         variableIndexes.push(i);
       }
@@ -529,14 +554,14 @@ function createParseable(equation) {
   variableIndexes.sort(function (a, b) {
     return b - a;
   });
-  for(let index of variableIndexes){
+  for (let index of variableIndexes) {
     let temp = equationArray[0].charAt(index);
     let match = variables.find(e => e.letter == temp);
     let newarry = [];
     newarry.push(equationArray[0].substring(0, index));
     newarry.push(match.numVar);
     newarry.push(equationArray[0].substring(index + 1));
-    equationArray.splice(0,1, ...newarry);
+    equationArray.splice(0, 1, ...newarry);
   }
   equationArray = equationArray.filter(val => val != "" && val != "‎");
   return equationArray;
