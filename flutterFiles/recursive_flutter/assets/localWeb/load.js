@@ -1588,9 +1588,10 @@ function solveEquation(method, clon) {
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
   console.log(def.chart.data.datasets[0].data)
-  let bottom = def.tabPage.querySelector('#minDomainGraph').value;
-  let top = def.tabPage.querySelector('#maxDomainGraph').value;
-  let step = def.tabPage.querySelector('#stepDomainGraph').value;
+  let mutplier = 1/def.chart.getZoomLevel()
+  let bottom = Number(def.tabPage.querySelector('#minDomainGraph').value) * mutplier;
+  let top =  Number(def.tabPage.querySelector('#maxDomainGraph').value) * mutplier;
+  let step = Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
   let result = calculatePoints(parsedEquation, Number(bottom), Number(top), Number(step));
   console.log(result)
   def.chart.data.datasets[0].data = result;
@@ -2635,6 +2636,7 @@ class TemplatePage extends FuncPage {
         }
       }
     })
+    console.log(this.def.chart.getState().panDelta.valueOf())
     clon.getElementById('functionMode').addEventListener("click", function () {
       funcTabs[0].style.visibility = "inherit";
       hidModes(parseInt(movable.dataset.pos), funcTabs);
@@ -2753,6 +2755,10 @@ class EquatPage extends TemplatePage {
       equationDIV.dataset.baseE = equationDIV.innerHTML;
       changeFunc(oldVal, newVal, fullConfig);
     });
+    fullConfig.chart.options.plugins.zoom.zoom.onZoomComplete = function(){
+      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+      console.log("shit")
+    }
     document.getElementById("mainPage").appendChild(clon);
     checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML), fullConfig);
     //try {

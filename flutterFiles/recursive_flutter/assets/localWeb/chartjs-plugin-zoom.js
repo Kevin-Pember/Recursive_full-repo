@@ -916,6 +916,7 @@ var Zoom = {
     chart.getZoomLevel = () => getZoomLevel(chart);
     chart.getInitialScaleBounds = () => getInitialScaleBounds(chart);
     chart.isZoomedOrPanned = () => isZoomedOrPanned(chart);
+    chart.getState = () => getState(chart);
   },
 
   beforeEvent(chart) {
