@@ -1589,8 +1589,9 @@ function solveEquation(method, clon) {
 function solveGraph(parsedEquation, def) {
   console.log(def.chart.data.datasets[0].data)
   let mutplier = 1/def.chart.getZoomLevel()
-  let bottom = Number(def.tabPage.querySelector('#minDomainGraph').value) * mutplier;
-  let top =  Number(def.tabPage.querySelector('#maxDomainGraph').value) * mutplier;
+  let scales = def.chart.getScales()
+  let bottom = Number(scales.x.min) * mutplier;
+  let top =  Number(scales.x.max) * mutplier;
   let step = Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
   let result = calculatePoints(parsedEquation, Number(bottom), Number(top), Number(step));
   console.log(result)
@@ -2636,7 +2637,8 @@ class TemplatePage extends FuncPage {
         }
       }
     })
-    console.log(this.def.chart.getState().panDelta.valueOf())
+    //console.log(this.def.chart.getState().panDelta.valueOf())
+    this.def.chart.setScales({'x':{'min': -10, 'max': 10},'y':{'min': -10, 'max': 10}})
     clon.getElementById('functionMode').addEventListener("click", function () {
       funcTabs[0].style.visibility = "inherit";
       hidModes(parseInt(movable.dataset.pos), funcTabs);
@@ -2756,6 +2758,10 @@ class EquatPage extends TemplatePage {
       changeFunc(oldVal, newVal, fullConfig);
     });
     fullConfig.chart.options.plugins.zoom.zoom.onZoomComplete = function(){
+      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+      console.log("shit")
+    }
+    fullConfig.chart.options.plugins.zoom.pan.onPanComplete = function(){
       parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
       console.log("shit")
     }
