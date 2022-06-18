@@ -101,6 +101,21 @@ let imgList = [
     'name': 'xIcon',
     'white': 'Images/xIconWhite.svg',
     'black': 'Images/xIcon.svg'
+  },
+  {
+    'name': 'graphMode',
+    'white': 'Images/graphModeWhite.svg',
+    'black': 'Images/graphMode.svg'
+  },
+  {
+    'name': 'mainMode',
+    'white': 'Images/mainModeWhite.svg',
+    'black': 'Images/mainMode.svg'
+  },
+  {
+    'name': 'tableMode',
+    'white': 'Images/tableModeWhite.svg',
+    'black': 'Images/graphMode.svg'
   }
 ];
 var settings;
@@ -170,6 +185,18 @@ if (document.getElementById("mainBody") != null) {
     }
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
+  document.getElementById('modeButton').addEventListener("click", () => {
+    switchMode('selectorMode')
+  });
+  document.getElementById('mainModeSelector').addEventListener("click", () => {
+    switchMode('mainMode')
+  })
+  document.getElementById('graphModeSelector').addEventListener("click", () => {
+    switchMode('graphMainMode')
+  })
+  document.getElementById('tableModeSelector').addEventListener("click", () => {
+    switchMode('tableMainMode')
+  })
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -1005,7 +1032,25 @@ function navigateButtons(direction) {
     }
   }
 }
-
+function switchMode(modeId){
+  let modes = document.getElementsByClassName('mode')
+  let hidingElems = [];
+  let showingElems = [document.getElementById(modeId)];
+  let modeButton = document.getElementById('modeButton');
+  for(let mode of modes){
+    console.log(mode)
+    if(mode.style.visibility != 'hidden'){
+      hidingElems.push(mode)
+    }
+  }
+  if(modeId == "selectorMode"){
+    hidingElems.push(modeButton)
+  }else{
+    showingElems.push(modeButton)
+  }
+  hideElements(hidingElems);
+  pullUpElements(showingElems)
+}
 //END
 /*******************************************|Main Page Custom Func Editing|*******************************************/
 //Responsible for the naming page for when a new func is typed in the enter header but needs a name

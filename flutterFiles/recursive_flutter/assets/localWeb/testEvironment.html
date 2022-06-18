@@ -9,7 +9,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <body>
     <div id="graphTab" class="tabcontent" data-tab="graphTab">
-        
+        <div id="graphContain">
+            <canvas></canvas>
+        </div>
+        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
+        <div id="graphControls">
+            <div id="graphFuncGrid">
+                <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                <template>
+                    <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                </template>
+                <button id="addGraphEquation">+</button>
+            </div>
+            <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
+        </div>
     </div>
 </body>
 </html>

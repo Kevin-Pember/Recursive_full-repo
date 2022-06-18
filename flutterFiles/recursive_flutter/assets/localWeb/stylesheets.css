@@ -28,8 +28,27 @@
   background-color: var(--displayColor);
 }
 .mode{
-  width: 100%;
+  width: calc(100% + 1px);
   height: 100%;
+  left: 0px;
+  border-radius: 25px 25px 0 0;
+  position: absolute;
+}
+.modeSelectButton{
+  width: calc(100% - 20px);
+  height: 200px;
+  border-radius: 25px;
+  border: none;
+  margin-left: 10px;
+  margin-top: 20px;
+  
+  background-color: var(--functionsColor);
+}
+.modeIcon{
+  height: calc(100% - 50px);
+  background-color: var(--numbersColor);
+  border-radius: 500px;
+  left: 0px;
 }
 /*********************************Injected css from mode***********************************/
 #graphTab{
@@ -87,6 +106,9 @@ bottom: 0px;
 position: absolute;
 }
 /*end*/
+#selectorMode{
+  background-color: var(--displayColor);
+}
 textarea {
   border: none;
   overflow: auto;

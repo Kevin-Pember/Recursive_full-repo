@@ -105,8 +105,9 @@
             <img id="settingsCogIcon" src="Images/SettingsCog.svg" height="100%" name="Open Settings">
         </div>
         <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
-            <div id="mainMode" class="mode">
-                <button id="modeButton">Mode</button>
+            <button id="modeButton">Mode</button>
+            <div id="mainMode" class="mode" style="visibility: hidden;">
+                
                 <div id="displayClip">
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                         autocorrect="off">
@@ -313,7 +314,7 @@
                     </div>
                 </div>
             </div>
-            <div id="graphMode" class="mode" style="visibility: hidden;">
+            <div id="graphMainMode" class="mode" style="visibility: hidden;">
                 <div id="graphContain">
                     <canvas></canvas>
                 </div>
@@ -328,6 +329,36 @@
                     </div>
                     <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
+            </div>
+            <div id="tableMainMode" class="mode" style="visibility: hidden;">
+                <div id="graphContain">
+                    <canvas></canvas>
+                </div>
+                <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
+                <div id="graphControls">
+                    <div id="graphFuncGrid">
+                        <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                        <template>
+                            <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                        </template>
+                        <button id="addGraphEquation">+</button>
+                    </div>
+                    <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
+                </div>
+            </div>
+            <div id="selectorMode" class="mode" style="visibility: visible;">
+                <button class="modeSelectButton" id="mainModeSelector">
+                    <img src="Images/mainMode.svg" class="modeIcon">
+                    <h1>Scientific</h1>
+                </button>
+                <button class="modeSelectButton" id="graphModeSelector">
+                    <img src="Images/graphMode.svg" class="modeIcon">
+                    <h1>Graphing</h1>
+                </button>
+                <button class="modeSelectButton" id="tableModeSelector">
+                    <img src="Images/tableMode.svg" class="modeIcon">
+                    <h1>Table</h1>
+                </button>
             </div>
         </div>
         <template class="custFuncTabTemp">
