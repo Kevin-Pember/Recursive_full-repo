@@ -54,19 +54,25 @@
 #graphTab{
   background-color: var(--functionsColor);
 }
-#graphContain{
+.dynamicContent{
 position: absolute;
 width: 100%;
 height: 60%;
 top: 0;
 left: 0;
 }
+#graphContain{
+  width: calc(100% - 20px);
+  margin-left: 10px;
+  height: calc(60% - 20px);
+  margin-top: 10px;
+}
 #fullGraph{
 position: absolute;
 top: calc(60% - 50px);
 right: 0;
 }
-#graphControls{
+.dynamicModeControls{
 width: 100%;
 height: 40%;
 top: 60%;
@@ -83,7 +89,7 @@ margin-top: 10px;
 display: grid;
 grid-auto-rows: 80px;
 }
-.graphEquation{
+.dynamicEquation{
 width: 100%;
 height: calc(100% - 10px);
 border-radius: 15px;
@@ -91,7 +97,7 @@ border: none;
 font-size: 60px;
 background-color: var(--numbersColor);
 }
-#addGraphEquation{
+.addDynamicEquation{
 width: 60px;
 height: 60px;
 margin-left: calc(50% - 30px);
@@ -399,15 +405,13 @@ button:focus, input[type="button"]:focus {
   }
   .mainCacGrid {
     width: 100%;
-    top: 33.3333%;
-    height: 66.6666%;
+    height: 100%;
     display: grid;
     grid-gap: 0px 0px;
     margin:0px;
     grid-template-columns: 25% 25% 25% 25%;
     grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
     background-color: #00000000;
-    position: absolute;
     grid-template-areas: 
       "num1 num2 num3 moreFuncBut"
       "num4 num5 num6 backspace"
@@ -485,13 +489,13 @@ button:focus, input[type="button"]:focus {
     box-shadow: none;
   }
   #extraFuncPopUp{
-    height: 66.6666%;
+    height: 100%;
     width: 100%;
     top: 100%;
     display: block;
     position:absolute;
     z-index: 1;
-    visibility:visible;
+    visibility:inherit;
   }
   #custFuncGridPopup{
     position: absolute;
@@ -807,6 +811,7 @@ button:focus, input[type="button"]:focus {
   #arrowIcon{
     transform:rotate(270deg);
     animation: "0.25s linear 0s 1 normal forwards running toDown";
+    visibility: inherit;
     top: inherit;
     right: 0;
     font-size: 15px;
@@ -1143,12 +1148,12 @@ button:focus, input[type="button"]:focus {
       top: 100%;
     }
     100% {
-      top: 33.3333%;
+      top: 0%;
     }
   }
   @keyframes toSlideDown{
     0%{
-      top: 33.3333%;
+      top: 0%;
     }
     100% {
       top: 100%;
@@ -1226,7 +1231,18 @@ button:focus, input[type="button"]:focus {
       border-radius: 20px 20px 0 0;
       width: 100%;
     }
+    .specialInput{
+      overflow: hidden;
+    }
+    #keypad{
+      width: 100%;
+      z-index: 2;
+      top: calc(33.3333% + 30px);
+      height: calc(66.6666% - 30px);
+      position: absolute;
+    }
     .mainCacGrid{
+      height: 100%;
       width: 100%;
       grid-template-areas: 
       "num1 num2 num3 moreFuncBut"
@@ -1280,7 +1296,7 @@ button:focus, input[type="button"]:focus {
     max-width: 100%;
     border-radius: 0 25px 25px 0;
   }
-  .mainCacGrid {
+  #keypad {
     width: 66.6666%;
     bottom: 0;
     padding: 0px;
@@ -1368,7 +1384,7 @@ button:focus, input[type="button"]:focus {
   #overlayDiv{
     bottom: 55%;
   }
-  .mainCacGrid {
+  #keypad {
     width: 66.6666%;
     left: 33.3333%;
     height: 55%;
@@ -1485,7 +1501,7 @@ button:focus, input[type="button"]:focus {
     resize:none;
     border-radius: 0 25px 25px 0;
   }
-  .mainCacGrid {
+  #keypad {
     width: 40%;
     bottom: 0;
     padding: 0px;

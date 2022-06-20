@@ -115,9 +115,10 @@ let imgList = [
   {
     'name': 'tableMode',
     'white': 'Images/tableModeWhite.svg',
-    'black': 'Images/graphMode.svg'
+    'black': 'Images/tableMode.svg'
   }
 ];
+let keyTargets = {"scroll":document.getElementById(uifCalculator), "input": document.getElementById('enterHeader')}
 var settings;
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
@@ -185,6 +186,7 @@ if (document.getElementById("mainBody") != null) {
     }
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
+  let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
   });
@@ -226,7 +228,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
   document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
   document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
-  document.getElementById('ac').addEventListener("click", function () { clearMain(); document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight; });
+  document.getElementById('ac').addEventListener("click", function () { clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight; });
   document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
   document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
   document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
@@ -239,7 +241,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pars').addEventListener("click", function () { parsMethod(); });
   document.getElementById('pow').addEventListener("click", function () { pow('1'); });
   document.getElementById('mutiplication').addEventListener("click", function () { frontButtonPressed('×'); });
-  document.getElementById('enter').addEventListener("click", function () { enterPressed(document.getElementById('enterHeader').innerHTML) });
+  document.getElementById('enter').addEventListener("click", function () { enterPressed(keyTargets.input.innerHTML) });
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
@@ -283,7 +285,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
-    if (document.getElementById('enterHeader').innerHTML != "‎" && document.getElementById('enterHeader').innerHTML != "") {
+    if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
       openPopup();
     } else {
       sessionStorage.setItem("facing", "creatorPage")
@@ -314,7 +316,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc('Function', document.getElementById('nameEntryArea').value, document.getElementById('enterHeader').innerHTML);
+    createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
     universalBack();
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
@@ -620,8 +622,8 @@ function popup() {
 //Responsible for hiding elements on main screen
 function hideAllTabs() {
   let tabs = document.getElementsByClassName('tabcontent');
-  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-    popup();
+  if (document.getElementById('keypad').style.visibility == "visible") {
+    keypadVis(false);
   }
   for (let tab of tabs) {
     tab.style.visibility = "hidden";
@@ -689,7 +691,7 @@ function setImages(color) {
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
 function frontButtonPressed(input) {
-  let display = document.getElementById('enterHeader');
+  let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -713,13 +715,13 @@ function frontButtonPressed(input) {
   range.collapse(true);
   sel.removeAllRanges()
   sel.addRange(range);
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for handling the pars button on main calc buttons
 function parsMethod() {
-  let badIdea = document.getElementById("enterHeader").selectionStart;
+  let badIdea = keyTargets.input.selectionStart;
   let lazyAfterthought = 0;
-  for (let i = 0; i < document.getElementById("enterHeader").innerHTML.length; i++) {
+  for (let i = 0; i < keyTargets.input.innerHTML.length; i++) {
     if (document.getElementById("enterHeader").innerHTML.charAt(i) == '(') {
       lazyAfterthought = lazyAfterthought + 1;
     }
@@ -727,7 +729,7 @@ function parsMethod() {
       lazyAfterthought = lazyAfterthought - 1;
     }
   }
-  if (lazyAfterthought >= 1 && document.getElementById("enterHeader").innerHTML.charAt(badIdea - 1) != '(') {
+  if (lazyAfterthought >= 1 && keyTargets.input.innerHTML.charAt(badIdea - 1) != '(') {
     frontButtonPressed(')');
   } else {
     frontButtonPressed('(');
@@ -735,7 +737,7 @@ function parsMethod() {
 }
 //Responsible (I Think) for handling all power of event for main calc buttons
 function pow(type) {
-  let display = document.getElementById('enterHeader');
+  let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -799,9 +801,9 @@ function keepBlank(eve) {
     higher = sel.focusOffset;
     lower = sel.anchorOffset;
   }
-  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == document.getElementById('enterHeader')) {
+  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == keyTargets.input) {
     eve.preventDefault();
-    let childNodes = document.getElementById('enterHeader').childNodes;
+    let childNodes = keyTargets.input.childNodes;
     for (let i = 0; i < childNodes.length; i++) {
       if (childNodes[i] == sel.focusNode) {
         range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
@@ -880,7 +882,7 @@ function setArc() {
 }
 //Responsible for the backspace button on the main calc buttons
 function backPressed() {
-  let uifCalculator = document.getElementById('enterHeader');
+  let uifCalculator = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -903,7 +905,7 @@ function backPressed() {
         sel.removeAllRanges()
         sel.addRange(range);
       } else {
-        let childNodes = document.getElementById('enterHeader').childNodes;
+        let childNodes = keyTargets.input.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
           if (childNodes[i] == sel.focusNode) {
             range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
@@ -930,15 +932,15 @@ function backPressed() {
         sel.removeAllRanges();
         sel.addRange(range);
         childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
-        document.getElementById('uifCalculator').childNodes[1].removeChild(childNodes[i]);
+        keyTargets.input.removeChild(childNodes[i]);
       }
     }
   }
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for the ac button clearing all text from the enter header
 function clearMain() {
-  let enterHeader = document.getElementById("enterHeader");
+  let enterHeader = keyTargets.input;
   let range = document.createRange();
   let sel = document.getSelection();
   enterHeader.innerHTML = '‎';
@@ -954,11 +956,11 @@ function deleteHistory() {
 }
 //Responsible for handling enter events on main cac button
 function enterPressed(input) {
-  let display = document.getElementById('enterHeader');
+  let display = keyTargets.input;
   let nonparse = input;
   display.innerHTML = inputSolver(input, "Couldn't calculate");
   historyMethod(nonparse)
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
   setSelect(display, display.lastChild.length);
 }
 //Responsible for handling the navigation buttons on the main calc tab
@@ -1043,9 +1045,13 @@ function switchMode(modeId){
       hidingElems.push(mode)
     }
   }
+  keypadVis(false);
   if(modeId == "selectorMode"){
     hidingElems.push(modeButton)
   }else{
+    if (modeId == "mainMode"){
+      showingElems.push(document.getElementById('keypad'))
+    }
     showingElems.push(modeButton)
   }
   hideElements(hidingElems);
@@ -1239,7 +1245,7 @@ function custButton(funcConfig, target) {
         }
         let funcName = elem.querySelector("#nameLabel").innerHTML;
         let funcParse = findFuncConfig(funcName);
-        universalBack();
+        keypadVis(false);
         if (matchPage(funcName) == null) {
           createTab(funcParse)
         } else {
@@ -1395,15 +1401,13 @@ function openElement(name) {
   console.log(match)
   let tabs = document.getElementsByClassName('tabcontent');
   if (name != "mainPage") {
-    if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-      document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
-      document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
-      setTimeout(donothing, 500);
-      document.getElementById('extraFuncPopUp').style.visibility = "hidden";
-    }
     document.getElementById('customFuncDisplay').style.visibility = "hidden";
+    keypadVis(false);
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
+    if(mainMode.style.visibility == "inherit"){
+      keypadVis(true);
+    }
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -1672,7 +1676,6 @@ function calculatePoints(parsedEquation, start, end, step) {
     if(i < 0.00000001 && i > -0.00000001){
       newPoint.x = Math.round(i);
     }
-    console.log(parsedEquation.replace('Æ', i));
     newPoint.y = inputSolver(parsedEquation.replace('Æ', newPoint.x), "Error Making Graph");
     pointArray.push(newPoint);
   }
@@ -2465,6 +2468,89 @@ function removeAllChildNodes(parent) {
     parent.removeChild(parent.firstChild);
   }
 }
+function createGraph(chart){
+  let defChart = new Chart(chart, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
+        label: "hidden",
+        fontColor: '#FFFFFF',
+        borderColor: colorArray[1],
+        backgroundColor: colorArray[1],
+        showLine: true,
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          grid: {
+            drawBorder: false,
+            color: colorArray[3],
+          },
+          ticks: {
+            color: colorArray[3],
+          }
+        },
+        y: {
+          grid: {
+            drawBorder: false,
+            color: colorArray[3],
+          },
+          ticks: {
+            color: colorArray[3],
+          }
+        },
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        zoom: {
+          limits: {
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy',
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'xy',
+            onZoomComplete({ chart }) {
+              chart.update('none');
+            }
+          }
+        }
+      }
+    }
+  })
+  return defChart;
+}
+function keypadController(keyElems, height){
+  let keypad = document.getElementById('keypad');
+  keypad.style.height = height;
+  keypad.style.top = `calc(100% - ${height})`;
+  keyTargets = keyElems;
+}
+let keypadVis = (visible) => {
+  if(visible){
+    document.getElementById('keypad').style.visibility = 'visible';
+  }else{
+    document.getElementById('keypad').style.visibility = "hidden";
+  }
+}
 //END
 /************************************************|help page|**************************************************/
 //Responsible for handling tab changes in help page (deprecated like everything on help page)
@@ -2613,75 +2699,7 @@ class TemplatePage extends FuncPage {
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
 
-    this.def.chart = new Chart(chart, {
-      type: 'scatter',
-      data: {
-        datasets: [{
-          data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
-          label: "hidden",
-          fontColor: '#FFFFFF',
-          borderColor: colorArray[1],
-          backgroundColor: colorArray[1],
-          showLine: true,
-        }]
-      },
-      options: {
-        scales: {
-          x: {
-            grid: {
-              drawBorder: false,
-              color: colorArray[0],
-            },
-            ticks: {
-              color: colorArray[0],
-            }
-          },
-          y: {
-            grid: {
-              drawBorder: false,
-              color: colorArray[0],
-            },
-            ticks: {
-              color: colorArray[0],
-            }
-          },
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            //radius: 0
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          zoom: {
-            limits: {
-              //x: { min: -200, max: 200, minRange: 50 },
-              //y: { min: -200, max: 200, minRange: 50 }
-            },
-            pan: {
-              enabled: true,
-              mode: 'xy',
-            },
-            zoom: {
-              wheel: {
-                enabled: true,
-              },
-              pinch: {
-                enabled: true
-              },
-              mode: 'xy',
-              onZoomComplete({ chart }) {
-                chart.update('none');
-              }
-            }
-          }
-        }
-      }
-    })
+    this.def.chart = createGraph(chart)
     //console.log(this.def.chart.getState().panDelta.valueOf())
     this.def.chart.setScales({'x':{'min': -10, 'max': 10},'y':{'min': -10, 'max': 10}})
     clon.getElementById('functionMode').addEventListener("click", function () {
@@ -2730,7 +2748,7 @@ class HybridPage extends TemplatePage {
     clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
     let nameElem = clon.getElementById('nameFunc');
     let subElem = clon.getElementById("EquationFunc");
-    let funcConfig = getByName(config.name)
+    let equationContain = clon.getElementById('EquationFunc');
     subElem.innerHTML = "Hybrid";
     subElem.contentEditable = false;
 
@@ -2746,6 +2764,7 @@ class HybridPage extends TemplatePage {
       console.log(fullConfig)
       changeFunc(oldVal, newVal, fullConfig);
     });
+    
     clon.getElementById('editIcon').addEventListener("click", function (e) {
       let json = JSON.parse(tabCopy.dataset.tab)
       openEdit(tabCopy, json.code);
@@ -2789,6 +2808,7 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
+    equationDIV.addEventListener('focus', () => { keypadVis(true); keypadController({"scroll": equationDIV, "input": equationDIV}, "55%")})
     equationDIV.addEventListener("focus", function (e) {
       let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
       equationDIV.innerHTML = initEquation.equation;

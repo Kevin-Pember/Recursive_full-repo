@@ -106,7 +106,7 @@
         </div>
         <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
             <button id="modeButton">Mode</button>
-            <div id="mainMode" class="mode" style="visibility: hidden;">
+            <div id="mainMode" class="mode" style="visibility: inherit;">
                 
                 <div id="displayClip">
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
@@ -147,72 +147,8 @@
                     <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
                         src="Images/MoreFuncArrow.svg" width="40" height="40">
                 </div>
-                <div class="mainCacGrid">
-                    <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
-                            id="num1">1</button></div>
-                    <div class="button-item" name="2" style="grid-area: num2;"><button class="numsbutton"
-                            id="num2">2</button>
-                    </div>
-                    <div class="specialElements" style="grid-area: num3;"><button class="numsbutton"
-                            id="num3">3</button>
-                    </div>
-                    <div class="function-item" style="grid-area: moreFuncBut;"><button
-                            id="moreFunctionsButton">More<br>Functions</button><img src="Images/MoreFuncArrow.svg"
-                            class="arrows" id="arrowIcon" width="40px"></div>
-                    <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button>
-                    </div>
-                    <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button>
-                    </div>
-                    <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button>
-                    </div>
-                    <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button
-                            class="funcbutton" id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon"
-                                width="40" height="20"></button><button class="textOverlay" id="ac">
-                            <div class="matchCircle">
-                                <h3 class="memText">ac</h3>
-                            </div>
-                        </button></div>
-                    <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button>
-                    </div>
-                    <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button>
-                    </div>
-                    <div class="button-item" style="grid-area: num9;"><button class="numsbutton" id="num9">9</button>
-                    </div>
-                    <div class="function-item" style="grid-area: plus;"><button class="funcbutton" id="plus">+</button>
-                    </div>
-                    <div class="specialElements" style="grid-area: pi;"><button class="numsbutton"
-                            id="piButton">π</button>
-                    </div>
-                    <div class="button-item" style="grid-area: num0;"><button class="numsbutton" id="num0">0</button>
-                    </div>
-                    <div class="specialElements" style="grid-area: point;"><button class="numsbutton"
-                            id="pointButton">.</button>
-                    </div>
-                    <div class="function-item" style="grid-area: minus;"><button class="funcbutton"
-                            id="minus">-</button>
-                    </div>
-                    <div class="function-item" style="grid-area: percent;"><button class="funcbutton"
-                            id="percent">%</button>
-                    </div>
-                    <div class="function-item" style="grid-area: pars;"><button class="funcbutton" id="pars">(
-                            )</button>
-                    </div>
-                    <div class="function-item" style="grid-area: pow;"><button class="funcbutton" id="pow">^</button>
-                    </div>
-                    <div class="function-item" style="grid-area: mutiplication;"><button class="funcbutton"
-                            id="mutiplication">×</button>
-                    </div>
-                    <div class="function-item" style="grid-area: enter;"><button class="funcbutton"
-                            id="enter">enter</button>
-                    </div>
-                    <div class="function-item" style="grid-area: pow2;"><button class="funcbutton" id="pow2">x²</button>
-                    </div>
-                    <div class="function-item" style="grid-area: sqrt;"><button class="funcbutton" id="sqrt">√x</button>
-                    </div>
-                    <div class="function-item" style="grid-area: division;"><button class="funcbutton"
-                            id="divison">÷</button>
-                    </div>
-                </div>
+                
+                
                 <div id="extendedFuncGrid">
                     <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
                                 class="helpIcon" src="Images/help.svg" height="40px"></button></div>
@@ -280,73 +216,32 @@
                         </template>
                     </div>
                 </div>
-                <div id="extraFuncPopUp">
-                    <div id="customFuncDisplayPopup" data-element="popup">
-                        <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="40" height="40">
-                        <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="40" height="40">
-                        <div id="custFuncGridPopup">
-
-                        </div>
-                    </div>
-                    <div class="customFuncDisplayBackgroundPopup" width="100%">
-                    </div>
-                    <div class="extraFuncPopUpGrid">
-                        <div class="button-item"><button class="funcbutton" id="historyPopup"><img class="historyIcon"
-                                    src="Images/historyIcon.svg" width="30" height="35"></button></div>
-                        <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
-                        <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
-                        <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
-                                    src="Images/help.svg" width="30" height="30"></button></div>
-                        <div class="button-item"><button class="funcbutton" id="log10Popup">log₁₀</button></div>
-                        <div class="button-item"><button class="funcbutton" id="lnPopup">ln</button>
-                        </div>
-                        <div class="button-item"><button class="funcbutton" id="ePopup">e</button>
-                        </div>
-                        <div class="function-item"><button class="funcbutton" id="factorialPopup">n!</button></div>
-                        <div class="function-item"><button class="funcbutton" id="degPopup">deg</button></div>
-                        <div class="function-item"><button class="funcbutton" id="arcPopup">arc</button></div>
-                        <div class="function-item"><button class="funcbutton" id="invPopup">inv</button></div>
-                        <div class="function-item"><button class="funcbutton" id="absPopup">| |</button></div>
-                        <div class="function-item"><button class="trigButton" id="sinPopup">sin</button></div>
-                        <div class="function-item"><button class="trigButton" id="cosPopup">cos</button></div>
-                        <div class="function-item"><button class="trigButton" id="tanPopup">tan</button></div>
-                        <div class="function-item"><button class="funcbutton" id="modPopup">mod</button></div>
-                    </div>
-                </div>
             </div>
             <div id="graphMainMode" class="mode" style="visibility: hidden;">
-                <div id="graphContain">
-                    <canvas></canvas>
+                <div id="graphContain" class="dynamicContent">
+                    <canvas id="graphModeCanvas"></canvas>
                 </div>
                 <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
-                <div id="graphControls">
+                <div id="graphControls" class="dynamicModeControls">
                     <div id="graphFuncGrid">
-                        <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <template>
-                            <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        </template>
-                        <button id="addGraphEquation">+</button>
+                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                        <button id="addGraphEquation" class="addDynamicEquation">+</button>
                     </div>
                     <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
             <div id="tableMainMode" class="mode" style="visibility: hidden;">
-                <div id="graphContain">
-                    <canvas></canvas>
+                <div class="dynamicContent">
                 </div>
-                <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
-                <div id="graphControls">
+                <div id="tableControls" class="dynamicModeControls">
                     <div id="graphFuncGrid">
-                        <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <template>
-                            <div class="graphEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        </template>
-                        <button id="addGraphEquation">+</button>
+                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
+                        <button id="addTableEquation" class="addDynamicEquation">+</button>
                     </div>
                     <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
-            <div id="selectorMode" class="mode" style="visibility: visible;">
+            <div id="selectorMode" class="mode" style="visibility: hidden;">
                 <button class="modeSelectButton" id="mainModeSelector">
                     <img src="Images/mainMode.svg" class="modeIcon">
                     <h1>Scientific</h1>
@@ -360,6 +255,9 @@
                     <h1>Table</h1>
                 </button>
             </div>
+            <template id="dynamicEquationTemp">
+                <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
+            </template>
         </div>
         <template class="custFuncTabTemp">
             <div class="tabcontent" id="customFuncTab">
@@ -719,6 +617,107 @@
             <input type="text" class="textInputTop" id="nameArea" placeholder="Name">
             <textarea id="equationArea" placeholder="Equation"></textarea>
             <button id="newFunction">+</button>
+        </div>
+    </div>
+    <div id="keypad" class="specialInput" style="visibility: visible;">
+        <div class="mainCacGrid">
+            <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
+                    id="num1">1</button></div>
+            <div class="button-item" name="2" style="grid-area: num2;"><button class="numsbutton"
+                    id="num2">2</button>
+            </div>
+            <div class="specialElements" style="grid-area: num3;"><button class="numsbutton"
+                    id="num3">3</button>
+            </div>
+            <div class="function-item" style="grid-area: moreFuncBut;"><button
+                    id="moreFunctionsButton">More<br>Functions</button><img src="Images/MoreFuncArrow.svg"
+                    class="arrows" id="arrowIcon" width="40px"></div>
+            <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button>
+            </div>
+            <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button>
+            </div>
+            <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button>
+            </div>
+            <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button
+                    class="funcbutton" id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon"
+                        width="40" height="20"></button><button class="textOverlay" id="ac">
+                    <div class="matchCircle">
+                        <h3 class="memText">ac</h3>
+                    </div>
+                </button></div>
+            <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button>
+            </div>
+            <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button>
+            </div>
+            <div class="button-item" style="grid-area: num9;"><button class="numsbutton" id="num9">9</button>
+            </div>
+            <div class="function-item" style="grid-area: plus;"><button class="funcbutton" id="plus">+</button>
+            </div>
+            <div class="specialElements" style="grid-area: pi;"><button class="numsbutton"
+                    id="piButton">π</button>
+            </div>
+            <div class="button-item" style="grid-area: num0;"><button class="numsbutton" id="num0">0</button>
+            </div>
+            <div class="specialElements" style="grid-area: point;"><button class="numsbutton"
+                    id="pointButton">.</button>
+            </div>
+            <div class="function-item" style="grid-area: minus;"><button class="funcbutton"
+                    id="minus">-</button>
+            </div>
+            <div class="function-item" style="grid-area: percent;"><button class="funcbutton"
+                    id="percent">%</button>
+            </div>
+            <div class="function-item" style="grid-area: pars;"><button class="funcbutton" id="pars">(
+                    )</button>
+            </div>
+            <div class="function-item" style="grid-area: pow;"><button class="funcbutton" id="pow">^</button>
+            </div>
+            <div class="function-item" style="grid-area: mutiplication;"><button class="funcbutton"
+                    id="mutiplication">×</button>
+            </div>
+            <div class="function-item" style="grid-area: enter;"><button class="funcbutton"
+                    id="enter">enter</button>
+            </div>
+            <div class="function-item" style="grid-area: pow2;"><button class="funcbutton" id="pow2">x²</button>
+            </div>
+            <div class="function-item" style="grid-area: sqrt;"><button class="funcbutton" id="sqrt">√x</button>
+            </div>
+            <div class="function-item" style="grid-area: division;"><button class="funcbutton"
+                    id="divison">÷</button>
+            </div>
+        </div>
+        <div id="extraFuncPopUp">
+            <div id="customFuncDisplayPopup" data-element="popup">
+                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="40" height="40">
+                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="40" height="40">
+                <div id="custFuncGridPopup">
+
+                </div>
+            </div>
+            <div class="customFuncDisplayBackgroundPopup" width="100%">
+            </div>
+            <div class="extraFuncPopUpGrid">
+                <div class="button-item"><button class="funcbutton" id="historyPopup"><img class="historyIcon"
+                            src="Images/historyIcon.svg" width="30" height="35"></button></div>
+                <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
+                <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
+                <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
+                            src="Images/help.svg" width="30" height="30"></button></div>
+                <div class="button-item"><button class="funcbutton" id="log10Popup">log₁₀</button></div>
+                <div class="button-item"><button class="funcbutton" id="lnPopup">ln</button>
+                </div>
+                <div class="button-item"><button class="funcbutton" id="ePopup">e</button>
+                </div>
+                <div class="function-item"><button class="funcbutton" id="factorialPopup">n!</button></div>
+                <div class="function-item"><button class="funcbutton" id="degPopup">deg</button></div>
+                <div class="function-item"><button class="funcbutton" id="arcPopup">arc</button></div>
+                <div class="function-item"><button class="funcbutton" id="invPopup">inv</button></div>
+                <div class="function-item"><button class="funcbutton" id="absPopup">| |</button></div>
+                <div class="function-item"><button class="trigButton" id="sinPopup">sin</button></div>
+                <div class="function-item"><button class="trigButton" id="cosPopup">cos</button></div>
+                <div class="function-item"><button class="trigButton" id="tanPopup">tan</button></div>
+                <div class="function-item"><button class="funcbutton" id="modPopup">mod</button></div>
+            </div>
         </div>
     </div>
     <script src="load.js"></script>
