@@ -1411,7 +1411,7 @@ function openElement(name) {
     if(mainMode.style.visibility == "inherit"){
       keypadVis(true);
     }
-    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(66.6666% - 30px)");
+    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(66.6666% - 45px)");
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -2544,7 +2544,6 @@ function createGraph(chart){
 }
 function keypadController(keyElems, height){
   let keypad = document.getElementById('keypad');
-  keypad.style.height = height;
   keypad.style.top = `calc(100% - ${height})`;
   keyTargets = keyElems;
 }

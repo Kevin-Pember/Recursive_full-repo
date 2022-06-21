@@ -105,10 +105,11 @@
             <img id="settingsCogIcon" src="Images/SettingsCog.svg" height="100%" name="Open Settings">
         </div>
         <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
-            <button id="modeButton">Mode</button>
+            
             <div id="mainMode" class="mode" style="visibility: inherit;">
                 
                 <div id="displayClip">
+                    <button id="modeButton">Mode</button>
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                         autocorrect="off">
                         <h3 contenteditable="false" id="historyHeader">
@@ -124,29 +125,32 @@
                         </template>
                         <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled>‎</h2>
                     </div>
+                    <div id="overlayContainer">
+                    <div id="overlayDiv">
+                        <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
+                            <div class="matchCircle">
+                                <h3 class="memText">MRC</h3>
+                            </div>
+                        </button>
+                        <button id="MAddOverlay" class="textOverlay" name="Memory Add">
+                            <div class="matchCircle">
+                                <h3 class="memText">M+</h3>
+                            </div>
+                        </button>
+                        <div id="memoryDiv" name="Recorded Text">
+                            <div id="memoryTextBoarder">
+                                <h2 id=memoryText></h2>
+                            </div>
+                        </div>
+                        <img img id="leftOverlayNav" name="backward" class="arrows" src="Images/MoreFuncArrow.svg"
+                            width="40" height="40" style="transform: rotate(180deg);">
+                        <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
+                            src="Images/MoreFuncArrow.svg" width="40" height="40">
+                    </div>
+                    </div>
                 </div>
 
-                <div id="overlayDiv">
-                    <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
-                        <div class="matchCircle">
-                            <h3 class="memText">MRC</h3>
-                        </div>
-                    </button>
-                    <button id="MAddOverlay" class="textOverlay" name="Memory Add">
-                        <div class="matchCircle">
-                            <h3 class="memText">M+</h3>
-                        </div>
-                    </button>
-                    <div id="memoryDiv" name="Recorded Text">
-                        <div id="memoryTextBoarder">
-                            <h2 id=memoryText></h2>
-                        </div>
-                    </div>
-                    <img img id="leftOverlayNav" name="backward" class="arrows" src="Images/MoreFuncArrow.svg"
-                        width="40" height="40" style="transform: rotate(180deg);">
-                    <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
-                        src="Images/MoreFuncArrow.svg" width="40" height="40">
-                </div>
+                
                 
                 
                 <div id="extendedFuncGrid">
