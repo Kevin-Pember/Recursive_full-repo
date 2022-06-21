@@ -283,18 +283,15 @@
                         <button class="modeButton" id="tableMode">Table</button>
                         <div id="selectorUnder" class="selectorSlider"></div>
                     </div>
-                    <div id='FunctionDiv'>
-                        <div id="resultDiv">
-                            <h2 id="equalsHeader">=</h2>
-                            <h2 id="functionResultHeader"></h2>
-                            <div id="funcModify">
-                                <button id="modBtn">deg</button>
-                                <div class="drop-cont">
-                                    <a id="selectorRad">rad</a>
-                                    <a id="selectorDeg">deg</a>
-                                </div>
+                    <div id='functionDiv'>
+                        <div id="funcModify">
+                            <button id="modBtn">deg</button>
+                            <div class="drop-cont">
+                                <a id="selectorRad">rad</a>
+                                <a id="selectorDeg">deg</a>
                             </div>
                         </div>
+                        <h2 id="equalsHeader">=</h2>
                     </div>
                     <div id="graphDiv">
                         <div id="graphContainer"><canvas id="funcChart"></canvas></div>
@@ -630,8 +627,8 @@
                     id="num3">3</button>
             </div>
             <div class="function-item" style="grid-area: moreFuncBut;"><button
-                    id="moreFunctionsButton">More<br>Functions</button><img src="Images/MoreFuncArrow.svg"
-                    class="arrows" id="arrowIcon" width="40px"></div>
+                    id="moreFunctionsButton">More<br>Functions</button tabindex="-1"><img src="Images/MoreFuncArrow.svg"
+                    class="arrows" id="arrowIcon" width="40px" tabindex="-1"></div>
             <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button>
             </div>
             <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button>

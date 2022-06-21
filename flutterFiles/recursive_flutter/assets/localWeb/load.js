@@ -118,7 +118,7 @@ let imgList = [
     'black': 'Images/tableMode.svg'
   }
 ];
-let keyTargets = {"scroll":document.getElementById(uifCalculator), "input": document.getElementById('enterHeader')}
+let keyTargets = {"scroll":document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}
 var settings;
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
@@ -222,7 +222,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
   document.getElementById('arrowIcon').addEventListener("click", function () { 
     popup(); 
-    preventFocus();
+    setSelect(keyTargets.input, keyTargets.input.lastChild.length);
+    //preventFocus();
   });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
@@ -691,6 +692,7 @@ function setImages(color) {
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
 function frontButtonPressed(input) {
+  console.log(keyTargets)
   let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
@@ -943,6 +945,7 @@ function clearMain() {
   let enterHeader = keyTargets.input;
   let range = document.createRange();
   let sel = document.getSelection();
+  console.log(sel)
   enterHeader.innerHTML = '‎';
   range.setStart(enterHeader.lastChild, enterHeader.firstChild.data.length);
   range.collapse(true);
@@ -1403,11 +1406,13 @@ function openElement(name) {
   if (name != "mainPage") {
     document.getElementById('customFuncDisplay').style.visibility = "hidden";
     keypadVis(false);
+    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(60% - 40px)");
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
     if(mainMode.style.visibility == "inherit"){
       keypadVis(true);
     }
+    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(66.6666% - 30px)");
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -1684,7 +1689,7 @@ function calculatePoints(parsedEquation, start, end, step) {
 //Responsible for (IDFK work on this later)
 function checkVar(type, clon, checkList, def) {
   let varGrid = clon.querySelector("#varGrid");
-  let funcTabs = [clon.querySelector('#resultDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
+  let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
   let varExisting = varListAssbely(varGrid);
   let newVars = [];
   for (let eVar of checkList) {
@@ -2671,7 +2676,7 @@ class TemplatePage extends FuncPage {
     this.clone = clon;
     let parent = clon.getElementById('customFuncTab');
     let chart = clon.getElementById("funcChart");
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+    let funcTabs = [clon.getElementById('functionDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
     let name = config.name;
     let tabCopy = clon.getElementById('customFuncTab');
     this.def.tabPage = tabCopy;
@@ -2808,13 +2813,26 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
-    equationDIV.addEventListener('focus', () => { keypadVis(true); keypadController({"scroll": equationDIV, "input": equationDIV}, "55%")})
+    equationDIV.addEventListener('focus', () => { })
     equationDIV.addEventListener("focus", function (e) {
-      let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
-      equationDIV.innerHTML = initEquation.equation;
-      setSelect(equationDIV, equationDIV.innerHTML.length);
+      if(document.getElementById('keypad').style.visibility == "hidden"){
+        console.log("focusthrone")
+        let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+        equationDIV.innerHTML = initEquation.equation;
+        setSelect(equationDIV, equationDIV.innerHTML.length);
+        keypadVis(true);
+        keypadController({"scroll": equationDIV, "input": equationDIV}, "calc(60% - 40px)");
+      }
     });
-    equationDIV.addEventListener("input", function (e) {
+    equationDIV.addEventListener('focusout', ()=> {
+      setTimeout(() => {
+        let sel = window.getSelection();
+        if(sel.focusNode.nodeName != "#text"){
+          keypadVis(false);
+        }
+      })
+    });
+    equationDIV.addEventListener("change", function (e) {
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
       checkVar("function", tabCopy, varInEquat(e.target.innerHTML), fullConfig);

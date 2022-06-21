@@ -579,7 +579,6 @@ button:focus, input[type="button"]:focus {
   }
   #funcModify {
     align-content: center;
-    position: absolute;
     display: inline-block;
     left: 1.5px;
     padding-top: 10px;
@@ -589,7 +588,6 @@ button:focus, input[type="button"]:focus {
   }
   .drop-cont {
     display: none;
-    position: absolute;
     background-color: var(--numbersColor);
     min-width: 50px;
     z-index: 1;
@@ -2333,7 +2331,7 @@ button:focus, input[type="button"]:focus {
   flex-wrap: wrap;
   border-radius: 25px;
   top: 15%;
-  height: 30%;
+  height: 25%;
   width: calc(100% - 20px);
   left: 10px;
   overflow-y: scroll;
@@ -2386,7 +2384,7 @@ button:focus, input[type="button"]:focus {
 }
 #resultPane{
   background-color: var(--functionsColor);
-  top: calc(45% + 10px);
+  top: calc(40% + 10px);
   bottom: 10px;
   width: calc(100% - 20px);
   left: 10px;
@@ -2495,18 +2493,17 @@ button:focus, input[type="button"]:focus {
   bottom: 2.5%;
   position: absolute;
 }
-#resultDiv{
+#equalsHeader{
   margin-top: 10px;
   padding: 5px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 25px;
   background-color: var(--numbersColor);
-  position: absolute;
-}
-#equalsHeader{
-  color: var(--textColor);
-  
+  width: fit-content;
+  max-width: 100%;
+  font-size: 45px;
+  overflow: auto;
 }
 #GraphDiv{
   top: 50px;
