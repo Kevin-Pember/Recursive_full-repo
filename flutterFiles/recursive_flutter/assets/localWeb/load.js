@@ -1406,7 +1406,6 @@ function openElement(name) {
   if (name != "mainPage") {
     document.getElementById('customFuncDisplay').style.visibility = "hidden";
     keypadVis(false);
-    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(60% - 40px)");
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
     if(mainMode.style.visibility == "inherit"){

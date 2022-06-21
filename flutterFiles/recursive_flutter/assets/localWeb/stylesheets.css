@@ -17,7 +17,7 @@
 [contenteditable=true]:empty:before{
   content: attr(placeholder);
   pointer-events: none;
-  color: grey;
+  color: #ffffff80;
   display: block;
 }
 .page{
