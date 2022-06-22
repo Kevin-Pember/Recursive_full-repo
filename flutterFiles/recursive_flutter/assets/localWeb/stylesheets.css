@@ -422,9 +422,8 @@ input[type="button"]:focus {
 #displayClip {
   position: absolute;
   width: 75%;
-  height: calc(33.3333% - 10px);
+  height: calc(35% - 10px);
   top: 10px;
-  max-height: 33.3333%;
   background-color: var(--functionsColor);
   overflow: hidden;
   width: calc(100% - 20px);
@@ -434,14 +433,13 @@ input[type="button"]:focus {
 
 .text-area {
   width: 100%;
-  height: calc(100% - 30px);
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 70px;
   border: none;
   color: var(--textColor);
   background-color: transparent;
-  padding-right: 10px;
-  padding-bottom: 40px;
   position: absolute;
 }
 
@@ -452,10 +450,11 @@ input[type="button"]:focus {
 .historyDateHeader {
   border-radius: 25px;
   width: fit-content;
+  margin-left: 5px;
   padding-left: 10px;
   padding-right: 10px;
   background-color: var(--numbersColor);
-  color: var(--functionsColor);
+  color: var(--textColor);
 }
 
 #historyHeader {
@@ -467,18 +466,22 @@ input[type="button"]:focus {
 }
 
 #historyTimeSubHeader {
-  font-size: 15px;
-  color: var(--numbersColor);
+  padding-left: 10px;
+  font-size: 20px;
+  color: var(--textColor);
 }
 
 #previousEquation {
+  padding-left: 10px;
   color: var(--numbersColor);
+  font-size: 40px;
 }
 
 #enterHeader {
   width: 100%;
   font-weight: lighter;
-  font-size: 30px;
+  padding-left: 10px;
+  font-size: 40px;
   text-indent: 5px;
   direction: ltr;
 }
@@ -1462,7 +1465,7 @@ input[type="button"]:focus {
     bottom: 10px;
     border-radius: 25px;
     z-index: 2;
-    top: calc(33.3333% + 45px);
+    top: calc(35% + 45px);
     position: absolute;
   }
 
