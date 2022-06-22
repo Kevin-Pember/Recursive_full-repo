@@ -129,33 +129,36 @@ let funcList = [
     "funcLength": 3,
   }
 ];
+let ignoreList = [
+  "Math.sin",
+  "Math.cos",
+  "Math.tan",
+  "Math.log",
+  "Math.log10",
+  "Math.abs",
+  "Math.sqrt",
+  "Math.pow",
+  "Math.PI"
+
+];
 let secondList = [
   "sup>",
 ];
-parseFunction("function hello(var,shit){}")
 //Main method called to parse an Equation
 function solveInpr(equation, degRad) {
-  console.log('Inpr ran');
+  defaultAngle = degRad;
   for (let i = 0; i < equation.length; i++) {
-    if (funcMatch(equation.substring(i)) != "") {
-      let func = getByName(funcMatch(equation.substring(i)));
+    let func = funcMatch(equation.substring(i));
+    if (func != "") {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
       );
-      let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func, degRad);
-      let parsedFunc = "";
-      if (func.type == "function") {
-        let funcTemp = findMethod(func, degRad);
-        parsedFunc = assembly(func, funcTemp, values);
-      } else if (func.type == "method") {
-        parsedFunc = func.mth(values)
-      }
+      let parsedFunc = solveFunc(equation, i)
       equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
       i = i + parsedFunc.length - 1;
     }
   }
   equation = builtInFunc(equation);
-  console.log(`Equation: ${equation}`);
   return equation;
 }
 //Func method to find if the current postion has a function defined in the funclist
@@ -173,23 +176,29 @@ function funcMatch(equation) {
   for (let func of funcList) {
     let check = equation.substring(0, (func.funcLength));
     if (check == func.func) {
-      console.log(`%c func matched ${func.func}`, "color: yellow;")
-      returned = func.func;
+      returned = func;
     }
   }
   for (let func of secondList) {
     let check = equation.substring(0, (func.length));
     if (check == func) {
-      returned =  "";
+      returned = "";
     }
   }
   return returned;
+}
+function ignoreTest(equation){
+  const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
+  if(ignore != undefined){
+    return ignore.length;
+  }else{
+    return undefined;
+  }
 }
 //A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
 function findMethod(funcUn, degRad) {
   let func = JSON.parse(JSON.stringify(funcUn));
   let array = func.funcParse;
-  console.log(`%cfunc Parse ${array}`, "color: blue")
   if (func.funcRadDeg) {
     if (degRad) {
       if (array.includes("toDeg")) {
@@ -211,28 +220,33 @@ function findMethod(funcUn, degRad) {
 function assembly(func, parsedFunc, values) {
   inputs = func.inputs;
   for (let i = 1; i <= inputs; i++) {
-    let index = parsedFunc.indexOf("v" + i);
-    parsedFunc[index] = values[i - 1];
+    let numVar = "v" + i;
+    let vararray = parsedFunc.filter(elem => elem == numVar);
+    for (let vare of vararray) {
+      let index = parsedFunc.indexOf(numVar);
+      parsedFunc[index] = values[i - 1];
+    }
   }
   let parsedString = parsedFunc.join("");
   return parsedString;
 }
 //A method which takes the inputs value from a func object in the funclist and gets how many inputs that function has and parses each
-function recrSolve(equation, func, degRad) {
+function recrSolve(equation, func) {
   let inputs = func.inputs;
   if (inputs == 1) {
-    return [equatInner(equation, degRad)];
+    return [equation];
   } else {
     let values = [];
     for (let i = 1; i <= inputs; i++) {
       if (i != inputs) {
-        values.push(equatInner(equation.substring(0, equation.indexOf(",")), degRad));
+        values.push(equation.substring(0, equation.indexOf(",")));
         equation = equation.substring(equation.indexOf(",") + 1);
       } else {
-        values.push(equatInner(equation, degRad));
+        values.push(equation);
         break;
       }
     }
+    values = values.filter(e => e != "");
     return values
   }
 }
@@ -241,6 +255,23 @@ function equatInner(equation, degRad) {
   equation = solveInpr(equation, degRad);
   //eval(equation)
   return equation;
+}
+function solveFunc(equation, index) {
+  let degRad = defaultAngle;
+  let i = index;
+  let func = funcMatch(equation.substring(i));
+  let innerRAW = parEncap(
+    equation.substring(i + func.funcLength)
+  );
+  let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func);
+  let parsedFunc = "";
+  if (func.type == "function") {
+    let funcTemp = findMethod(func, degRad);
+    parsedFunc = assembly(func, funcTemp, values);
+  } else if (func.type == "method") {
+    parsedFunc = func.mth(values)
+  }
+  return parsedFunc;
 }
 //A meothod for creating the end of a parenthesis
 function parComplete(input) {
@@ -296,7 +327,6 @@ function supEncap(sub) {
       break;
     }
   }
-  console.log("Sub is " + sub);
   return sub;
 }
 //A deprecated Method to find the postion of a function in the equation string
@@ -325,18 +355,18 @@ function builtInFunc(equation) {
   equation = equation.replaceAll('÷', '/');
   for (let i = 0; i < equation.length; i++) {
     if (equation.substring(i, i + 5) == "<sup>") {
-      let exponent = equatInner(supEncap(equation.substring(i)).substring(5,supEncap(equation.substring(i)).length-6));
+      let exponent = equatInner(supEncap(equation.substring(i)).substring(5, supEncap(equation.substring(i)).length - 6));
       let exponentRAW = supEncap(equation.substring(i));
       let base = "";
       let baseRAW = "";
-      if(equation.charAt(i-1) == ")"){
-        base = equatInner(parEncap2(equation.substring(0,i)).substring(1,parEncap2(equation.substring(0,i)).length-1));
-        baseRAW = parEncap2(equation.substring(0,i));
-      }else{
-        base = forward(equation.substring(0,i));
-        baseRAW = forward(equation.substring(0,i));
+      if (equation.charAt(i - 1) == ")") {
+        base = equatInner(parEncap2(equation.substring(0, i)).substring(1, parEncap2(equation.substring(0, i)).length - 1));
+        baseRAW = parEncap2(equation.substring(0, i));
+      } else {
+        base = forward(equation.substring(0, i));
+        baseRAW = forward(equation.substring(0, i));
       }
-      equation = equation.substring(0,i-baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i+exponentRAW.length);
+      equation = equation.substring(0, i - baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i + exponentRAW.length);
     } else if (equation.charAt(i) == "^") {
       let exponent = "";
       let exponentRAW = "";
@@ -473,7 +503,6 @@ function forward(sub) {
       break;
     }
   }
-  console.log("Outputsub is " + outputSub);
   return outputSub;
 }
 //A method that returns an array of the names of the funcs that are in the Funclist
@@ -484,62 +513,49 @@ function getNameList() {
   }
   return nameList;
 }
-/*function findSign(sub) {
-  let type = false;
-  if (sub.charAt(0) == "(") {
-    type = true;
-    sub = sub.substring(1);
-  }
-
-  for (let i = 1; i < sub.length; i++) {
-    if (sub.charAt(i) == "|" && sub.charAt(i + 1) != ")" && !type) {
-
-    } else if (sub.charAt(i) == "|" && sub.charAt(i + 1) == ")" && type) {
-
-    }
-  }
-}*/
 //Takes string and returns an array for funclist
 function createParseable(equation) {
-  let equationArray = [];
-  let variablesInOrder = [];
-  let varArray = varInEquat(equation);
-  for (let i = 0; i < varArray.length; i++) {
-    varArray[i].letter = "v" + (i + 1);
+  
+  for (let i = equation.length - 1; i >= 0; i--) {
+    let func = funcMatch(equation.substring(i));
+    if (func != "") {
+      let innerRAW = parEncap(
+        equation.substring(i + func.funcLength)
+      );
+      let parsedFunc = solveFunc(equation, i)
+      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+      i = i - parsedFunc.length + 1;
+    }
   }
-  console.log(varArray);
-  variablesInOrder.push({ "name": varArray[0].letter, "index": varArray[0].positions[0] });
-  varArray.shift();
-  for (item of varArray) {
-    for (let postion of item.positions) {
-      for (let j = variablesInOrder.length - 1; j >= 0; j--) {
-        if (postion > variablesInOrder[j].index) {
-          variablesInOrder.splice(j + 1, 0, { "name": item.letter, "index": postion });
-          break;
-        }
+  let equationArray = [equation];
+  let variables = varInEquat(equation);
+  let variableIndexes = [];
+  for (let i = 0; i < variables.length; i++) {
+    variables[i].numVar = 'v' + (i + 1);
+  }
+  for (let data of variables) {
+    for (let i = 0; i < equation.length; i++) {
+      let ignore = ignoreTest(equation.substring(i));
+      if (ignore != undefined) {
+        i += ignore-1;
+      } else if (equation.charAt(i) == data.letter) {
+        variableIndexes.push(i);
       }
     }
   }
-  for (let i = 0; i < variablesInOrder.length; i++) {
-    let index = variablesInOrder[i].index;
-    let pre = "";
-    let vard = "";
-    if (i == 0) {
-      pre = equation.substring(0, index);
-      vard = variablesInOrder[i].name;
-    } else {
-      let prevIndex = variablesInOrder[i - 1].index;
-      pre = equation.substring(prevIndex + 1, index);
-      vard = variablesInOrder[i].name;
-    }
-    if (pre != "") {
-      equationArray.push(pre);
-    }
-    equationArray.push(vard);
-    if (i == variablesInOrder.length - 1 && equation.substring(index + 1) != '') {
-      equationArray.push(equation.substring(index + 1));
-    }
+  variableIndexes.sort(function (a, b) {
+    return b - a;
+  });
+  for (let index of variableIndexes) {
+    let temp = equationArray[0].charAt(index);
+    let match = variables.find(e => e.letter == temp);
+    let newarry = [];
+    newarry.push(equationArray[0].substring(0, index));
+    newarry.push(match.numVar);
+    newarry.push(equationArray[0].substring(index + 1));
+    equationArray.splice(0, 1, ...newarry);
   }
+  equationArray = equationArray.filter(val => val != "" && val != "‎");
   return equationArray;
 }
 //calculate inputs
@@ -581,15 +597,15 @@ function containsTrig(string) {
 /*(var, var2){
   console.log(var + var2)
 }*/
-function stringifyMethod(object){
+function stringifyMethod(object) {
   let name = object.func;
   let string = object.string;
   let vars = object.variables;
   let parsedVariables = "";
   for (let i = 0; i < vars.length; i++) {
-    if(i == 0){
+    if (i == 0) {
       parsedVariables += vars[i].letter;
-    }else{
+    } else {
       parsedVariables += "," + vars[i].letter;
     }
   }
@@ -603,11 +619,9 @@ function stringFunction(object) {
     string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
   }
   string = `var ${name} = function (array)${string} \n return ${name};`;
-  console.log(string)
   return Function(string);
 }
 function parseFunction(StringFunction) {
-  console.log(StringFunction)
   StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   StringFunction = StringFunction.substring(StringFunction.indexOf("("))
@@ -623,7 +637,6 @@ function parseFunction(StringFunction) {
     }
   }
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
-  console.log(`%c ${variables[0]}`, "color: green;")
   let finalObject = {
     "func": name,
     "type": "method",
@@ -658,7 +671,6 @@ function createNewFunction() {
     funcObject.mth = stringFunction(funcObject)();
     funcList.push(funcObject);*/
   }
-  console.log(object)
   funcList.push(object);
 }
 function parseFuncEntry() {
@@ -666,12 +678,12 @@ function parseFuncEntry() {
   if (arguments[0] == "function") {
     let name = arguments[1];
     let func = arguments[2];
-    let parseable = createParseable(solveInpr(func), defaultAngle);
+    let parseable = createParseable(func, defaultAngle);
     returnedObject.type = arguments[0];
     returnedObject.func = name;
     returnedObject.funcParse = parseable;
     returnedObject.inputs = cacInputs(parseable);
-    returnedObject.funcRadDeg = containsTrig(func);
+    returnedObject.funcRadDeg = false;
     returnedObject.funcLength = name.length;
   } else if (arguments[0] == "method") {
     let funcString = arguments[1];

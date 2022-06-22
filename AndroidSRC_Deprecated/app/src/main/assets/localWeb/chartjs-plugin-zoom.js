@@ -17,6 +17,7 @@ var Hammer__default = /*#__PURE__*/_interopDefaultLegacy(Hammer);
 const getModifierKey = opts => opts && opts.enabled && opts.modifierKey;
 const keyPressed = (key, event) => key && event[key + 'Key'];
 const keyNotPressed = (key, event) => key && !event[key + 'Key'];
+let scales = {};
 
 /**
  * @param {string|function} mode can be 'x', 'y' or 'xy'
@@ -818,13 +819,20 @@ function startPan(chart, state, event) {
 }
 
 function endPan(chart, state) {
+  console.log(JSON.parse(JSON.stringify(state)).updatedScaleLimits)
+  scales = JSON.parse(JSON.stringify(state)).updatedScaleLimits;
   state.delta = null;
   if (state.panning) {
     state.panEndTimeout = setTimeout(() => (state.panning = false), 500);
     helpers.callback(state.options.pan.onPanComplete, [{chart}]);
   }
 }
-
+function getScales(){
+  return scales;
+}
+function setScales(object){
+  scales = object
+}
 const hammers = new WeakMap();
 function startHammer(chart, options) {
   const state = getState(chart);
@@ -916,6 +924,8 @@ var Zoom = {
     chart.getZoomLevel = () => getZoomLevel(chart);
     chart.getInitialScaleBounds = () => getInitialScaleBounds(chart);
     chart.isZoomedOrPanned = () => isZoomedOrPanned(chart);
+    chart.getScales = () => getScales();
+    chart.setScales = (object) => setScales(object);
   },
 
   beforeEvent(chart) {

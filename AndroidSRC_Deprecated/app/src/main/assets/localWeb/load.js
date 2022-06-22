@@ -1,3 +1,4 @@
+console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
@@ -100,8 +101,24 @@ let imgList = [
     'name': 'xIcon',
     'white': 'Images/xIconWhite.svg',
     'black': 'Images/xIcon.svg'
+  },
+  {
+    'name': 'graphMode',
+    'white': 'Images/graphModeWhite.svg',
+    'black': 'Images/graphMode.svg'
+  },
+  {
+    'name': 'mainMode',
+    'white': 'Images/mainModeWhite.svg',
+    'black': 'Images/mainMode.svg'
+  },
+  {
+    'name': 'tableMode',
+    'white': 'Images/tableModeWhite.svg',
+    'black': 'Images/tableMode.svg'
   }
 ];
+let keyTargets = {"scroll":document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}
 var settings;
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
@@ -169,6 +186,19 @@ if (document.getElementById("mainBody") != null) {
     }
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
+  let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
+  document.getElementById('modeButton').addEventListener("click", () => {
+    switchMode('selectorMode')
+  });
+  document.getElementById('mainModeSelector').addEventListener("click", () => {
+    switchMode('mainMode')
+  })
+  document.getElementById('graphModeSelector').addEventListener("click", () => {
+    switchMode('graphMainMode')
+  })
+  document.getElementById('tableModeSelector').addEventListener("click", () => {
+    switchMode('tableMainMode')
+  })
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -190,12 +220,16 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
-  document.getElementById('arrowIcon').addEventListener("click", function () { popup(); preventFocus(); sessionStorage.setItem("facing", "mainPopup") });
+  document.getElementById('arrowIcon').addEventListener("click", function () { 
+    popup(); 
+    setSelect(keyTargets.input, keyTargets.input.lastChild.length);
+    //preventFocus();
+  });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
   document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
   document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
-  document.getElementById('ac').addEventListener("click", function () { clearMain(); document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight; });
+  document.getElementById('ac').addEventListener("click", function () { clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight; });
   document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
   document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
   document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
@@ -208,7 +242,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pars').addEventListener("click", function () { parsMethod(); });
   document.getElementById('pow').addEventListener("click", function () { pow('1'); });
   document.getElementById('mutiplication').addEventListener("click", function () { frontButtonPressed('×'); });
-  document.getElementById('enter').addEventListener("click", function () { enterPressed(document.getElementById('enterHeader').innerHTML) });
+  document.getElementById('enter').addEventListener("click", function () { enterPressed(keyTargets.input.innerHTML) });
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
@@ -252,7 +286,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
-    if (document.getElementById('enterHeader').innerHTML != "‎" && document.getElementById('enterHeader').innerHTML != "") {
+    if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
       openPopup();
     } else {
       sessionStorage.setItem("facing", "creatorPage")
@@ -283,14 +317,11 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc('Function', document.getElementById('nameEntryArea').value, document.getElementById('enterHeader').innerHTML);
-    document.getElementById('nameEntry').style.visibility = "hidden";
+    createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
+    universalBack();
   });
   document.getElementById('exitNameEntry').addEventListener("click", function () {
-    console.log("things");
-    document.getElementById('nameEntry').style.visibility = "hidden";
-    document.getElementById('nameEntry').style.animation = null;
-    document.getElementById('nameEntryArea').value = "";
+    universalBack();
   });
 
   document.getElementById('exitConfirmPage').addEventListener("click", function () {
@@ -577,11 +608,13 @@ function popup() {
   if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
     document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
     document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideDown";
+    sessionStorage.setItem("facing", "");
     setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
   } else {
     document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toUp";
     document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running toSlideUp";
+    sessionStorage.setItem("facing", "mainPopup");
     setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
   }
@@ -590,8 +623,8 @@ function popup() {
 //Responsible for hiding elements on main screen
 function hideAllTabs() {
   let tabs = document.getElementsByClassName('tabcontent');
-  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-    popup();
+  if (document.getElementById('keypad').style.visibility == "visible") {
+    keypadVis(false);
   }
   for (let tab of tabs) {
     tab.style.visibility = "hidden";
@@ -642,7 +675,6 @@ function setImages(color) {
     } else {
       image = image.substring(image.indexOf('Images/') + 7, image.indexOf('.svg'));
     }
-    console.log(image)
     for (let item of imgList) {
       if (image == item.name) {
         if (type) {
@@ -660,7 +692,8 @@ function setImages(color) {
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
 function frontButtonPressed(input) {
-  let display = document.getElementById('enterHeader');
+  console.log(keyTargets)
+  let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -684,13 +717,13 @@ function frontButtonPressed(input) {
   range.collapse(true);
   sel.removeAllRanges()
   sel.addRange(range);
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for handling the pars button on main calc buttons
 function parsMethod() {
-  let badIdea = document.getElementById("enterHeader").selectionStart;
+  let badIdea = keyTargets.input.selectionStart;
   let lazyAfterthought = 0;
-  for (let i = 0; i < document.getElementById("enterHeader").innerHTML.length; i++) {
+  for (let i = 0; i < keyTargets.input.innerHTML.length; i++) {
     if (document.getElementById("enterHeader").innerHTML.charAt(i) == '(') {
       lazyAfterthought = lazyAfterthought + 1;
     }
@@ -698,7 +731,7 @@ function parsMethod() {
       lazyAfterthought = lazyAfterthought - 1;
     }
   }
-  if (lazyAfterthought >= 1 && document.getElementById("enterHeader").innerHTML.charAt(badIdea - 1) != '(') {
+  if (lazyAfterthought >= 1 && keyTargets.input.innerHTML.charAt(badIdea - 1) != '(') {
     frontButtonPressed(')');
   } else {
     frontButtonPressed('(');
@@ -706,7 +739,7 @@ function parsMethod() {
 }
 //Responsible (I Think) for handling all power of event for main calc buttons
 function pow(type) {
-  let display = document.getElementById('enterHeader');
+  let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -770,9 +803,9 @@ function keepBlank(eve) {
     higher = sel.focusOffset;
     lower = sel.anchorOffset;
   }
-  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == document.getElementById('enterHeader')) {
+  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == keyTargets.input) {
     eve.preventDefault();
-    let childNodes = document.getElementById('enterHeader').childNodes;
+    let childNodes = keyTargets.input.childNodes;
     for (let i = 0; i < childNodes.length; i++) {
       if (childNodes[i] == sel.focusNode) {
         range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
@@ -851,7 +884,7 @@ function setArc() {
 }
 //Responsible for the backspace button on the main calc buttons
 function backPressed() {
-  let uifCalculator = document.getElementById('enterHeader');
+  let uifCalculator = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
   let index = 0;
@@ -874,7 +907,7 @@ function backPressed() {
         sel.removeAllRanges()
         sel.addRange(range);
       } else {
-        let childNodes = document.getElementById('enterHeader').childNodes;
+        let childNodes = keyTargets.input.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
           if (childNodes[i] == sel.focusNode) {
             range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
@@ -901,17 +934,18 @@ function backPressed() {
         sel.removeAllRanges();
         sel.addRange(range);
         childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
-        document.getElementById('uifCalculator').childNodes[1].removeChild(childNodes[i]);
+        keyTargets.input.removeChild(childNodes[i]);
       }
     }
   }
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for the ac button clearing all text from the enter header
 function clearMain() {
-  let enterHeader = document.getElementById("enterHeader");
+  let enterHeader = keyTargets.input;
   let range = document.createRange();
   let sel = document.getSelection();
+  console.log(sel)
   enterHeader.innerHTML = '‎';
   range.setStart(enterHeader.lastChild, enterHeader.firstChild.data.length);
   range.collapse(true);
@@ -925,11 +959,11 @@ function deleteHistory() {
 }
 //Responsible for handling enter events on main cac button
 function enterPressed(input) {
-  let display = document.getElementById('enterHeader');
+  let display = keyTargets.input;
   let nonparse = input;
   display.innerHTML = inputSolver(input, "Couldn't calculate");
   historyMethod(nonparse)
-  document.getElementById('uifCalculator').scrollTop = document.getElementById('uifCalculator').scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
   setSelect(display, display.lastChild.length);
 }
 //Responsible for handling the navigation buttons on the main calc tab
@@ -1003,7 +1037,29 @@ function navigateButtons(direction) {
     }
   }
 }
-
+function switchMode(modeId){
+  let modes = document.getElementsByClassName('mode')
+  let hidingElems = [];
+  let showingElems = [document.getElementById(modeId)];
+  let modeButton = document.getElementById('modeButton');
+  for(let mode of modes){
+    console.log(mode)
+    if(mode.style.visibility != 'hidden'){
+      hidingElems.push(mode)
+    }
+  }
+  keypadVis(false);
+  if(modeId == "selectorMode"){
+    hidingElems.push(modeButton)
+  }else{
+    if (modeId == "mainMode"){
+      showingElems.push(document.getElementById('keypad'))
+    }
+    showingElems.push(modeButton)
+  }
+  hideElements(hidingElems);
+  pullUpElements(showingElems)
+}
 //END
 /*******************************************|Main Page Custom Func Editing|*******************************************/
 //Responsible for the naming page for when a new func is typed in the enter header but needs a name
@@ -1192,7 +1248,7 @@ function custButton(funcConfig, target) {
         }
         let funcName = elem.querySelector("#nameLabel").innerHTML;
         let funcParse = findFuncConfig(funcName);
-        universalBack();
+        keypadVis(false);
         if (matchPage(funcName) == null) {
           createTab(funcParse)
         } else {
@@ -1348,15 +1404,14 @@ function openElement(name) {
   console.log(match)
   let tabs = document.getElementsByClassName('tabcontent');
   if (name != "mainPage") {
-    if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-      document.getElementById('arrowIcon').style.animation = "0.0 ease-in 0s 1 normal forwards running toDown";
-      document.getElementById('extraFuncPopUp').style.animation = "0.0s ease-in 0s 1 normal forwards running toSlideDown";
-      setTimeout(donothing, 500);
-      document.getElementById('extraFuncPopUp').style.visibility = "hidden";
-    }
     document.getElementById('customFuncDisplay').style.visibility = "hidden";
+    keypadVis(false);
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
+    if(mainMode.style.visibility == "inherit"){
+      keypadVis(true);
+    }
+    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(66.6666% - 45px)");
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -1468,7 +1523,7 @@ function changeImplemented(oldConfig, newObject) {
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {
   if (funcConfig.type == "Function") {
-    createNewFunction("function", funcConfig.name, solveInpr(funcConfig.equation, settings.degRad));
+    createNewFunction("function", funcConfig.name, funcConfig.equation);
   } else if (funcConfig.type == "Hybrid") {
     createNewFunction("method", funcConfig.code)
   }
@@ -1586,7 +1641,12 @@ function solveEquation(method, clon) {
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
   console.log(def.chart.data.datasets[0].data)
-  let result = calculatePoints(parsedEquation, settings.gDMin, settings.gDMax, settings.gDS);
+  let mutplier = 1/def.chart.getZoomLevel()
+  let scales = def.chart.getScales()
+  let bottom = Number(scales.x.min) * mutplier;
+  let top =  Number(scales.x.max) * mutplier;
+  let step = Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
+  let result = calculatePoints(parsedEquation, Number(bottom), Number(top), Number(step));
   console.log(result)
   def.chart.data.datasets[0].data = result;
   console.log(def.chart.data.datasets[0])
@@ -1617,8 +1677,10 @@ function calculatePoints(parsedEquation, start, end, step) {
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
-    console.log(parsedEquation.replace('Æ', i));
-    newPoint.y = inputSolver(parsedEquation.replace('Æ', i), "Error Making Graph");
+    if(i < 0.00000001 && i > -0.00000001){
+      newPoint.x = Math.round(i);
+    }
+    newPoint.y = inputSolver(parsedEquation.replace('Æ', newPoint.x), "Error Making Graph");
     pointArray.push(newPoint);
   }
   return pointArray;
@@ -1626,7 +1688,7 @@ function calculatePoints(parsedEquation, start, end, step) {
 //Responsible for (IDFK work on this later)
 function checkVar(type, clon, checkList, def) {
   let varGrid = clon.querySelector("#varGrid");
-  let funcTabs = [clon.querySelector('#resultDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
+  let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
   let varExisting = varListAssbely(varGrid);
   let newVars = [];
   for (let eVar of checkList) {
@@ -1933,7 +1995,7 @@ let facingBack = [
   },
   {
     "elm": "createNaming",
-    "backElm": "",
+    "backElm": "mainPopup",
     "prtCont": 'main',
     "mth": function () {
       document.getElementById('nameEntry').style.visibility = "hidden";
@@ -2015,7 +2077,7 @@ let facingBack = [
   },
   {
     "elm": "creatorPage",
-    "backElm": '',
+    "backElm": 'mainPopup',
     "prtCont": 'main',
     "mth": function () {
       closePage('custCreatorPage');
@@ -2200,10 +2262,10 @@ function report(message, meaning) {
 /*errorStatement is what appears in the popup console */
 function inputSolver(equation, errorStatement) {
   equation = solveInpr(equation, settings.degRad)
-  console.log(`%c ${equation}`, "color: #f74646");
   try {
     return eval(equation);
   } catch (e) {
+    console.log(e)
     report(errorStatement, false);
   }
 }
@@ -2308,9 +2370,11 @@ function pullUpElements(elements) {
 }
 //Responsible for finding where variables are in a given equation
 function varInEquat(equation) {
+  console.log(`Equation is ${equation}`)
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
-    if (equation.charCodeAt(i) > 92 && equation.charCodeAt(i) < 123) {
+    if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
+      console.log(equation.charAt(i))
       if (isVar(equation.substring(i)) === 0) {
         if (varInList(varArray, equation.substring(i, i + 1)) == null) {
           varArray.push(
@@ -2324,7 +2388,8 @@ function varInEquat(equation) {
           func.positions.push(i);
         }
       } else {
-        i += isVar(equation.substring(i));
+        console.log(isVar(equation.substring(i)))
+        i += isVar(equation.substring(i)) - 1;
       }
     }
   }
@@ -2342,13 +2407,17 @@ function varInList(list, varLetter) {
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
   let func = funcMatch(entry);
+  let ignore = ignoreTest(entry);
+  console.log(ignore)
   if (func != "") {
     if (getByName(func) != null) {
       let object = getByName(func);
       return object.funcLength;
     } else {
-      return func.length
+      return func.func.length
     }
+  }else if(ignore != undefined){
+    return ignore
   } else {
     return 0;
   }
@@ -2356,6 +2425,8 @@ function isVar(entry) {
 //Responsible for parsing a variable to its value in an equation 
 function setVar(element, equation) {
   let varData = varListAssbely(element);
+  console.log(`%c seVar ran`, "color: red;");
+  console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
       if (funcMatch(equation.substring(i)) != "") {
@@ -2399,6 +2470,88 @@ function searchAlgo(string, checking) {
 function removeAllChildNodes(parent) {
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
+  }
+}
+function createGraph(chart){
+  let defChart = new Chart(chart, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
+        label: "hidden",
+        fontColor: '#FFFFFF',
+        borderColor: colorArray[1],
+        backgroundColor: colorArray[1],
+        showLine: true,
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          grid: {
+            drawBorder: false,
+            color: colorArray[3],
+          },
+          ticks: {
+            color: colorArray[3],
+          }
+        },
+        y: {
+          grid: {
+            drawBorder: false,
+            color: colorArray[3],
+          },
+          ticks: {
+            color: colorArray[3],
+          }
+        },
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        zoom: {
+          limits: {
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy',
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'xy',
+            onZoomComplete({ chart }) {
+              chart.update('none');
+            }
+          }
+        }
+      }
+    }
+  })
+  return defChart;
+}
+function keypadController(keyElems, height){
+  let keypad = document.getElementById('keypad');
+  keypad.style.top = `calc(100% - ${height})`;
+  keyTargets = keyElems;
+}
+let keypadVis = (visible) => {
+  if(visible){
+    document.getElementById('keypad').style.visibility = 'visible';
+  }else{
+    document.getElementById('keypad').style.visibility = "hidden";
   }
 }
 //END
@@ -2506,51 +2659,7 @@ function custFuncExisting(name, duplicates) {
   }
   return exist;
 }
-/*function createParseable(equation){
-  let equationArray = [];
-  let variablesInOrder = [];
-  let varArray = varInEquat(equation);
-  for(let i = 0; i < varArray.length; i++){
-    varArray[i].letter = "v" + (i+1);
-  }
-  console.log(varArray);
-  variablesInOrder.push({"name": varArray[0].letter, "index": varArray[0].positions[0]});
-  varArray.shift();
-  for(item of varArray){
-    for(let postion of item.positions){
-      for(let j = variablesInOrder.length-1; j >= 0; j--){
-        console.log(`${postion} vs. ${variablesInOrder[j].index} and ${postion > variablesInOrder[j].index}`)
-        if(postion > variablesInOrder[j].index){
-          variablesInOrder.splice(j+1, 0, {"name": item.letter, "index": postion});
-          break;
-        }
-      }
-    }
-  }
-  console.log(variablesInOrder)
-  for(let i = 0; i < variablesInOrder.length; i++){
-    let index = variablesInOrder[i].index;
-    let pre = "";
-    let vard = "";
-    if(i == 0){
-      pre = equation.substring(0,index);
-      vard = variablesInOrder[i].name;
-    }else{
-      let prevIndex = variablesInOrder[i-1].index;
-      pre = equation.substring(prevIndex+1, index);
-      vard = variablesInOrder[i].name;
-    }
-    if(pre != ""){
-      equationArray.push(pre);
-    }
-    equationArray.push(vard);
-    if(i == variablesInOrder.length-1 && equation.substring(index+1) != ''){
-      equationArray.push(equation.substring(index+1));
-    }
-  }
-  return equationArray;
-}*/
-//END
+
 
 class FuncPage {
   constructor(config) {
@@ -2565,7 +2674,7 @@ class TemplatePage extends FuncPage {
     this.clone = clon;
     let parent = clon.getElementById('customFuncTab');
     let chart = clon.getElementById("funcChart");
-    let funcTabs = [clon.getElementById('resultDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
+    let funcTabs = [clon.getElementById('functionDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
     let name = config.name;
     let tabCopy = clon.getElementById('customFuncTab');
     this.def.tabPage = tabCopy;
@@ -2593,75 +2702,9 @@ class TemplatePage extends FuncPage {
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
 
-    this.def.chart = new Chart(chart, {
-      type: 'scatter',
-      data: {
-        datasets: [{
-          data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
-          label: "hidden",
-          fontColor: '#FFFFFF',
-          borderColor: colorArray[1],
-          backgroundColor: colorArray[1],
-          showLine: true,
-        }]
-      },
-      options: {
-        scales: {
-          x: {
-            grid: {
-              drawBorder: false,
-              color: colorArray[0],
-            },
-            ticks: {
-              color: colorArray[0],
-            }
-          },
-          y: {
-            grid: {
-              drawBorder: false,
-              color: colorArray[0],
-            },
-            ticks: {
-              color: colorArray[0],
-            }
-          },
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            radius: 0
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          zoom: {
-            limits: {
-              //x: { min: -200, max: 200, minRange: 50 },
-              //y: { min: -200, max: 200, minRange: 50 }
-            },
-            pan: {
-              enabled: true,
-              mode: 'xy',
-            },
-            zoom: {
-              wheel: {
-                enabled: true,
-              },
-              pinch: {
-                enabled: true
-              },
-              mode: 'xy',
-              onZoomComplete({ chart }) {
-                chart.update('none');
-              }
-            }
-          }
-        }
-      }
-    })
+    this.def.chart = createGraph(chart)
+    //console.log(this.def.chart.getState().panDelta.valueOf())
+    this.def.chart.setScales({'x':{'min': -10, 'max': 10},'y':{'min': -10, 'max': 10}})
     clon.getElementById('functionMode').addEventListener("click", function () {
       funcTabs[0].style.visibility = "inherit";
       hidModes(parseInt(movable.dataset.pos), funcTabs);
@@ -2708,7 +2751,7 @@ class HybridPage extends TemplatePage {
     clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
     let nameElem = clon.getElementById('nameFunc');
     let subElem = clon.getElementById("EquationFunc");
-    let funcConfig = getByName(config.name)
+    let equationContain = clon.getElementById('EquationFunc');
     subElem.innerHTML = "Hybrid";
     subElem.contentEditable = false;
 
@@ -2724,6 +2767,7 @@ class HybridPage extends TemplatePage {
       console.log(fullConfig)
       changeFunc(oldVal, newVal, fullConfig);
     });
+    
     clon.getElementById('editIcon').addEventListener("click", function (e) {
       let json = JSON.parse(tabCopy.dataset.tab)
       openEdit(tabCopy, json.code);
@@ -2767,12 +2811,26 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
+    equationDIV.addEventListener('focus', () => { })
     equationDIV.addEventListener("focus", function (e) {
-      let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
-      equationDIV.innerHTML = initEquation.equation;
-      setSelect(equationDIV, equationDIV.innerHTML.length);
+      if(document.getElementById('keypad').style.visibility == "hidden"){
+        console.log("focusthrone")
+        let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+        equationDIV.innerHTML = initEquation.equation;
+        setSelect(equationDIV, equationDIV.innerHTML.length);
+        keypadVis(true);
+        keypadController({"scroll": equationDIV, "input": equationDIV}, "calc(60% - 40px)");
+      }
     });
-    equationDIV.addEventListener("input", function (e) {
+    equationDIV.addEventListener('focusout', ()=> {
+      setTimeout(() => {
+        let sel = window.getSelection();
+        if(sel.focusNode.nodeName != "#text"){
+          keypadVis(false);
+        }
+      })
+    });
+    equationDIV.addEventListener("change", function (e) {
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
       checkVar("function", tabCopy, varInEquat(e.target.innerHTML), fullConfig);
@@ -2780,6 +2838,14 @@ class EquatPage extends TemplatePage {
       equationDIV.dataset.baseE = equationDIV.innerHTML;
       changeFunc(oldVal, newVal, fullConfig);
     });
+    fullConfig.chart.options.plugins.zoom.zoom.onZoomComplete = function(){
+      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+      console.log("shit")
+    }
+    fullConfig.chart.options.plugins.zoom.pan.onPanComplete = function(){
+      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+      console.log("shit")
+    }
     document.getElementById("mainPage").appendChild(clon);
     checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML), fullConfig);
     //try {
