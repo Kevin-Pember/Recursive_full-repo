@@ -1411,7 +1411,7 @@ function openElement(name) {
     if(mainMode.style.visibility == "inherit"){
       keypadVis(true);
     }
-    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(66.6666% - 45px)");
+    keypadController({"scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader')}, "calc(65% - 45px)");
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -2855,3 +2855,12 @@ class EquatPage extends TemplatePage {
     }*/
   }
 }
+/**************************************Func filter**************************************************/
+let numLimit = [
+  "function",
+  "Function",
+  "cust",
+  "let",
+  "var",
+  ".log"
+]

@@ -108,7 +108,7 @@
             <button id="modeButton">Mode</button>
             <div id="mainMode" class="mode" style="visibility: inherit;">
 
-                <div id="displayClip">
+                <div id="displayClip" class="pane">
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                         autocorrect="off">
                         <h3 contenteditable="false" id="historyHeader">
@@ -151,57 +151,60 @@
 
 
 
-
-                <div id="extendedFuncGrid">
-                    <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
-                                class="helpIcon" src="Images/help.svg" height="40px"></button></div>
-                    <div class="function-item" style="grid-area: func;"><button class="funcbutton"
-                            id="functionEx">Func</button>
+                <div id="extendedKeypad" class="pane">
+                    <div id="extendedFuncGrid">
+                        <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
+                                    class="helpIcon" src="Images/help.svg" height="40px"></button></div>
+                        <div class="function-item" style="grid-area: func;"><button class="funcbutton"
+                                id="functionEx">Func</button>
+                        </div>
+                        <div class="function-item" style="grid-area: his;"><button class="funcbutton"
+                                id="historyEx"><img class="historyIcon" src="Images/historyIcon.svg" width="30"
+                                    height="35"></button></div>
+                        <div class="function-item" style="grid-area: vars;"><button class="funcbutton"
+                                id="varEx">xyz</button>
+                        </div>
+                        <div class="function-item" style="grid-area: arc;"><button class="funcbutton"
+                                id="arcEx">arc</button>
+                        </div>
+                        <div class="function-item" style="grid-area: inv;"><button class="funcbutton"
+                                id="invEx">inv</button>
+                        </div>
+                        <div class="function-item" style="grid-area: sin;"><button class="trigButton"
+                                id="sinEx">sin</button>
+                        </div>
+                        <div class="function-item" style="grid-area: deg;"><button class="funcbutton"
+                                id="degEx">deg</button>
+                        </div>
+                        <div class="function-item" style="grid-area: cos;"><button class="trigButton"
+                                id="cosEx">cos</button>
+                        </div>
+                        <div class="function-item" style="grid-area: mod;"><button class="funcbutton"
+                                id="modEx">mod</button>
+                        </div>
+                        <div class="function-item" style="grid-area: tan;"><button class="trigButton"
+                                id="tanEx">tan</button>
+                        </div>
+                        <div class="function-item" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
+                                |</button>
+                        </div>
+                        <div class="function-item" style="grid-area: d-f;"><button class="funcbutton"
+                                id="deciToFracEx">d→f</button>
+                        </div>
+                        <div class="function-item" style="grid-area: fact;"><button class="funcbutton"
+                                id="factorialEx">n!</button>
+                        </div>
+                        <div class="function-item" style="grid-area: ln;"><button class="funcbutton"
+                                id="lnEx">ln</button>
+                        </div>
+                        <div class="function-item" style="grid-area: log;"><button class="funcbutton"
+                                id="log10Ex">log</button>
+                        </div>
+                        <div class="function-item" style="grid-area: log10;"><button
+                                class="funcbutton">log<sub>10</sub></button>
+                        </div>
+                        <div class="function-item" style="grid-area: e;"><button class="funcbutton">e</button></div>
                     </div>
-                    <div class="function-item" style="grid-area: his;"><button class="funcbutton" id="historyEx"><img
-                                class="historyIcon" src="Images/historyIcon.svg" width="30" height="35"></button></div>
-                    <div class="function-item" style="grid-area: vars;"><button class="funcbutton"
-                            id="varEx">xyz</button>
-                    </div>
-                    <div class="function-item" style="grid-area: arc;"><button class="funcbutton"
-                            id="arcEx">arc</button>
-                    </div>
-                    <div class="function-item" style="grid-area: inv;"><button class="funcbutton"
-                            id="invEx">inv</button>
-                    </div>
-                    <div class="function-item" style="grid-area: sin;"><button class="trigButton"
-                            id="sinEx">sin</button>
-                    </div>
-                    <div class="function-item" style="grid-area: deg;"><button class="funcbutton"
-                            id="degEx">deg</button>
-                    </div>
-                    <div class="function-item" style="grid-area: cos;"><button class="trigButton"
-                            id="cosEx">cos</button>
-                    </div>
-                    <div class="function-item" style="grid-area: mod;"><button class="funcbutton"
-                            id="modEx">mod</button>
-                    </div>
-                    <div class="function-item" style="grid-area: tan;"><button class="trigButton"
-                            id="tanEx">tan</button>
-                    </div>
-                    <div class="function-item" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
-                            |</button>
-                    </div>
-                    <div class="function-item" style="grid-area: d-f;"><button class="funcbutton"
-                            id="deciToFracEx">d→f</button>
-                    </div>
-                    <div class="function-item" style="grid-area: fact;"><button class="funcbutton"
-                            id="factorialEx">n!</button>
-                    </div>
-                    <div class="function-item" style="grid-area: ln;"><button class="funcbutton" id="lnEx">ln</button>
-                    </div>
-                    <div class="function-item" style="grid-area: log;"><button class="funcbutton"
-                            id="log10Ex">log</button>
-                    </div>
-                    <div class="function-item" style="grid-area: log10;"><button
-                            class="funcbutton">log<sub>10</sub></button>
-                    </div>
-                    <div class="function-item" style="grid-area: e;"><button class="funcbutton">e</button></div>
                 </div>
                 <div id="customFuncDisplay">
                     <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40" height="40"
@@ -436,7 +439,7 @@
             </div>
             <button id="buyButton">$ 0.99</button>
         </div>
-        <div id="navColumn">
+        <div id="navColumn" class="pane" >
             <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="50"
                     height="50"></button>
             <h1 id="settingsTitle">Settings</h1>
@@ -447,7 +450,7 @@
             <button id="About" class="navButtons"><img id="AboutIcon" src="Images/aboutUS.svg" class="settingsIcon"
                     height="100%">About</button>
         </div>
-        <div id="colorsTab" class="settingTabContent">
+        <div id="colorsTab" class="settingTabContent pane">
             <button id="colorsBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                     class="backIcon"></button>
             <h1 class="settingsHeaders">Colors</h1>
@@ -530,7 +533,7 @@
             </div>
         </div>
 
-        <div id="PreferencesTab" class="settingTabContent">
+        <div id="PreferencesTab" class="settingTabContent pane">
             <button id="PreferencesBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                     class="backIcon"></button>
             <h1 class="settingsHeaders">Calculations</h1>
@@ -585,15 +588,15 @@
                 </div>
             </div>
         </div>
-        <div id="AboutTab" class="settingTabContent">
+        <div id="AboutTab" class="settingTabContent pane">
             <button id="AboutBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
                     class="backIcon"></button>
             <h1 class="settingsHeaders">About</h1>
-            <div id="VersionDiv">
+            <div id="VersionDiv" class="settingsDiv">
                 <h2 class="h2Settings" id="versionHeader" style="border-radius: 25px;">Version</h2>
                 <h1 style="position: absolute; right: 7px; top: 3.5px; ">V2</h1>
             </div>
-            <div id="AboutUsDiv">
+            <div id="AboutUsDiv" class="settingsDiv">
                 <h2 class="h2Settings">About Us</h2>
                 <h2 class="h5Settings" id="aboutTag" style="margin-bottom: 0px;">We are a team that works to make the
                     lives of our customers easier
@@ -624,7 +627,7 @@
             <button id="newFunction">+</button>
         </div>
     </div>
-    <div id="keypad" class="specialInput" style="visibility: visible;">
+    <div id="keypad" class="pane" style="visibility: visible;">
         <div class="mainCacGrid">
             <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
                     id="num1">1</button></div>

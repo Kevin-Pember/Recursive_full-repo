@@ -39,6 +39,12 @@
   position: absolute;
 }
 
+.pane{
+  border-radius: 25px;
+  background-color: var(--functionsColor);
+
+}
+
 .modeSelectButton {
   width: calc(100% - 20px);
   height: 200px;
@@ -433,11 +439,9 @@ input[type="button"]:focus {
   width: 75%;
   height: calc(35% - 10px);
   top: 10px;
-  background-color: var(--functionsColor);
   overflow: hidden;
   width: calc(100% - 20px);
   left: 10px;
-  border-radius: 25px;
 }
 
 .text-area {
@@ -513,6 +517,12 @@ input[type="button"]:focus {
     "enter pow2 sqrt division";
 }
 
+#extendedKeypad{
+  height: fit-content;
+  width: fit-content;
+  overflow: hidden;
+  visibility: hidden;
+}
 #extendedFuncGrid {
   height: 100%;
   top: 33.3333%;
@@ -525,7 +535,6 @@ input[type="button"]:focus {
   grid-template-columns: 50% 50%;
   grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
   background-color: #00000000;
-  position: absolute;
   z-index: 1;
   grid-template-areas:
     "help func"
@@ -1444,393 +1453,7 @@ input[type="button"]:focus {
   initial-value: var(--displayColor);
 }
 
-@media only screen and (max-aspect-ratio: 3/4) {
-  #tab {
-    height: 50px;
-  }
 
-  #mobileTabs {
-    visibility: visible;
-    left: 0;
-  }
-
-  .tablinks {
-    visibility: hidden;
-  }
-
-  .tabcontent {
-    position: absolute;
-    top: 50px;
-    bottom: 0;
-  }
-
-  .specialInput {
-    overflow: hidden;
-  }
-
-  #keypad {
-    width: calc(100% - 20px);
-    left: 10px;
-    bottom: 10px;
-    border-radius: 25px;
-    z-index: 2;
-    top: calc(35% + 45px);
-    position: absolute;
-  }
-
-  .mainCacGrid {
-    height: 100%;
-    width: 100%;
-    grid-template-areas:
-      "num1 num2 num3 moreFuncBut"
-      "num4 num5 num6 backspace"
-      "num7 num8 num9 plus"
-      "pi num0 point minus"
-      "percent pars pow mutiplication"
-      "enter pow2 sqrt division";
-  }
-
-  #extendedFuncGrid {
-    left: 100%;
-  }
-
-  #moreFunctionsButton {
-    border-radius: 0 15px 0 0;
-  }
-
-  #arrowIcon {
-    opacity: 1;
-  }
-
-  #backExMini {
-    visibility: hidden;
-  }
-
-  #DisplayLabel {
-    initial-value: "Display";
-  }
-
-  #customFuncDisplay {
-    visibility: hidden;
-  }
-
-  #settingsCogIcon {
-    width: 50px;
-    height: 50px;
-    position: absolute;
-  }
-}
-
-@media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 2/1) {
-  #tab {
-    height: 40px
-  }
-
-  #settingsCogIcon {
-    width: 40px;
-    height: 40px;
-    top: 0;
-  }
-
-  .tabcontent {
-    top: 40px;
-  }
-
-  .tablinks {
-    left: 0;
-  }
-
-  #displayClip {
-    width: 66.6666%;
-    max-width: 100%;
-    border-radius: 0 25px 25px 0;
-  }
-
-  #keypad {
-    width: 66.6666%;
-    bottom: 0;
-    padding: 0px;
-  }
-
-  #extendedFuncGrid {
-    top: 0;
-    height: 100%;
-    width: 33.3333%;
-    left: 66.6666%;
-    max-width: 100%;
-  }
-
-  #varsDiv {
-    top: 0;
-    height: 40%;
-    width: 33.3333%;
-    left: 66.6666%;
-    max-width: 100%;
-    grid-template-columns: 20% 20% 20% 20% 20%;
-    grid-template-rows: 20% 20% 20% 20% 20%;
-  }
-
-  #arrowIcon {
-    opacity: 0;
-    animation: 0.25s ease-in 0s 1 normal forwards running toDown;
-  }
-
-  #extraFuncPopUp {
-    visibility: hidden;
-  }
-
-  #overlayDiv {
-    width: 66.6666%;
-  }
-
-  #customFuncDisplay {
-    background-color: var(--functionsColor);
-    visibility: visible;
-    width: 33.333%;
-    left: 100%;
-    position: absolute;
-    z-index: 1;
-    border-radius: 0 0 0 0;
-  }
-
-  #backExMini {
-    position: absolute;
-    z-index: 1;
-    left: 10px;
-    top: 8.5px;
-  }
-
-  #customFuncDisplayGrid .button {
-    width: 95%;
-    height: 90%;
-    top: 5%;
-    right: 2.5%;
-    border-radius: 25px;
-    border: none;
-    background-color: var(--numbersColor);
-  }
-
-  #customFuncDisplayGrid {
-    grid-template-columns: 100%;
-  }
-
-  .text-area {
-    direction: rtl;
-  }
-
-  #customFuncDisplayRecentText {
-    color: transparent;
-  }
-}
-
-@media only screen and (max-height: 450px) {
-  #tab {
-    height: 40px
-  }
-
-  #settingsCogIcon {
-    width: 40px;
-    height: 40px;
-  }
-
-  #displayClip {
-    width: 66.6666%;
-    left: 33.3333%;
-    max-width: 100%;
-    max-height: 45%;
-    border-radius: 0 25px 25px 0;
-  }
-
-  #Container {
-    background-color: var(--functionsColor);
-  }
-
-  #overlayDiv {
-    bottom: 55%;
-  }
-
-  #keypad {
-    width: 66.6666%;
-    left: 33.3333%;
-    height: 55%;
-    top: 45%;
-    bottom: 0;
-    padding: 0px;
-    grid-template-columns: 16.666% 16.666% 16.666% 16.666% 16.666% 16.666%;
-    grid-template-rows: 25% 25% 25% 25%;
-    grid-template-areas:
-      "pow num1 num2 num3 plus moreFuncBut"
-      "pow2 num4 num5 num6 minus backspace"
-      "sqrt num7 num8 num9 mutiplication pars"
-      "enter pi num0 point division percent";
-  }
-
-  #piButton {
-    border-radius: 0
-  }
-
-  #pointButton {
-    border-radius: 0
-  }
-
-  #extendedFuncGrid {
-    top: 0;
-    height: 100%;
-    width: 33.3333%;
-    left: 0;
-    max-width: 100%;
-    grid-template-columns: 33.3333% 33.3333% 33.3333%;
-    grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
-    grid-template-areas:
-      "his help func"
-      "vars abs d-f"
-      "deg inv arc"
-      "sin cos tan"
-      "mod log10 fact"
-      "log ln e";
-  }
-
-  #varsDiv {
-    top: 0;
-    height: 100%;
-    width: 33.3333%;
-    left: 0;
-    max-width: 100%;
-    display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
-    grid-template-rows: 20% 20% 20% 20% 20%;
-    position: absolute;
-    z-index: 4;
-  }
-
-
-  #arrowIcon {
-    opacity: 0;
-    animation: 0.25s ease-in 0s 1 normal forwards running toDown;
-  }
-
-  #extraFuncPopUp {
-    visibility: hidden;
-  }
-
-  #overlayDiv {
-    width: 66.6666%;
-  }
-
-  #customFuncDisplay {
-    background-color: var(--functionsColor);
-    visibility: visible;
-    width: 33.333%;
-    left: 100%;
-    position: absolute;
-    z-index: 1;
-    border-radius: 0 0 0 0;
-  }
-
-  #backExMini {
-    position: absolute;
-    z-index: 1;
-    left: 10px;
-    top: 8.5px;
-  }
-
-  #customFuncDisplayGrid .button {
-    width: 95%;
-    height: 90%;
-    top: 5%;
-    right: 2.5%;
-    border-radius: 25px;
-    border: none;
-    background-color: var(--numbersColor);
-  }
-
-  #customFuncDisplayGrid {
-    grid-template-columns: 100%;
-  }
-
-  .text-area {
-    direction: rtl;
-  }
-
-  #displayClip {
-    height: 100%;
-  }
-
-  #customFuncDisplayRecentText {
-    color: transparent;
-  }
-
-  #nameCreator {
-    width: 20%
-  }
-
-  #mainCreator {
-    width: calc(80% - 30px);
-    left: calc(20% + 20px);
-    top: 50px;
-  }
-}
-
-@media only screen and (max-width: 451px) {}
-
-@media only screen and (min-aspect-ratio: 5/3) and (min-height: 451px) {
-  #displayClip {
-    width: 40%;
-    max-width: 100%;
-    resize: none;
-    border-radius: 0 25px 25px 0;
-  }
-
-  #keypad {
-    width: 40%;
-    bottom: 0;
-    padding: 0px;
-  }
-
-  #extendedFuncGrid {
-    top: 0;
-    height: 100%;
-    width: 20%;
-    left: 40%;
-    max-width: 100%;
-  }
-
-  #arrowIcon {
-    opacity: 0;
-  }
-
-  #customFuncDisplay {
-    visibility: visible;
-    height: 100%;
-    width: 40%;
-    left: 60%;
-    background-color: var(--displayColor);
-    position: absolute;
-    z-index: 1;
-    border-radius: 25px 0 0 0;
-  }
-
-  #extraFuncPopUp {
-    visibility: hidden;
-  }
-
-  #overlayDiv {
-    width: 40%;
-  }
-
-  #customFuncDisplayRecentText {
-    color: var(--textColor);
-    text-align: center;
-  }
-
-  #customFuncDisplayGrid {
-    grid-template-columns: 50% 50%;
-  }
-
-  #backExMini {
-    visibility: hidden;
-  }
-}
 
 #settingsBody {
   background-color: var(--displayColor);
@@ -1840,7 +1463,8 @@ input[type="button"]:focus {
 
 #navColumn {
   width: 15%;
-  height: 100%;
+  height: calc(100% - 20px);
+  margin-top: 10px;
   background-color: var(--functionsColor);
 }
 
@@ -1871,10 +1495,11 @@ input[type="button"]:focus {
   visibility: hidden;
   left: 15%;
   top: 0;
-  height: 100%;
+  height: calc(100% - 20px);
+  top: 10px;
   width: 85%;
   position: absolute;
-  background-color: var(--displayColor);
+  background-color: var(--functionsColor);
 }
 
 .settingBackButtons {
@@ -1913,12 +1538,12 @@ input[type="button"]:focus {
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
+  width: calc(100% - 20px);
   text-align: center;
-  font-size: 50px;
 }
 
 .settingsDiv {
-  background-color: var(--functionsColor);
+  background-color: var(--displayColor);
   border-radius: 25px;
   align-self: center;
   position: relative;
@@ -2194,7 +1819,6 @@ input[type="button"]:focus {
 }
 
 #accentColorDiv {
-  background-color: var(--functionsColor);
   height: 200px;
   border-radius: 25px;
   align-self: center;
@@ -2337,7 +1961,6 @@ input[type="button"]:focus {
 }
 
 #AboutUsDiv {
-  background-color: var(--functionsColor);
   height: auto;
   border-radius: 25px;
   position: relative;
@@ -2357,7 +1980,6 @@ input[type="button"]:focus {
 }
 
 #VersionDiv {
-  background-color: var(--functionsColor);
   border-radius: 25px;
   position: relative;
   height: auto;
@@ -2444,36 +2066,6 @@ input[type="button"]:focus {
   border: none;
   left: calc(50% - 45px);
   background-color: var(--numbersColor);
-}
-
-@media only screen and (max-aspect-ratio: 3/4) {
-  #navColumn {
-    width: 100%;
-  }
-
-  #colorsTab {
-    visibility: hidden;
-    left: 100%;
-  }
-
-  #PreferencesTab {
-    visibility: hidden;
-    left: 100%;
-  }
-
-  #AboutTab {
-    visibility: hidden;
-    left: 100%;
-  }
-
-  .navButtons {
-    text-indent: 100px;
-    height: 100px;
-  }
-
-  #customFuncDisplayGrid {
-    visibility: hidden;
-  }
 }
 
 @media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {
@@ -2616,7 +2208,7 @@ input[type="button"]:focus {
   position: absolute;
   border-radius: 25px 25px 0 0;
   background-color: var(--functionsColor);
-  grid-template-columns: 33.3333% 33.3333% 33.3333%;
+  
   display: grid;
   grid-template-columns: 50% 50%;
   grid-auto-rows: 130px;
@@ -3115,9 +2707,116 @@ th {
   margin-top: 20px;
 }
 
+#newTabName {
+  width: calc(100% - 31.5px);
+  text-align: start;
+}
+
+#tabRemove {
+  right: 0;
+}
 @media only screen and (max-aspect-ratio: 3/4) {
+  #tab {
+    height: 50px;
+  }
+
+  #mobileTabs {
+    visibility: visible;
+    left: 0;
+  }
+
+  .tablinks {
+    visibility: hidden;
+  }
+
+  .tabcontent {
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+  }
+
+  #keypad {
+    width: calc(100% - 20px);
+    left: 10px;
+    bottom: 10px;
+    border-radius: 25px;
+    z-index: 2;
+    top: calc(35% + 45px);
+    position: absolute;
+    overflow: hidden;
+  }
+
+  .mainCacGrid {
+    height: 100%;
+    width: 100%;
+    grid-template-areas:
+      "num1 num2 num3 moreFuncBut"
+      "num4 num5 num6 backspace"
+      "num7 num8 num9 plus"
+      "pi num0 point minus"
+      "percent pars pow mutiplication"
+      "enter pow2 sqrt division";
+  }
+
+  #extendedFuncGrid {
+    left: 100%;
+  }
+
+  #moreFunctionsButton {
+    border-radius: 0 15px 0 0;
+  }
+
+  #arrowIcon {
+    opacity: 1;
+  }
+
+  #backExMini {
+    visibility: hidden;
+  }
+
+  #DisplayLabel {
+    initial-value: "Display";
+  }
+
+  #customFuncDisplay {
+    visibility: hidden;
+  }
+
+  #settingsCogIcon {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+  }
   #navColumn {
     width: 100%;
+  }
+
+  #colorsTab {
+    visibility: hidden;
+    left: 100%;
+  }
+
+  #PreferencesTab {
+    visibility: hidden;
+    left: 100%;
+  }
+
+  #AboutTab {
+    visibility: hidden;
+    left: 100%;
+  }
+
+  .navButtons {
+    text-indent: 100px;
+    height: 100px;
+  }
+
+  #customFuncDisplayGrid {
+    visibility: hidden;
+  }
+  #navColumn {
+    width: calc(100% - 20px);
+    margin-left: 10px;
   }
 
   #mainCalculatorHelp {
@@ -3136,11 +2835,351 @@ th {
   }
 }
 
-#newTabName {
-  width: calc(100% - 31.5px);
-  text-align: start;
+@media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 2/1) {
+  #tab {
+    height: 40px
+  }
+
+  #settingsCogIcon {
+    width: 40px;
+    height: 40px;
+    top: 0;
+  }
+
+  .tabcontent {
+    top: 40px;
+  }
+
+  .tablinks {
+    left: 0;
+  }
+
+  #displayClip {
+    width: 66.6666%;
+    max-width: 100%;
+    border-radius: 0 25px 25px 0;
+  }
+
+  #keypad {
+    width: 66.6666%;
+    bottom: 0;
+    padding: 0px;
+  }
+
+  #extendedFuncGrid {
+    top: 0;
+    height: 100%;
+    width: 33.3333%;
+    left: 66.6666%;
+    max-width: 100%;
+  }
+
+  #varsDiv {
+    top: 0;
+    height: 40%;
+    width: 33.3333%;
+    left: 66.6666%;
+    max-width: 100%;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 20% 20% 20% 20%;
+  }
+
+  #arrowIcon {
+    opacity: 0;
+    animation: 0.25s ease-in 0s 1 normal forwards running toDown;
+  }
+
+  #extraFuncPopUp {
+    visibility: hidden;
+  }
+
+  #overlayDiv {
+    width: 66.6666%;
+  }
+
+  #customFuncDisplay {
+    background-color: var(--functionsColor);
+    visibility: visible;
+    width: 33.333%;
+    left: 100%;
+    position: absolute;
+    z-index: 1;
+    border-radius: 0 0 0 0;
+  }
+
+  #backExMini {
+    position: absolute;
+    z-index: 1;
+    left: 10px;
+    top: 8.5px;
+  }
+
+  #customFuncDisplayGrid .button {
+    width: 95%;
+    height: 90%;
+    top: 5%;
+    right: 2.5%;
+    border-radius: 25px;
+    border: none;
+    background-color: var(--numbersColor);
+  }
+
+  #customFuncDisplayGrid {
+    grid-template-columns: 100%;
+  }
+
+  .text-area {
+    direction: rtl;
+  }
+
+  #customFuncDisplayRecentText {
+    color: transparent;
+  }
 }
 
-#tabRemove {
-  right: 0;
+@media only screen and (max-height: 450px) {
+  .tabcontent {
+    top: 40px;
+    border-radius: 0 25px 0 0;
+  }
+  #tab {
+    height: 40px
+  }
+
+  #settingsCogIcon {
+    width: 40px;
+    height: 40px;
+  }
+  #modeButton{
+    left: 20px;
+    right: unset;
+  }
+  #displayClip {
+    width: calc(33.3333% - 15px);
+    height: calc(100% - 20px);
+    max-width: 100%;
+  }
+
+  #Container {
+    background-color: var(--functionsColor);
+  }
+
+  #overlayDiv {
+    bottom: 55%;
+  }
+  #keypad{
+    width: calc(33.3333% - 15px);
+    left: calc(66.6666% + 5px);
+    height: calc(100% - 60px);
+    top: 50px;
+    bottom: 0;
+    padding: 0px;
+    position: absolute;
+    border-radius: 25px;
+    overflow: hidden;
+  }
+  #mainCacGrid {
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 16.666% 16.666% 16.666% 16.666% 16.666% 16.666%;
+    grid-template-rows: 25% 25% 25% 25%;
+    grid-template-areas:
+      "pow num1 num2 num3 plus moreFuncBut"
+      "pow2 num4 num5 num6 minus backspace"
+      "sqrt num7 num8 num9 mutiplication pars"
+      "enter pi num0 point division percent";
+  }
+  #extendedKeypad{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: calc(33.3333% - 10px);
+    height: calc(100% - 20px);
+    left: calc(33.3333% + 5px);
+    top: 10px;
+    visibility: inherit;
+  }
+  #extendedFuncGrid {
+    top: 0;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    max-width: 100%;
+    grid-template-columns: 33.3333% 33.3333% 33.3333%;
+    grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
+    grid-template-areas:
+      "his help func"
+      "vars abs d-f"
+      "deg inv arc"
+      "sin cos tan"
+      "mod log10 fact"
+      "log ln e";
+  }
+
+  #varsDiv {
+    top: 0;
+    height: 100%;
+    width: 33.3333%;
+    left: 0;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 20% 20% 20% 20%;
+    position: absolute;
+    z-index: 4;
+  }
+
+
+  #arrowIcon {
+    opacity: 0;
+    animation: 0.25s ease-in 0s 1 normal forwards running toDown;
+  }
+
+  #extraFuncPopUp {
+    visibility: hidden;
+  }
+
+  #overlayDiv {
+    width: 66.6666%;
+  }
+
+  #customFuncDisplay {
+    background-color: var(--functionsColor);
+    visibility: visible;
+    width: 33.333%;
+    left: 100%;
+    position: absolute;
+    z-index: 1;
+    border-radius: 0 0 0 0;
+  }
+
+  #backExMini {
+    position: absolute;
+    z-index: 1;
+    left: 10px;
+    top: 8.5px;
+  }
+
+  #customFuncDisplayGrid .button {
+    width: 95%;
+    height: 90%;
+    top: 5%;
+    right: 2.5%;
+    border-radius: 25px;
+    border: none;
+    background-color: var(--numbersColor);
+  }
+
+  #customFuncDisplayGrid {
+    grid-template-columns: 100%;
+  }
+
+  .text-area {
+    direction: rtl;
+  }
+
+  #customFuncDisplayRecentText {
+    color: transparent;
+  }
+
+  #nameCreator {
+    width: 20%
+  }
+
+  #mainCreator {
+    width: calc(80% - 30px);
+    left: calc(20% + 20px);
+    top: 50px;
+  }
+
+  .modeSelectButton{
+    height: calc(100% - 20px);
+    width: calc(32% - 10px);
+    margin-top: 10px;
+  }
+  .modeIcon{
+    height: unset;
+    width: calc(100% - 40px);
+  }
+  .dynamicModePane{
+    height: calc(100% - 20px);
+    width: calc(66.6666% - 20px);
+  }
+  .dynamicModeControls{
+    left: calc(66.6666%);
+    width: calc(33.3333% - 10px);
+    top: 10px;
+    height: calc(100% - 20px)
+  }
+  #navColumn{
+    width: calc(25% - 15px);
+    margin-left: 10px;
+  }
+  .settingTabContent{
+    left: calc(25% + 5px);
+    width: calc(75% - 15px);
+    overflow: auto;
+  }
+  #funcGrid{
+    grid-template-columns: 33.3333% 33.3333% 33.3333%;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 5/3) and (min-height: 451px) {
+  #displayClip {
+    width: 40%;
+    max-width: 100%;
+    resize: none;
+    border-radius: 0 25px 25px 0;
+  }
+
+  #keypad {
+    width: 40%;
+    bottom: 0;
+    padding: 0px;
+  }
+
+  #extendedFuncGrid {
+    top: 0;
+    height: 100%;
+    width: 20%;
+    left: 40%;
+    max-width: 100%;
+  }
+
+  #arrowIcon {
+    opacity: 0;
+  }
+
+  #customFuncDisplay {
+    visibility: visible;
+    height: 100%;
+    width: 40%;
+    left: 60%;
+    background-color: var(--displayColor);
+    position: absolute;
+    z-index: 1;
+    border-radius: 25px 0 0 0;
+  }
+
+  #extraFuncPopUp {
+    visibility: hidden;
+  }
+
+  #overlayDiv {
+    width: 40%;
+  }
+
+  #customFuncDisplayRecentText {
+    color: var(--textColor);
+    text-align: center;
+  }
+
+  #customFuncDisplayGrid {
+    grid-template-columns: 50% 50%;
+  }
+
+  #backExMini {
+    visibility: hidden;
+  }
 }

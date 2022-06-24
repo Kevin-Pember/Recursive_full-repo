@@ -39,6 +39,12 @@
   position: absolute;
 }
 
+.pane{
+  border-radius: 25px;
+  background-color: var(--functionsColor);
+
+}
+
 .modeSelectButton {
   width: calc(100% - 20px);
   height: 200px;
@@ -65,7 +71,7 @@
 .dynamicContent {
   position: absolute;
   width: 100%;
-  height: 60%;
+  height: 100%;
   top: 0;
   left: 0;
 }
@@ -73,19 +79,29 @@
 #graphContain {
   width: calc(100% - 20px);
   margin-left: 10px;
-  height: calc(60% - 20px);
+  height: calc(100% - 20px);
   margin-top: 10px;
+}
+
+.dynamicModePane{
+  width: calc(100% - 20px);
+  left: 10px;
+  top: 10px;
+  bottom: calc(40% + 10px);
+  border-radius: 25px;
+  position: absolute;
+  background-color: var(--functionsColor);
 }
 
 #fullGraph {
   position: absolute;
-  top: calc(60% - 50px);
+  bottom: 0;
   right: 0;
 }
 
 .dynamicModeControls {
   width: calc(100% - 20px);
-  max-height: calc(40% - 10px);
+  height: calc(40% - 10px);
   top: 60%;
   position: absolute;
   left: 10px;
@@ -124,7 +140,6 @@
 
 #settingsCogGraph {
   bottom: 0px;
-  margin-top: -20px;
 }
 
 /*end*/
@@ -424,11 +439,9 @@ input[type="button"]:focus {
   width: 75%;
   height: calc(35% - 10px);
   top: 10px;
-  background-color: var(--functionsColor);
   overflow: hidden;
   width: calc(100% - 20px);
   left: 10px;
-  border-radius: 25px;
 }
 
 .text-area {
@@ -504,6 +517,12 @@ input[type="button"]:focus {
     "enter pow2 sqrt division";
 }
 
+#extendedKeypad{
+  height: fit-content;
+  width: fit-content;
+  overflow: hidden;
+
+}
 #extendedFuncGrid {
   height: 100%;
   top: 33.3333%;
@@ -516,7 +535,6 @@ input[type="button"]:focus {
   grid-template-columns: 50% 50%;
   grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
   background-color: #00000000;
-  position: absolute;
   z-index: 1;
   grid-template-areas:
     "help func"
@@ -1455,10 +1473,6 @@ input[type="button"]:focus {
     bottom: 0;
   }
 
-  .specialInput {
-    overflow: hidden;
-  }
-
   #keypad {
     width: calc(100% - 20px);
     left: 10px;
@@ -1467,6 +1481,7 @@ input[type="button"]:focus {
     z-index: 2;
     top: calc(35% + 45px);
     position: absolute;
+    overflow: hidden;
   }
 
   .mainCacGrid {
@@ -1615,6 +1630,9 @@ input[type="button"]:focus {
 }
 
 @media only screen and (max-height: 450px) {
+  .tabcontent {
+    top: 40px;
+  }
   #tab {
     height: 40px
   }
@@ -1623,13 +1641,14 @@ input[type="button"]:focus {
     width: 40px;
     height: 40px;
   }
-
+  #modeButton{
+    left: unset;
+    right: calc(66.6666% + 10px);
+  }
   #displayClip {
-    width: 66.6666%;
-    left: 33.3333%;
+    width: calc(33.3333% - 10px);
+    height: calc(100% - 20px);
     max-width: 100%;
-    max-height: 45%;
-    border-radius: 0 25px 25px 0;
   }
 
   #Container {
@@ -1639,14 +1658,20 @@ input[type="button"]:focus {
   #overlayDiv {
     bottom: 55%;
   }
-
-  #keypad {
-    width: 66.6666%;
-    left: 33.3333%;
-    height: 55%;
-    top: 45%;
+  #keypad{
+    width: calc(33.3333% - 20px);
+    left: 66.6666%;
+    height: calc(100% - 60px);
+    top: 50px;
     bottom: 0;
     padding: 0px;
+    position: absolute;
+    border-radius: 25px;
+    overflow: hidden;
+  }
+  #mainCacGrid {
+    width: 100%;
+    height: 100%;
     grid-template-columns: 16.666% 16.666% 16.666% 16.666% 16.666% 16.666%;
     grid-template-rows: 25% 25% 25% 25%;
     grid-template-areas:
@@ -1663,11 +1688,20 @@ input[type="button"]:focus {
   #pointButton {
     border-radius: 0
   }
+  #extendedKeypad{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: calc(33.3333% - 20px);
+    height: calc(100% - 20px);
+    left: calc(33.3333% + 10px);
+    top: 10px;
 
+  }
   #extendedFuncGrid {
     top: 0;
     height: 100%;
-    width: 33.3333%;
+    width: 100%;
     left: 0;
     max-width: 100%;
     grid-template-columns: 33.3333% 33.3333% 33.3333%;
@@ -1741,10 +1775,6 @@ input[type="button"]:focus {
 
   .text-area {
     direction: rtl;
-  }
-
-  #displayClip {
-    height: 100%;
   }
 
   #customFuncDisplayRecentText {
@@ -2919,6 +2949,7 @@ input[type="button"]:focus {
 
 #graphContainer {
   height: calc(100% - 110px);
+  padding: 5px;
   margin-top: 10px;
   width: 100%;
   background-color: var(--displayColor);
