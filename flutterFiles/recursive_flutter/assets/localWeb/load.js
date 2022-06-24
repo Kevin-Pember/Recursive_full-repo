@@ -2516,9 +2516,13 @@ function createGraph(chart) {
   })
   return defChart;
 }
-function keypadController(keyElems, height) {
+function keypadController(keyElems, reset, style) {
   let keypad = document.getElementById('keypad');
-  keypad.style.top = `calc(100% - ${height})`;
+  if(reset){
+    keypad.style = undefined
+  }else{
+    keypad.style= `style`;
+  }
   keyTargets = keyElems;
 }
 let keypadVis = (visible) => {
