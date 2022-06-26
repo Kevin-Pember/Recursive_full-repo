@@ -174,6 +174,9 @@ if (document.getElementById("mainBody") != null) {
     }
     openElement("mainPage")
   });
+
+  //new
+
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
       console.log("toggled")
@@ -1417,7 +1420,12 @@ function openElement(name) {
     if (mainMode.style.visibility == "inherit") {
       keypadVis(true);
     }
-    keypadController({ "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }, true);
+    keypadController(
+      {
+        "reset": true,
+        "rePage": () => { },
+      }
+    );
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -1631,8 +1639,8 @@ function parseVariables(element, def) {
       parsedEquation = parseVar(parsedEquation, data);
     }*/
     method = parseVarFunc(name, varData);
-  }else{
-    method = name+"()";
+  } else {
+    method = name + "()";
   }
   if (all) {
     solveEquation(method, clon);
@@ -2527,14 +2535,38 @@ function createGraph(chart) {
   })
   return defChart;
 }
-function keypadController(keyElems, reset, style) {
-  let keypad = document.getElementById('keypad');
-  if (reset) {
-    keypad.style = undefined
+/*
+  keyController object dev guide
+{
+  "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+  "reset": false, //OR even undefined
+  "upPage": () => {//not Denfined},
+  "rePage": () => {//not Denfined but reverse of the upPage},
+  "keyStyling": "" //string of a css file which java will pull the keypadStyle class from that document
+}
+*/
+function keypadController(object) {
+  console.log("keypadController ran")
+  if (object.reset != undefined && object.reset == false) {
+    let styling = document.createElement('style');
+    styling.id = 'keypadStyling';
+    let keypad = document.getElementById("keypad")
+    styling.innerHTML = object.keyStyling;
+    document.getElementsByTagName('body')[0].appendChild(styling);
+    keypad.className = "keypadStyle";
+    object.upPage();
+    keyTargets = object.keyElems
   } else {
-    keypad.style = style;
+    console.log('reset')
+    let keypad = document.getElementById("keypad")
+    keypad.className = "pane";
+    let styleElem = document.getElementById('keypadStyling');
+    if(styleElem != null){
+      document.getElementsByTagName('body')[0].removeChild(styleElem);
+    }
+    object.rePage()
+    keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') };
   }
-  keyTargets = keyElems;
 }
 let keypadVis = (visible) => {
   if (visible) {
@@ -2811,7 +2843,27 @@ class EquatPage extends TemplatePage {
         equationDIV.innerHTML = initEquation.equation;
         setSelect(equationDIV, equationDIV.innerHTML.length);
         keypadVis(true);
-        keypadController({ "scroll": equationDIV, "input": equationDIV }, "height: calc(100% - 95px); top: 85px;width: calc(50% - 15px);left: calc(50% + 5px);");
+        keypadController(
+          {
+            "keyElems": { "scroll": equationDIV, "input": equationDIV },
+            "reset": false,
+            "upPage": () => { },
+            "rePage": () => { },
+            "keyStyling": `
+              #keypad {
+                top: calc(40% + 40px);
+                bottom: 10px;
+                width: calc(100% - 20px);
+                left: 10px;
+                position: absolute;
+              }
+              @media only screen and (max-height: 450px){
+                #keypad {
+                  width: 50%;
+                }
+              }`
+          }
+        );
       }
     });
     equationDIV.addEventListener('focusout', () => {

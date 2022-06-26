@@ -2732,6 +2732,16 @@ th {
 #tabRemove {
   right: 0;
 }
+#keypad {
+  width: calc(100% - 20px);
+  left: 10px;
+  bottom: 10px;
+  border-radius: 25px;
+  z-index: 2;
+  top: calc(35% + 45px);
+  position: absolute;
+  overflow: hidden;
+}
 @media only screen and (max-aspect-ratio: 3/4) {
   #tab {
     height: 50px;
@@ -2750,17 +2760,6 @@ th {
     position: absolute;
     top: 50px;
     bottom: 0;
-  }
-
-  #keypad {
-    width: calc(100% - 20px);
-    left: 10px;
-    bottom: 10px;
-    border-radius: 25px;
-    z-index: 2;
-    top: calc(35% + 45px);
-    position: absolute;
-    overflow: hidden;
   }
 
   .mainCacGrid {
