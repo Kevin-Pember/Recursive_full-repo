@@ -109,6 +109,7 @@
             <div id="mainMode" class="mode" style="visibility: inherit;">
 
                 <div id="displayClip" class="pane">
+                    <img id="deleteHistory" src="Images/historyIcon.svg" width="42.5px">
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                         autocorrect="off">
                         <h3 contenteditable="false" id="historyHeader">
@@ -158,9 +159,8 @@
                         <div class="function-item" style="grid-area: func;"><button class="funcbutton"
                                 id="functionEx">Func</button>
                         </div>
-                        <div class="function-item" style="grid-area: his;"><button class="funcbutton"
-                                id="historyEx"><img class="historyIcon" src="Images/historyIcon.svg" width="30"
-                                    height="35"></button></div>
+                        <div class="function-item" style="grid-area: ac;"><button class="funcbutton"
+                                id="acEx">ac</button></div>
                         <div class="function-item" style="grid-area: vars;"><button class="funcbutton"
                                 id="varEx">xyz</button>
                         </div>
@@ -439,7 +439,7 @@
             </div>
             <button id="buyButton">$ 0.99</button>
         </div>
-        <div id="navColumn" class="pane" >
+        <div id="navColumn" class="pane">
             <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="50"
                     height="50"></button>
             <h1 id="settingsTitle">Settings</h1>
@@ -645,12 +645,8 @@
             <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button>
             </div>
             <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button class="funcbutton"
-                    id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon" width="40"
-                        height="20"></button><button class="textOverlay" id="ac">
-                    <div class="matchCircle">
-                        <h3 class="memText">ac</h3>
-                    </div>
-                </button></div>
+                    id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon" width="40" height="20"></button>
+            </div>
             <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button>
             </div>
             <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button>
@@ -698,12 +694,11 @@
             <div class="customFuncDisplayBackgroundPopup" width="100%">
             </div>
             <div class="extraFuncPopUpGrid">
-                <div class="button-item"><button class="funcbutton" id="historyPopup"><img class="historyIcon"
-                            src="Images/historyIcon.svg" width="30" height="35"></button></div>
-                <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
-                <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
                 <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
                             src="Images/help.svg" width="30" height="30"></button></div>
+                <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
+                <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
+                <div class="button-item"><button class="funcbutton" id="acPopup">ac</button></div>
                 <div class="button-item"><button class="funcbutton" id="log10Popup">log₁₀</button></div>
                 <div class="button-item"><button class="funcbutton" id="lnPopup">ln</button>
                 </div>

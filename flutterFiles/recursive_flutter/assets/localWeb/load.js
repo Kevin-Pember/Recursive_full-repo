@@ -179,10 +179,12 @@ if (document.getElementById("mainBody") != null) {
       console.log("toggled")
       hideAllTabs();
       changeTabAs(true);
+      document.getElementById('keypad').style.visibility = "hidden";
     } else {
       console.log("toggled other")
       openElement("mainPage")
       changeTabAs(false);
+      document.getElementById('keypad').style = undefined;
     }
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
@@ -229,7 +231,6 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
   document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
   document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
-  document.getElementById('ac').addEventListener("click", function () { clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight; });
   document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
   document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
   document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
@@ -255,9 +256,12 @@ if (document.getElementById("mainBody") != null) {
       sessionStorage.setItem("facing", "mainFlip")
     }
   });
-  document.getElementById('historyEx').addEventListener("click", function () { deleteHistory(); });
+  document.getElementById('deleteHistory').addEventListener("click", function () { deleteHistory(); });
   document.getElementById('deciToFracEx').addEventListener("click", function () { frontButtonPressed('d→f('); });
   document.getElementById('absEx').addEventListener("click", function () { frontButtonPressed('|'); });
+  document.getElementById('acEx').addEventListener('click', () => {
+    clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+  })
   document.getElementById('modEx').addEventListener("click", function () { frontButtonPressed('mod('); });
   document.getElementById('degEx').addEventListener("click", function (e) {
     setDegMode();
@@ -296,7 +300,9 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('minusIconPopup').addEventListener("click", function () { });
   document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
-  document.getElementById('historyPopup').addEventListener("click", function () { deleteHistory(); });
+  document.getElementById('acPopup').addEventListener('click', () => {
+    clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+  })
   document.getElementById('deciToFracPopup').addEventListener("click", function () { frontButtonPressed('d→f('); });
   document.getElementById('helpPopup').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('log10Popup').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
@@ -1411,7 +1417,7 @@ function openElement(name) {
     if (mainMode.style.visibility == "inherit") {
       keypadVis(true);
     }
-    keypadController({ "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }, "calc(65% - 45px)");
+    keypadController({ "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }, true);
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -1603,26 +1609,31 @@ function parseVariables(element, def) {
   let clon = def.tabPage
   console.log(clon)
   let varData = varListAssbely(element);
+  console.log(def)
   console.log(clon)
   let name = clon.querySelector('#nameFunc').value;
   let method = "";
   let all = true;
   let first = undefined;
-  for (let Vars of varData) {
-    if (all) {
-      if (Vars.Value == '') {
-        all = false;
-        first = Vars;
-        Vars.Value = "Æ";
+  if (varData.length > 0) {
+    for (let Vars of varData) {
+      if (all) {
+        if (Vars.Value == '') {
+          all = false;
+          first = Vars;
+          Vars.Value = "Æ";
+        }
+      } else if (Vars.Value == '') {
+        first = undefined;
       }
-    } else if (Vars.Value == '') {
-      first = undefined;
     }
+    /*for (let data of varData) {
+      parsedEquation = parseVar(parsedEquation, data);
+    }*/
+    method = parseVarFunc(name, varData);
+  }else{
+    method = name+"()";
   }
-  /*for (let data of varData) {
-    parsedEquation = parseVar(parsedEquation, data);
-  }*/
-  method = parseVarFunc(name, varData);
   if (all) {
     solveEquation(method, clon);
     solveGraph(method, def);
@@ -1801,8 +1812,8 @@ function SettingsBack() {
   var target;
   let tabs = document.getElementsByClassName('settingTabContent');
   console.log(tabs)
-  for(let tab of tabs){
-    if(tab.style.visibility == "visible"){
+  for (let tab of tabs) {
+    if (tab.style.visibility == "visible") {
       target = tab;
     }
   }
@@ -2518,10 +2529,10 @@ function createGraph(chart) {
 }
 function keypadController(keyElems, reset, style) {
   let keypad = document.getElementById('keypad');
-  if(reset){
+  if (reset) {
     keypad.style = undefined
-  }else{
-    keypad.style= `style`;
+  } else {
+    keypad.style = style;
   }
   keyTargets = keyElems;
 }
@@ -2800,7 +2811,7 @@ class EquatPage extends TemplatePage {
         equationDIV.innerHTML = initEquation.equation;
         setSelect(equationDIV, equationDIV.innerHTML.length);
         keypadVis(true);
-        keypadController({ "scroll": equationDIV, "input": equationDIV }, "calc(60% - 40px)");
+        keypadController({ "scroll": equationDIV, "input": equationDIV }, "height: calc(100% - 95px); top: 85px;width: calc(50% - 15px);left: calc(50% + 5px);");
       }
     });
     equationDIV.addEventListener('focusout', () => {

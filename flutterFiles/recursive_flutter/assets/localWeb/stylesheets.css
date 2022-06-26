@@ -334,6 +334,16 @@ input[type="button"]:focus {
   left: 10px;
 }
 
+#deleteHistory{
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  padding: 2.5px;
+  border-radius: 50%;
+  background-color: var(--displayColor);
+  position: absolute;
+}
+
 #overlayDiv {
   height: 40px;
   width: 100%;
@@ -538,7 +548,7 @@ input[type="button"]:focus {
   z-index: 1;
   grid-template-areas:
     "help func"
-    "his vars"
+    "vars ac"
     "mod abs"
     "sin deg"
     "cos arc"
@@ -2892,7 +2902,7 @@ th {
   }
 
   #arrowIcon {
-    opacity: 0;
+    visibility: hidden;
     animation: 0.25s ease-in 0s 1 normal forwards running toDown;
   }
 
@@ -3015,7 +3025,7 @@ th {
     grid-template-columns: 33.3333% 33.3333% 33.3333%;
     grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
     grid-template-areas:
-      "his help func"
+      "help func ac"
       "vars abs d-f"
       "deg inv arc"
       "sin cos tan"
@@ -3038,12 +3048,17 @@ th {
 
 
   #arrowIcon {
-    opacity: 0;
+    visibility: hidden;
     animation: 0.25s ease-in 0s 1 normal forwards running toDown;
   }
 
   #extraFuncPopUp {
     visibility: hidden;
+  }
+
+  #deleteHistory{
+    left: unset;
+    right: 10px;
   }
 
   #overlayDiv {
@@ -3158,7 +3173,7 @@ th {
   }
 
   #arrowIcon {
-    opacity: 0;
+    visibility: hidden;
   }
 
   #customFuncDisplay {
