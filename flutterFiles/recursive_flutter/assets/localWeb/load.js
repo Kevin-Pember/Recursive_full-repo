@@ -372,6 +372,10 @@ if (document.getElementById("mainBody") != null) {
     }
     #graphContainer{
       height: 80%;
+    }
+    .navButtons{
+      height: 50px;
+      text-indent: 50px;
     }`
   };
   const mobilePortrait = {
@@ -3085,7 +3089,6 @@ function keypadController(object) {
     styling.innerHTML = object.keyStyling;
     document.getElementsByTagName('body')[0].appendChild(styling);
     keypad.className = "keypadStyle";
-    object.upPage();
     keyTargets = object.keyElems
   } else {
     console.log('reset')
@@ -3095,7 +3098,6 @@ function keypadController(object) {
     if (styleElem != null) {
       document.getElementsByTagName('body')[0].removeChild(styleElem);
     }
-    object.rePage()
     keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') };
   }
 }
@@ -3378,8 +3380,6 @@ class EquatPage extends TemplatePage {
           {
             "keyElems": { "scroll": equationDIV, "input": equationDIV },
             "reset": false,
-            "upPage": () => { },
-            "rePage": () => { },
             "keyStyling": `
               #keypad {
                 top: calc(40% + 40px);
@@ -3389,8 +3389,26 @@ class EquatPage extends TemplatePage {
                 position: absolute;
               }
               @media only screen and (max-height: 450px){
-                #keypad {
-                  width: 50%;
+                #keypad{
+                  width: calc(33.3333% - 15px);
+                  left: calc(66.6666% + 5px);
+                  height: calc(100% - 60px);
+                  top: 50px;
+                  bottom: 0;
+                  padding: 0px;
+                  position: absolute;
+                  border-radius: 25px;
+                  overflow: hidden;
+                }
+                #varEquationContainer{
+                  width: calc(33.3333% - 15px)
+                }
+                #resultPane{
+                  width: calc(33.3333% - 10px);
+                  left: calc(33.3333% + 5px);
+                }
+                #nameFunc{
+                  width: calc(66.6666% - 5px)
                 }
               }`
           }
@@ -3402,6 +3420,15 @@ class EquatPage extends TemplatePage {
         let sel = window.getSelection();
         if (sel.focusNode.nodeName != "#text") {
           keypadVis(false);
+          keypadController(
+            {
+              "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+              "reset": true,
+              "rePage": () => {
+  
+              },
+            }
+          );
         }
       })
     });
