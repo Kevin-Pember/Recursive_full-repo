@@ -175,7 +175,538 @@ if (document.getElementById("mainBody") != null) {
     openElement("mainPage")
   });
 
-  //new
+  //new media queries
+  const shit = window.matchMedia("(screen and max-height: 450px)");
+  const mobileLandscape = {
+    "q": window.matchMedia("screen and (max-height: 450px)"),
+    "styling": `
+    .tabcontent {
+      top: 40px;
+      border-radius: 0 25px 0 0;
+    }
+    #tab {
+      height: 40px
+    }
+  
+    #settingsCogIcon {
+      width: 40px;
+      height: 40px;
+    }
+    #modeButton{
+      left: 20px;
+      right: unset;
+    }
+    #displayClip {
+      width: calc(33.3333% - 15px);
+      height: calc(100% - 20px);
+      max-width: 100%;
+    }
+  
+    #Container {
+      background-color: var(--functionsColor);
+    }
+  
+    #overlayDiv {
+      bottom: 55%;
+    }
+    #keypad{
+      width: calc(33.3333% - 15px);
+      left: calc(66.6666% + 5px);
+      height: calc(100% - 60px);
+      top: 50px;
+      bottom: 0;
+      padding: 0px;
+      position: absolute;
+      border-radius: 25px;
+      overflow: hidden;
+    }
+    #mainCacGrid {
+      width: 100%;
+      height: 100%;
+      grid-template-columns: 16.666% 16.666% 16.666% 16.666% 16.666% 16.666%;
+      grid-template-rows: 25% 25% 25% 25%;
+      grid-template-areas:
+        "pow num1 num2 num3 plus moreFuncBut"
+        "pow2 num4 num5 num6 minus backspace"
+        "sqrt num7 num8 num9 mutiplication pars"
+        "enter pi num0 point division percent";
+    }
+    #extendedKeypad{
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: calc(33.3333% - 10px);
+      height: calc(100% - 20px);
+      left: calc(33.3333% + 5px);
+      top: 10px;
+      visibility: inherit;
+    }
+    #extendedFuncGrid {
+      top: 0;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      max-width: 100%;
+      grid-template-columns: 33.3333% 33.3333% 33.3333%;
+      grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
+      grid-template-areas:
+        "help func ac"
+        "vars abs d-f"
+        "deg inv arc"
+        "sin cos tan"
+        "mod log10 fact"
+        "log ln e";
+    }
+  
+    #varsDiv {
+      top: 0;
+      height: 100%;
+      width: 33.3333%;
+      left: 0;
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: 20% 20% 20% 20% 20%;
+      grid-template-rows: 20% 20% 20% 20% 20%;
+      position: absolute;
+      z-index: 4;
+    }
+  
+  
+    #arrowIcon {
+      visibility: hidden;
+      animation: 0.25s ease-in 0s 1 normal forwards running toDown;
+    }
+  
+    #extraFuncPopUp {
+      visibility: hidden;
+    }
+  
+    #deleteHistory{
+      left: unset;
+      right: 10px;
+    }
+  
+    #overlayDiv {
+      width: 66.6666%;
+    }
+  
+    #customFuncDisplay {
+      background-color: var(--functionsColor);
+      visibility: visible;
+      width: 33.333%;
+      left: 100%;
+      position: absolute;
+      z-index: 1;
+      border-radius: 0 0 0 0;
+    }
+  
+    #backExMini {
+      position: absolute;
+      z-index: 1;
+      left: 10px;
+      top: 8.5px;
+    }
+  
+    #customFuncDisplayGrid .button {
+      width: 95%;
+      height: 90%;
+      top: 5%;
+      right: 2.5%;
+      border-radius: 25px;
+      border: none;
+      background-color: var(--numbersColor);
+    }
+  
+    #customFuncDisplayGrid {
+      grid-template-columns: 100%;
+    }
+  
+    .text-area {
+      direction: rtl;
+    }
+  
+    #customFuncDisplayRecentText {
+      color: transparent;
+    }
+  
+    #nameCreator {
+      width: 20%
+    }
+  
+    #mainCreator {
+      width: calc(80% - 30px);
+      left: calc(20% + 20px);
+      top: 50px;
+    }
+  
+    .modeSelectButton{
+      height: calc(100% - 20px);
+      width: calc(32% - 10px);
+      margin-top: 10px;
+    }
+    .modeIcon{
+      height: unset;
+      width: calc(100% - 40px);
+    }
+    .dynamicModePane{
+      height: calc(100% - 20px);
+      width: calc(66.6666% - 20px);
+    }
+    .dynamicModeControls{
+      left: calc(66.6666%);
+      width: calc(33.3333% - 10px);
+      top: 10px;
+      height: calc(100% - 20px)
+    }
+    #navColumn{
+      width: calc(25% - 15px);
+      margin-left: 10px;
+    }
+    .settingTabContent{
+      left: calc(25% + 5px);
+      width: calc(75% - 15px);
+      overflow: auto;
+    }
+    #funcGrid{
+      grid-template-columns: 33.3333% 33.3333% 33.3333%;
+    }
+    #graphContainer{
+      height: 80%;
+    }`
+  };
+  const mobilePortrait = {
+    "q": window.matchMedia("screen and (max-aspect-ratio: 3/4) and (max-width: 450px)"),
+    "styling": `
+    #tab {
+      height: 50px;
+    }
+  
+    #mobileTabs {
+      visibility: visible;
+      left: 0;
+    }
+  
+    .tablinks {
+      visibility: hidden;
+    }
+  
+    .tabcontent {
+      position: absolute;
+      top: 50px;
+      bottom: 0;
+    }
+  
+    .mainCacGrid {
+      height: 100%;
+      width: 100%;
+      grid-template-areas:
+        "num1 num2 num3 moreFuncBut"
+        "num4 num5 num6 backspace"
+        "num7 num8 num9 plus"
+        "pi num0 point minus"
+        "percent pars pow mutiplication"
+        "enter pow2 sqrt division";
+    }
+  
+    #extendedFuncGrid {
+      left: 100%;
+    }
+  
+    #moreFunctionsButton {
+      border-radius: 0 15px 0 0;
+    }
+  
+    #arrowIcon {
+      opacity: 1;
+    }
+  
+    #backExMini {
+      visibility: hidden;
+    }
+  
+    #DisplayLabel {
+      initial-value: "Display";
+    }
+  
+    #customFuncDisplay {
+      visibility: hidden;
+    }
+  
+    #settingsCogIcon {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+    }
+    #navColumn {
+      width: 100%;
+    }
+  
+    #colorsTab {
+      visibility: hidden;
+      left: 100%;
+    }
+  
+    #PreferencesTab {
+      visibility: hidden;
+      left: 100%;
+    }
+  
+    #AboutTab {
+      visibility: hidden;
+      left: 100%;
+    }
+  
+    .navButtons {
+      text-indent: 100px;
+      height: 100px;
+    }
+  
+    #customFuncDisplayGrid {
+      visibility: hidden;
+    }
+    #navColumn {
+      width: calc(100% - 20px);
+      margin-left: 10px;
+    }
+  
+    #mainCalculatorHelp {
+      visibility: hidden;
+      left: 100%;
+    }
+  
+    #customFuncHelp {
+      visibility: hidden;
+      left: 100%;
+    }
+  
+    #settingsHelp {
+      visibility: hidden;
+      left: 100%;
+    }`
+  }
+  var tabletLandscape = {
+    "q": window.matchMedia("screen and (min-aspect-ratio: 4/3) and (max-aspect-ratio: 16/9)"),
+    "styling": `
+    #tab {
+      height: 40px
+    }
+  
+    #settingsCogIcon {
+      width: 40px;
+      height: 40px;
+      top: 0;
+    }
+  
+    .tabcontent {
+      top: 40px;
+    }
+  
+    .tablinks {
+      left: 0;
+    }
+  
+    #displayClip {
+      width: 66.6666%;
+      max-width: 100%;
+      border-radius: 0 25px 25px 0;
+    }
+  
+    #keypad {
+      width: 66.6666%;
+      bottom: 0;
+      padding: 0px;
+    }
+  
+    #extendedFuncGrid {
+      top: 0;
+      height: 100%;
+      width: 33.3333%;
+      left: 66.6666%;
+      max-width: 100%;
+    }
+  
+    #varsDiv {
+      top: 0;
+      height: 40%;
+      width: 33.3333%;
+      left: 66.6666%;
+      max-width: 100%;
+      grid-template-columns: 20% 20% 20% 20% 20%;
+      grid-template-rows: 20% 20% 20% 20% 20%;
+    }
+  
+    #arrowIcon {
+      visibility: hidden;
+      animation: 0.25s ease-in 0s 1 normal forwards running toDown;
+    }
+  
+    #extraFuncPopUp {
+      visibility: hidden;
+    }
+  
+    #overlayDiv {
+      width: 66.6666%;
+    }
+  
+    #customFuncDisplay {
+      background-color: var(--functionsColor);
+      visibility: visible;
+      width: 33.333%;
+      left: 100%;
+      position: absolute;
+      z-index: 1;
+      border-radius: 0 0 0 0;
+    }
+  
+    #backExMini {
+      position: absolute;
+      z-index: 1;
+      left: 10px;
+      top: 8.5px;
+    }
+  
+    #customFuncDisplayGrid .button {
+      width: 95%;
+      height: 90%;
+      top: 5%;
+      right: 2.5%;
+      border-radius: 25px;
+      border: none;
+      background-color: var(--numbersColor);
+    }
+  
+    #customFuncDisplayGrid {
+      grid-template-columns: 100%;
+    }
+  
+    .text-area {
+      direction: rtl;
+    }
+  
+    #customFuncDisplayRecentText {
+      color: transparent;
+    }
+    `
+  };
+  var tabletPortrait = {
+    "q": window.matchMedia("screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3)"),
+    "styling": `
+    .navButtons {
+      text-indent: 50px;
+      height: 50px;
+    }
+  
+    #navColumn {
+      width: 27%;
+    }
+  
+    .settingTabContent {
+      width: 73%;
+      left: 27%;
+    }`
+  }
+  var largeFormat = {
+    "q": window.matchMedia("screen and (max-aspect-ratio: 16/9)"),
+    "styling": ` 
+    #displayClip {
+      width: 40%;
+      max-width: 100%;
+      resize: none;
+      border-radius: 0 25px 25px 0;
+    }
+  
+    #keypad {
+      width: 40%;
+      bottom: 0;
+      padding: 0px;
+    }
+  
+    #extendedFuncGrid {
+      top: 0;
+      height: 100%;
+      width: 20%;
+      left: 40%;
+      max-width: 100%;
+    }
+  
+    #arrowIcon {
+      visibility: hidden;
+    }
+  
+    #customFuncDisplay {
+      visibility: visible;
+      height: 100%;
+      width: 40%;
+      left: 60%;
+      background-color: var(--displayColor);
+      position: absolute;
+      z-index: 1;
+      border-radius: 25px 0 0 0;
+    }
+  
+    #extraFuncPopUp {
+      visibility: hidden;
+    }
+  
+    #overlayDiv {
+      width: 40%;
+    }
+  
+    #customFuncDisplayRecentText {
+      color: var(--textColor);
+      text-align: center;
+    }
+  
+    #customFuncDisplayGrid {
+      grid-template-columns: 50% 50%;
+    }
+  
+    #backExMini {
+      visibility: hidden;
+    }`
+  }
+  function queryMethod() {
+    console.log("queryMethod")
+    var styleElem;
+    if (document.getElementById('screenStyle') == null) {
+      styleElem = document.createElement('style');
+      styleElem.id = 'screenStyle';
+      document.getElementsByTagName('body')[0].appendChild(styleElem);
+    } else {
+      styleElem = document.getElementById('screenStyle');
+    }
+
+    if (mobileLandscape.q.matches) {
+      styleElem.innerHTML = mobileLandscape.styling;
+    } else if (mobilePortrait.q.matches) {
+      styleElem.innerHTML = mobilePortrait.styling;
+    } else if (tabletLandscape.q.matches) {
+      styleElem.innerHTML = tabletLandscape.styling;
+    } else if (tabletPortrait.q.matches) {
+      styleElem.innerHTML = tabletPortrait.styling;
+    } else if (largeFormat.q.matches) {
+      styleElem.innerHTML = largeFormat.styling;
+    } else {
+      console.log('Default Styling')
+    }
+
+  }
+  queryMethod();
+  mobileLandscape.q.addEventListener("change", () => {
+    queryMethod();
+  })
+  mobilePortrait.q.addEventListener("change", () => {
+    queryMethod();
+  })
+  tabletLandscape.q.addEventListener("change", () => {
+    queryMethod();
+  })
+  tabletPortrait.q.addEventListener("change", () => {
+    queryMethod();
+  })
+  largeFormat.q.addEventListener("change", () => {
+    queryMethod();
+  })
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -2561,7 +3092,7 @@ function keypadController(object) {
     let keypad = document.getElementById("keypad")
     keypad.className = "pane";
     let styleElem = document.getElementById('keypadStyling');
-    if(styleElem != null){
+    if (styleElem != null) {
       document.getElementsByTagName('body')[0].removeChild(styleElem);
     }
     object.rePage()
