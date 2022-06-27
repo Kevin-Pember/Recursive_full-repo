@@ -71,6 +71,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta charset="UTF-8">
 <meta name="theme-color" content="#000000">
+
 <body id="mainBody">
     <div class="page" id="mainPage">
         <div id="tab">
@@ -206,9 +207,9 @@
                     </div>
                 </div>
                 <div id="customFuncDisplay">
-                    <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40" height="40"
+                    <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40"
                         style="transform: rotate(180deg);">
-                    <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40" height="40">
+                    <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40">
                     <img class="minusIcon" id="minusFunctionEx" src="Images/minusIcon.svg" width="40" height="40">
                     <h1 id="customFuncDisplayRecentText">Recent</h1>
                     <div id="customFuncDisplayGrid">
@@ -634,9 +635,12 @@
             </div>
             <div class="specialElements" style="grid-area: num3;"><button class="numsbutton" id="num3">3</button>
             </div>
-            <div class="function-item" style="grid-area: moreFuncBut;"><button
-                    id="moreFunctionsButton">More<br>Functions</button tabindex="-1"><img src="Images/MoreFuncArrow.svg"
-                    class="arrows" id="arrowIcon" width="40px" tabindex="-1"></div>
+            <div class="function-item" style="grid-area: moreFuncBut;">
+                <button id="moreFunctionsButton">More<br>Functions</button tabindex="-1">
+                <div id="arrowPosition">
+                    <img src="Images/MoreFuncArrow.svg" class="arrows" id="arrowIcon" width="40px" tabindex="-1">
+                </div>
+            </div>
             <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button>
             </div>
             <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button>
@@ -684,15 +688,15 @@
         </div>
         <div id="extraFuncPopUp">
             <div id="customFuncDisplayPopup" data-element="popup">
-                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="40" height="40">
-                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="40" height="40">
+                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="50px">
+                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="50px">
                 <div id="custFuncGridPopup">
 
                 </div>
             </div>
             <div class="customFuncDisplayBackgroundPopup" width="100%">
             </div>
-            <div class="extraFuncPopUpGrid">
+            <div id="extraFuncPopUpGrid">
                 <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
                             src="Images/help.svg" width="30" height="30"></button></div>
                 <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>

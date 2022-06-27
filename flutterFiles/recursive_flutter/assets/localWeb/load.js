@@ -3084,9 +3084,40 @@ function keypadController(object) {
   console.log("keypadController ran")
   if (object.reset != undefined && object.reset == false) {
     let styling = document.createElement('style');
+    let builtInStyling = `
+    #arrowPosition{
+      display: grid;
+      justify-content: center;
+      align-content: center;
+      background-color: var(--functionsColor);
+    }
+    #arrowIcon{
+      position: unset;
+      width: 50px;
+    }
+    #moreFunctionsButton{
+      visibility: hidden;
+    }
+    #custFuncGridPopup{
+      visibility: hidden;
+    }
+    #addIconPopup{
+      visibility: hidden;
+    }
+    #minusIconPopup{
+      visibility: hidden;
+    }
+    #customFuncDisplayPopup{
+      border-radius: 25px;
+      height: 16.6666%;
+    }
+    #extraFuncPopUpGrid{
+      top: 16.6666%;
+      height: 83.3333%;
+    }`;
     styling.id = 'keypadStyling';
     let keypad = document.getElementById("keypad")
-    styling.innerHTML = object.keyStyling;
+    styling.innerHTML = object.keyStyling + builtInStyling;
     document.getElementsByTagName('body')[0].appendChild(styling);
     keypad.className = "keypadStyle";
     keyTargets = object.keyElems

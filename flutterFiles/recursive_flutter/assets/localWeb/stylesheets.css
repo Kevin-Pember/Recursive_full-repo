@@ -674,8 +674,8 @@ input[type="button"]:focus {
 }
 
 .addIcon {
-  top: 0;
-  left: 0;
+  top: 5px;
+  left: 5px;
   width: 40px;
   height: 40px;
   background-color: transparent;
@@ -684,8 +684,8 @@ input[type="button"]:focus {
 }
 
 .minusIcon {
-  left: 40px;
-  top: 0;
+  left: 45px;
+  top: 5px;
   width: 40px;
   height: 40px;
   background-color: transparent;
@@ -760,7 +760,7 @@ input[type="button"]:focus {
   z-index: -1;
 }
 
-.extraFuncPopUpGrid {
+#extraFuncPopUpGrid {
   position: absolute;
   height: 66.6666%;
   width: 100%;
@@ -954,29 +954,27 @@ input[type="button"]:focus {
   display: flex;
 }
 
-#arrowButton {
-  top: inherit;
-  right: 0;
-  font-size: 15px;
-  text-align: center;
-  border-style: none;
-  background-color: #00000000;
+#arrowPosition{
+  width: 25%;
+  height: 16.6666%;
   position: absolute;
-  z-index: 2;
+  top: 0;
+  pointer-events:none
 }
 
 #arrowIcon {
   transform: rotate(270deg);
   animation: "0.25s linear 0s 1 normal forwards running toDown";
   visibility: inherit;
-  top: inherit;
-  right: 0;
+  top: 5px;
+  right: 5px;
   font-size: 15px;
   text-align: center;
   border-style: none;
   background-color: #00000000;
   position: absolute;
   z-index: 2;
+  pointer-events: all;
 }
 
 .backIcon {
