@@ -224,18 +224,21 @@
                 </div>
             </div>
             <div id="graphMainMode" class="mode" style="visibility: hidden;">
-                <div id="graphPane" class="dynamicModePane">
-                    <div id="graphContain" class="dynamicContent">
-                        <canvas id="graphModeCanvas"></canvas>
+                <div id="graphModeContainer" class="dynamicModeContainer">
+                    <div id="graphPane" class="dynamicModePane" grid-area="graph">
+                        <div id="graphContain" class="dynamicContent">
+                            <canvas id="graphModeCanvas"></canvas>
+                        </div>
+                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
                     </div>
-                    <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
-                </div>
-                <div id="graphControls" class="dynamicModeControls">
-                    <div id="graphFuncGrid">
-                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <button id="addGraphEquation" class="addDynamicEquation">+</button>
+                    <div id="graphControls" class="dynamicModeControls" grid-area="controls">
+                        <div id="graphFuncGrid">
+                            <div id="initGraphEquation" class="dynamicEquation" placeholder="Equation"
+                                contenteditable="true" value=""></div>
+                            <button id="addGraphEquation" class="addDynamicEquation">+</button>
+                        </div>
+                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                     </div>
-                    <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
             <div id="tableMainMode" class="mode" style="visibility: hidden;">
@@ -272,95 +275,97 @@
         </div>
         <template class="custFuncTabTemp">
             <div class="tabcontent" id="customFuncTab">
-                <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
-                <div id="varEquationContainer" value="">
-                    <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
-                    <img id="editIcon" src="Images/EditIcon.svg" width="40px" style="visibility: hidden;">
-                    <div id="varGrid">
-                        <template class="variableTemplate">
-                            <div class="variableContainer">
-                                <label id="varLabel">
-                                    <h3 id="variableName"></h3>
-                                    <input id="variableEntry" type="text" placeholder="value">
-                                </label>
+                <div id="funcContainer">
+                    <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
+                    <div id="varEquationContainer" value="">
+                        <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
+                        <img id="editIcon" src="Images/EditIcon.svg" width="40px" style="visibility: hidden;">
+                        <div id="varGrid">
+                            <template class="variableTemplate">
+                                <div class="variableContainer">
+                                    <label id="varLabel">
+                                        <h3 id="variableName"></h3>
+                                        <input id="variableEntry" type="text" placeholder="value">
+                                    </label>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <div id="resultPane">
+                        <div id=modeSwitcher>
+                            <button class="modeButton" id="functionMode">Function</button>
+                            <button class="modeButton" id="graphMode">Graph</button>
+                            <button class="modeButton" id="tableMode">Table</button>
+                            <div id="selectorUnder" class="selectorSlider"></div>
+                        </div>
+                        <div id='functionDiv' class="funcModes">
+                            <div id="funcModify">
+                                <button id="modBtn">deg</button>
+                                <div class="drop-cont">
+                                    <a id="selectorRad">rad</a>
+                                    <a id="selectorDeg">deg</a>
+                                </div>
                             </div>
-                        </template>
-                    </div>
-                </div>
-                <div id="resultPane">
-                    <div id=modeSwitcher>
-                        <button class="modeButton" id="functionMode">Function</button>
-                        <button class="modeButton" id="graphMode">Graph</button>
-                        <button class="modeButton" id="tableMode">Table</button>
-                        <div id="selectorUnder" class="selectorSlider"></div>
-                    </div>
-                    <div id='functionDiv' class="funcModes">
-                        <div id="funcModify">
-                            <button id="modBtn">deg</button>
-                            <div class="drop-cont">
-                                <a id="selectorRad">rad</a>
-                                <a id="selectorDeg">deg</a>
+                            <h2 id="equalsHeader">=</h2>
+                        </div>
+                        <div id="graphDiv" class="funcModes">
+                            <div id="graphContainer"><canvas id="funcChart"></canvas></div>
+                            <div id="rangingValues">
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
+                                                id="minDomainGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
+                                                id="maxDomainGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepDomainGraph" type="text"></h3>
+                                    </div>
+                                </details>
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
+                                                id="minRangeGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
+                                                id="maxRangeGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepRangeGraph" type="text"></h3>
+                                    </div>
+                                </details>
+                                <details class="funcDetails" id="settingsSelector">
+                                    <summary class="secondaryFuncHeaders">Settings</summary>
+                                    <div class="selectorDiv">
+                                    </div>
+                                </details>
                             </div>
+
                         </div>
-                        <h2 id="equalsHeader">=</h2>
-                    </div>
-                    <div id="graphDiv" class="funcModes">
-                        <div id="graphContainer"><canvas id="funcChart"></canvas></div>
-                        <div id="rangingValues">
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
-                                            id="minDomainGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
-                                            id="maxDomainGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepDomainGraph" type="text"></h3>
-                                </div>
-                            </details>
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
-                                            id="minRangeGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
-                                            id="maxRangeGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepRangeGraph" type="text"></h3>
-                                </div>
-                            </details>
-                            <details class="funcDetails" id="settingsSelector">
-                                <summary class="secondaryFuncHeaders">Settings</summary>
-                                <div class="selectorDiv">
-                                </div>
-                            </details>
+                        <div id="tableDiv" class="funcModes">
+                            <div id="tableContainer">
+                                <table id="funcTable">
+                                    <tr>
+                                        <th>x</th>
+                                        <th>y</th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="rangingValues">
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders">Settings</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">cells<input class="funcInputs" input type="number"
+                                                id="cellsTable" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepTable" type="text"></h3>
+                                    </div>
+                                </details>
+                            </div>
+
                         </div>
+
 
                     </div>
-                    <div id="tableDiv" class="funcModes">
-                        <div id="tableContainer">
-                            <table id="funcTable">
-                                <tr>
-                                    <th>x</th>
-                                    <th>y</th>
-                                </tr>
-                            </table>
-                        </div>
-                        <div id="rangingValues">
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders">Settings</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">cells<input class="funcInputs" input type="number"
-                                            id="cellsTable" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepTable" type="text"></h3>
-                                </div>
-                            </details>
-                        </div>
-
-                    </div>
-
-
                 </div>
                 <div id="editDiv" style="visibility: hidden;">
                     <h1 id="custFuncEditHeader">Edit</h1>

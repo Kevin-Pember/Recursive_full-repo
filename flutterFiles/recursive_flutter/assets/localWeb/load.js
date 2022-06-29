@@ -257,7 +257,11 @@ if (document.getElementById("mainBody") != null) {
         "mod log10 fact"
         "log ln e";
     }
-  
+    
+    #EquationFunc{
+      font-size: 30px;
+    }
+
     #varsDiv {
       top: 0;
       height: 100%;
@@ -275,10 +279,6 @@ if (document.getElementById("mainBody") != null) {
     #arrowIcon {
       visibility: hidden;
       animation: 0.25s ease-in 0s 1 normal forwards running toDown;
-    }
-  
-    #extraFuncPopUp {
-      visibility: hidden;
     }
   
     #deleteHistory{
@@ -348,15 +348,26 @@ if (document.getElementById("mainBody") != null) {
       height: unset;
       width: calc(100% - 40px);
     }
+    .dynamicModeContainer{
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-areas: 
+      "graph controls";
+      grid-template-columns: 66.6666% 33.3333%;
+      grid-template-rows: unset;
+      position: absolute;
+    }
     .dynamicModePane{
       height: calc(100% - 20px);
-      width: calc(66.6666% - 20px);
+      width: calc(100% - 10px);
+      margin-left: 10px;
     }
     .dynamicModeControls{
-      left: calc(66.6666%);
-      width: calc(33.3333% - 10px);
-      top: 10px;
+      width: calc(100% - 20px);
+      margin-top: 10px;
       height: calc(100% - 20px)
+      margin-left: 10px;
     }
     #navColumn{
       width: calc(25% - 15px);
@@ -682,14 +693,19 @@ if (document.getElementById("mainBody") != null) {
 
     if (mobileLandscape.q.matches) {
       styleElem.innerHTML = mobileLandscape.styling;
+      styleElem.className = "mobileLandscape"
     } else if (mobilePortrait.q.matches) {
       styleElem.innerHTML = mobilePortrait.styling;
+      styleElem.className = "mobilePortrait"
     } else if (tabletLandscape.q.matches) {
       styleElem.innerHTML = tabletLandscape.styling;
+      styleElem.className = "tabletLandscape"
     } else if (tabletPortrait.q.matches) {
       styleElem.innerHTML = tabletPortrait.styling;
+      styleElem.className = "tabletPortrait"
     } else if (largeFormat.q.matches) {
       styleElem.innerHTML = largeFormat.styling;
+      styleElem.className = "largeFormat"
     } else {
       console.log('Default Styling')
     }
@@ -711,6 +727,77 @@ if (document.getElementById("mainBody") != null) {
   largeFormat.q.addEventListener("change", () => {
     queryMethod();
   })
+  //new event listeners for the portable keypad
+  let initGraph = document.getElementById('initGraphEquation');
+  initGraph.addEventListener("focus", function (e) {
+    console.log(initGraph)
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      console.log("focusthrone")
+      setSelect(initGraph, initGraph.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": initGraph, "input": initGraph },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  initGraph.addEventListener('focusout', () => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (sel.focusNode.nodeName != "#text") {
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    },100)
+  });
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -1660,6 +1747,10 @@ function setSelect(node, index) {
   let range = document.createRange();
   let higher = 0;
   let lower = 0;
+  if (node.lastChild == undefined) {
+    let textNode = document.createTextNode('‎')
+    node.appendChild(textNode)
+  } 
   range.setStart(node.lastChild, index);
   range.collapse(true);
   sel.removeAllRanges();
@@ -3094,6 +3185,7 @@ function keypadController(object) {
     #arrowIcon{
       position: unset;
       width: 50px;
+      visibility: visible;
     }
     #moreFunctionsButton{
       visibility: hidden;
@@ -3403,7 +3495,7 @@ class EquatPage extends TemplatePage {
     equationDIV.addEventListener("focus", function (e) {
       if (document.getElementById('keypad').style.visibility == "hidden") {
         console.log("focusthrone")
-        let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+        let initEquation = JSON.parse(e.target.parentNode.parentNode.parentNode.dataset.tab);
         equationDIV.innerHTML = initEquation.equation;
         setSelect(equationDIV, equationDIV.innerHTML.length);
         keypadVis(true);
@@ -3431,15 +3523,8 @@ class EquatPage extends TemplatePage {
                   border-radius: 25px;
                   overflow: hidden;
                 }
-                #varEquationContainer{
-                  width: calc(33.3333% - 15px)
-                }
-                #resultPane{
-                  width: calc(33.3333% - 10px);
-                  left: calc(33.3333% + 5px);
-                }
-                #nameFunc{
-                  width: calc(66.6666% - 5px)
+                #funcContainer{
+                  width: calc(66.6666%)
                 }
               }`
           }
@@ -3456,7 +3541,7 @@ class EquatPage extends TemplatePage {
               "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
               "reset": true,
               "rePage": () => {
-  
+
               },
             }
           );
