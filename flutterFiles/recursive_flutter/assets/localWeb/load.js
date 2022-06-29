@@ -887,6 +887,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
   let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
+  //modeSwitcher section
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
   });
@@ -899,6 +900,383 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('tableModeSelector').addEventListener("click", () => {
     switchMode('tableMainMode')
   })
+  //keypad button Elems
+  let keypadButtons = [
+    {
+      "id":'num1',
+      "name": "one",
+      "function": () => {
+        frontButtonPressed('1');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num2',
+      "name": "two",
+      "function": () => {
+        frontButtonPressed('2');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num3',
+      "name": "three",
+      "function": () => {
+        frontButtonPressed('3');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'moreFunctionsButton',
+      "name": "Functions Page",
+      "function": () => {
+        sessionStorage.setItem("facing", "moreFunctionsPage");
+        openPage("moreFunctionsPage");
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'arrowIcon',
+      "name": "More Functions Menu",
+      "function": () => {
+        popup();
+        setSelect(keyTargets.input, keyTargets.input.lastChild.length);
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'num4',
+      "name": "four",
+      "function": () => {
+        frontButtonPressed('4');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num5',
+      "name": "five",
+      "function": () => {
+        frontButtonPressed('5');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num6',
+      "name": "six",
+      "function": () => {
+        frontButtonPressed('6');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'backspace',
+      "name": "back space",
+      "function": () => {
+        backPressed();
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num7',
+      "name": "seven",
+      "function": () => {
+        frontButtonPressed('7');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num8',
+      "name": "eight",
+      "function": () => {
+        frontButtonPressed('8');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num9',
+      "name": "nine",
+      "function": () => {
+        frontButtonPressed('9');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'plus',
+      "name": "plus",
+      "function": () => {
+        frontButtonPressed('+');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'piButton',
+      "name": "pie",
+      "function": () => {
+        frontButtonPressed('π');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num0',
+      "name": "zero",
+      "function": () => {
+        frontButtonPressed('0');
+      },
+      "repeatable": true,
+    },{
+      "id":'pointButton',
+      "name": "point",
+      "function": () => {
+        frontButtonPressed('.');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'minus',
+      "name": "minus",
+      "function": () => {
+        frontButtonPressed('-');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'percent',
+      "name": "percent",
+      "function": () => {
+        frontButtonPressed('%');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pars',
+      "name": "Parenthesis",
+      "function": () => {
+        parsMethod();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pow',
+      "name": "Parenthesis",
+      "function": () => {
+        pow('1');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'mutiplication',
+      "name": "mutiplication",
+      "function": () => {
+        frontButtonPressed('×');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'enter',
+      "name": "enter",
+      "function": () => {
+        enterPressed(keyTargets.input.innerHTML);
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pow2',
+      "name": "power of 2",
+      "function": () => {
+        pow('2');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sqrt',
+      "name": "square root",
+      "function": () => {
+        frontButtonPressed('√');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'divison',
+      "name": "divison",
+      "function": () => {
+        frontButtonPressed('÷');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'addIconPopup',
+      "name": "add Custom Function",
+      "function": () => {
+        if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
+          openPopup();
+        } else {
+          sessionStorage.setItem("facing", "creatorPage")
+          openPage("custCreatorPage")
+        }
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'minusIconPopup',
+      "name": "remove Custom Function",
+      "function": () => {
+        //method needs to be added
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'functionPopup',
+      "name": " deprecated Button",
+      "function": () => {
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'acPopup',
+      "name": "Clear all",
+      "function": () => {
+        clearMain(); 
+        keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'deciToFracPopup',
+      "name": "decimal to fraction",
+      "function": () => {
+        frontButtonPressed('d→f(');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'helpPopup',
+      "name": "Help Page",
+      "function": () => {
+        document.location = 'help.html'; 
+        setState(); 
+        sessionStorage.setItem("facing", "helpOut");
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'log10Popup',
+      "name": "log ten",
+      "function": () => {
+        frontButtonPressed('log₁₀(')
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'lnPopup',
+      "name": "natural log",
+      "function": () => {
+        frontButtonPressed('ln(');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'ePopup',
+      "name": "Euler's number",
+      "function": () => {
+        frontButtonPressed('e');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'factorialPopup',
+      "name": "factorial",
+      "function": () => {
+        frontButtonPressed('!');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'degPopup',
+      "name": "Angle Mode :"+document.getElementById('degPopup').innerHTML,
+      "function": () => {
+        setDegMode();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'arcPopup',
+      "name": "arc is :"+document.getElementById('arcPopup').innerHTML,
+      "function": () => {
+        setArc();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'invPopup',
+      "name": "Inverse is :"+document.getElementById('invPopup').innerHTML,
+      "function": () => {
+        setInverse();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'cosPopup',
+      "name": "cosine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'tanPopup',
+      "name": "tangent",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'absPopup',
+      "name": "absolute Value",
+      "function": (e) => {
+        frontButtonPressed('|');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'modPopup',
+      "name": "Modulo",
+      "function": (e) => {
+        frontButtonPressed('mod(');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+
+  ];
+
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -916,14 +1294,15 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
+
+
+  document.getElementById('num1').addEventListener("click", function () {  });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
   document.getElementById('arrowIcon').addEventListener("click", function () {
     popup();
     setSelect(keyTargets.input, keyTargets.input.lastChild.length);
-    //preventFocus();
   });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
@@ -945,6 +1324,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
+
+
   document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
     if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
@@ -986,6 +1367,8 @@ if (document.getElementById("mainBody") != null) {
     openPopup();
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
+
+
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
     if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
@@ -1019,6 +1402,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
   document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
+
+
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
@@ -3305,6 +3690,30 @@ let keypadVis = (visible) => {
 }
 function isHidden(el) {
   return (el.offsetParent === null)
+}
+/*
+Format of objects input to button mapper
+{
+  'id': "entry",
+  'name': "entry",
+  'function': () => {function},
+  "repeatable": true,
+}
+*/
+function buttonMapper(elemArray){
+  for(let elem of elemArray){
+    var repeater;
+    let elemDef = document.getElementById(elem.id);
+    elemDef.addEventListener('click', () => {
+      elem.function();
+    });
+    if(elem.repeatable){
+      let mouseDown = () =>{};
+      let mouseUp = () => {};
+      elemDef.addEventListener()
+      elemDef.addEventListener()
+    }
+  }
 }
 //END
 /************************************************|help page|**************************************************/
