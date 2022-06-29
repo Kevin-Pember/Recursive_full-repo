@@ -728,16 +728,14 @@ if (document.getElementById("mainBody") != null) {
     queryMethod();
   })
   //new event listeners for the portable keypad
-  let initGraph = document.getElementById('initGraphEquation');
-  initGraph.addEventListener("focus", function (e) {
-    console.log(initGraph)
+  let initGraphEquation = document.getElementById('initGraphEquation');
+  initGraphEquation.addEventListener("focus", function (e) {
     if (document.getElementById('keypad').style.visibility == "hidden") {
-      console.log("focusthrone")
-      setSelect(initGraph, initGraph.innerHTML.length);
+      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
       keypadVis(true);
       keypadController(
         {
-          "keyElems": { "scroll": initGraph, "input": initGraph },
+          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
           "reset": false,
           "keyStyling": `
             #keypad {
@@ -781,10 +779,13 @@ if (document.getElementById("mainBody") != null) {
       );
     }
   });
-  initGraph.addEventListener('focusout', () => {
+  initGraphEquation.addEventListener('focusout', (e) => {
     setTimeout(() => {
       let sel = window.getSelection();
-      if (sel.focusNode.nodeName != "#text") {
+      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if(initGraphEquation.innerHTML.length == 1){
+          initGraphEquation.innerHTML = "";
+        }
         keypadVis(false);
         keypadController(
           {
@@ -796,7 +797,79 @@ if (document.getElementById("mainBody") != null) {
           }
         );
       }
-    },100)
+    })
+  });
+  
+  let initTableEquation = document.getElementById('initTableEquation');
+  initTableEquation.addEventListener("focus", function (e) {
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  initTableEquation.addEventListener('focusout', (e) => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if(initGraphEquation.innerHTML.length == 1){
+          initGraphEquation.innerHTML = "";
+        }
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    })
   });
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
@@ -1674,7 +1747,6 @@ function switchMode(modeId) {
   let showingElems = [document.getElementById(modeId)];
   let modeButton = document.getElementById('modeButton');
   for (let mode of modes) {
-    console.log(mode)
     if (mode.style.visibility != 'hidden') {
       hidingElems.push(mode)
     }
@@ -3534,7 +3606,7 @@ class EquatPage extends TemplatePage {
     equationDIV.addEventListener('focusout', () => {
       setTimeout(() => {
         let sel = window.getSelection();
-        if (sel.focusNode.nodeName != "#text") {
+        if (!equationDIV.contains(sel.focusNode)) {
           keypadVis(false);
           keypadController(
             {

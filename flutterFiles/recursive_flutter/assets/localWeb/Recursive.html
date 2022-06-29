@@ -232,7 +232,7 @@
                         <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
                     </div>
                     <div id="graphControls" class="dynamicModeControls" grid-area="controls">
-                        <div id="graphFuncGrid">
+                        <div id="graphFuncGrid" class="dynamicFuncGrid">
                             <div id="initGraphEquation" class="dynamicEquation" placeholder="Equation"
                                 contenteditable="true" value=""></div>
                             <button id="addGraphEquation" class="addDynamicEquation">+</button>
@@ -242,16 +242,21 @@
                 </div>
             </div>
             <div id="tableMainMode" class="mode" style="visibility: hidden;">
-                <div id="tablePane" class="dynamicModePane">
-                    <div id="graphContain" class="dynamicContent">
+                <div id="tableModeContainer" class="dynamicModeContainer">
+                    <div id="tablePane" class="dynamicModePane" grid-area="graph">
+                        <div id="tableContain" class="dynamicContent">
+                            <canvas id="tableModeCanvas"></canvas>
+                        </div>
+                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
                     </div>
-                </div>
-                <div id="tableControls" class="dynamicModeControls">
-                    <div id="graphFuncGrid">
-                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <button id="addTableEquation" class="addDynamicEquation">+</button>
+                    <div id="tableControls" class="dynamicModeControls" grid-area="controls">
+                        <div id="tableFuncGrid" class="dynamicFuncGrid">
+                            <div id="initTableEquation" class="dynamicEquation" placeholder="Equation"
+                                contenteditable="true" value=""></div>
+                            <button id="addTableEquation" class="addDynamicEquation">+</button>
+                        </div>
+                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                     </div>
-                    <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
 
