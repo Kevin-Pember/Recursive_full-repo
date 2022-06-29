@@ -3657,7 +3657,7 @@ function buttonMapper(elemArray){
     if(elem.repeatable){
       let mouseDown = (e) =>{
         let event = e;
-        repeater = setInterval(() => {elem.function(event)}, 100)
+        repeater = setInterval(() => {elem.function(event)}, 150)
       };
       let mouseUp = () => {clearInterval(repeater)};
       elemDef.addEventListener("mousedown", (e) => {mouseDown(e)})
