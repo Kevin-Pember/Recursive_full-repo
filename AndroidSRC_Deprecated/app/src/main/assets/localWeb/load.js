@@ -257,7 +257,11 @@ if (document.getElementById("mainBody") != null) {
         "mod log10 fact"
         "log ln e";
     }
-  
+    
+    #EquationFunc{
+      font-size: 30px;
+    }
+
     #varsDiv {
       top: 0;
       height: 100%;
@@ -275,10 +279,6 @@ if (document.getElementById("mainBody") != null) {
     #arrowIcon {
       visibility: hidden;
       animation: 0.25s ease-in 0s 1 normal forwards running toDown;
-    }
-  
-    #extraFuncPopUp {
-      visibility: hidden;
     }
   
     #deleteHistory{
@@ -348,15 +348,26 @@ if (document.getElementById("mainBody") != null) {
       height: unset;
       width: calc(100% - 40px);
     }
+    .dynamicModeContainer{
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-areas: 
+      "graph controls";
+      grid-template-columns: 66.6666% 33.3333%;
+      grid-template-rows: unset;
+      position: absolute;
+    }
     .dynamicModePane{
       height: calc(100% - 20px);
-      width: calc(66.6666% - 20px);
+      width: calc(100% - 10px);
+      margin-left: 10px;
     }
     .dynamicModeControls{
-      left: calc(66.6666%);
-      width: calc(33.3333% - 10px);
-      top: 10px;
+      width: calc(100% - 20px);
+      margin-top: 10px;
       height: calc(100% - 20px)
+      margin-left: 10px;
     }
     #navColumn{
       width: calc(25% - 15px);
@@ -682,14 +693,19 @@ if (document.getElementById("mainBody") != null) {
 
     if (mobileLandscape.q.matches) {
       styleElem.innerHTML = mobileLandscape.styling;
+      styleElem.className = "mobileLandscape"
     } else if (mobilePortrait.q.matches) {
       styleElem.innerHTML = mobilePortrait.styling;
+      styleElem.className = "mobilePortrait"
     } else if (tabletLandscape.q.matches) {
       styleElem.innerHTML = tabletLandscape.styling;
+      styleElem.className = "tabletLandscape"
     } else if (tabletPortrait.q.matches) {
       styleElem.innerHTML = tabletPortrait.styling;
+      styleElem.className = "tabletPortrait"
     } else if (largeFormat.q.matches) {
       styleElem.innerHTML = largeFormat.styling;
+      styleElem.className = "largeFormat"
     } else {
       console.log('Default Styling')
     }
@@ -711,6 +727,150 @@ if (document.getElementById("mainBody") != null) {
   largeFormat.q.addEventListener("change", () => {
     queryMethod();
   })
+  //new event listeners for the portable keypad
+  let initGraphEquation = document.getElementById('initGraphEquation');
+  initGraphEquation.addEventListener("focus", function (e) {
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  initGraphEquation.addEventListener('focusout', (e) => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if(initGraphEquation.innerHTML.length == 1){
+          initGraphEquation.innerHTML = "";
+        }
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    })
+  });
+  
+  let initTableEquation = document.getElementById('initTableEquation');
+  initTableEquation.addEventListener("focus", function (e) {
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  initTableEquation.addEventListener('focusout', (e) => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if(initGraphEquation.innerHTML.length == 1){
+          initGraphEquation.innerHTML = "";
+        }
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    })
+  });
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -727,6 +887,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
   let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
+  //modeSwitcher section
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
   });
@@ -739,6 +900,384 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('tableModeSelector').addEventListener("click", () => {
     switchMode('tableMainMode')
   })
+  //keypad button Elems
+  let keypadButtons = [
+    {
+      "id":'num1',
+      "name": "one",
+      "function": () => {
+        frontButtonPressed('1');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num2',
+      "name": "two",
+      "function": () => {
+        frontButtonPressed('2');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num3',
+      "name": "three",
+      "function": () => {
+        frontButtonPressed('3');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'moreFunctionsButton',
+      "name": "Functions Page",
+      "function": () => {
+        sessionStorage.setItem("facing", "moreFunctionsPage");
+        openPage("moreFunctionsPage");
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'arrowIcon',
+      "name": "More Functions Menu",
+      "function": () => {
+        popup();
+        setSelect(keyTargets.input, keyTargets.input.lastChild.length);
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'num4',
+      "name": "four",
+      "function": () => {
+        frontButtonPressed('4');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num5',
+      "name": "five",
+      "function": () => {
+        frontButtonPressed('5');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num6',
+      "name": "six",
+      "function": () => {
+        frontButtonPressed('6');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'backspace',
+      "name": "back space",
+      "function": () => {
+        backPressed();
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num7',
+      "name": "seven",
+      "function": () => {
+        frontButtonPressed('7');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num8',
+      "name": "eight",
+      "function": () => {
+        frontButtonPressed('8');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num9',
+      "name": "nine",
+      "function": () => {
+        frontButtonPressed('9');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'plus',
+      "name": "plus",
+      "function": () => {
+        frontButtonPressed('+');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'piButton',
+      "name": "pie",
+      "function": () => {
+        frontButtonPressed('π');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'num0',
+      "name": "zero",
+      "function": () => {
+        frontButtonPressed('0');
+      },
+      "repeatable": true,
+    },{
+      "id":'pointButton',
+      "name": "point",
+      "function": () => {
+        frontButtonPressed('.');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'minus',
+      "name": "minus",
+      "function": () => {
+        frontButtonPressed('-');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'percent',
+      "name": "percent",
+      "function": () => {
+        frontButtonPressed('%');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pars',
+      "name": "Parenthesis",
+      "function": () => {
+        parsMethod();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pow',
+      "name": "Parenthesis",
+      "function": () => {
+        pow('1');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'mutiplication',
+      "name": "mutiplication",
+      "function": () => {
+        frontButtonPressed('×');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'enter',
+      "name": "enter",
+      "function": () => {
+        enterPressed(keyTargets.input.innerHTML);
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'pow2',
+      "name": "power of 2",
+      "function": () => {
+        pow('2');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sqrt',
+      "name": "square root",
+      "function": () => {
+        frontButtonPressed('√');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'divison',
+      "name": "divison",
+      "function": () => {
+        frontButtonPressed('÷');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'addIconPopup',
+      "name": "add Custom Function",
+      "function": () => {
+        if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
+          openPopup();
+        } else {
+          sessionStorage.setItem("facing", "creatorPage")
+          openPage("custCreatorPage")
+        }
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'minusIconPopup',
+      "name": "remove Custom Function",
+      "function": () => {
+        //method needs to be added
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'functionPopup',
+      "name": " deprecated Button",
+      "function": () => {
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'acPopup',
+      "name": "Clear all",
+      "function": () => {
+        clearMain(); 
+        keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+      },
+      "repeatable": false,
+    },
+    
+    {
+      "id":'deciToFracPopup',
+      "name": "decimal to fraction",
+      "function": () => {
+        frontButtonPressed('d→f(');
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'helpPopup',
+      "name": "Help Page",
+      "function": () => {
+        document.location = 'help.html'; 
+        setState(); 
+        sessionStorage.setItem("facing", "helpOut");
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'log10Popup',
+      "name": "log ten",
+      "function": () => {
+        frontButtonPressed('log₁₀(')
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'lnPopup',
+      "name": "natural log",
+      "function": () => {
+        frontButtonPressed('ln(');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'ePopup',
+      "name": "Euler's number",
+      "function": () => {
+        frontButtonPressed('e');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'factorialPopup',
+      "name": "factorial",
+      "function": () => {
+        frontButtonPressed('!');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'degPopup',
+      "name": "Angle Mode :"+document.getElementById('degPopup').innerHTML,
+      "function": () => {
+        setDegMode();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'arcPopup',
+      "name": "arc is :"+document.getElementById('arcPopup').innerHTML,
+      "function": () => {
+        setArc();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'invPopup',
+      "name": "Inverse is :"+document.getElementById('invPopup').innerHTML,
+      "function": () => {
+        setInverse();
+      },
+      "repeatable": false,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'cosPopup',
+      "name": "cosine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'tanPopup',
+      "name": "tangent",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'absPopup',
+      "name": "absolute Value",
+      "function": (e) => {
+        frontButtonPressed('|');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'modPopup',
+      "name": "Modulo",
+      "function": (e) => {
+        frontButtonPressed('mod(');
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+    {
+      "id":'sinPopup',
+      "name": "sine",
+      "function": (e) => {
+        trigPressed(e);
+      },
+      "repeatable": true,
+    },
+
+  ];
+  buttonMapper(keypadButtons)
+
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
     let mrmText = document.getElementById('memoryText').innerHTML;
@@ -756,14 +1295,15 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
-  document.getElementById('num1').addEventListener("click", function () { frontButtonPressed('1'); });
+
+/*
+  document.getElementById('num1').addEventListener("click", function () {  });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
   document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
   document.getElementById('arrowIcon').addEventListener("click", function () {
     popup();
     setSelect(keyTargets.input, keyTargets.input.lastChild.length);
-    //preventFocus();
   });
   document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
   document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
@@ -785,6 +1325,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
+*/
+
   document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
     if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
@@ -826,6 +1368,8 @@ if (document.getElementById("mainBody") != null) {
     openPopup();
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
+
+/*
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
     if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
@@ -859,6 +1403,8 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
   document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
+*/
+
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
@@ -1587,7 +2133,6 @@ function switchMode(modeId) {
   let showingElems = [document.getElementById(modeId)];
   let modeButton = document.getElementById('modeButton');
   for (let mode of modes) {
-    console.log(mode)
     if (mode.style.visibility != 'hidden') {
       hidingElems.push(mode)
     }
@@ -1660,6 +2205,10 @@ function setSelect(node, index) {
   let range = document.createRange();
   let higher = 0;
   let lower = 0;
+  if (node.lastChild == undefined) {
+    let textNode = document.createTextNode('‎')
+    node.appendChild(textNode)
+  } 
   range.setStart(node.lastChild, index);
   range.collapse(true);
   sel.removeAllRanges();
@@ -3084,9 +3633,41 @@ function keypadController(object) {
   console.log("keypadController ran")
   if (object.reset != undefined && object.reset == false) {
     let styling = document.createElement('style');
+    let builtInStyling = `
+    #arrowPosition{
+      display: grid;
+      justify-content: center;
+      align-content: center;
+      background-color: var(--functionsColor);
+    }
+    #arrowIcon{
+      position: unset;
+      width: 50px;
+      visibility: visible;
+    }
+    #moreFunctionsButton{
+      visibility: hidden;
+    }
+    #custFuncGridPopup{
+      visibility: hidden;
+    }
+    #addIconPopup{
+      visibility: hidden;
+    }
+    #minusIconPopup{
+      visibility: hidden;
+    }
+    #customFuncDisplayPopup{
+      border-radius: 25px;
+      height: 16.6666%;
+    }
+    #extraFuncPopUpGrid{
+      top: 16.6666%;
+      height: 83.3333%;
+    }`;
     styling.id = 'keypadStyling';
     let keypad = document.getElementById("keypad")
-    styling.innerHTML = object.keyStyling;
+    styling.innerHTML = object.keyStyling + builtInStyling;
     document.getElementsByTagName('body')[0].appendChild(styling);
     keypad.className = "keypadStyle";
     keyTargets = object.keyElems
@@ -3110,6 +3691,35 @@ let keypadVis = (visible) => {
 }
 function isHidden(el) {
   return (el.offsetParent === null)
+}
+/*
+Format of objects input to button mapper
+{
+  'id': "entry",
+  'name': "entry",
+  'function': () => {function},
+  "repeatable": true,
+}
+*/
+function buttonMapper(elemArray){
+  for(let elem of elemArray){
+    var repeater;
+    let elemDef = document.getElementById(elem.id);
+    elemDef.addEventListener('click', (e) => {
+      elem.function(e);
+    });
+    if(elem.repeatable){
+      let mouseDown = (e) =>{
+        let event = e;
+        repeater = setInterval(() => {elem.function(event)}, 100)
+      };
+      let mouseUp = () => {clearInterval(repeater)};
+      elemDef.addEventListener("mousedown", (e) => {mouseDown(e)})
+      elemDef.addEventListener("mouseup",(e) => {mouseUp(e)})
+      elemDef.addEventListener('touchstart', (e) => {mouseDown(e)})
+      elemDef.addEventListener('touchend', (e) => {mouseUp(e)})
+    }
+  }
 }
 //END
 /************************************************|help page|**************************************************/
@@ -3372,7 +3982,7 @@ class EquatPage extends TemplatePage {
     equationDIV.addEventListener("focus", function (e) {
       if (document.getElementById('keypad').style.visibility == "hidden") {
         console.log("focusthrone")
-        let initEquation = JSON.parse(e.target.parentNode.parentNode.dataset.tab);
+        let initEquation = JSON.parse(e.target.parentNode.parentNode.parentNode.dataset.tab);
         equationDIV.innerHTML = initEquation.equation;
         setSelect(equationDIV, equationDIV.innerHTML.length);
         keypadVis(true);
@@ -3400,15 +4010,8 @@ class EquatPage extends TemplatePage {
                   border-radius: 25px;
                   overflow: hidden;
                 }
-                #varEquationContainer{
-                  width: calc(33.3333% - 15px)
-                }
-                #resultPane{
-                  width: calc(33.3333% - 10px);
-                  left: calc(33.3333% + 5px);
-                }
-                #nameFunc{
-                  width: calc(66.6666% - 5px)
+                #funcContainer{
+                  width: calc(66.6666%)
                 }
               }`
           }
@@ -3418,14 +4021,14 @@ class EquatPage extends TemplatePage {
     equationDIV.addEventListener('focusout', () => {
       setTimeout(() => {
         let sel = window.getSelection();
-        if (sel.focusNode.nodeName != "#text") {
+        if (!equationDIV.contains(sel.focusNode)) {
           keypadVis(false);
           keypadController(
             {
               "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
               "reset": true,
               "rePage": () => {
-  
+
               },
             }
           );

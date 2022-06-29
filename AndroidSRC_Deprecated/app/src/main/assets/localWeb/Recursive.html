@@ -71,6 +71,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta charset="UTF-8">
 <meta name="theme-color" content="#000000">
+
 <body id="mainBody">
     <div class="page" id="mainPage">
         <div id="tab">
@@ -206,9 +207,9 @@
                     </div>
                 </div>
                 <div id="customFuncDisplay">
-                    <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40" height="40"
+                    <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40"
                         style="transform: rotate(180deg);">
-                    <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40" height="40">
+                    <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40">
                     <img class="minusIcon" id="minusFunctionEx" src="Images/minusIcon.svg" width="40" height="40">
                     <h1 id="customFuncDisplayRecentText">Recent</h1>
                     <div id="customFuncDisplayGrid">
@@ -223,31 +224,39 @@
                 </div>
             </div>
             <div id="graphMainMode" class="mode" style="visibility: hidden;">
-                <div id="graphPane" class="dynamicModePane">
-                    <div id="graphContain" class="dynamicContent">
-                        <canvas id="graphModeCanvas"></canvas>
+                <div id="graphModeContainer" class="dynamicModeContainer">
+                    <div id="graphPane" class="dynamicModePane" grid-area="graph">
+                        <div id="graphContain" class="dynamicContent">
+                            <canvas id="graphModeCanvas"></canvas>
+                        </div>
+                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
                     </div>
-                    <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
-                </div>
-                <div id="graphControls" class="dynamicModeControls">
-                    <div id="graphFuncGrid">
-                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <button id="addGraphEquation" class="addDynamicEquation">+</button>
+                    <div id="graphControls" class="dynamicModeControls" grid-area="controls">
+                        <div id="graphFuncGrid" class="dynamicFuncGrid">
+                            <div id="initGraphEquation" class="dynamicEquation" placeholder="Equation"
+                                contenteditable="true" value=""></div>
+                            <button id="addGraphEquation" class="addDynamicEquation">+</button>
+                        </div>
+                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                     </div>
-                    <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
             <div id="tableMainMode" class="mode" style="visibility: hidden;">
-                <div id="tablePane" class="dynamicModePane">
-                    <div id="graphContain" class="dynamicContent">
+                <div id="tableModeContainer" class="dynamicModeContainer">
+                    <div id="tablePane" class="dynamicModePane" grid-area="graph">
+                        <div id="tableContain" class="dynamicContent">
+                            <canvas id="tableModeCanvas"></canvas>
+                        </div>
+                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
                     </div>
-                </div>
-                <div id="tableControls" class="dynamicModeControls">
-                    <div id="graphFuncGrid">
-                        <div class="dynamicEquation" placeholder="Equation" contenteditable="true" value=""></div>
-                        <button id="addTableEquation" class="addDynamicEquation">+</button>
+                    <div id="tableControls" class="dynamicModeControls" grid-area="controls">
+                        <div id="tableFuncGrid" class="dynamicFuncGrid">
+                            <div id="initTableEquation" class="dynamicEquation" placeholder="Equation"
+                                contenteditable="true" value=""></div>
+                            <button id="addTableEquation" class="addDynamicEquation">+</button>
+                        </div>
+                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                     </div>
-                    <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
                 </div>
             </div>
 
@@ -271,95 +280,97 @@
         </div>
         <template class="custFuncTabTemp">
             <div class="tabcontent" id="customFuncTab">
-                <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
-                <div id="varEquationContainer" value="">
-                    <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
-                    <img id="editIcon" src="Images/EditIcon.svg" width="40px" style="visibility: hidden;">
-                    <div id="varGrid">
-                        <template class="variableTemplate">
-                            <div class="variableContainer">
-                                <label id="varLabel">
-                                    <h3 id="variableName"></h3>
-                                    <input id="variableEntry" type="text" placeholder="value">
-                                </label>
+                <div id="funcContainer">
+                    <input type="text" class="textInputTop" id="nameFunc" placeholder="Name">
+                    <div id="varEquationContainer" value="">
+                        <div id="EquationFunc" placeholder="Equation" contenteditable="true" value=""></div>
+                        <img id="editIcon" src="Images/EditIcon.svg" width="40px" style="visibility: hidden;">
+                        <div id="varGrid">
+                            <template class="variableTemplate">
+                                <div class="variableContainer">
+                                    <label id="varLabel">
+                                        <h3 id="variableName"></h3>
+                                        <input id="variableEntry" type="text" placeholder="value">
+                                    </label>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <div id="resultPane">
+                        <div id=modeSwitcher>
+                            <button class="modeButton" id="functionMode">Function</button>
+                            <button class="modeButton" id="graphMode">Graph</button>
+                            <button class="modeButton" id="tableMode">Table</button>
+                            <div id="selectorUnder" class="selectorSlider"></div>
+                        </div>
+                        <div id='functionDiv' class="funcModes">
+                            <div id="funcModify">
+                                <button id="modBtn">deg</button>
+                                <div class="drop-cont">
+                                    <a id="selectorRad">rad</a>
+                                    <a id="selectorDeg">deg</a>
+                                </div>
                             </div>
-                        </template>
-                    </div>
-                </div>
-                <div id="resultPane">
-                    <div id=modeSwitcher>
-                        <button class="modeButton" id="functionMode">Function</button>
-                        <button class="modeButton" id="graphMode">Graph</button>
-                        <button class="modeButton" id="tableMode">Table</button>
-                        <div id="selectorUnder" class="selectorSlider"></div>
-                    </div>
-                    <div id='functionDiv' class="funcModes">
-                        <div id="funcModify">
-                            <button id="modBtn">deg</button>
-                            <div class="drop-cont">
-                                <a id="selectorRad">rad</a>
-                                <a id="selectorDeg">deg</a>
+                            <h2 id="equalsHeader">=</h2>
+                        </div>
+                        <div id="graphDiv" class="funcModes">
+                            <div id="graphContainer"><canvas id="funcChart"></canvas></div>
+                            <div id="rangingValues">
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
+                                                id="minDomainGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
+                                                id="maxDomainGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepDomainGraph" type="text"></h3>
+                                    </div>
+                                </details>
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
+                                                id="minRangeGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
+                                                id="maxRangeGraph" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepRangeGraph" type="text"></h3>
+                                    </div>
+                                </details>
+                                <details class="funcDetails" id="settingsSelector">
+                                    <summary class="secondaryFuncHeaders">Settings</summary>
+                                    <div class="selectorDiv">
+                                    </div>
+                                </details>
                             </div>
+
                         </div>
-                        <h2 id="equalsHeader">=</h2>
-                    </div>
-                    <div id="graphDiv" class="funcModes">
-                        <div id="graphContainer"><canvas id="funcChart"></canvas></div>
-                        <div id="rangingValues">
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Domain</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
-                                            id="minDomainGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
-                                            id="maxDomainGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepDomainGraph" type="text"></h3>
-                                </div>
-                            </details>
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders" style="width: 142.5px;">Range</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">min<input class="funcInputs" input type="number"
-                                            id="minRangeGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">max<input class="funcInputs" input type="number"
-                                            id="maxRangeGraph" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepRangeGraph" type="text"></h3>
-                                </div>
-                            </details>
-                            <details class="funcDetails" id="settingsSelector">
-                                <summary class="secondaryFuncHeaders">Settings</summary>
-                                <div class="selectorDiv">
-                                </div>
-                            </details>
+                        <div id="tableDiv" class="funcModes">
+                            <div id="tableContainer">
+                                <table id="funcTable">
+                                    <tr>
+                                        <th>x</th>
+                                        <th>y</th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="rangingValues">
+                                <details class="funcDetails">
+                                    <summary class="secondaryFuncHeaders">Settings</summary>
+                                    <div class="selectorDiv">
+                                        <h3 class="funcHeaders">cells<input class="funcInputs" input type="number"
+                                                id="cellsTable" type="text"></h3>
+                                        <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
+                                                id="stepTable" type="text"></h3>
+                                    </div>
+                                </details>
+                            </div>
+
                         </div>
+
 
                     </div>
-                    <div id="tableDiv" class="funcModes">
-                        <div id="tableContainer">
-                            <table id="funcTable">
-                                <tr>
-                                    <th>x</th>
-                                    <th>y</th>
-                                </tr>
-                            </table>
-                        </div>
-                        <div id="rangingValues">
-                            <details class="funcDetails">
-                                <summary class="secondaryFuncHeaders">Settings</summary>
-                                <div class="selectorDiv">
-                                    <h3 class="funcHeaders">cells<input class="funcInputs" input type="number"
-                                            id="cellsTable" type="text"></h3>
-                                    <h3 class="funcHeaders">step<input class="stepInputs" input type="number"
-                                            id="stepTable" type="text"></h3>
-                                </div>
-                            </details>
-                        </div>
-
-                    </div>
-
-
                 </div>
                 <div id="editDiv" style="visibility: hidden;">
                     <h1 id="custFuncEditHeader">Edit</h1>
@@ -628,71 +639,95 @@
     </div>
     <div id="keypad" class="pane" style="visibility: visible;">
         <div class="mainCacGrid">
-            <div id="Container" name="1" class="button-item" style="grid-area: num1;"><button class="numsbutton"
-                    id="num1">1</button></div>
-            <div class="button-item" name="2" style="grid-area: num2;"><button class="numsbutton" id="num2">2</button>
+            <div id="Container" name="1" class="button-item" style="grid-area: num1;">
+                <button class="numsbutton"id="num1" focusable="false">1</button>
             </div>
-            <div class="specialElements" style="grid-area: num3;"><button class="numsbutton" id="num3">3</button>
+            <div class="button-item" name="2" style="grid-area: num2;">
+                <button class="numsbutton" id="num2">2</button>
             </div>
-            <div class="function-item" style="grid-area: moreFuncBut;"><button
-                    id="moreFunctionsButton">More<br>Functions</button tabindex="-1"><img src="Images/MoreFuncArrow.svg"
-                    class="arrows" id="arrowIcon" width="40px" tabindex="-1"></div>
-            <div class="button-item" style="grid-area: num4;"><button class="numsbutton" id="num4">4</button>
+            <div class="specialElements" style="grid-area: num3;">
+                <button class="numsbutton" id="num3">3</button>
             </div>
-            <div class="button-item" style="grid-area: num5;"><button class="numsbutton" id="num5">5</button>
+            <div class="function-item" style="grid-area: moreFuncBut;">
+                <button id="moreFunctionsButton">More<br>Functions</button tabindex="-1">
+                <div id="arrowPosition">
+                    <img src="Images/MoreFuncArrow.svg" class="arrows" id="arrowIcon" width="40px" tabindex="-1">
+                </div>
             </div>
-            <div class="button-item" style="grid-area: num6;"><button class="numsbutton" id="num6">6</button>
+            <div class="button-item" style="grid-area: num4;">
+                <button class="numsbutton" id="num4">4</button>
             </div>
-            <div class="function-item" id="backspaceDiv" style="grid-area: backspace;"><button class="funcbutton"
-                    id="backspace"><img src="Images/backIcon.svg" id="backspcaeIcon" width="40" height="20"></button>
+            <div class="button-item" style="grid-area: num5;">
+                <button class="numsbutton" id="num5">5</button>
             </div>
-            <div class="button-item" style="grid-area: num7;"><button class="numsbutton" id="num7">7</button>
+            <div class="button-item" style="grid-area: num6;">
+                <button class="numsbutton" id="num6">6</button>
             </div>
-            <div class="button-item" style="grid-area: num8;"><button class="numsbutton" id="num8">8</button>
+            <div class="function-item" id="backspaceDiv" style="grid-area: backspace;">
+                <button class="funcbutton" id="backspace">
+                    <img src="Images/backIcon.svg" id="backspcaeIcon" width="40" height="20">
+                </button>
             </div>
-            <div class="button-item" style="grid-area: num9;"><button class="numsbutton" id="num9">9</button>
+            <div class="button-item" style="grid-area: num7;">
+                <button class="numsbutton" id="num7">7</button>
             </div>
-            <div class="function-item" style="grid-area: plus;"><button class="funcbutton" id="plus">+</button>
+            <div class="button-item" style="grid-area: num8;">
+                <button class="numsbutton" id="num8">8</button>
             </div>
-            <div class="specialElements" style="grid-area: pi;"><button class="numsbutton" id="piButton">π</button>
+            <div class="button-item" style="grid-area: num9;">
+                <button class="numsbutton" id="num9">9</button>
             </div>
-            <div class="button-item" style="grid-area: num0;"><button class="numsbutton" id="num0">0</button>
+            <div class="function-item" style="grid-area: plus;">
+                <button class="funcbutton" id="plus">+</button>
             </div>
-            <div class="specialElements" style="grid-area: point;"><button class="numsbutton"
-                    id="pointButton">.</button>
+            <div class="specialElements" style="grid-area: pi;">
+                <button class="numsbutton" id="piButton">π</button>
             </div>
-            <div class="function-item" style="grid-area: minus;"><button class="funcbutton" id="minus">-</button>
+            <div class="button-item" style="grid-area: num0;">
+                <button class="numsbutton" id="num0">0</button>
             </div>
-            <div class="function-item" style="grid-area: percent;"><button class="funcbutton" id="percent">%</button>
+            <div class="specialElements" style="grid-area: point;">
+                <button class="numsbutton" id="pointButton">.</button>
             </div>
-            <div class="function-item" style="grid-area: pars;"><button class="funcbutton" id="pars">(
-                    )</button>
+            <div class="function-item" style="grid-area: minus;">
+                <button class="funcbutton" id="minus">-</button>
             </div>
-            <div class="function-item" style="grid-area: pow;"><button class="funcbutton" id="pow">^</button>
+            <div class="function-item" style="grid-area: percent;">
+                <button class="funcbutton" id="percent">%</button>
             </div>
-            <div class="function-item" style="grid-area: mutiplication;"><button class="funcbutton"
-                    id="mutiplication">×</button>
+            <div class="function-item" style="grid-area: pars;">
+                <button class="funcbutton" id="pars">( )</button>
             </div>
-            <div class="function-item" style="grid-area: enter;"><button class="funcbutton" id="enter">enter</button>
+            <div class="function-item" style="grid-area: pow;">
+                <button class="funcbutton" id="pow">^</button>
             </div>
-            <div class="function-item" style="grid-area: pow2;"><button class="funcbutton" id="pow2">x²</button>
+            <div class="function-item" style="grid-area: mutiplication;">
+                <button class="funcbutton" id="mutiplication">×</button>
             </div>
-            <div class="function-item" style="grid-area: sqrt;"><button class="funcbutton" id="sqrt">√x</button>
+            <div class="function-item" style="grid-area: enter;">
+                <button class="funcbutton" id="enter">enter</button>
             </div>
-            <div class="function-item" style="grid-area: division;"><button class="funcbutton" id="divison">÷</button>
+            <div class="function-item" style="grid-area: pow2;">
+                <button class="funcbutton" id="pow2">x²</button>
+            </div>
+            <div class="function-item" style="grid-area: sqrt;">
+                <button class="funcbutton" id="sqrt">√x</button>
+            </div>
+            <div class="function-item" style="grid-area: division;">
+                <button class="funcbutton" id="divison">÷</button>
             </div>
         </div>
         <div id="extraFuncPopUp">
             <div id="customFuncDisplayPopup" data-element="popup">
-                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="40" height="40">
-                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="40" height="40">
+                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="50px">
+                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="50px">
                 <div id="custFuncGridPopup">
 
                 </div>
             </div>
             <div class="customFuncDisplayBackgroundPopup" width="100%">
             </div>
-            <div class="extraFuncPopUpGrid">
+            <div id="extraFuncPopUpGrid">
                 <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
                             src="Images/help.svg" width="30" height="30"></button></div>
                 <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
