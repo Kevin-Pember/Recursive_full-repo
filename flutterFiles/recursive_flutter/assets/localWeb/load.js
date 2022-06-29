@@ -1276,6 +1276,7 @@ if (document.getElementById("mainBody") != null) {
     },
 
   ];
+  buttonMapper(keypadButtons)
 
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
@@ -1295,7 +1296,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
 
-
+/*
   document.getElementById('num1').addEventListener("click", function () {  });
   document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
   document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
@@ -1324,7 +1325,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
   document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
   document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
-
+*/
 
   document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
@@ -1368,7 +1369,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
 
-
+/*
   document.getElementById('addIconPopup').addEventListener("click", function () {
     console.log("Icon Popup")
     if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
@@ -1402,7 +1403,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
   document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
   document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
-
+*/
 
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
@@ -3704,14 +3705,19 @@ function buttonMapper(elemArray){
   for(let elem of elemArray){
     var repeater;
     let elemDef = document.getElementById(elem.id);
-    elemDef.addEventListener('click', () => {
-      elem.function();
+    elemDef.addEventListener('click', (e) => {
+      elem.function(e);
     });
     if(elem.repeatable){
-      let mouseDown = () =>{};
-      let mouseUp = () => {};
-      elemDef.addEventListener()
-      elemDef.addEventListener()
+      let mouseDown = (e) =>{
+        let event = e;
+        repeater = setInterval(() => {elem.function(event)}, 100)
+      };
+      let mouseUp = () => {clearInterval(repeater)};
+      elemDef.addEventListener("mousedown", (e) => {mouseDown(e)})
+      elemDef.addEventListener("mouseup",(e) => {mouseUp(e)})
+      elemDef.addEventListener('touchstart', (e) => {mouseDown(e)})
+      elemDef.addEventListener('touchend', (e) => {mouseUp(e)})
     }
   }
 }
