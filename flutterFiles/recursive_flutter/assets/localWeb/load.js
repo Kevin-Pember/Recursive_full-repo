@@ -729,148 +729,22 @@ if (document.getElementById("mainBody") != null) {
   })
   //new event listeners for the portable keypad
   let initGraphEquation = document.getElementById('initGraphEquation');
-  initGraphEquation.addEventListener("focus", function (e) {
-    if (document.getElementById('keypad').style.visibility == "hidden") {
-      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
-      keypadVis(true);
-      keypadController(
-        {
-          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
-          "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
-
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
-        }
-      );
-    }
-  });
-  initGraphEquation.addEventListener('focusout', (e) => {
-    setTimeout(() => {
-      let sel = window.getSelection();
-      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
-        if(initGraphEquation.innerHTML.length == 1){
-          initGraphEquation.innerHTML = "";
-        }
-        keypadVis(false);
-        keypadController(
-          {
-            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-            "reset": true,
-            "rePage": () => {
-
-            },
-          }
-        );
-      }
-    })
-  });
+  keypadEquationMapper(initGraphEquation)
+  document.getElementById('addGraphEquation').addEventListener('click', () =>{
+    let gEContainer = document.getElementById('graphFuncGrid')
+    let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
+    keypadEquationMapper(clon.getElementById('equation'));
+    gEContainer.insertBefore(clon, document.getElementById('addGraphEquation'))
+  })
   
   let initTableEquation = document.getElementById('initTableEquation');
-  initTableEquation.addEventListener("focus", function (e) {
-    if (document.getElementById('keypad').style.visibility == "hidden") {
-      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
-      keypadVis(true);
-      keypadController(
-        {
-          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
-          "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
-
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
-        }
-      );
-    }
-  });
-  initTableEquation.addEventListener('focusout', (e) => {
-    setTimeout(() => {
-      let sel = window.getSelection();
-      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
-        if(initGraphEquation.innerHTML.length == 1){
-          initGraphEquation.innerHTML = "";
-        }
-        keypadVis(false);
-        keypadController(
-          {
-            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-            "reset": true,
-            "rePage": () => {
-
-            },
-          }
-        );
-      }
-    })
-  });
+  keypadEquationMapper(initTableEquation)
+  document.getElementById('addTableEquation').addEventListener('click', () =>{
+    let gEContainer = document.getElementById('tableFuncGrid')
+    let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
+    keypadEquationMapper(clon.getElementById('equation'));
+    gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
+  })
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -3688,6 +3562,78 @@ let keypadVis = (visible) => {
   } else {
     document.getElementById('keypad').style.visibility = "hidden";
   }
+}
+function keypadEquationMapper(elem){
+  elem.addEventListener("focus", function (e) {
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      setSelect(elem, elem.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": elem, "input": elem },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  elem.addEventListener('focusout', (e) => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (!elem.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if(elem.innerHTML.length == 1){
+          elem.innerHTML = "";
+        }
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    })
+  });
 }
 function isHidden(el) {
   return (el.offsetParent === null)
