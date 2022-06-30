@@ -1243,43 +1243,6 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
 
-/*
-  document.getElementById('addIconPopup').addEventListener("click", function () {
-    console.log("Icon Popup")
-    if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
-      openPopup();
-    } else {
-      sessionStorage.setItem("facing", "creatorPage")
-      openPage("custCreatorPage")
-    }
-
-  });
-  document.getElementById('minusIconPopup').addEventListener("click", function () { });
-  document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
-  document.getElementById('acPopup').addEventListener('click', () => {
-    clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-  })
-  document.getElementById('deciToFracPopup').addEventListener("click", function () { frontButtonPressed('d→f('); });
-  document.getElementById('helpPopup').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
-  document.getElementById('log10Popup').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
-  document.getElementById('lnPopup').addEventListener("click", function () { frontButtonPressed('ln('); });
-  document.getElementById('ePopup').addEventListener("click", function () { frontButtonPressed('e'); });
-  document.getElementById('factorialPopup').addEventListener("click", function () { frontButtonPressed('!'); });
-  document.getElementById('degPopup').addEventListener("click", function (e) {
-    setDegMode();
-  });
-  document.getElementById('arcPopup').addEventListener("click", function () { setArc(); });
-  document.getElementById('invPopup').addEventListener("click", function () {
-    setInverse();
-  })
-  document.getElementById('sinPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('cosPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
-  document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
-*/
-
-
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
     universalBack();
@@ -1670,7 +1633,7 @@ function frontButtonPressed(input) {
     higher = sel.focusOffset;
     lower = sel.anchorOffset;
   }
-  if (sel.anchorNode != null) {
+  if (keyTargets.input.contains(sel.focusNode) && sel.focusNode != null) {
     let appendString = sel.focusNode.nodeValue.substring(0, lower) + input;
     sel.focusNode.nodeValue = appendString + sel.focusNode.nodeValue.substring(higher);
     range.setStart(sel.focusNode, appendString.length);
@@ -2149,6 +2112,25 @@ function setDegMode() {
     document.getElementById(elem).innerHTML = text;
   }
 }
+//END
+/**************************************************|Graph Mode Methods|**************************************************/
+function graphInMode(equation){
+  let vars = varInEquat(equation)
+  if(vars.length <= 1){
+    let parsedEquation = "";
+    let parsedArray = createParseable(equation);
+    for(let item of parsedArray){
+      if(item == "v1"){
+        item = 'Æ';
+      }
+      parsedEquation += item;
+    }
+    solveGraph(parsedEquation, {"chart": graphModeChart})
+  }else{
+
+  }
+}
+
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
@@ -2657,7 +2639,7 @@ function calculatePoints(parsedEquation, start, end, step) {
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    newPoint.y = inputSolver(parsedEquation.replace('Æ', newPoint.x), "Error Making Graph");
+    newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
     pointArray.push(newPoint);
   }
   return pointArray;
@@ -3657,13 +3639,14 @@ function buttonMapper(elemArray){
     if(elem.repeatable){
       let mouseDown = (e) =>{
         let event = e;
-        repeater = setInterval(() => {elem.function(event)}, 150)
+        repeater = setInterval(() => {elem.function(event)}, 300)
       };
       let mouseUp = () => {clearInterval(repeater)};
       elemDef.addEventListener("mousedown", (e) => {mouseDown(e)})
       elemDef.addEventListener("mouseup",(e) => {mouseUp(e)})
       elemDef.addEventListener('touchstart', (e) => {mouseDown(e)})
       elemDef.addEventListener('touchend', (e) => {mouseUp(e)})
+      elemDef.addEventListener('contextmenu', function (e){e.preventDefault(); return false;});
     }
   }
 }
