@@ -131,6 +131,7 @@ if (localStorage.getItem("settings") != undefined) {
 }
 let themeElem = {};
 setSettings();
+let graphVars = {};
 let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
 graphModeChart.options.plugins.zoom.zoom.onZoomComplete = function () {
   graphInMode()
@@ -2144,6 +2145,7 @@ function graphInMode() {
     "#697bf0",
     "#69f077",
   ]
+  console.log(graphVars)
   for (let elem of equationElems) {
     let equation = elem.innerHTML
     let vars = varInEquat(equation)
@@ -2158,7 +2160,7 @@ function graphInMode() {
       }
       let dataColor = accents[(datasets.length) % 11]
       datasets.push({
-        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top), Number(graphVars.step)),
+        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top)),
         label: "hidden",
         fontColor: '#FFFFFF',
         borderColor: dataColor,
@@ -2644,9 +2646,8 @@ function solveEquation(method, clon) {
 function solveGraph(parsedEquation, def) {
   let vars = getGraphVars(def);
   //Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
-  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top), Number(vars.step));
+  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top));
   def.chart.data.datasets[0].data = result;
-  console.log(def.chart.data.datasets)
   def.chart.update();
 }
 //Responsible for solving the parsedEquation with one open variable table wise
@@ -2669,8 +2670,9 @@ function solveTable(parsedEquation, clon) {
     newYCell.id = "other shit"
   }
 }
-function calculatePoints(parsedEquation, start, end, step) {
+function calculatePoints(parsedEquation, start, end) {
   let pointArray = [];
+  let step = Math.abs(end-start) * 0.05 
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
@@ -2683,21 +2685,14 @@ function calculatePoints(parsedEquation, start, end, step) {
   return pointArray;
 }
 //creates an array of all variables needed for calculatePoints
-let denfinedConstraints = {
-
-}
 function getGraphVars(def){
   let varArray = {}
-  if(denfinedConstraints.scales != def.chart.getScales() || denfinedConstraints.zoom != def.chart.getZoomLevel()){
-    denfinedConstraints = {"scales": def.chart.getScales(), "zoom": def.chart.getZoomLevel()}
-  }
-  let mutiplier = 1 / denfinedConstraints.zoom;
+  console.log("chart scales");
+  console.log(def.chart.scales);
   varArray = {
-    "bottom": Number(denfinedConstraints.scales.x.min) * mutiplier,
-    "top": Number(denfinedConstraints.scales.x.max) * mutiplier,
-    "step": def.tabPage === undefined ? settings.gDS : def.tabPage.querySelector('#stepDomainGraph').value
+    "bottom": Number(def.chart.scales.x.min),
+    "top": Number(def.chart.scales.x.max),
   }
-  varArray.step * mutiplier
   return varArray
 }
 //Responsible for (IDFK work on this later)
@@ -3529,7 +3524,6 @@ function createGraph(chart) {
       }
     }
   })
-  defChart.setScales({ 'x': { 'min': Number(settings.gDMin), 'max': Number(settings.gDMax) }, 'y': { 'min': Number(settings.gRMin), 'max': Number(settings.gRMax) } })
   return defChart;
 }
 /*
