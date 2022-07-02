@@ -2128,7 +2128,6 @@ function setDegMode() {
 function graphInMode() {
   let equationGrid = document.getElementById("graphFuncGrid");
   let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
-  console.log(graphModeChart.data.datasets)
   let def = { "chart": graphModeChart }
   let graphVars = getGraphVars(def)
   let datasets = [];
@@ -2145,7 +2144,6 @@ function graphInMode() {
     "#697bf0",
     "#69f077",
   ]
-  console.log(graphVars)
   for (let elem of equationElems) {
     let equation = elem.innerHTML
     let vars = varInEquat(equation)
@@ -2672,7 +2670,10 @@ function solveTable(parsedEquation, clon) {
 }
 function calculatePoints(parsedEquation, start, end) {
   let pointArray = [];
-  let step = Math.abs(end-start) * 0.05 
+  start = Math.floor(start)
+  end = Math.ceil(end)
+  console.log(`calculating from ${start} to ${end}`)
+  let step = Math.abs(end - start) * 0.01
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
@@ -2685,7 +2686,7 @@ function calculatePoints(parsedEquation, start, end) {
   return pointArray;
 }
 //creates an array of all variables needed for calculatePoints
-function getGraphVars(def){
+function getGraphVars(def) {
   let varArray = {}
   console.log("chart scales");
   console.log(def.chart.scales);
@@ -3490,6 +3491,9 @@ function createGraph(chart) {
           }
         },
       },
+      animation: {
+        duration: 0
+      },
       responsive: true,
       maintainAspectRatio: false,
       elements: {
@@ -3502,6 +3506,9 @@ function createGraph(chart) {
           display: false
         },
         zoom: {
+          animation: {
+            duration: 0
+          },
           limits: {
           },
           pan: {
@@ -3702,7 +3709,7 @@ function buttonMapper(elemArray) {
   }
 }
 
-function calculateGraph(){
+function calculateGraph() {
 
 }
 //END
