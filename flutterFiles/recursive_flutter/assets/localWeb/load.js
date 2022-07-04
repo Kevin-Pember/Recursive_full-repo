@@ -2579,8 +2579,8 @@ function parseVar(parsedEquation, data) {
   console.log("Parse var types")
   console.log(typeof data.Value)
   for (let i = 0; i < parsedEquation.length; i++) {
-    if (funcMatch(parsedEquation.substring(i)) != "") {
-      i += funcMatch(parsedEquation.substring(i)).length;
+    if (funcMatch(parsedEquation.substring(i),true) != "") {
+      i += funcMatch(parsedEquation.substring(i),true).length;
     } else if (parsedEquation.charAt(i) == data.Name) {
       parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
     }
@@ -3391,7 +3391,7 @@ function varInList(list, varLetter) {
 }
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
-  let func = funcMatch(entry);
+  let func = funcMatch(entry,true);
   let ignore = ignoreTest(entry);
   console.log(ignore)
   if (func != "") {
@@ -3414,8 +3414,8 @@ function setVar(element, equation) {
   console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i)) != "") {
-        i += funcMatch(equation.substring(i)).length;
+      if (funcMatch(equation.substring(i),true) != "") {
+        i += funcMatch(equation.substring(i),true).length;
       } else if (equation.charAt(i) == data.Name) {
         if (data.Value != "") {
           equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
@@ -3490,6 +3490,11 @@ function createGraph(chart) {
             color: colorArray[3],
           }
         },
+      },
+      hover:{
+        intersect: false,
+        mode: 'nearest',
+        axis: 'xy',
       },
       animation: {
         duration: 0
