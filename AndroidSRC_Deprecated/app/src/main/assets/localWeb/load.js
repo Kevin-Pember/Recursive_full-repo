@@ -131,6 +131,14 @@ if (localStorage.getItem("settings") != undefined) {
 }
 let themeElem = {};
 setSettings();
+let graphVars = {};
+let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
+graphModeChart.options.plugins.zoom.zoom.onZoomComplete = function () {
+  graphInMode()
+}
+graphModeChart.options.plugins.zoom.pan.onPanComplete = function () {
+  graphInMode()
+}
 if (document.getElementById("mainBody") != null) {
   var funcs = getFuncList();
   for (let funcObject of funcs) {
@@ -729,148 +737,26 @@ if (document.getElementById("mainBody") != null) {
   })
   //new event listeners for the portable keypad
   let initGraphEquation = document.getElementById('initGraphEquation');
-  initGraphEquation.addEventListener("focus", function (e) {
-    if (document.getElementById('keypad').style.visibility == "hidden") {
-      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
-      keypadVis(true);
-      keypadController(
-        {
-          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
-          "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
+  keypadEquationMapper(initGraphEquation)
+  document.getElementById('addGraphEquation').addEventListener('click', () => {
+    let gEContainer = document.getElementById('graphFuncGrid')
+    let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
+    keypadEquationMapper(clon.getElementById('equation'));
+    gEContainer.insertBefore(clon, document.getElementById('addGraphEquation'))
+  })
+  initGraphEquation.addEventListener('input', function (e) {
+    console.log("change")
+    graphInMode()
+  })
 
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
-        }
-      );
-    }
-  });
-  initGraphEquation.addEventListener('focusout', (e) => {
-    setTimeout(() => {
-      let sel = window.getSelection();
-      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
-        if(initGraphEquation.innerHTML.length == 1){
-          initGraphEquation.innerHTML = "";
-        }
-        keypadVis(false);
-        keypadController(
-          {
-            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-            "reset": true,
-            "rePage": () => {
-
-            },
-          }
-        );
-      }
-    })
-  });
-  
   let initTableEquation = document.getElementById('initTableEquation');
-  initTableEquation.addEventListener("focus", function (e) {
-    if (document.getElementById('keypad').style.visibility == "hidden") {
-      setSelect(initGraphEquation, initGraphEquation.innerHTML.length);
-      keypadVis(true);
-      keypadController(
-        {
-          "keyElems": { "scroll": initGraphEquation, "input": initGraphEquation },
-          "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
-
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
-        }
-      );
-    }
-  });
-  initTableEquation.addEventListener('focusout', (e) => {
-    setTimeout(() => {
-      let sel = window.getSelection();
-      if (!initGraphEquation.contains(sel.focusNode) || sel.anchorOffset == 0) {
-        if(initGraphEquation.innerHTML.length == 1){
-          initGraphEquation.innerHTML = "";
-        }
-        keypadVis(false);
-        keypadController(
-          {
-            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-            "reset": true,
-            "rePage": () => {
-
-            },
-          }
-        );
-      }
-    })
-  });
+  keypadEquationMapper(initTableEquation)
+  document.getElementById('addTableEquation').addEventListener('click', () => {
+    let gEContainer = document.getElementById('tableFuncGrid')
+    let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
+    keypadEquationMapper(clon.getElementById('equation'));
+    gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
+  })
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -886,7 +772,7 @@ if (document.getElementById("mainBody") != null) {
     }
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
-  let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
+
   //modeSwitcher section
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
@@ -903,7 +789,7 @@ if (document.getElementById("mainBody") != null) {
   //keypad button Elems
   let keypadButtons = [
     {
-      "id":'num1',
+      "id": 'num1',
       "name": "one",
       "function": () => {
         frontButtonPressed('1');
@@ -911,7 +797,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num2',
+      "id": 'num2',
       "name": "two",
       "function": () => {
         frontButtonPressed('2');
@@ -919,7 +805,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num3',
+      "id": 'num3',
       "name": "three",
       "function": () => {
         frontButtonPressed('3');
@@ -927,7 +813,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'moreFunctionsButton',
+      "id": 'moreFunctionsButton',
       "name": "Functions Page",
       "function": () => {
         sessionStorage.setItem("facing", "moreFunctionsPage");
@@ -936,7 +822,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'arrowIcon',
+      "id": 'arrowIcon',
       "name": "More Functions Menu",
       "function": () => {
         popup();
@@ -945,7 +831,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'num4',
+      "id": 'num4',
       "name": "four",
       "function": () => {
         frontButtonPressed('4');
@@ -953,7 +839,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num5',
+      "id": 'num5',
       "name": "five",
       "function": () => {
         frontButtonPressed('5');
@@ -961,7 +847,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num6',
+      "id": 'num6',
       "name": "six",
       "function": () => {
         frontButtonPressed('6');
@@ -969,7 +855,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'backspace',
+      "id": 'backspace',
       "name": "back space",
       "function": () => {
         backPressed();
@@ -977,7 +863,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num7',
+      "id": 'num7',
       "name": "seven",
       "function": () => {
         frontButtonPressed('7');
@@ -985,7 +871,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num8',
+      "id": 'num8',
       "name": "eight",
       "function": () => {
         frontButtonPressed('8');
@@ -993,7 +879,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num9',
+      "id": 'num9',
       "name": "nine",
       "function": () => {
         frontButtonPressed('9');
@@ -1001,7 +887,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'plus',
+      "id": 'plus',
       "name": "plus",
       "function": () => {
         frontButtonPressed('+');
@@ -1009,7 +895,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'piButton',
+      "id": 'piButton',
       "name": "pie",
       "function": () => {
         frontButtonPressed('π');
@@ -1017,14 +903,14 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'num0',
+      "id": 'num0',
       "name": "zero",
       "function": () => {
         frontButtonPressed('0');
       },
       "repeatable": true,
-    },{
-      "id":'pointButton',
+    }, {
+      "id": 'pointButton',
       "name": "point",
       "function": () => {
         frontButtonPressed('.');
@@ -1032,7 +918,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'minus',
+      "id": 'minus',
       "name": "minus",
       "function": () => {
         frontButtonPressed('-');
@@ -1040,7 +926,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'percent',
+      "id": 'percent',
       "name": "percent",
       "function": () => {
         frontButtonPressed('%');
@@ -1048,7 +934,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'pars',
+      "id": 'pars',
       "name": "Parenthesis",
       "function": () => {
         parsMethod();
@@ -1056,7 +942,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'pow',
+      "id": 'pow',
       "name": "Parenthesis",
       "function": () => {
         pow('1');
@@ -1064,7 +950,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'mutiplication',
+      "id": 'mutiplication',
       "name": "mutiplication",
       "function": () => {
         frontButtonPressed('×');
@@ -1072,7 +958,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'enter',
+      "id": 'enter',
       "name": "enter",
       "function": () => {
         enterPressed(keyTargets.input.innerHTML);
@@ -1080,7 +966,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'pow2',
+      "id": 'pow2',
       "name": "power of 2",
       "function": () => {
         pow('2');
@@ -1088,7 +974,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'sqrt',
+      "id": 'sqrt',
       "name": "square root",
       "function": () => {
         frontButtonPressed('√');
@@ -1096,7 +982,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'divison',
+      "id": 'divison',
       "name": "divison",
       "function": () => {
         frontButtonPressed('÷');
@@ -1104,7 +990,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'addIconPopup',
+      "id": 'addIconPopup',
       "name": "add Custom Function",
       "function": () => {
         if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
@@ -1116,36 +1002,36 @@ if (document.getElementById("mainBody") != null) {
       },
       "repeatable": false,
     },
-    
+
     {
-      "id":'minusIconPopup',
+      "id": 'minusIconPopup',
       "name": "remove Custom Function",
       "function": () => {
         //method needs to be added
       },
       "repeatable": false,
     },
-    
+
     {
-      "id":'functionPopup',
+      "id": 'functionPopup',
       "name": " deprecated Button",
       "function": () => {
       },
       "repeatable": false,
     },
-    
+
     {
-      "id":'acPopup',
+      "id": 'acPopup',
       "name": "Clear all",
       "function": () => {
-        clearMain(); 
+        clearMain();
         keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
       },
       "repeatable": false,
     },
-    
+
     {
-      "id":'deciToFracPopup',
+      "id": 'deciToFracPopup',
       "name": "decimal to fraction",
       "function": () => {
         frontButtonPressed('d→f(');
@@ -1153,17 +1039,17 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": false,
     },
     {
-      "id":'helpPopup',
+      "id": 'helpPopup',
       "name": "Help Page",
       "function": () => {
-        document.location = 'help.html'; 
-        setState(); 
+        document.location = 'help.html';
+        setState();
         sessionStorage.setItem("facing", "helpOut");
       },
       "repeatable": false,
     },
     {
-      "id":'log10Popup',
+      "id": 'log10Popup',
       "name": "log ten",
       "function": () => {
         frontButtonPressed('log₁₀(')
@@ -1171,7 +1057,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'lnPopup',
+      "id": 'lnPopup',
       "name": "natural log",
       "function": () => {
         frontButtonPressed('ln(');
@@ -1179,7 +1065,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'ePopup',
+      "id": 'ePopup',
       "name": "Euler's number",
       "function": () => {
         frontButtonPressed('e');
@@ -1187,7 +1073,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'factorialPopup',
+      "id": 'factorialPopup',
       "name": "factorial",
       "function": () => {
         frontButtonPressed('!');
@@ -1195,31 +1081,31 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'degPopup',
-      "name": "Angle Mode :"+document.getElementById('degPopup').innerHTML,
+      "id": 'degPopup',
+      "name": "Angle Mode :" + document.getElementById('degPopup').innerHTML,
       "function": () => {
         setDegMode();
       },
       "repeatable": false,
     },
     {
-      "id":'arcPopup',
-      "name": "arc is :"+document.getElementById('arcPopup').innerHTML,
+      "id": 'arcPopup',
+      "name": "arc is :" + document.getElementById('arcPopup').innerHTML,
       "function": () => {
         setArc();
       },
       "repeatable": false,
     },
     {
-      "id":'invPopup',
-      "name": "Inverse is :"+document.getElementById('invPopup').innerHTML,
+      "id": 'invPopup',
+      "name": "Inverse is :" + document.getElementById('invPopup').innerHTML,
       "function": () => {
         setInverse();
       },
       "repeatable": false,
     },
     {
-      "id":'sinPopup',
+      "id": 'sinPopup',
       "name": "sine",
       "function": (e) => {
         trigPressed(e);
@@ -1227,7 +1113,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'cosPopup',
+      "id": 'cosPopup',
       "name": "cosine",
       "function": (e) => {
         trigPressed(e);
@@ -1235,7 +1121,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'tanPopup',
+      "id": 'tanPopup',
       "name": "tangent",
       "function": (e) => {
         trigPressed(e);
@@ -1243,7 +1129,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'absPopup',
+      "id": 'absPopup',
       "name": "absolute Value",
       "function": (e) => {
         frontButtonPressed('|');
@@ -1251,7 +1137,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'modPopup',
+      "id": 'modPopup',
       "name": "Modulo",
       "function": (e) => {
         frontButtonPressed('mod(');
@@ -1259,7 +1145,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'sinPopup',
+      "id": 'sinPopup',
       "name": "sine",
       "function": (e) => {
         trigPressed(e);
@@ -1267,7 +1153,7 @@ if (document.getElementById("mainBody") != null) {
       "repeatable": true,
     },
     {
-      "id":'sinPopup',
+      "id": 'sinPopup',
       "name": "sine",
       "function": (e) => {
         trigPressed(e);
@@ -1296,36 +1182,36 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
 
-/*
-  document.getElementById('num1').addEventListener("click", function () {  });
-  document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
-  document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
-  document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
-  document.getElementById('arrowIcon').addEventListener("click", function () {
-    popup();
-    setSelect(keyTargets.input, keyTargets.input.lastChild.length);
-  });
-  document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
-  document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
-  document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
-  document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
-  document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
-  document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
-  document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
-  document.getElementById('plus').addEventListener("click", function () { frontButtonPressed('+'); });
-  document.getElementById('piButton').addEventListener("click", function () { frontButtonPressed('π'); });
-  document.getElementById('num0').addEventListener("click", function () { frontButtonPressed('0'); });
-  document.getElementById('pointButton').addEventListener("click", function () { frontButtonPressed('.'); });
-  document.getElementById('minus').addEventListener("click", function () { frontButtonPressed('-'); });
-  document.getElementById('percent').addEventListener("click", function () { frontButtonPressed('%'); });
-  document.getElementById('pars').addEventListener("click", function () { parsMethod(); });
-  document.getElementById('pow').addEventListener("click", function () { pow('1'); });
-  document.getElementById('mutiplication').addEventListener("click", function () { frontButtonPressed('×'); });
-  document.getElementById('enter').addEventListener("click", function () { enterPressed(keyTargets.input.innerHTML) });
-  document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
-  document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
-  document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
-*/
+  /*
+    document.getElementById('num1').addEventListener("click", function () {  });
+    document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
+    document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
+    document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
+    document.getElementById('arrowIcon').addEventListener("click", function () {
+      popup();
+      setSelect(keyTargets.input, keyTargets.input.lastChild.length);
+    });
+    document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
+    document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
+    document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
+    document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
+    document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
+    document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
+    document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
+    document.getElementById('plus').addEventListener("click", function () { frontButtonPressed('+'); });
+    document.getElementById('piButton').addEventListener("click", function () { frontButtonPressed('π'); });
+    document.getElementById('num0').addEventListener("click", function () { frontButtonPressed('0'); });
+    document.getElementById('pointButton').addEventListener("click", function () { frontButtonPressed('.'); });
+    document.getElementById('minus').addEventListener("click", function () { frontButtonPressed('-'); });
+    document.getElementById('percent').addEventListener("click", function () { frontButtonPressed('%'); });
+    document.getElementById('pars').addEventListener("click", function () { parsMethod(); });
+    document.getElementById('pow').addEventListener("click", function () { pow('1'); });
+    document.getElementById('mutiplication').addEventListener("click", function () { frontButtonPressed('×'); });
+    document.getElementById('enter').addEventListener("click", function () { enterPressed(keyTargets.input.innerHTML) });
+    document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
+    document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
+    document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
+  */
 
   document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
@@ -1368,43 +1254,6 @@ if (document.getElementById("mainBody") != null) {
     openPopup();
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
-
-/*
-  document.getElementById('addIconPopup').addEventListener("click", function () {
-    console.log("Icon Popup")
-    if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
-      openPopup();
-    } else {
-      sessionStorage.setItem("facing", "creatorPage")
-      openPage("custCreatorPage")
-    }
-
-  });
-  document.getElementById('minusIconPopup').addEventListener("click", function () { });
-  document.getElementById('functionPopup').addEventListener("click", function () { console.log("variables Fill In"); });
-  document.getElementById('acPopup').addEventListener('click', () => {
-    clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-  })
-  document.getElementById('deciToFracPopup').addEventListener("click", function () { frontButtonPressed('d→f('); });
-  document.getElementById('helpPopup').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
-  document.getElementById('log10Popup').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
-  document.getElementById('lnPopup').addEventListener("click", function () { frontButtonPressed('ln('); });
-  document.getElementById('ePopup').addEventListener("click", function () { frontButtonPressed('e'); });
-  document.getElementById('factorialPopup').addEventListener("click", function () { frontButtonPressed('!'); });
-  document.getElementById('degPopup').addEventListener("click", function (e) {
-    setDegMode();
-  });
-  document.getElementById('arcPopup').addEventListener("click", function () { setArc(); });
-  document.getElementById('invPopup').addEventListener("click", function () {
-    setInverse();
-  })
-  document.getElementById('sinPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('cosPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('tanPopup').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('absPopup').addEventListener("click", function () { frontButtonPressed('|'); });
-  document.getElementById('modPopup').addEventListener("click", function () { frontButtonPressed('mod(') });
-*/
-
 
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
@@ -1782,7 +1631,6 @@ function setImages(color) {
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
 function frontButtonPressed(input) {
-  console.log(keyTargets)
   let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
@@ -1796,7 +1644,7 @@ function frontButtonPressed(input) {
     higher = sel.focusOffset;
     lower = sel.anchorOffset;
   }
-  if (sel.anchorNode != null) {
+  if (keyTargets.input.contains(sel.focusNode) && sel.focusNode != null) {
     let appendString = sel.focusNode.nodeValue.substring(0, lower) + input;
     sel.focusNode.nodeValue = appendString + sel.focusNode.nodeValue.substring(higher);
     range.setStart(sel.focusNode, appendString.length);
@@ -2208,7 +2056,7 @@ function setSelect(node, index) {
   if (node.lastChild == undefined) {
     let textNode = document.createTextNode('‎')
     node.appendChild(textNode)
-  } 
+  }
   range.setStart(node.lastChild, index);
   range.collapse(true);
   sel.removeAllRanges();
@@ -2275,6 +2123,57 @@ function setDegMode() {
     document.getElementById(elem).innerHTML = text;
   }
 }
+//END
+/**************************************************|Graph Mode Methods|**************************************************/
+function graphInMode() {
+  let equationGrid = document.getElementById("graphFuncGrid");
+  let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
+  let def = { "chart": graphModeChart }
+  let graphVars = getGraphVars(def)
+  let datasets = [];
+  let accents = [
+    colorArray[1],
+    "#e6cc4e",
+    "#4ecfe6",
+    "#b169f0",
+    "#f06970",
+    "#87f069",
+    "#69f0c5",
+    "#f0a469",
+    "#69f0ed",
+    "#697bf0",
+    "#69f077",
+  ]
+  for (let elem of equationElems) {
+    let equation = elem.innerHTML
+    let vars = varInEquat(equation)
+    if (vars.length <= 1) {
+      let parsedEquation = "";
+      let parsedArray = createParseable(equation);
+      for (let item of parsedArray) {
+        if (item == "v1") {
+          item = 'Æ';
+        }
+        parsedEquation += item;
+      }
+      let dataColor = accents[(datasets.length) % 11]
+      datasets.push({
+        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top)),
+        label: "hidden",
+        fontColor: '#FFFFFF',
+        borderColor: dataColor,
+        backgroundColor: dataColor,
+        showLine: true,
+      });
+    } else {
+      report("Equation needs single variable", false)
+    }
+  }
+  def.chart.data.datasets = datasets;
+  console.log(datasets)
+  def.chart.update();
+}
+
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
@@ -2680,8 +2579,8 @@ function parseVar(parsedEquation, data) {
   console.log("Parse var types")
   console.log(typeof data.Value)
   for (let i = 0; i < parsedEquation.length; i++) {
-    if (funcMatch(parsedEquation.substring(i)) != "") {
-      i += funcMatch(parsedEquation.substring(i)).length;
+    if (funcMatch(parsedEquation.substring(i),true) != "") {
+      i += funcMatch(parsedEquation.substring(i),true).length;
     } else if (parsedEquation.charAt(i) == data.Name) {
       parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
     }
@@ -2743,16 +2642,10 @@ function solveEquation(method, clon) {
 }
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
-  console.log(def.chart.data.datasets[0].data)
-  let mutplier = 1 / def.chart.getZoomLevel()
-  let scales = def.chart.getScales()
-  let bottom = Number(scales.x.min) * mutplier;
-  let top = Number(scales.x.max) * mutplier;
-  let step = Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
-  let result = calculatePoints(parsedEquation, Number(bottom), Number(top), Number(step));
-  console.log(result)
+  let vars = getGraphVars(def);
+  //Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
+  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top));
   def.chart.data.datasets[0].data = result;
-  console.log(def.chart.data.datasets[0])
   def.chart.update();
 }
 //Responsible for solving the parsedEquation with one open variable table wise
@@ -2775,18 +2668,33 @@ function solveTable(parsedEquation, clon) {
     newYCell.id = "other shit"
   }
 }
-function calculatePoints(parsedEquation, start, end, step) {
+function calculatePoints(parsedEquation, start, end) {
   let pointArray = [];
+  start = Math.floor(start)
+  end = Math.ceil(end)
+  console.log(`calculating from ${start} to ${end}`)
+  let step = Math.abs(end - start) * 0.01
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    newPoint.y = inputSolver(parsedEquation.replace('Æ', newPoint.x), "Error Making Graph");
+    newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
     pointArray.push(newPoint);
   }
   return pointArray;
+}
+//creates an array of all variables needed for calculatePoints
+function getGraphVars(def) {
+  let varArray = {}
+  console.log("chart scales");
+  console.log(def.chart.scales);
+  varArray = {
+    "bottom": Number(def.chart.scales.x.min),
+    "top": Number(def.chart.scales.x.max),
+  }
+  return varArray
 }
 //Responsible for (IDFK work on this later)
 function checkVar(type, clon, checkList, def) {
@@ -3483,7 +3391,7 @@ function varInList(list, varLetter) {
 }
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
-  let func = funcMatch(entry);
+  let func = funcMatch(entry,true);
   let ignore = ignoreTest(entry);
   console.log(ignore)
   if (func != "") {
@@ -3506,8 +3414,8 @@ function setVar(element, equation) {
   console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i)) != "") {
-        i += funcMatch(equation.substring(i)).length;
+      if (funcMatch(equation.substring(i),true) != "") {
+        i += funcMatch(equation.substring(i),true).length;
       } else if (equation.charAt(i) == data.Name) {
         if (data.Value != "") {
           equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
@@ -3583,6 +3491,14 @@ function createGraph(chart) {
           }
         },
       },
+      hover:{
+        intersect: false,
+        mode: 'nearest',
+        axis: 'xy',
+      },
+      animation: {
+        duration: 0
+      },
       responsive: true,
       maintainAspectRatio: false,
       elements: {
@@ -3595,6 +3511,9 @@ function createGraph(chart) {
           display: false
         },
         zoom: {
+          animation: {
+            duration: 0
+          },
           limits: {
           },
           pan: {
@@ -3689,6 +3608,78 @@ let keypadVis = (visible) => {
     document.getElementById('keypad').style.visibility = "hidden";
   }
 }
+function keypadEquationMapper(elem) {
+  elem.addEventListener("focus", function (e) {
+    if (document.getElementById('keypad').style.visibility == "hidden") {
+      setSelect(elem, elem.innerHTML.length);
+      keypadVis(true);
+      keypadController(
+        {
+          "keyElems": { "scroll": elem, "input": elem },
+          "reset": false,
+          "keyStyling": `
+            #keypad {
+              top: calc(40% + 30px);
+              bottom: 10px;
+              width: calc(100% - 20px);
+              left: 10px;
+              position: absolute;
+            }
+            .dynamicModeContainer{
+              height: 40%;
+              grid-template-rows: 0px 100%;
+
+            }
+            #fullGraph{
+              visibility: hidden;
+            }
+            @media only screen and (max-height: 450px){
+              #keypad{
+                width: calc(33.3333% - 15px);
+                left: calc(66.6666% + 5px);
+                height: calc(100% - 60px);
+                top: 50px;
+                bottom: 0;
+                padding: 0px;
+                position: absolute;
+                border-radius: 25px;
+                overflow: hidden;
+              }
+              .dynamicModeContainer{
+                width: 66.6666%;
+                grid-template-columns: 50% 50%;
+                height: 100%;
+                grid-template-rows: unset;
+              }
+              #fullGraph{
+                visibility: visible;
+              }
+            }`
+        }
+      );
+    }
+  });
+  elem.addEventListener('focusout', (e) => {
+    setTimeout(() => {
+      let sel = window.getSelection();
+      if (!elem.contains(sel.focusNode) || sel.anchorOffset == 0) {
+        if (elem.innerHTML.length == 1) {
+          elem.innerHTML = "";
+        }
+        keypadVis(false);
+        keypadController(
+          {
+            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
+            "reset": true,
+            "rePage": () => {
+
+            },
+          }
+        );
+      }
+    })
+  });
+}
 function isHidden(el) {
   return (el.offsetParent === null)
 }
@@ -3701,25 +3692,30 @@ Format of objects input to button mapper
   "repeatable": true,
 }
 */
-function buttonMapper(elemArray){
-  for(let elem of elemArray){
+function buttonMapper(elemArray) {
+  for (let elem of elemArray) {
     var repeater;
     let elemDef = document.getElementById(elem.id);
     elemDef.addEventListener('click', (e) => {
       elem.function(e);
     });
-    if(elem.repeatable){
-      let mouseDown = (e) =>{
+    if (elem.repeatable) {
+      let mouseDown = (e) => {
         let event = e;
-        repeater = setInterval(() => {elem.function(event)}, 100)
+        repeater = setInterval(() => { elem.function(event) }, 200)
       };
-      let mouseUp = () => {clearInterval(repeater)};
-      elemDef.addEventListener("mousedown", (e) => {mouseDown(e)})
-      elemDef.addEventListener("mouseup",(e) => {mouseUp(e)})
-      elemDef.addEventListener('touchstart', (e) => {mouseDown(e)})
-      elemDef.addEventListener('touchend', (e) => {mouseUp(e)})
+      let mouseUp = () => { clearInterval(repeater) };
+      elemDef.addEventListener("mousedown", (e) => { mouseDown(e) })
+      elemDef.addEventListener("mouseup", (e) => { mouseUp(e) })
+      elemDef.addEventListener('touchstart', (e) => { mouseDown(e) })
+      elemDef.addEventListener('touchend', (e) => { mouseUp(e) })
+      elemDef.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
     }
   }
+}
+
+function calculateGraph() {
+
 }
 //END
 /************************************************|help page|**************************************************/
@@ -3826,8 +3822,6 @@ function custFuncExisting(name, duplicates) {
   }
   return exist;
 }
-
-
 class FuncPage {
   constructor(config) {
     this.def = {}
@@ -3870,8 +3864,6 @@ class TemplatePage extends FuncPage {
     clon.getElementById("nameFunc").value = name;
 
     this.def.chart = createGraph(chart)
-    //console.log(this.def.chart.getState().panDelta.valueOf())
-    this.def.chart.setScales({ 'x': { 'min': -10, 'max': 10 }, 'y': { 'min': -10, 'max': 10 } })
     clon.getElementById('functionMode').addEventListener("click", function () {
       funcTabs[0].style.visibility = "inherit";
       hidModes(parseInt(movable.dataset.pos), funcTabs);

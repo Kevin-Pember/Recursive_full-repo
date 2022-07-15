@@ -827,12 +827,6 @@ function endPan(chart, state) {
     helpers.callback(state.options.pan.onPanComplete, [{chart}]);
   }
 }
-function getScales(){
-  return scales;
-}
-function setScales(object){
-  scales = object
-}
 const hammers = new WeakMap();
 function startHammer(chart, options) {
   const state = getState(chart);
@@ -924,8 +918,6 @@ var Zoom = {
     chart.getZoomLevel = () => getZoomLevel(chart);
     chart.getInitialScaleBounds = () => getInitialScaleBounds(chart);
     chart.isZoomedOrPanned = () => isZoomedOrPanned(chart);
-    chart.getScales = () => getScales();
-    chart.setScales = (object) => setScales(object);
   },
 
   beforeEvent(chart) {

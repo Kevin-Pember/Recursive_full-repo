@@ -148,7 +148,7 @@ let secondList = [
 function solveInpr(equation, degRad) {
   defaultAngle = degRad;
   for (let i = 0; i < equation.length; i++) {
-    let func = funcMatch(equation.substring(i));
+    let func = funcMatch(equation.substring(i), true);
     if (func != "") {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
@@ -171,19 +171,24 @@ function getByName(name) {
   return null;
 }
 //A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
-function funcMatch(equation) {
+function funcMatch(equation, way) {
   var returned = "";
   for (let func of funcList) {
-    let check = equation.substring(0, (func.funcLength));
-    if (check == func.func) {
-      returned = func;
-    }
+      let check
+      if (way) {
+          check = equation.substring(0, (func.funcLength));
+      } else {
+          check = equation.substring(equation.length - func.funcLength);
+      }
+      if (check == func.func) {
+          returned = func;
+      }
   }
   for (let func of secondList) {
-    let check = equation.substring(0, (func.length));
-    if (check == func) {
-      returned = "";
-    }
+      let check = equation.substring(0, (func.length));
+      if (check == func) {
+          returned = "";
+      }
   }
   return returned;
 }
@@ -259,7 +264,7 @@ function equatInner(equation, degRad) {
 function solveFunc(equation, index) {
   let degRad = defaultAngle;
   let i = index;
-  let func = funcMatch(equation.substring(i));
+  let func = funcMatch(equation.substring(i), true);
   let innerRAW = parEncap(
     equation.substring(i + func.funcLength)
   );
@@ -517,7 +522,7 @@ function getNameList() {
 function createParseable(equation) {
   
   for (let i = equation.length - 1; i >= 0; i--) {
-    let func = funcMatch(equation.substring(i));
+    let func = funcMatch(equation.substring(i), true);
     if (func != "") {
       let innerRAW = parEncap(
         equation.substring(i + func.funcLength)
