@@ -407,6 +407,8 @@ if (document.getElementById("mainBody") != null) {
     #mobileTabs {
       visibility: visible;
       left: 0;
+      aspect-ratio: 1/1;
+      height: 50px;
     }
   
     .tablinks {
@@ -3697,6 +3699,7 @@ function buttonMapper(elemArray) {
     var repeater;
     let elemDef = document.getElementById(elem.id);
     elemDef.addEventListener('click', (e) => {
+      console.log(e)
       elem.function(e);
     });
     if (elem.repeatable) {
@@ -3705,7 +3708,7 @@ function buttonMapper(elemArray) {
         repeater = setInterval(() => { elem.function(event) }, 200)
       };
       let mouseUp = () => { clearInterval(repeater) };
-      elemDef.addEventListener("mousedown", (e) => { mouseDown(e) })
+      elemDef.addEventListener("mousedown", (e) => {console.log(e); mouseDown(e) })
       elemDef.addEventListener("mouseup", (e) => { mouseUp(e) })
       elemDef.addEventListener('touchstart', (e) => { mouseDown(e) })
       elemDef.addEventListener('touchend', (e) => { mouseUp(e) })

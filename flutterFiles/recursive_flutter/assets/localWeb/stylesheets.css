@@ -31,6 +31,12 @@
   background-color: var(--displayColor);
 }
 
+.imgDivClass{
+  aspect-ratio: 1 / 1;
+}
+.svgText{
+  fill: #FFFFFF;
+}
 .mode {
   width: calc(100% + 1px);
   height: 100%;
@@ -905,6 +911,11 @@ input[type="button"]:focus {
   top: 0;
   right: 0;
   position: absolute;
+  aspect-ratio: 1 / 1;
+}
+
+.basicSVG path{
+  
 }
 
 .tranparentOverlayButtons {

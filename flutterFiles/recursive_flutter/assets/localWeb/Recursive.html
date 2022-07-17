@@ -76,7 +76,25 @@
 <body id="mainBody">
     <div class="page" id="mainPage">
         <div id="tab">
-            <button id="mobileTabs"><img src="Images/mobileTabsIcon.svg" id="mobileTabIcon" width="50px">
+            <button id="mobileTabs">
+                <div id="mobileTabIcon" class="imgDivClass" width="50px">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                            <path class="svgText"
+                                d="m171.54 540c0-203.36 165.1-368.46 368.46-368.46s368.46 165.1 368.46 368.46-165.1 368.46-368.46 368.46-368.46-165.1-368.46-368.46zm185.6 168.54c-93.017-100.92-86.6-258.38 14.322-351.39 100.92-93.017 258.38-86.6 351.39 14.322 93.017 100.92 86.6 258.38-14.322 351.39-100.92 93.017-258.38 86.6-351.39-14.322z"
+                                fill-rule="evenodd" />
+                        </g>
+                    </svg>
+
+                </div>
                 <h3 id="tabNum">1</h3>
             </button>
             <div id="tabContainer">
@@ -90,7 +108,25 @@
                 <template class="newTab">
                     <button id="tabButton" class="tablinks" data-tabMap="custFunc">
                         <h3 id="newTabName"></h3>
-                        <img id="tabRemove" src="Images/xIcon.svg" width="31.5px">
+                        <div id="tabRemove" class="imgDivClass" style="height:31.5px">
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="a">
+                                        <rect width="1080" height="1080" />
+                                    </clipPath>
+                                </defs>
+                                <g clip-path="url(#a)">
+                                    <path
+                                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                        fill-opacity=".2" />
+                                    <path class="svgText"
+                                        d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                                </g>
+                            </svg>
+
+                        </div>
                         <div class="displayBase" id="displayFunc">
                             <h2 id="nameDisplay"></h2>
                             <div id="bodyFunc" class="functionBase">
@@ -103,14 +139,50 @@
                     </button>
                 </template>
             </div>
-            <img id="settingsCogIcon" src="Images/SettingsCog.svg" height="100%" name="Open Settings">
+            <div id="settingsCogIcon" name="Open Settings"><svg class="basicSVG" style="isolation:isolate"
+                    viewBox="0 0 1080 1080" width="100%" height="100%">
+                    <defs>
+                        <clipPath id="_clipPath_E0NGXa0g8VD7apDyydYCdTahXZOSOwz1">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#_clipPath_E0NGXa0g8VD7apDyydYCdTahXZOSOwz1)">
+                        <circle vector-effect="non-scaling-stroke" cx="540" cy="540" r="500" fill="rgb(0,0,0)"
+                            fill-opacity="0.2" />
+                        <path
+                            d=" M 244.674 697.548 C 232.822 675.449 223.384 651.865 216.714 627.15 L 184.02 627.15 C 157.205 627.15 135.435 605.38 135.435 578.565 L 135.435 504.283 C 135.435 477.468 157.205 455.698 184.02 455.698 L 215.958 455.698 L 215.958 455.698 C 224.818 421.674 238.911 389.752 257.327 360.847 L 235.667 337.347 C 217.494 317.63 218.748 286.868 238.465 268.695 L 293.086 218.352 C 312.803 200.179 343.565 201.433 361.738 221.15 L 383.307 244.551 L 383.307 244.551 C 405.378 232.865 428.913 223.58 453.562 217.045 L 453.562 184.732 C 453.562 157.917 475.332 136.147 502.147 136.147 L 576.429 136.147 C 603.244 136.147 625.014 157.917 625.014 184.732 L 625.014 217.045 C 658.734 225.985 690.369 240.072 719.025 258.412 L 719.025 258.412 L 743.659 235.708 C 763.376 217.535 794.138 218.789 812.311 238.506 L 862.654 293.127 C 880.827 312.844 879.574 343.606 859.856 361.779 L 835.061 384.633 C 846.595 406.527 855.769 429.853 862.243 454.274 L 862.243 454.274 L 895.98 454.274 C 922.795 454.274 944.565 476.044 944.565 502.859 L 944.565 577.141 C 944.565 603.956 922.795 625.726 895.98 625.726 L 862.243 625.726 C 853.33 659.346 839.3 690.893 821.04 719.481 L 821.04 719.481 L 843.286 743.618 C 861.459 763.335 860.205 794.097 840.488 812.27 L 785.867 862.613 C 766.149 880.786 735.387 879.533 717.214 859.815 L 694.924 835.631 C 672.953 847.232 649.535 856.454 625.014 862.955 L 625.014 895.268 C 625.014 922.083 603.244 943.853 576.429 943.853 L 502.147 943.853 C 475.332 943.853 453.562 922.083 453.562 895.268 L 453.562 862.955 C 420.658 854.232 389.74 840.607 361.638 822.913 L 337.306 845.339 C 317.589 863.512 286.827 862.258 268.654 842.541 L 218.311 787.92 C 200.138 768.203 201.392 737.441 221.109 719.268 L 244.674 697.548 Z  M 397.96 670.915 C 325.972 592.81 330.939 470.954 409.044 398.966 C 487.149 326.979 609.005 331.945 680.993 410.05 C 752.98 488.155 748.014 610.011 669.909 681.999 C 591.804 753.987 469.948 749.02 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 Z "
+                            fill-rule="evenodd" fill="rgb(255,255,255)" />
+                    </g>
+                </svg></div>
+
         </div>
         <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
             <button id="modeButton">Mode</button>
             <div id="mainMode" class="mode" style="visibility: inherit;">
 
                 <div id="displayClip" class="pane">
-                    <img id="deleteHistory" src="Images/historyIcon.svg" width="42.5px">
+                    <div id="deleteHistory" class="imgDivClass" style="height: 42.5px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path
+                                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                    fill-opacity=".2" />
+                                <path class="svgText"
+                                    d="m263.96 352.97h-0.328c-0.021-0.638-0.032-1.277-0.032-1.917 0-68.745 123.85-124.56 276.4-124.56s276.4 55.812 276.4 124.56c0 0.64-0.011 1.279-0.032 1.917h-0.36c0.236 1.255 0.36 2.551 0.36 3.874v5.777c0 11.521-9.354 20.875-20.875 20.875h-511.01c-11.521 0-20.875-9.354-20.875-20.875v-5.777c0-1.323 0.124-2.619 0.36-3.874z" />
+                                <path class="svgText"
+                                    d="m764.84 415.5v376.64c0 33.863-23.915 61.356-53.371 61.356h-342.94c-29.456 0-53.371-27.493-53.371-61.356v-376.64h449.68zm-199.45 81.188c69.081 12.044 121.67 72.365 121.67 144.87 0 81.164-65.895 147.06-147.06 147.06s-147.06-65.895-147.06-147.06h38.264c0 60.037 48.742 108.78 108.78 108.78s108.78-48.742 108.78-108.78c0-51.29-35.573-94.336-83.371-105.79v26.732l-83.392-47.514 83.392-47.514v29.216z"
+                                    fill-rule="evenodd" />
+                            </g>
+                        </svg>
+
+                    </div>
                     <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                         autocorrect="off">
                         <h3 contenteditable="false" id="historyHeader">
@@ -143,10 +215,46 @@
                                     <h2 id=memoryText></h2>
                                 </div>
                             </div>
-                            <img img id="leftOverlayNav" name="backward" class="arrows" src="Images/MoreFuncArrow.svg"
-                                width="40" height="40" style="transform: rotate(180deg);">
-                            <img img id="rightOverlayNav" name="forward" class="arrows" class='navLeft'
-                                src="Images/MoreFuncArrow.svg" width="40" height="40">
+                            <div id="leftOverlayNav" class="arrows imgDivClass" name="backward"
+                                style="transform: rotate(180deg); height: 40px;">
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <clipPath id="a">
+                                            <rect width="1080" height="1080" />
+                                        </clipPath>
+                                    </defs>
+                                    <g clip-path="url(#a)">
+                                        <rect width="1080" height="1080" fill-opacity="0" />
+                                        <circle cx="540" cy="540" r="450" fill-opacity=".2"
+                                            vector-effect="non-scaling-stroke" />
+                                        <path class="svgText"
+                                            d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                                    </g>
+                                </svg>
+
+                            </div>
+                            <div id="rightOverlayNav" name="forward" class="arrows imgDivClass navLeft"
+                                style="height: 40px;">
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <clipPath id="a">
+                                            <rect width="1080" height="1080" />
+                                        </clipPath>
+                                    </defs>
+                                    <g clip-path="url(#a)">
+                                        <rect width="1080" height="1080" fill-opacity="0" />
+                                        <circle cx="540" cy="540" r="450" fill-opacity=".2"
+                                            vector-effect="non-scaling-stroke" />
+                                        <path class="svgText"
+                                            d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                                    </g>
+                                </svg>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,8 +263,25 @@
 
                 <div id="extendedKeypad" class="pane">
                     <div id="extendedFuncGrid">
-                        <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx"><img
-                                    class="helpIcon" src="Images/help.svg" height="40px"></button></div>
+                        <div class="function-item" style="grid-area: help;"><button class="funcbutton" id="helpEx">
+                                <div class="helpIcon imgDivClass" style="height: 40px;">
+                                    <?xml version="1.0" encoding="UTF-8"?>
+                                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 45 45"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <clipPath id="a">
+                                                <rect width="45" height="45" />
+                                            </clipPath>
+                                        </defs>
+                                        <g clip-path="url(#a)">
+                                            <path class="svgText"
+                                                d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
+                                                fill-rule="evenodd" />
+                                        </g>
+                                    </svg>
+
+                                </div>
+                            </button></div>
                         <div class="function-item" style="grid-area: func;"><button class="funcbutton"
                                 id="functionEx">Func</button>
                         </div>
@@ -208,17 +333,88 @@
                     </div>
                 </div>
                 <div id="customFuncDisplay">
-                    <img id="backExMini" class="arrows" src="Images/MoreFuncArrow.svg" width="40"
-                        style="transform: rotate(180deg);">
-                    <img class="addIcon" id="addFunctionEx" src="Images/addObject.svg" width="40">
-                    <img class="minusIcon" id="minusFunctionEx" src="Images/minusIcon.svg" width="40" height="40">
+                    <div id="backExMini" class="arrows imgDivClass" style="transform: rotate(180deg); height: 40px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <rect width="1080" height="1080" fill-opacity="0" />
+                                <circle cx="540" cy="540" r="450" fill-opacity=".2"
+                                    vector-effect="non-scaling-stroke" />
+                                <path class="svgText"
+                                    d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                            </g>
+                        </svg>
+
+                    </div>
+                    <div id="addFunctionEx" class="addIcon imgDivClass" style="height: 40px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path
+                                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                    fill-opacity=".2" />
+                                <path class="svgText"
+                                    d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
+                            </g>
+                        </svg>
+
+                    </div>
+                    <div id="minusFunctionEx" class="minusIcon imgDivClass" style="height: 40px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path
+                                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                    fill-opacity=".2" />
+                                <rect class="svgText" transform="matrix(-1,0,0,-1,1080,1080)" x="287.12" y="481.64"
+                                    width="505.75" height="116.71" />
+                            </g>
+                        </svg>
+
+                    </div>
                     <h1 id="customFuncDisplayRecentText">Recent</h1>
                     <div id="customFuncDisplayGrid">
                         <template class="customFuncTemplate">
                             <button class="customFuncLinks" id="customFuncButton">
                                 <h2 id="equationLabel">Equation</h2>
                                 <h5 id="nameLabel" class="custFuncNames">New Function</h5>
-                                <img id="removeFunc" class="removeFuncIcons" src="Images/xIcon.svg" width="40">
+                                <div id="removeFunc" class="removeFuncIcons imgDivClass" style="height: 40px;">
+                                    <?xml version="1.0" encoding="UTF-8"?>
+                                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <clipPath id="a">
+                                                <rect width="1080" height="1080" />
+                                            </clipPath>
+                                        </defs>
+                                        <g clip-path="url(#a)">
+                                            <path
+                                                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                                fill-opacity=".2" />
+                                            <path class="svgText"
+                                                d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                                        </g>
+                                    </svg>
+
+                                </div>
                             </button>
                         </template>
                     </div>
@@ -230,7 +426,25 @@
                         <div id="graphContain" class="dynamicContent">
                             <canvas id="graphModeCanvas"></canvas>
                         </div>
-                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
+                        <div id="fullGraph" class="imgDivClass" style="height: 50px;">
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="a">
+                                        <rect width="1080" height="1080" />
+                                    </clipPath>
+                                </defs>
+                                <g clip-path="url(#a)">
+                                    <path
+                                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                        fill-opacity=".2" />
+                                    <path class="svgText"
+                                        d="m352.08 274.47h-84.084v237h84.084v-152.92h152.92v-84.084h-152.92zm453.44 446.97v-152.92h-84.084v152.92h-152.92v84.084h152.92 84.084v-84.084z"
+                                        fill-rule="evenodd" />
+                                </g>
+                            </svg>
+                        </div>
                     </div>
                     <div id="graphControls" class="dynamicModeControls" grid-area="controls">
                         <div id="graphFuncGrid" class="dynamicFuncGrid">
@@ -238,7 +452,25 @@
                                 contenteditable="true" value=""></div>
                             <button id="addGraphEquation" class="addDynamicEquation">+</button>
                         </div>
-                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
+                        <div id="settingsCogGraph" class="imgDivClass" style="height: 50px;">
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="a">
+                                        <rect width="1080" height="1080" />
+                                    </clipPath>
+                                </defs>
+                                <g clip-path="url(#a)">
+                                    <circle cx="540" cy="540" r="500" fill-opacity=".2"
+                                        vector-effect="non-scaling-stroke" />
+                                    <path class="svgText"
+                                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
+                                        fill-rule="evenodd" />
+                                </g>
+                            </svg>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,7 +480,25 @@
                         <div id="tableContain" class="dynamicContent">
                             <canvas id="tableModeCanvas"></canvas>
                         </div>
-                        <img id="fullGraph" src="Images/resizeWhite.svg" width="50px">
+                        <div id="fullGraph" class="imgDivClass" style="height: 50px;">
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="a">
+                                        <rect width="1080" height="1080" />
+                                    </clipPath>
+                                </defs>
+                                <g clip-path="url(#a)">
+                                    <path
+                                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                        fill-opacity=".2" />
+                                    <path class="svgText"
+                                        d="m352.08 274.47h-84.084v237h84.084v-152.92h152.92v-84.084h-152.92zm453.44 446.97v-152.92h-84.084v152.92h-152.92v84.084h152.92 84.084v-84.084z"
+                                        fill-rule="evenodd" />
+                                </g>
+                            </svg>
+                        </div>
                     </div>
                     <div id="tableControls" class="dynamicModeControls" grid-area="controls">
                         <div id="tableFuncGrid" class="dynamicFuncGrid">
@@ -256,7 +506,25 @@
                                 contenteditable="true" value=""></div>
                             <button id="addTableEquation" class="addDynamicEquation">+</button>
                         </div>
-                        <img id="settingsCogGraph" src="Images/SettingsCogWhite.svg" width="50px">
+                        <div id="settingsCogGraph" class="imgDivClass" style="height: 50px;">
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <clipPath id="a">
+                                        <rect width="1080" height="1080" />
+                                    </clipPath>
+                                </defs>
+                                <g clip-path="url(#a)">
+                                    <circle cx="540" cy="540" r="500" fill-opacity=".2"
+                                        vector-effect="non-scaling-stroke" />
+                                    <path class="svgText"
+                                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
+                                        fill-rule="evenodd" />
+                                </g>
+                            </svg>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -375,8 +643,43 @@
                 </div>
                 <div id="editDiv" style="visibility: hidden;">
                     <h1 id="custFuncEditHeader">Edit</h1>
-                    <img id="editExit" src="Images/xIcon.svg" width="71px">
-                    <img id="confirmEdit" src="Images/checkmark.svg" width="71px">
+                    <div id="editExit" class="imgDivClass" style="height: 71px">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path
+                                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                    fill-opacity=".2" />
+                                <path class="svgText"
+                                    d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                            </g>
+                        </svg>
+
+                    </div>
+                    <div id="confirmEdit" class="imgDivClass" style="height: 71px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path
+                                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                    fill-opacity=".2" />
+                                <path class="svgText"
+                                    d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+                            </g>
+                        </svg>
+                    </div>
                     <div id="textEditorEdit"></div>
 
                 </div>
@@ -399,8 +702,43 @@
     <div id="nameEntry">
         <div id="entryDiv">
             <h2 id="entryNameHeader">Name</h2>
-            <img src="Images/checkmark.svg" width="40px" id="confirmNameEntry">
-            <img src="Images/xIcon.svg" width="40px" id="exitNameEntry">
+            <div id="confirmNameEntry" class="imgDivClass" style="height: 40px;">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="a">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#a)">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+                    </g>
+                </svg>
+            </div>
+            <div id="exitNameEntry" class="imgDivClass" style="height: 40px;">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="a">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#a)">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                    </g>
+                </svg>
+
+            </div>
             <textarea id="nameEntryArea" placeholder="Enter Name"></textarea>
         </div>
     </div>
@@ -408,14 +746,66 @@
         <div id="confirmDiv">
             <h2 id="confirmHeader">Confirm</h2>
             <h3 id="confirmMessage"></h3>
-            <img src="Images/checkmark.svg" width="40px" id="confirmButton">
-            <img src="Images/xIcon.svg" width="40px" id="exitConfirmPage">
+            <div id="confirmButton" class="imgDivClass" style="height: 40px;">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="a">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#a)">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+                    </g>
+                </svg>
+            </div>
+            <div id="exitConfirmPage" class="imgDivClass" style="height: 40px;">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="a">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#a)">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                    </g>
+                </svg>
+
+            </div>
         </div>
     </div>
     <h1 id="popupConsole">
     </h1>
     <div class="page" id="custCreatorPage">
-        <img id="backCreator" src="Images/MoreFuncArrow.svg" width="45px" style="transform: rotate(180deg);">
+        <div id="backCreator" class="imgDivClass" style="height: 45px; transform: rotate(180deg);">
+            <?xml version="1.0" encoding="UTF-8"?>
+            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="a">
+                        <rect width="1080" height="1080" />
+                    </clipPath>
+                </defs>
+                <g clip-path="url(#a)">
+                    <rect width="1080" height="1080" fill-opacity="0" />
+                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                </g>
+            </svg>
+
+        </div>
         <input type="text" id="nameCreator" placeholder="Name">
         <div id="mainCreator">
             <div id=modeSwitcher>
@@ -440,7 +830,25 @@
     <div class="page" id="settingsPage">
         <div id="buyScreen" style="visibility: hidden;">
             <h1 class="settingsHeaders" id="buyTitle">Custom <br> Themes</h1>
-            <img id="buyExit" src="Images/xIconWhite.svg" width="50px">
+            <div id="buyExit" class="imgDivClass" style="height: 50px;">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="a">
+                            <rect width="1080" height="1080" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#a)">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                    </g>
+                </svg>
+
+            </div>
             <div id="imagesContainer">
 
             </div>
@@ -451,19 +859,142 @@
             <button id="buyButton">$ 0.99</button>
         </div>
         <div id="navColumn" class="pane">
-            <button id="backButton"><img src="Images/MoreFuncArrowWhite.svg" class="backIcon" width="50"
-                    height="50"></button>
+            <button id="backButton">
+                <div class="backIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <rect width="1080" height="1080" fill-opacity="0" />
+                            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                            <path class="svgText"
+                                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                        </g>
+                    </svg>
+
+                </div>
+            </button>
             <h1 id="settingsTitle">Settings</h1>
-            <button id="LooknFeel" class="navButtons"><img id="ColorsIcon" src="Images/ColorsWhite.svg"
-                    class="settingsIcon" height="100%">Colors</button>
-            <button id="Preferences" class="navButtons"><img id="PreferencesIcon" src="Images/CalipiersWhite.svg"
-                    class="settingsIcon" height="100%">Calculations</button>
-            <button id="About" class="navButtons"><img id="AboutIcon" src="Images/aboutUS.svg" class="settingsIcon"
-                    height="100%">About</button>
+            <button id="LooknFeel" class="navButtons">
+                <div id="ColorsIcon" class="settingsIcon imgDivClass" style="height: 100%;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate; position: absolute; left: 0;"
+                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <circle class='settingCircle' cx="540" cy="539.53" r="411"
+                                vector-effect="non-scaling-stroke" />
+                            <path
+                                d="m743.22 742.79h38.854c22.453 0 40.682-18.229 40.682-40.682v-325.16c0-22.453-18.229-40.682-40.682-40.682h-38.854v406.52z"
+                                fill="#b9b7b7" />
+                            <rect x="333.01" y="336.27" width="84.071" height="406.52" fill="#ffad50" />
+                            <rect x="413.98" y="336.27" width="82.636" height="406.52" fill="#f0ff50" />
+                            <rect x="493.81" y="336.27" width="82.341" height="406.52" fill="#50ff96" />
+                            <rect x="573.64" y="336.27" width="82.046" height="406.52" fill="#50a5ff" />
+                            <rect x="655.69" y="336.27" width="87.528" height="406.52" fill="#ad50ff" />
+                            <path
+                                d="m257.25 585.07v-208.11c0-22.453 18.229-40.682 40.682-40.682h38.071v234.98c51.586 9.971 90.594 55.413 90.594 109.89 0 61.775-50.153 111.93-111.93 111.93-61.774 0-111.93-50.153-111.93-111.93 0-40.79 21.868-76.514 54.509-96.077z"
+                                fill="#ff5050" />
+                        </g>
+                    </svg>
+
+                </div>
+                Colors
+            </button>
+            <button id="Preferences" class="navButtons">
+                <div id="PreferencesIcon" class="settingsIcon imgDivClass" style="height: 100%;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate; position: absolute; left: 0;"
+                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <circle class='settingCircle' cx="540" cy="540" r="411"
+                                vector-effect="non-scaling-stroke" />
+                            <path
+                                d="m480.45 255.27c0-32.866 26.682-59.549 59.548-59.549s59.548 26.683 59.548 59.549c0 32.865-26.682 59.548-59.548 59.548s-59.548-26.683-59.548-59.548zm14.729 0c0-24.737 20.082-44.82 44.819-44.82s44.819 20.083 44.819 44.82c0 24.736-20.082 44.819-44.819 44.819s-44.819-20.083-44.819-44.819z"
+                                fill="#b3b3b3" fill-rule="evenodd" />
+                            <path
+                                d="m758.19 648.43c-0.47-2.52-0.978-5.064-1.525-7.633 0-0.312-12.589-20.357-16.879-26.65q-33.034-48.457-242.09-316.58h79.479q231.01 269.75 231.01 382.44c0 112.68-71.982 204.19-168.25 204.19h-12.556c2.411 2.395 164.41-55.509 130.8-235.77z"
+                                fill="#aaa9a9" fill-rule="evenodd" />
+                            <path
+                                d="m550.34 338.6q-179.71 230.93-210.13 275.55c-4.29 6.293-16.879 26.338-16.879 26.65-0.547 2.568-1.055 5.113-1.525 7.633-33.604 180.26 128.39 238.17 130.8 235.77h-12.556c-96.264 0-168.25-91.51-168.25-204.19q0-111.52 226.25-376.87c-0.24-1.821-0.364-3.679-0.364-5.566 0-23.345 18.954-42.299 42.3-42.299s42.299 18.953 42.3 42.299c0 19.779-13.604 36.405-31.957 41.024z"
+                                fill="#cac8c8" />
+                            <path
+                                d="m556.19 269.53 16.19 28.042-16.19 28.042h-32.38l-16.188-28.042 16.188-28.042h32.38z"
+                                fill="#999" fill-rule="evenodd" />
+                            <path
+                                d="m501.95 349.71h172.68v-11.361c0-7.027 5.705-12.732 12.732-12.732 7.026 0 12.731 5.705 12.731 12.732v48.269c0 7.027-5.705 12.732-12.731 12.732-7.027 0-12.732-5.705-12.732-12.732v-11.361h-172.68c-3.824 4.944-9.813 8.129-16.541 8.129-11.536 0-20.902-9.366-20.902-20.903 0-11.536 9.366-20.902 20.902-20.902 6.728 0 12.717 3.185 16.541 8.129z"
+                                fill="#8e8e8e" />
+                        </g>
+                    </svg>
+
+                </div>
+                Calculations
+            </button>
+            <button id="About" class="navButtons">
+                <div id="AboutIcon" class="settingsIcon imgDivClass" style="height: 100%;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate; position: absolute; left: 0;"
+                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <circle cx="540" cy="540" r="411" vector-effect="non-scaling-stroke" />
+                            <clipPath id="b">
+                                <circle class='settingCircle' cx="540" cy="540" r="411"
+                                    vector-effect="non-scaling-stroke" />
+                            </clipPath>
+                            <g clip-path="url(#b)">
+                                <path
+                                    d="m615.76 477.4c27.036-21.981 44.306-55.484 44.306-92.984 0-66.184-53.793-119.92-120.05-119.92s-120.05 53.733-120.05 119.92c0 38.667 18.362 73.085 46.85 95.012-67.159 18.544-114.29 61.855-114.29 112.27v159.77h374.99v-167.96c0-48.301-46.388-89.62-111.75-106.11z"
+                                    fill="#4a86e8" fill-rule="evenodd" />
+                                <path
+                                    d="m409.36 694.06h261.28c31.388 0 56.872 25.484 56.872 56.874v7.692c0 31.39-25.484 56.874-56.872 56.874h-261.28c-31.388 0-56.872-25.484-56.872-56.874v-7.692c0-31.39 25.484-56.874 56.872-56.874z"
+                                    fill="#4A86E8" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                About
+            </button>
         </div>
         <div id="colorsTab" class="settingTabContent pane">
-            <button id="colorsBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
-                    class="backIcon"></button>
+            <button id="colorsBack" class="settingBackButtons">
+                <div class="backIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <rect width="1080" height="1080" fill-opacity="0" />
+                            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                            <path class="svgText"
+                                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                        </g>
+                    </svg>
+
+                </div>
+            </button>
             <h1 class="settingsHeaders">Colors</h1>
             <div id="ColorsDiv" class="settingsDiv" style="visibility: hidden; position: absolute;">
                 <h2 class="h2Settings" id="colorsHeader">Colors</h2>
@@ -545,8 +1076,26 @@
         </div>
 
         <div id="PreferencesTab" class="settingTabContent pane">
-            <button id="PreferencesBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
-                    class="backIcon"></button>
+            <button id="PreferencesBack" class="settingBackButtons">
+                <div class="backIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <rect width="1080" height="1080" fill-opacity="0" />
+                            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                            <path class="svgText"
+                                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                        </g>
+                    </svg>
+
+                </div>
+            </button>
             <h1 class="settingsHeaders">Calculations</h1>
             <div class="settingsDiv">
                 <h2 class="h2Settings" id="colorsHeader">General</h2>
@@ -600,8 +1149,26 @@
             </div>
         </div>
         <div id="AboutTab" class="settingTabContent pane">
-            <button id="AboutBack" class="settingBackButtons"><img src="Images/MoreFuncArrowWhite.svg"
-                    class="backIcon"></button>
+            <button id="AboutBack" class="settingBackButtons">
+                <div class="backIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <rect width="1080" height="1080" fill-opacity="0" />
+                            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                            <path class="svgText"
+                                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                        </g>
+                    </svg>
+
+                </div>
+            </button>
             <h1 class="settingsHeaders">About</h1>
             <div id="VersionDiv" class="settingsDiv">
                 <h2 class="h2Settings" id="versionHeader" style="border-radius: 25px;">Version</h2>
@@ -620,11 +1187,63 @@
     </div>
     </div>
     <div class="page" id="moreFunctionsPage">
-        <img id="backIconFunc" src="Images/MoreFuncArrowWhite.svg" width="50">
+        <div id="backIconFunc" class="imgDivClass" style="height: 50px;">
+            <?xml version="1.0" encoding="UTF-8"?>
+            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="a">
+                        <rect width="1080" height="1080" />
+                    </clipPath>
+                </defs>
+                <g clip-path="url(#a)">
+                    <rect width="1080" height="1080" fill-opacity="0" />
+                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                </g>
+            </svg>
+
+        </div>
         <input type="text" class="textInputTop" id="searchArea" placeholder="Search">
-        <img class="clearModifiers" src="Images/addObjectWhite.svg" width="60" id="addIcon"
-            style="left: unset; right: 5px;">
-        <img class="clearModifiers" src="Images/minusIconWhite.svg" width="60" id="minusIcon" style="right: 65px;">
+        <div id="addIcon" class="clearModifiers imgDivClass" style="left: unset; right: 5px; height: 60px;">
+            <?xml version="1.0" encoding="UTF-8"?>
+            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="a">
+                        <rect width="1080" height="1080" />
+                    </clipPath>
+                </defs>
+                <g clip-path="url(#a)">
+                    <path
+                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                        fill-opacity=".2" />
+                    <path class="svgText"
+                        d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
+                </g>
+            </svg>
+
+        </div>
+        <div id="minusIcon" class="clearModifiers imgDivClass" style="right: 65px; height: 60px;">
+            <?xml version="1.0" encoding="UTF-8"?>
+            <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="a">
+                        <rect width="1080" height="1080" />
+                    </clipPath>
+                </defs>
+                <g clip-path="url(#a)">
+                    <path
+                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                        fill-opacity=".2" />
+                    <rect class="svgText" transform="matrix(-1,0,0,-1,1080,1080)" x="287.12" y="481.64" width="505.75"
+                        height="116.71" />
+                </g>
+            </svg>
+
+        </div>
         <div id="funcGrid">
             <template class="customFuncTemplate">
                 <button class="customFuncLinks" id="customFuncButton">
@@ -641,7 +1260,7 @@
     <div id="keypad" class="pane" style="visibility: visible;">
         <div class="mainCacGrid">
             <div id="Container" name="1" class="button-item" style="grid-area: num1;">
-                <button class="numsbutton"id="num1" focusable="false">1</button>
+                <button class="numsbutton" id="num1" focusable="false">1</button>
             </div>
             <div class="button-item" name="2" style="grid-area: num2;">
                 <button class="numsbutton" id="num2">2</button>
@@ -652,7 +1271,25 @@
             <div class="function-item" style="grid-area: moreFuncBut;">
                 <button id="moreFunctionsButton">More<br>Functions</button tabindex="-1">
                 <div id="arrowPosition">
-                    <img src="Images/MoreFuncArrow.svg" class="arrows" id="arrowIcon" width="40px" tabindex="-1">
+                    <div id="arrowIcon" class="arrows imgDivClass" style="height: 40px;" tabindex="-1">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="1080" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <rect width="1080" height="1080" fill-opacity="0" />
+                                <circle cx="540" cy="540" r="450" fill-opacity=".2"
+                                    vector-effect="non-scaling-stroke" />
+                                <path class="svgText"
+                                    d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                            </g>
+                        </svg>
+
+                    </div>
                 </div>
             </div>
             <div class="button-item" style="grid-area: num4;">
@@ -665,8 +1302,25 @@
                 <button class="numsbutton" id="num6">6</button>
             </div>
             <div class="function-item" id="backspaceDiv" style="grid-area: backspace;">
-                <button class="funcbutton" id="backspace">
-                    <img src="Images/backIcon.svg" id="backspcaeIcon" width="40" height="20">
+                <button class="funcbutton" id="backspace" style="display: grid;justify-content: center;align-content: center;">
+                    <div id="backspcaeIcon" style="height: 20px; width: 40px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 540"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="1080" height="540" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <rect width="1080" height="540" fill-opacity="0" />
+                                <path class="svgText"
+                                    d="m657.21 270-147.56 147.13 37.394 37.284 147.56-147.13 147.56 147.13 37.395-37.284-147.56-147.13 147.56-147.13-37.395-37.284-147.56 147.13-147.56-147.13-37.394 37.284 147.56 147.13zm-231.69-247.29v-1.106l-403.92 248.4 403.92 248.4v-1.106c14.803 14.068 34.815 22.706 56.829 22.706h515.12c45.548 0 82.527-36.979 82.527-82.527v-374.95c0-45.548-36.979-82.527-82.527-82.527h-515.12c-22.014 0-42.026 8.638-56.829 22.706z"
+                                    fill-rule="evenodd" />
+                            </g>
+                        </svg>
+
+                    </div>
                 </button>
             </div>
             <div class="button-item" style="grid-area: num7;">
@@ -720,8 +1374,44 @@
         </div>
         <div id="extraFuncPopUp">
             <div id="customFuncDisplayPopup" data-element="popup">
-                <img class="addIcon" id="addIconPopup" src="Images/addObject.svg" width="50px">
-                <img class="minusIcon" id="minusIconPopup" src="Images/minusIcon.svg" width="50px">
+                <div id="addIconPopup" class="addIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <path
+                                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                fill-opacity=".2" />
+                            <path class="svgText"
+                                d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
+                        </g>
+                    </svg>
+        
+                </div>
+                <div id="minusIconPopup" class="minusIcon imgDivClass" style="height: 50px;">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 1080 1080"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="a">
+                                <rect width="1080" height="1080" />
+                            </clipPath>
+                        </defs>
+                        <g clip-path="url(#a)">
+                            <path
+                                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                                fill-opacity=".2" />
+                            <rect class="svgText" transform="matrix(-1,0,0,-1,1080,1080)" x="287.12" y="481.64" width="505.75"
+                                height="116.71" />
+                        </g>
+                    </svg>
+        
+                </div>
                 <div id="custFuncGridPopup">
 
                 </div>
@@ -729,8 +1419,25 @@
             <div class="customFuncDisplayBackgroundPopup" width="100%">
             </div>
             <div id="extraFuncPopUpGrid">
-                <div class="function-item"><button class="funcbutton" id="helpPopup"><img class="helpIcon"
-                            src="Images/help.svg" width="30" height="30"></button></div>
+                <div class="function-item"><button class="funcbutton" id="helpPopup" style="display: grid;justify-content: center;align-content: center;">
+                    <div class="helpIcon imgDivClass" style="height: 30px;">
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <svg width="100%" height="100%" style="isolation:isolate" viewBox="0 0 45 45"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="a">
+                                    <rect width="45" height="45" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)">
+                                <path class="svgText"
+                                    d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
+                                    fill-rule="evenodd" />
+                            </g>
+                        </svg>
+
+                    </div>
+                </button></div>
                 <div class="specialElements"><button class="funcbutton" id="deciToFracPopup">d→f</button></div>
                 <div class="button-item"><button class="funcbutton" id="functionPopup">xyz</button></div>
                 <div class="button-item"><button class="funcbutton" id="acPopup">ac</button></div>
