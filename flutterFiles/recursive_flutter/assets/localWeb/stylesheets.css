@@ -1,8 +1,8 @@
 :root {
-  --displayColor: #000000;
-  --numbersColor: #000000;
-  --functionsColor: #000000;
-  --textColor: #000000;
+  --displayColor: #22362F;
+  --numbersColor: #014D65;
+  --functionsColor: #191C1B;
+  --textColor: #CEE8DB;
   --translucent: #00000033;
   --semi-transparent: #000000c5;
 }
@@ -35,7 +35,22 @@
   aspect-ratio: 1 / 1;
 }
 .svgText{
-  fill: #FFFFFF;
+  fill: var(--textColor);
+}
+.settingCircle{
+  fill: var(--textColor)
+}
+.primary{
+  fill:var(--functionsColor);
+}
+.secondary{
+  fill:var(--displayColor);
+}
+.accent{
+ fill: var(--numbersColor);
+}
+.text{
+  fill: var(--textColor)
 }
 .mode {
   width: calc(100% + 1px);
@@ -123,9 +138,6 @@
   overflow: hidden;
 }
 
-#graphFuncGrid {
-  
-}
 .dynamicFuncGrid{
   padding-top: 10px;
   width: calc(100% - 20px);
@@ -912,10 +924,6 @@ input[type="button"]:focus {
   right: 0;
   position: absolute;
   aspect-ratio: 1 / 1;
-}
-
-.basicSVG path{
-  
 }
 
 .tranparentOverlayButtons {

@@ -407,6 +407,8 @@ if (document.getElementById("mainBody") != null) {
     #mobileTabs {
       visibility: visible;
       left: 0;
+      aspect-ratio: 1/1;
+      height: 50px;
     }
   
     .tablinks {
@@ -3208,11 +3210,11 @@ function setSettings() {
     }
   }
   let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', colorArray[2]);
+  /*rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
-  setImages(colorArray[3]);
+  setImages(colorArray[3]);*/
   TextColorGlobal = colorArray[3];
   if (!settings.degRad) {
     setDegMode();
@@ -3697,18 +3699,35 @@ function buttonMapper(elemArray) {
     var repeater;
     let elemDef = document.getElementById(elem.id);
     elemDef.addEventListener('click', (e) => {
+      console.log(e)
+      console.log(elem)
       elem.function(e);
     });
     if (elem.repeatable) {
+      let evtTarget = undefined
       let mouseDown = (e) => {
         let event = e;
-        repeater = setInterval(() => { elem.function(event) }, 200)
+        evtTarget = event.currentTarget;
+        repeater = setInterval((e) => {
+          elem.function(event)
+          console.log(event)
+        }, 200)
       };
-      let mouseUp = () => { clearInterval(repeater) };
-      elemDef.addEventListener("mousedown", (e) => { mouseDown(e) })
-      elemDef.addEventListener("mouseup", (e) => { mouseUp(e) })
+      let mouseMove = (e) => {
+        if(evtTarget != e.currentTarget){
+          clearInterval(repeater)
+        }
+      };
+      let mouseUp = (e) => {
+        clearInterval(repeater)
+      }
+      elemDef.addEventListener("mousedown", (e) => {console.log(e); mouseDown(e) })
+      elemDef.addEventListener("mousemove", (e) => { mouseMove(e) })
+      elemDef.addEventListener('mouseup',(e) => {mouseUp(e)})
       elemDef.addEventListener('touchstart', (e) => { mouseDown(e) })
-      elemDef.addEventListener('touchend', (e) => { mouseUp(e) })
+      elemDef.addEventListener('touchmove', (e) => { mouseMove(e) })
+      elemDef.addEventListener('touchend',(e) => {mouseUp(e)})
+      elemDef.addEventListener('touchcancel',(e) => {mouseUp(e)})
       elemDef.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
     }
   }
