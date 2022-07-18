@@ -3699,8 +3699,6 @@ function buttonMapper(elemArray) {
     var repeater;
     let elemDef = document.getElementById(elem.id);
     elemDef.addEventListener('click', (e) => {
-      console.log(e)
-      console.log(elem)
       elem.function(e);
     });
     if (elem.repeatable) {
