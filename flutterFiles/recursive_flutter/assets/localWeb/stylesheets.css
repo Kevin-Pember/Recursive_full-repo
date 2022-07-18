@@ -512,6 +512,7 @@ input[type="button"]:focus {
 }
 
 #historyHeader {
+  padding-top: 62.5px;
   margin-left: 5px;
   font-weight: lighter;
   font-size: 25px;
@@ -1002,7 +1003,8 @@ input[type="button"]:focus {
   right: 5px;
   font-size: 15px;
   text-align: center;
-  border-style: none;
+  stroke: transparent;
+  stroke-width: 0px;
   background-color: #00000000;
   position: absolute;
   z-index: 2;
