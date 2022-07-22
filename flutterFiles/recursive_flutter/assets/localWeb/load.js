@@ -2,6 +2,7 @@ console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
+let evalWork = new Worker('solveWorker.js')
 let definedPages = [
   {
     "srtConfig": {
