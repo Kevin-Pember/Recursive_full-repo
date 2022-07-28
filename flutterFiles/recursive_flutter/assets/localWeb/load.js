@@ -126,7 +126,7 @@ if (localStorage.getItem("settings") != undefined) {
   console.log("settings got");
   console.log(settings);
 } else {
-  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tS" : 1,"tC" : 5,"gDS" : 1,"gDMin" : -10,"gDMax" : 10,"gRS" : 1,"gRMin" : -10,"gRMax" : 10}');
+  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tS" : 1,"tC" : 5,"gS" : 1,"gMin" : -10,"gMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
@@ -2280,9 +2280,11 @@ function createTab(config) {
     tabs[i].style.visibility = 'hidden';
   }
   if (config.type == "Function") {
-    definedPages.push((new EquatPage(config)).def);
+    let def = (new EquatPage(config)).def;
+    definedPages.push(def);
   } else if (config.type == "Hybrid") {
-    definedPages.push((new HybridPage(config)).def);
+    let def = (new HybridPage(config)).def;
+    definedPages.push(def);
   }
 }
 //Responsible for the creation of a tab button that links to the tab
@@ -2423,6 +2425,8 @@ function openElement(name) {
 }
 //Responsible for matching a tab with its tab page
 function matchPage(name) {
+  console.log(definedPages)
+  console.log(name)
   for (let pageObj of definedPages) {
     console.log(pageObj)
     console.log(name)
@@ -2690,12 +2694,16 @@ function calculatePoints(parsedEquation, start, end) {
 }
 //creates an array of all variables needed for calculatePoints
 function getGraphVars(def) {
+  console.log(def)
   let varArray = {}
   console.log("chart scales");
   console.log(def.chart.scales);
+  if(def.chart.scales.x == undefined){
+    console.log('No thats not true')
+  }
   varArray = {
-    "bottom": Number(def.chart.scales.x.min),
-    "top": Number(def.chart.scales.x.max),
+    "bottom": def.chart.scales.x == undefined ? settings.gMin : Number(def.chart.scales.x.min),
+    "top": def.chart.scales.x == undefined ? settings.gMax : Number(def.chart.scales.x.max),
   }
   return varArray
 }
@@ -3211,11 +3219,11 @@ function setSettings() {
     }
   }
   let rootCss = document.querySelector(':root');
-  /*rootCss.style.setProperty('--displayColor', colorArray[2]);
+  rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
-  setImages(colorArray[3]);*/
+  setImages(colorArray[3]);
   TextColorGlobal = colorArray[3];
   if (!settings.degRad) {
     setDegMode();
@@ -3870,12 +3878,13 @@ class TemplatePage extends FuncPage {
     if (TextColorGlobal == "#000000") {
       clon.getElementById("editIcon").src = getSource('EditIcon');
     }
-    clon.getElementById("minDomainGraph").value = settings.gDMin;
+    //Graph settings that need to be updated
+    /*clon.getElementById("minDomainGraph").value = settings.gDMin;
     clon.getElementById("maxDomainGraph").value = settings.gDMax;
     clon.getElementById("stepDomainGraph").value = settings.gDS;
     clon.getElementById("minRangeGraph").value = settings.gRMin;
     clon.getElementById("maxRangeGraph").value = settings.gRMax;
-    clon.getElementById("stepRangeGraph").value = settings.gRS;
+    clon.getElementById("stepRangeGraph").value = settings.gRS;*/
     clon.getElementById("cellsTable").value = settings.tC;
     clon.getElementById('stepTable').value = settings.tS;
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
@@ -3976,7 +3985,7 @@ class EquatPage extends TemplatePage {
     let tabCopy = fullConfig.tabPage;
     let equation = config.equation;
     let equationDIV = clon.getElementById("EquationFunc");
-
+    console.log(this.def)
 
     equationDIV.innerHTML = equation;
     equationDIV.dataset.baseE = equation;
