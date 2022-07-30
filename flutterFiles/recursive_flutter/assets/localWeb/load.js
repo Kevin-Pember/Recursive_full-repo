@@ -126,7 +126,7 @@ if (localStorage.getItem("settings") != undefined) {
   console.log("settings got");
   console.log(settings);
 } else {
-  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tS" : 1,"tC" : 5,"gS" : 1,"gMin" : -10,"gMax" : 10}');
+  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tC" : 5,"tMin" : -10,"tMax" : 10,"gR" : 100,"gMin" : -10,"gMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
@@ -192,6 +192,9 @@ if (document.getElementById("mainBody") != null) {
     .tabcontent {
       top: 40px;
       border-radius: 0 25px 0 0;
+    }
+    .tabIcons{
+      visibility: hidden;
     }
     #tab {
       height: 40px
@@ -745,6 +748,9 @@ if (document.getElementById("mainBody") != null) {
     let gEContainer = document.getElementById('graphFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
+    clon.getElementById('equation').addEventListener('input', () => {
+      graphInMode();
+    })
     gEContainer.insertBefore(clon, document.getElementById('addGraphEquation'))
   })
   initGraphEquation.addEventListener('input', function (e) {
@@ -758,8 +764,10 @@ if (document.getElementById("mainBody") != null) {
     let gEContainer = document.getElementById('tableFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
+    clon.addEventListener('input', function (e) {tableInMode()});
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
+  initTableEquation.addEventListener('input', function (e) {tableInMode()});
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -2127,7 +2135,7 @@ function setDegMode() {
   }
 }
 //END
-/**************************************************|Graph Mode Methods|**************************************************/
+/**************************************************|Mode Methods|**************************************************/
 function graphInMode() {
   let equationGrid = document.getElementById("graphFuncGrid");
   let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
@@ -2161,7 +2169,7 @@ function graphInMode() {
       }
       let dataColor = accents[(datasets.length) % 11]
       datasets.push({
-        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top)),
+        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top), Number(graphVars.res)),
         label: "hidden",
         fontColor: '#FFFFFF',
         borderColor: dataColor,
@@ -2176,7 +2184,60 @@ function graphInMode() {
   console.log(datasets)
   def.chart.update();
 }
-
+function tableInMode(){
+  let equationGrid = document.getElementById("tableFuncGrid");
+  let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
+  let tableModeDef = document.getElementById("modeTable");
+  tableModeDef.innerHTML = "<tr><th>x</th></tr>"
+  let accents = [
+    colorArray[1],
+    "#e6cc4e",
+    "#4ecfe6",
+    "#b169f0",
+    "#f06970",
+    "#87f069",
+    "#69f0c5",
+    "#f0a469",
+    "#69f0ed",
+    "#697bf0",
+    "#69f077",
+  ]
+  let resulting = [];
+  for (let elem of equationElems) {
+    let equation = elem.innerHTML
+    let vars = varInEquat(equation)
+    if (vars.length <= 1) {
+      let parsedEquation = "";
+      let parsedArray = createParseable(equation);
+      for (let item of parsedArray) {
+        if (item == "v1") {
+          item = 'Æ';
+        }
+        parsedEquation += item;
+      }
+      let dataColor = accents[(resulting.length) % 11]
+      resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
+      
+    } else {
+      report("Equation needs single variable", false)
+    }
+  }
+  resulting[0].forEach( (val) => {
+    let newRow = tableModeDef.insertRow()
+    let newCell = newRow.insertCell()
+    newCell.innerHTML = val.x
+  })
+  resulting.forEach( (val,index) => {
+    let tableElems = tableModeDef.childNodes[0].childNodes;
+    let titleHeader = document.createElement("TH");
+    titleHeader.innerHTML = "y" + (index + 1)
+    tableElems[0].appendChild(titleHeader)
+    val.forEach( (val2,index) => {
+      let newCell = tableElems[index + 1].insertCell() 
+      newCell.innerHTML = val2.y;
+    })
+  });
+}
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
@@ -2294,14 +2355,13 @@ function newTabButton(config, tabPage) {
   let nameElem = tabClon.getElementById('newTabName');
   let buttonCopy = tabClon.getElementById('tabButton');
   tabClon.getElementById('newTabName').innerHTML = name;
-  tabClon.getElementById('nameDisplay').innerHTML = name;
-  if (config.type == "Function") {
+  /*if (config.type == "Function") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
   } else if (config.type == "Code") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = "Code";
   } else if (config.type == "Hybrid") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = "Hybrid";
-  }
+  }*/
   tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
   tabClon.getElementById('tabRemove').src = getSource('xIcon');
 
@@ -2651,15 +2711,16 @@ function solveEquation(method, clon) {
 function solveGraph(parsedEquation, def) {
   let vars = getGraphVars(def);
   //Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
-  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top));
+  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top), Number(vars.res));
+  console.log(result.length)
   def.chart.data.datasets[0].data = result;
   def.chart.update();
 }
 //Responsible for solving the parsedEquation with one open variable table wise
 function solveTable(parsedEquation, clon) {
 
-  let numValue = Number(clon.querySelector('#cellsTable').value);
-  let step = Number(clon.querySelector('#stepTable').value);
+  let numValue = Number(clon.querySelector('#cellTable').value);
+  let step = Number(0.1);
   clon.querySelector("#funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
   for (let i = 1; i <= numValue; i++) {
     let result;
@@ -2674,13 +2735,14 @@ function solveTable(parsedEquation, clon) {
     newYCell.innerHTML = result;
     newYCell.id = "other shit"
   }
+  console.log(clon.querySelector("#funcTable").childNodes[0].childNodes)
 }
-function calculatePoints(parsedEquation, start, end) {
+function calculatePoints(parsedEquation, start, end, res) {
   let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
-  console.log(`calculating from ${start} to ${end}`)
-  let step = Math.abs(end - start) * 0.01
+  let invRes = 1 / res;
+  let step = Math.abs(end - start) * invRes;
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
@@ -2704,6 +2766,7 @@ function getGraphVars(def) {
   varArray = {
     "bottom": def.chart.scales.x == undefined ? settings.gMin : Number(def.chart.scales.x.min),
     "top": def.chart.scales.x == undefined ? settings.gMax : Number(def.chart.scales.x.max),
+    'res': settings.gR
   }
   return varArray
 }
@@ -3473,7 +3536,7 @@ function createGraph(chart) {
     type: 'scatter',
     data: {
       datasets: [{
-        data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
+        data: [],
         label: "hidden",
         fontColor: '#FFFFFF',
         borderColor: colorArray[1],
@@ -3561,6 +3624,7 @@ function createGraph(chart) {
 */
 function keypadController(object) {
   console.log("keypadController ran")
+  console.log(keyTargets)
   if (object.reset != undefined && object.reset == false) {
     let styling = document.createElement('style');
     let builtInStyling = `
@@ -3673,7 +3737,12 @@ function keypadEquationMapper(elem) {
   elem.addEventListener('focusout', (e) => {
     setTimeout(() => {
       let sel = window.getSelection();
-      if (!elem.contains(sel.focusNode) || sel.anchorOffset == 0) {
+      console.log(keyTargets)
+      console.log(sel)
+      let keypad = document.getElementById('keypad')
+      console.log(keypad)
+      console.log(keypad.contains(sel.focusNode))
+      if ((!elem.contains(sel.focusNode) || sel.anchorOffset == 0) && !keypad.contains(sel.focusNode)) {
         if (elem.innerHTML.length == 1) {
           elem.innerHTML = "";
         }
@@ -3870,8 +3939,12 @@ class TemplatePage extends FuncPage {
     console.log(varGrid)
     let movable = clon.getElementById("selectorUnder");
     let updateElements = [
-      "stepTable",
-      "cellsTable"
+      "minGraph",
+      "maxGraph",
+      'resolutionGraph',
+      'minTable',
+      'maxTable',
+      "cellTable",
     ];
     movable.dataset.pos = 0;
 
@@ -3879,14 +3952,12 @@ class TemplatePage extends FuncPage {
       clon.getElementById("editIcon").src = getSource('EditIcon');
     }
     //Graph settings that need to be updated
-    /*clon.getElementById("minDomainGraph").value = settings.gDMin;
-    clon.getElementById("maxDomainGraph").value = settings.gDMax;
-    clon.getElementById("stepDomainGraph").value = settings.gDS;
-    clon.getElementById("minRangeGraph").value = settings.gRMin;
-    clon.getElementById("maxRangeGraph").value = settings.gRMax;
-    clon.getElementById("stepRangeGraph").value = settings.gRS;*/
-    clon.getElementById("cellsTable").value = settings.tC;
-    clon.getElementById('stepTable').value = settings.tS;
+    clon.getElementById("minGraph").value = settings.gMin;
+    clon.getElementById("maxGraph").value = settings.gMax;
+    clon.getElementById("resolutionGraph").value = settings.gR;
+    clon.getElementById("minTable").value = settings.tMin;
+    clon.getElementById("maxTable").value = settings.tMax;
+    clon.getElementById('cellTable').value = settings.tC;
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
 
@@ -3997,8 +4068,8 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
-    equationDIV.addEventListener('focus', () => { })
-    equationDIV.addEventListener("focus", function (e) {
+    keypadEquationMapper(equationDIV)
+    /*equationDIV.addEventListener("focus", function (e) {
       if (document.getElementById('keypad').style.visibility == "hidden") {
         console.log("focusthrone")
         let initEquation = JSON.parse(e.target.parentNode.parentNode.parentNode.dataset.tab);
@@ -4053,7 +4124,7 @@ class EquatPage extends TemplatePage {
           );
         }
       })
-    });
+    });*/
     equationDIV.addEventListener("change", function (e) {
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
