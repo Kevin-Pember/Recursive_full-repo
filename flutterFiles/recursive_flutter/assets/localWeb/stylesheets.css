@@ -8,10 +8,10 @@
   font-weight: bold;
 }
 :root {
-  --displayColor: #22362F;
-  --numbersColor: #014D65;
-  --functionsColor: #191C1B;
-  --textColor: #CEE8DB;
+  --displayColor: #000000;
+  --numbersColor: #000000;
+  --functionsColor: #000000;
+  --textColor: #000000;
   --translucent: #00000033;
   --semi-transparent: #000000c5;
 }
@@ -1764,7 +1764,6 @@ input[type="button"]:focus {
   border-width: 0.0000000005px;
   left: 5px;
   top: 33px;
-  width: calc(100% - 10px);
   max-width: 300px;
   border-radius: 18px;
   background-color: transparent;
@@ -2519,7 +2518,16 @@ input[type="button"]:focus {
   margin-top: 10px;
   border-spacing: 10px;
 }
-
+.templateTable{
+  width: 100%;
+  height: 100%;
+  border-spacing: 10px;
+}
+.tabIcons{
+  aspect-ratio: 1 / 1.45;
+  height: 240.1575px;
+  width: unset;
+}
 #settingsSelector {
   right: 2.5%;
   position: absolute;
@@ -2529,20 +2537,17 @@ input[type="button"]:focus {
 #funcTable {
   position: relative;
   top: 10px;
-  width: calc(100% - 20px);
-  height: calc(100% - 20px);
-  margin-left: 10px;
-  border-collapse: collapse;
-  border-radius: 20px;
+  width: 100%;
+  height: calc(100% - 110px);
 }
 
-#modeTable td{
+td{
   border-radius: 20px;
   text-indent: 10px;
   padding: 5px;
   background-color: var(--displayColor);
 }
-#modeTable th {
+th {
   width: 100px;
   margin: 5px;
   background-color: var(--numbersColor);

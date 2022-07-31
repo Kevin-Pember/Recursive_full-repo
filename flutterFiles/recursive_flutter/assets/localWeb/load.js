@@ -12,113 +12,6 @@ let definedPages = [
     "tab": document.getElementById("mainTab"),
   }
 ];
-let imgList = [
-  {
-    'name': 'aboutUS',
-    'white': 'Images/aboutUSWhite.svg',
-    'black': 'Images/aboutUS.svg'
-  },
-  {
-    'name': 'addObject',
-    'white': 'Images/addObjectWhite.svg',
-    'black': 'Images/addObject.svg'
-  },
-  {
-    'name': 'backIcon',
-    'white': 'Images/backIconWhite.svg',
-    'black': 'Images/backIcon.svg'
-  },
-  {
-    'name': 'calculatorIcon',
-    'white': 'Images/calculatorIconWhite.svg',
-    'black': 'Images/calculatorIcon.svg'
-  },
-  {
-    'name': 'Calipiers',
-    'white': 'Images/CalipiersWhite.svg',
-    'black': 'Images/Calipiers.svg'
-  },
-  {
-    'name': 'checkmark',
-    'white': 'Images/checkmarkWhite.svg',
-    'black': 'Images/checkmark.svg'
-  },
-  {
-    'name': 'Colors',
-    'white': 'Images/ColorsWhite.svg',
-    'black': 'Images/Colors.svg'
-  },
-  {
-    'name': 'customFunctionIcon',
-    'white': 'Images/customFunctionIconWhite.svg',
-    'black': 'Images/customFunctionIcon.svg'
-  },
-  {
-    'name': 'EditIcon',
-    'white': 'Images/EditIconWhite.svg',
-    'black': 'Images/EditIcon.svg'
-  },
-  {
-    'name': 'help',
-    'white': 'Images/helpWhite.svg',
-    'black': 'Images/help.svg'
-  },
-  {
-    'name': 'historyIcon',
-    'white': 'Images/historyIconWhite.svg',
-    'black': 'Images/historyIcon.svg'
-  },
-  {
-    'name': 'minusIcon',
-    'white': 'Images/minusIconWhite.svg',
-    'black': 'Images/minusIcon.svg'
-  },
-  {
-    'name': 'mobileTabsIcon',
-    'white': 'Images/mobileTabsIconWhite.svg',
-    'black': 'Images/mobileTabsIcon.svg'
-  },
-  {
-    'name': 'MoreFuncArrow',
-    'white': 'Images/MoreFuncArrowWhite.svg',
-    'black': 'Images/MoreFuncArrow.svg'
-  },
-  {
-    'name': 'resize',
-    'white': 'Images/resizeWhite.svg',
-    'black': 'Images/resize.svg'
-  },
-  {
-    'name': 'SettingsCog',
-    'white': 'Images/SettingsCogWhite.svg',
-    'black': 'Images/SettingsCog.svg'
-  },
-  {
-    'name': 'settingsPageIcon',
-    'white': 'Images/settingsPageIconWhite.svg',
-    'black': 'Images/settingsPageIcon.svg'
-  },
-  {
-    'name': 'xIcon',
-    'white': 'Images/xIconWhite.svg',
-    'black': 'Images/xIcon.svg'
-  },
-  {
-    'name': 'graphMode',
-    'white': 'Images/graphModeWhite.svg',
-    'black': 'Images/graphMode.svg'
-  },
-  {
-    'name': 'mainMode',
-    'white': 'Images/mainModeWhite.svg',
-    'black': 'Images/mainMode.svg'
-  },
-  {
-    'name': 'tableMode',
-    'white': 'Images/tableModeWhite.svg',
-    'black': 'Images/tableMode.svg'
-  }
-];
 let keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }
 var settings;
 if (localStorage.getItem("settings") != undefined) {
@@ -1586,9 +1479,9 @@ function changeTabAs(change) {
   console.log(bases)
   if (change) {
     visibility = "visible";
-    tabstyle = "visibility: visible; left: 5%; width: 90%; height: 90%; border-radius: 20px; text-align: center;";
+    tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: 50% 50%; grid-auto-rows: 300px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: 100%; background-color: var(--translucent); border-radius: 25px 25px 0 0;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 195px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
@@ -1612,32 +1505,7 @@ function getSource(name) {
     return "Images/" + name + ".svg";
   }
 }
-function setImages(color) {
-  let type = true;
-  if (color == "#FFFFFF" || color == "#ffffff") {
-    type = false;
-  }
-  let images = document.getElementsByTagName('img');
-  for (let elem of images) {
-    let image = elem.src;
-    if (image.includes("White.svg")) {
-      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('White.svg'));
-    } else {
-      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('.svg'));
-    }
-    for (let item of imgList) {
-      if (image == item.name) {
-        if (type) {
-          elem.src = item.black;
-          break;
-        } else {
-          elem.src = item.white;
-          break;
-        }
-      }
-    }
-  }
-}
+
 //END
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
@@ -3286,7 +3154,6 @@ function setSettings() {
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
-  setImages(colorArray[3]);
   TextColorGlobal = colorArray[3];
   if (!settings.degRad) {
     setDegMode();
@@ -3683,53 +3550,57 @@ let keypadVis = (visible) => {
     document.getElementById('keypad').style.visibility = "hidden";
   }
 }
-function keypadEquationMapper(elem) {
+function keypadEquationMapper() {
+  let elem = arguments[0]
+  let newStyling = arguments[1]
   elem.addEventListener("focus", function (e) {
     if (document.getElementById('keypad').style.visibility == "hidden") {
       setSelect(elem, elem.innerHTML.length);
       keypadVis(true);
+      console.log(arguments)
+      let defaultStyle = `
+      #keypad {
+        top: calc(40% + 30px);
+        bottom: 10px;
+        width: calc(100% - 20px);
+        left: 10px;
+        position: absolute;
+      }
+      .dynamicModeContainer{
+        height: 40%;
+        grid-template-rows: 0px 100%;
+
+      }
+      #fullGraph{
+        visibility: hidden;
+      }
+      @media only screen and (max-height: 450px){
+        #keypad{
+          width: calc(33.3333% - 15px);
+          left: calc(66.6666% + 5px);
+          height: calc(100% - 60px);
+          top: 50px;
+          bottom: 0;
+          padding: 0px;
+          position: absolute;
+          border-radius: 25px;
+          overflow: hidden;
+        }
+        .dynamicModeContainer{
+          width: 66.6666%;
+          grid-template-columns: 50% 50%;
+          height: 100%;
+          grid-template-rows: unset;
+        }
+        #fullGraph{
+          visibility: visible;
+        }
+      }`;
       keypadController(
         {
           "keyElems": { "scroll": elem, "input": elem },
           "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
-
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
+          "keyStyling": newStyling == undefined ? defaultStyle: newStyling,
         }
       );
     }
@@ -4068,7 +3939,31 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
-    keypadEquationMapper(equationDIV)
+    let styleVal = `
+    #keypad {
+      top: calc(40% + 40px);
+      bottom: 10px;
+      width: calc(100% - 20px);
+      left: 10px;
+      position: absolute;
+    }
+    @media only screen and (max-height: 450px){
+      #keypad{
+        width: calc(33.3333% - 15px);
+        left: calc(66.6666% + 5px);
+        height: calc(100% - 60px);
+        top: 50px;
+        bottom: 0;
+        padding: 0px;
+        position: absolute;
+        border-radius: 25px;
+        overflow: hidden;
+      }
+      #funcContainer{
+        width: calc(66.6666%)
+      }
+    }`;
+    keypadEquationMapper(equationDIV, styleVal)
     /*equationDIV.addEventListener("focus", function (e) {
       if (document.getElementById('keypad').style.visibility == "hidden") {
         console.log("focusthrone")
