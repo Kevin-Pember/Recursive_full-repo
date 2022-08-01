@@ -77,11 +77,9 @@
 
 .modeSelectButton {
   width: calc(100% - 20px);
-  height: 200px;
+  height: calc(100% - 10px);
   border-radius: 25px;
   border: none;
-  margin-left: 10px;
-  margin-top: 20px;
 
   background-color: var(--functionsColor);
 }
@@ -185,6 +183,10 @@
 /*end*/
 #selectorMode {
   background-color: var(--displayColor);
+  display: grid;
+  grid-template-rows: 33.3333% 33.3333% 33.3333%;
+  justify-items: center;
+  align-items: center;
 }
 
 textarea {
@@ -2509,14 +2511,21 @@ input[type="button"]:focus {
   width: 100%;
 }
 
-#tableContain {
+#tableContainer {
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background-color: var(--displayColor);
 }
 #modeTable{
   width: calc(100% - 20px);
   height: calc(100% - 20px);
   margin-left: 10px;
   margin-top: 10px;
-  border-spacing: 10px;
+  border-spacing: 5px;
+}
+#modeTable td {
+  background-color: var(--displayColor);
 }
 .templateTable{
   width: 100%;
@@ -2536,16 +2545,15 @@ input[type="button"]:focus {
 
 #funcTable {
   position: relative;
-  top: 10px;
   width: 100%;
-  height: calc(100% - 110px);
+  height: calc(100% - 100px);
 }
 
 td{
   border-radius: 20px;
   text-indent: 10px;
   padding: 5px;
-  background-color: var(--displayColor);
+  background-color: var(--functionsColor);
 }
 th {
   width: 100px;

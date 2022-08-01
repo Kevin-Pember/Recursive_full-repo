@@ -2058,7 +2058,6 @@ function tableInMode(){
   let tableModeDef = document.getElementById("modeTable");
   tableModeDef.innerHTML = "<tr><th>x</th></tr>"
   let accents = [
-    colorArray[1],
     "#e6cc4e",
     "#4ecfe6",
     "#b169f0",
@@ -2083,7 +2082,7 @@ function tableInMode(){
         }
         parsedEquation += item;
       }
-      let dataColor = accents[(resulting.length) % 11]
+      let dataColor = accents[(resulting.length) % 10]
       resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
       
     } else {
@@ -2099,6 +2098,7 @@ function tableInMode(){
     let tableElems = tableModeDef.childNodes[0].childNodes;
     let titleHeader = document.createElement("TH");
     titleHeader.innerHTML = "y" + (index + 1)
+    titleHeader.style.color = accents[(index) % 11]
     tableElems[0].appendChild(titleHeader)
     val.forEach( (val2,index) => {
       let newCell = tableElems[index + 1].insertCell() 
@@ -2586,11 +2586,17 @@ function solveGraph(parsedEquation, def) {
 }
 //Responsible for solving the parsedEquation with one open variable table wise
 function solveTable(parsedEquation, clon) {
-
-  let numValue = Number(clon.querySelector('#cellTable').value);
-  let step = Number(0.1);
-  clon.querySelector("#funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
-  for (let i = 1; i <= numValue; i++) {
+  let table = clon.querySelector("#funcTable");
+  table.innerHTML = "<tr><th>x</th><th>y</th></tr>";
+  let result = calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC))
+  result.forEach((elem, index) => {
+    let newRow = table.insertRow()
+    let newXCell = newRow.insertCell()
+    newXCell.innerHTML = elem.x
+    let newYCell = newRow.insertCell()
+    newYCell.innerHTML = elem.y
+  });
+  /*for (let point of result) {
     let result;
     let currentVal = i * step;
     result = inputSolver(parsedEquation.replace('Æ', currentVal), "Error Making Table");
@@ -2602,8 +2608,8 @@ function solveTable(parsedEquation, clon) {
     console.log(i * step)
     newYCell.innerHTML = result;
     newYCell.id = "other shit"
-  }
-  console.log(clon.querySelector("#funcTable").childNodes[0].childNodes)
+  }*/
+  //console.log(clon.querySelector("#funcTable").childNodes[0].childNodes)
 }
 function calculatePoints(parsedEquation, start, end, res) {
   let pointArray = [];
