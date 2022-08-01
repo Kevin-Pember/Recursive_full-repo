@@ -3800,6 +3800,11 @@ class FuncPage {
     this.def.srtConfig = config
   }
 }
+class CustomPage extends FuncPage{
+  constructor(config){
+    super(config)
+  }
+}
 class TemplatePage extends FuncPage {
   constructor(config) {
     super(config)
@@ -4051,12 +4056,3 @@ class EquatPage extends TemplatePage {
     }*/
   }
 }
-/**************************************Func filter**************************************************/
-let numLimit = [
-  "function",
-  "Function",
-  "cust",
-  "let",
-  "var",
-  ".log"
-]

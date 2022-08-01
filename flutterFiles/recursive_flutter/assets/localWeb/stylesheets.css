@@ -1,10 +1,10 @@
 @font-face{
   font-family: ubuntu;
-  src: url(Roboto-Regular.ttf);
+  src: url(./fontAssets/Roboto-Regular.ttf);
 }
 @font-face {
   font-family: ubuntu;
-  src: url(Roboto-Bold.ttf);
+  src: url(./fontAssets/Roboto-Bold.ttf);
   font-weight: bold;
 }
 :root {
