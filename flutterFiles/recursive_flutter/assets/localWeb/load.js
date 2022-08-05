@@ -2,7 +2,7 @@ console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
-let evalWork = new Worker('solveWorker.js')
+let evalWork = new Worker('evalWorker.js')
 let definedPages = [
   {
     "srtConfig": {
@@ -1703,8 +1703,79 @@ function setArc() {
 function backPressed() {
   let uifCalculator = keyTargets.input;
   let sel = window.getSelection();
+  console.log(sel)
+  console.log(keyTargets.input.childNodes)
   let range = document.createRange();
-  let index = 0;
+  let baseNode = sel.baseNode
+  let baseOffset = sel.baseOffset
+  let extentNode = sel.extentNode
+  let extentOffset = sel.extentOffset
+  let baseString = baseNode.textContent;
+  console.log(baseOffset)
+
+  //Conditions 
+  let front = baseString.charAt(baseOffset - 1) != '‎' && baseString.length != 1
+  let same = baseNode == extentNode;
+  let back = extentOffset > 0
+
+  //sel.isCollapsed is true if there is no selection
+    if(sel.isCollapsed){
+      console.log(baseOffset - 1)
+      if(front){
+        replacement = baseString.substring(0, baseOffset-1) + baseString.substring(baseOffset)
+        console.log(replacement)
+        baseNode.nodeValue = replacement;
+        setFocus(baseNode, baseOffset-1);
+      }else{
+        let sd = keyTargets.input.childNodes;
+        var nodesArray = [].slice.call(sd);
+          let childIndex = 0;
+          let childern = keyTargets.input.childNodes;
+          
+          for(let value of childern.values()){
+            if(value.contains(baseNode)){
+              if(nodesArray.indexOf(baseNode) == -1){
+                if(keyTargets.input.childNodes[childIndex - 1].nodeType == 3 && keyTargets.input.childNodes[childIndex + 1].nodeType == 3){
+                  keyTargets.input.childNodes[childIndex - 1].nodeValue += keyTargets.input.childNodes[childIndex + 1].nodeValue.substring(1);
+                  keyTargets.input.removeChild(keyTargets.input.childNodes[childIndex + 1]);
+                }
+                keyTargets.input.removeChild(value);
+              }
+              let target = getText(keyTargets.input.childNodes[childIndex - 1]);
+              console.log(target)
+              setFocus(target, target.textContent.length);
+            }
+            childIndex++;
+          }
+      }
+    }else{
+      let elems = elemArray(keyTargets.input.childNodes)
+      let lower =  baseOffset > extentOffset ? extentOffset : baseOffset;
+      let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
+      elems.find(elem => elem == baseNode)
+      if(same){
+        let removed = baseString.substring(lower, higher+1)
+        if(removed.contains('‎')){
+          baseNode.nodeValue = "‎"+baseString.substring(0, lower) + baseString.substring(higher+1)
+        }else{
+          baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher+1)
+        }
+      }else{
+        let nodes = keyTargets.input.childNodes;
+        for(let i = lower+1; i < higher; i++){
+          keyTargets.input.removeChild(nodes[i]);
+        }
+        var nodesArray = [].slice.call(nodes);
+        if(nodesArray.indexOf(baseNode) < nodesArray.indexOf(extentNode)){
+          baseNode.nodeValue = baseString.substring(0, lower)
+          extentNode.nodeValue = extentNode.textContent.substring(higher)
+        }else{
+          baseNode.nodeValue = baseString.substring(higher)
+          extentNode.nodeValue = extentNode.textContent.substring(0, lower)
+        }
+      }
+    }
+  /*let index = 0;
   let higher = 0;
   let lower = 0;
   if (sel.anchorOffset > sel.focusOffset) {
@@ -1755,7 +1826,7 @@ function backPressed() {
       }
     }
   }
-  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;*/
 }
 //Responsible for the ac button clearing all text from the enter header
 function clearMain() {
@@ -2002,6 +2073,14 @@ function setDegMode() {
     document.getElementById(elem).innerHTML = text;
   }
 }
+function setFocus(node, index){
+  let sel = window.getSelection();
+  let range = document.createRange();
+  range.setStart(node, index);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
 //END
 /**************************************************|Mode Methods|**************************************************/
 function graphInMode() {
@@ -2214,6 +2293,9 @@ function createTab(config) {
   } else if (config.type == "Hybrid") {
     let def = (new HybridPage(config)).def;
     definedPages.push(def);
+  }else if (config.type == "Code"){
+    let def = (new CustomPage(config)).def;
+    definedPages.push(def)
   }
 }
 //Responsible for the creation of a tab button that links to the tab
@@ -2923,7 +3005,7 @@ let facingBack = [
     "backElm": "",
     "prtCont": 'main',
     "mth": function () {
-      popup(); preventFocus();
+      popup();
     },
   },
   {
@@ -3247,11 +3329,6 @@ function createNumHeader(parentElem, num) {
   initial.innerHTML = num;
   console.log()
   parentElem.appendChild(initial)
-}
-//Responsible (I think) for preventing focus being lost while other element on a page are being clicked
-function preventFocus() {
-  var ae = document.activeElement;
-  setTimeout(function () { ae.focus() }, 1);
 }
 //Method for fining whether or not the focus is on a superscript element (might be implemented in back pressed because that is the only refrence)
 function plainSup(sel) {
@@ -3689,6 +3766,31 @@ function buttonMapper(elemArray) {
 function calculateGraph() {
 
 }
+function createElem (tag){
+  let ele = document.createElement(tag);
+  return ele;
+}
+function codeFilter(code) {
+  if (code.includes("Navigator") || code.includes("XMLHttpRequest")) {
+      return "";
+  } else {
+      return code;
+  }
+}
+function elemArray(colect){
+  let arry = [];
+  for(let value of colect.values()){
+    arry.push(value);
+  }
+  return arry;
+}
+function getText(node){
+  if(node.nodeType != 3){
+    return getText(node.lastChild)
+  }else{
+    return node;
+  }
+}
 //END
 /************************************************|help page|**************************************************/
 //Responsible for handling tab changes in help page (deprecated like everything on help page)
@@ -3803,12 +3905,29 @@ class FuncPage {
 class CustomPage extends FuncPage{
   constructor(config){
     super(config)
+    let temp = document.getElementById('custFuncTab'), clon = temp.content.cloneNode(true);
+    this.clone = clon;
+    let fullConfig = this.def;
+    let mainBody = clon.getElementById('customFuncTab');
+    let custPageWorker = new Worker('customFuncWorker.js');
+    fullConfig.pageWorker = custPageWorker;
+    custPageWorker.onmessage = function (e){
+      if (e.data[0] == 'createElement'){
+        worker.postMessage(['newElem',createElem(e.data[1])]);
+      }else if (e.data[0] == 'error'){
+        report(e.data[1], false)
+      }
+    }
+    let object = ['init', mainBody, fullConfig.srtConfig.code];
+    console.log(object)
+    custPageWorker.postMessage(object);
+    document.getElementById("mainPage").appendChild(clon);
   }
 }
 class TemplatePage extends FuncPage {
   constructor(config) {
     super(config)
-    let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true);
+    let temp = document.getElementById('templateFuncTab'), clon = temp.content.cloneNode(true);
     this.clone = clon;
     let parent = clon.getElementById('customFuncTab');
     let chart = clon.getElementById("funcChart");
@@ -3881,6 +4000,7 @@ class HybridPage extends TemplatePage {
     let clon = this.clone;
     let fullConfig = this.def;
     let tabCopy = fullConfig.tabPage;
+    let funcConfig = getByName(config.name)
 
     clon.getElementById("editIcon").style = "";
     clon.getElementById("editIcon").src = getSource("EditIcon");
