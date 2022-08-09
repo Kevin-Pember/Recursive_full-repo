@@ -657,10 +657,10 @@ if (document.getElementById("mainBody") != null) {
     let gEContainer = document.getElementById('tableFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
-    clon.addEventListener('input', function (e) {tableInMode()});
+    clon.addEventListener('input', function (e) { tableInMode() });
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
-  initTableEquation.addEventListener('input', function (e) {tableInMode()});
+  initTableEquation.addEventListener('input', function (e) { tableInMode() });
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -1083,8 +1083,8 @@ if (document.getElementById("mainBody") != null) {
     let enteredText = document.getElementById('enterHeader').innerHTML;
     document.getElementById('memoryText').innerHTML = inputSolver(enteredText, "error adding to memory");
   });
-  document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
-  document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
+  document.getElementById('leftOverlayNav').addEventListener("click", function (e) { navigateButtons(false) });
+  document.getElementById('rightOverlayNav').addEventListener("click", function (e) { navigateButtons(true) });
 
   /*
     document.getElementById('num1').addEventListener("click", function () {  });
@@ -1719,62 +1719,62 @@ function backPressed() {
   let back = extentOffset > 0
 
   //sel.isCollapsed is true if there is no selection
-    if(sel.isCollapsed){
-      console.log(baseOffset - 1)
-      if(front){
-        replacement = baseString.substring(0, baseOffset-1) + baseString.substring(baseOffset)
-        console.log(replacement)
-        baseNode.nodeValue = replacement;
-        setFocus(baseNode, baseOffset-1);
-      }else{
-        let sd = keyTargets.input.childNodes;
-        var nodesArray = [].slice.call(sd);
-          let childIndex = 0;
-          let childern = keyTargets.input.childNodes;
-          
-          for(let value of childern.values()){
-            if(value.contains(baseNode)){
-              if(nodesArray.indexOf(baseNode) == -1){
-                if(keyTargets.input.childNodes[childIndex - 1].nodeType == 3 && keyTargets.input.childNodes[childIndex + 1].nodeType == 3){
-                  keyTargets.input.childNodes[childIndex - 1].nodeValue += keyTargets.input.childNodes[childIndex + 1].nodeValue.substring(1);
-                  keyTargets.input.removeChild(keyTargets.input.childNodes[childIndex + 1]);
-                }
-                keyTargets.input.removeChild(value);
-              }
-              let target = getText(keyTargets.input.childNodes[childIndex - 1]);
-              console.log(target)
-              setFocus(target, target.textContent.length);
+  if (sel.isCollapsed) {
+    console.log(baseOffset - 1)
+    if (front) {
+      replacement = baseString.substring(0, baseOffset - 1) + baseString.substring(baseOffset)
+      console.log(replacement)
+      baseNode.nodeValue = replacement;
+      setFocus(baseNode, baseOffset - 1);
+    } else {
+      let sd = keyTargets.input.childNodes;
+      var nodesArray = [].slice.call(sd);
+      let childIndex = 0;
+      let childern = keyTargets.input.childNodes;
+
+      for (let value of childern.values()) {
+        if (value.contains(baseNode)) {
+          if (nodesArray.indexOf(baseNode) == -1) {
+            if (keyTargets.input.childNodes[childIndex - 1].nodeType == 3 && keyTargets.input.childNodes[childIndex + 1].nodeType == 3) {
+              keyTargets.input.childNodes[childIndex - 1].nodeValue += keyTargets.input.childNodes[childIndex + 1].nodeValue.substring(1);
+              keyTargets.input.removeChild(keyTargets.input.childNodes[childIndex + 1]);
             }
-            childIndex++;
+            keyTargets.input.removeChild(value);
           }
-      }
-    }else{
-      let elems = elemArray(keyTargets.input.childNodes)
-      let lower =  baseOffset > extentOffset ? extentOffset : baseOffset;
-      let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
-      elems.find(elem => elem == baseNode)
-      if(same){
-        let removed = baseString.substring(lower, higher+1)
-        if(removed.contains('‎')){
-          baseNode.nodeValue = "‎"+baseString.substring(0, lower) + baseString.substring(higher+1)
-        }else{
-          baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher+1)
+          let target = getText(keyTargets.input.childNodes[childIndex - 1]);
+          console.log(target)
+          setFocus(target, target.textContent.length);
         }
-      }else{
-        let nodes = keyTargets.input.childNodes;
-        for(let i = lower+1; i < higher; i++){
-          keyTargets.input.removeChild(nodes[i]);
-        }
-        var nodesArray = [].slice.call(nodes);
-        if(nodesArray.indexOf(baseNode) < nodesArray.indexOf(extentNode)){
-          baseNode.nodeValue = baseString.substring(0, lower)
-          extentNode.nodeValue = extentNode.textContent.substring(higher)
-        }else{
-          baseNode.nodeValue = baseString.substring(higher)
-          extentNode.nodeValue = extentNode.textContent.substring(0, lower)
-        }
+        childIndex++;
       }
     }
+  } else {
+    let elems = elemArray(keyTargets.input.childNodes)
+    let lower = baseOffset > extentOffset ? extentOffset : baseOffset;
+    let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
+    elems.find(elem => elem == baseNode)
+    if (same) {
+      let removed = baseString.substring(lower, higher + 1)
+      if (removed.contains('‎')) {
+        baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher + 1)
+      } else {
+        baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher + 1)
+      }
+    } else {
+      let nodes = keyTargets.input.childNodes;
+      for (let i = lower + 1; i < higher; i++) {
+        keyTargets.input.removeChild(nodes[i]);
+      }
+      var nodesArray = [].slice.call(nodes);
+      if (nodesArray.indexOf(baseNode) < nodesArray.indexOf(extentNode)) {
+        baseNode.nodeValue = baseString.substring(0, lower)
+        extentNode.nodeValue = extentNode.textContent.substring(higher)
+      } else {
+        baseNode.nodeValue = baseString.substring(higher)
+        extentNode.nodeValue = extentNode.textContent.substring(0, lower)
+      }
+    }
+  }
   /*let index = 0;
   let higher = 0;
   let lower = 0;
@@ -1856,7 +1856,28 @@ function enterPressed(input) {
 }
 //Responsible for handling the navigation buttons on the main calc tab
 function navigateButtons(direction) {
-  let parentElement;
+  let sel = document.getSelection();
+  console.log(sel)
+  let baseNode = sel.baseNode;
+  let baseOffset = sel.baseOffset;
+  let extentNode = sel.extentNode;
+  let extentOffset = sel.extentOffset;
+  let collapsed = sel.isCollapsed;
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode) ? false : true;
+  console.log(direction)
+  console.log(extentNode.textContent)
+  if (direction) {
+    let elem = inverse ? baseNode : extentNode;
+    let index = inverse ? baseOffset : extentOffset
+    moveOne(elem, index, direction)
+  } else {
+    let elem = !inverse ? baseNode : extentNode;
+    let index = !inverse ? baseOffset : extentOffset
+    moveOne(elem, index, direction)
+  }
+  /*let parentElement;
   let sel = window.getSelection();
   let isSup = false;
   let range = document.createRange();
@@ -1923,6 +1944,45 @@ function navigateButtons(direction) {
       sel.removeAllRanges();
       sel.addRange(range);
     }
+  }*/
+}
+function moveOne(elem, index, dire) {
+  let elemString = elem.textContent
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if ((index == 1 && dire == false) || (index == elemString.length && dire == true)) {
+    console.log('recursive pre')
+    recursiveNode(dire,elem)
+  } else {
+    dire ? setFocus(elem, index + 1) : setFocus(elem, index - 1);
+  }
+}
+function recursiveNode(dire, elem) {
+  let parent = elem.parentNode;
+  let childNodes = parent.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if (((nodes.indexOf(elem) == nodes.length - 1 && parent != keyTargets.input) && dire == true) || ((nodes.indexOf(elem) == 0 && parent != keyTargets.input) && dire == false)) {
+    recursiveNode(dire, parent)
+  }else if (parent == keyTargets.input && (nodes.indexOf(elem) == nodes.length - 1 || nodes.indexOf(elem) == 0)){
+    nodes.indexOf(elem) == nodes.length - 1 ? setFocus(elem, elem.textContent.length) : setFocus(elem, 1)
+  } else {
+    console.log('changing focus')
+    console.log(parent)
+    console.log(childNodes)
+    //console.log(nodes(elem))
+    nextText(dire, parent, elem)
+  }
+}
+function nextText(dire, parent, elem) {
+  let childNodes = parent.childNodes;
+  var nodes = [].slice.call(childNodes);
+  let index = nodes.indexOf(elem);
+  if (dire) {
+    let nextElem = getText(nodes[index + 1]);
+    setFocus(nextElem, 1)
+  } else {
+    let nextElem = getText(nodes[index - 1]);
+    setFocus(nextElem, nextElem.textContent.length)
   }
 }
 function switchMode(modeId) {
@@ -2073,7 +2133,7 @@ function setDegMode() {
     document.getElementById(elem).innerHTML = text;
   }
 }
-function setFocus(node, index){
+function setFocus(node, index) {
   let sel = window.getSelection();
   let range = document.createRange();
   range.setStart(node, index);
@@ -2131,7 +2191,7 @@ function graphInMode() {
   console.log(datasets)
   def.chart.update();
 }
-function tableInMode(){
+function tableInMode() {
   let equationGrid = document.getElementById("tableFuncGrid");
   let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
   let tableModeDef = document.getElementById("modeTable");
@@ -2163,24 +2223,24 @@ function tableInMode(){
       }
       let dataColor = accents[(resulting.length) % 10]
       resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
-      
+
     } else {
       report("Equation needs single variable", false)
     }
   }
-  resulting[0].forEach( (val) => {
+  resulting[0].forEach((val) => {
     let newRow = tableModeDef.insertRow()
     let newCell = newRow.insertCell()
     newCell.innerHTML = val.x
   })
-  resulting.forEach( (val,index) => {
+  resulting.forEach((val, index) => {
     let tableElems = tableModeDef.childNodes[0].childNodes;
     let titleHeader = document.createElement("TH");
     titleHeader.innerHTML = "y" + (index + 1)
     titleHeader.style.color = accents[(index) % 11]
     tableElems[0].appendChild(titleHeader)
-    val.forEach( (val2,index) => {
-      let newCell = tableElems[index + 1].insertCell() 
+    val.forEach((val2, index) => {
+      let newCell = tableElems[index + 1].insertCell()
       newCell.innerHTML = val2.y;
     })
   });
@@ -2293,7 +2353,7 @@ function createTab(config) {
   } else if (config.type == "Hybrid") {
     let def = (new HybridPage(config)).def;
     definedPages.push(def);
-  }else if (config.type == "Code"){
+  } else if (config.type == "Code") {
     let def = (new CustomPage(config)).def;
     definedPages.push(def)
   }
@@ -2596,8 +2656,8 @@ function parseVar(parsedEquation, data) {
   console.log("Parse var types")
   console.log(typeof data.Value)
   for (let i = 0; i < parsedEquation.length; i++) {
-    if (funcMatch(parsedEquation.substring(i),true) != "") {
-      i += funcMatch(parsedEquation.substring(i),true).length;
+    if (funcMatch(parsedEquation.substring(i), true) != "") {
+      i += funcMatch(parsedEquation.substring(i), true).length;
     } else if (parsedEquation.charAt(i) == data.Name) {
       parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
     }
@@ -2716,7 +2776,7 @@ function getGraphVars(def) {
   let varArray = {}
   console.log("chart scales");
   console.log(def.chart.scales);
-  if(def.chart.scales.x == undefined){
+  if (def.chart.scales.x == undefined) {
     console.log('No thats not true')
   }
   varArray = {
@@ -3415,7 +3475,7 @@ function varInList(list, varLetter) {
 }
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
-  let func = funcMatch(entry,true);
+  let func = funcMatch(entry, true);
   let ignore = ignoreTest(entry);
   console.log(ignore)
   if (func != "") {
@@ -3438,8 +3498,8 @@ function setVar(element, equation) {
   console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i),true) != "") {
-        i += funcMatch(equation.substring(i),true).length;
+      if (funcMatch(equation.substring(i), true) != "") {
+        i += funcMatch(equation.substring(i), true).length;
       } else if (equation.charAt(i) == data.Name) {
         if (data.Value != "") {
           equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
@@ -3515,7 +3575,7 @@ function createGraph(chart) {
           }
         },
       },
-      hover:{
+      hover: {
         intersect: false,
         mode: 'nearest',
         axis: 'xy',
@@ -3683,7 +3743,7 @@ function keypadEquationMapper() {
         {
           "keyElems": { "scroll": elem, "input": elem },
           "reset": false,
-          "keyStyling": newStyling == undefined ? defaultStyle: newStyling,
+          "keyStyling": newStyling == undefined ? defaultStyle : newStyling,
         }
       );
     }
@@ -3744,20 +3804,20 @@ function buttonMapper(elemArray) {
         }, 200)
       };
       let mouseMove = (e) => {
-        if(evtTarget != e.currentTarget){
+        if (evtTarget != e.currentTarget) {
           clearInterval(repeater)
         }
       };
       let mouseUp = (e) => {
         clearInterval(repeater)
       }
-      elemDef.addEventListener("mousedown", (e) => {console.log(e); mouseDown(e) })
+      elemDef.addEventListener("mousedown", (e) => { console.log(e); mouseDown(e) })
       elemDef.addEventListener("mousemove", (e) => { mouseMove(e) })
-      elemDef.addEventListener('mouseup',(e) => {mouseUp(e)})
+      elemDef.addEventListener('mouseup', (e) => { mouseUp(e) })
       elemDef.addEventListener('touchstart', (e) => { mouseDown(e) })
       elemDef.addEventListener('touchmove', (e) => { mouseMove(e) })
-      elemDef.addEventListener('touchend',(e) => {mouseUp(e)})
-      elemDef.addEventListener('touchcancel',(e) => {mouseUp(e)})
+      elemDef.addEventListener('touchend', (e) => { mouseUp(e) })
+      elemDef.addEventListener('touchcancel', (e) => { mouseUp(e) })
       elemDef.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
     }
   }
@@ -3766,29 +3826,38 @@ function buttonMapper(elemArray) {
 function calculateGraph() {
 
 }
-function createElem (tag){
+function createElem(tag) {
   let ele = document.createElement(tag);
   return ele;
 }
 function codeFilter(code) {
   if (code.includes("Navigator") || code.includes("XMLHttpRequest")) {
-      return "";
+    return "";
   } else {
-      return code;
+    return code;
   }
 }
-function elemArray(colect){
+function elemArray(colect) {
   let arry = [];
-  for(let value of colect.values()){
+  for (let value of colect.values()) {
     arry.push(value);
   }
   return arry;
 }
-function getText(node){
-  if(node.nodeType != 3){
+function getText(node) {
+  if (node.nodeType != 3) {
     return getText(node.lastChild)
-  }else{
+  } else {
     return node;
+  }
+}
+function getParent(node) {
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if (nodes.includes(node)) {
+    return node;
+  } else {
+    return getParent(node.parentNode);
   }
 }
 //END
@@ -3902,8 +3971,8 @@ class FuncPage {
     this.def.srtConfig = config
   }
 }
-class CustomPage extends FuncPage{
-  constructor(config){
+class CustomPage extends FuncPage {
+  constructor(config) {
     super(config)
     let temp = document.getElementById('custFuncTab'), clon = temp.content.cloneNode(true);
     this.clone = clon;
@@ -3911,10 +3980,10 @@ class CustomPage extends FuncPage{
     let mainBody = clon.getElementById('customFuncTab');
     let custPageWorker = new Worker('customFuncWorker.js');
     fullConfig.pageWorker = custPageWorker;
-    custPageWorker.onmessage = function (e){
-      if (e.data[0] == 'createElement'){
-        worker.postMessage(['newElem',createElem(e.data[1])]);
-      }else if (e.data[0] == 'error'){
+    custPageWorker.onmessage = function (e) {
+      if (e.data[0] == 'createElement') {
+        worker.postMessage(['newElem', createElem(e.data[1])]);
+      } else if (e.data[0] == 'error') {
         report(e.data[1], false)
       }
     }
