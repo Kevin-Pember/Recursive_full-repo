@@ -1559,22 +1559,21 @@ function pow(type) {
   let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
+  let baseOffset = sel.baseOffset;
+  let extentNode = sel.extentNode;
   let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  for (let i = 0; i < display.childNodes.length; i++) {
+  let inverse = sel.baseOffset > sel.extentOffset ? false : true
+  let higher = inverse ? sel.extentOffset : sel.baseOffset;
+  let lower = inverse ? sel.baseOffset : sel.extentOffset;
+  /*for (let i = 0; i < display.childNodes.length; i++) {
     if (sel.focusNode == display.childNodes[i]) {
       index = i;
       break;
     }
-  }
+  }*/
+  let childNodes = display.childNodes;
+  var nodes = [].slice.call(childNodes);
+  index = nodes.indexOf()
   let backend = sel.focusNode.nodeValue.substring(higher);
   sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
   let superSr = document.createElement("sup");
@@ -1754,12 +1753,13 @@ function backPressed() {
     let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
     elems.find(elem => elem == baseNode)
     if (same) {
-      let removed = baseString.substring(lower, higher + 1)
-      if (removed.contains('‎')) {
-        baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher + 1)
+      let removed = baseString.substring(lower, higher)
+      if (removed.includes('‎')) {
+        baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher)
       } else {
-        baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher + 1)
+        baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher)
       }
+      setFocus(baseNode, lower)
     } else {
       let nodes = keyTargets.input.childNodes;
       for (let i = lower + 1; i < higher; i++) {
