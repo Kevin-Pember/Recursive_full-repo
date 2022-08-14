@@ -1,4 +1,3 @@
-console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
@@ -1082,6 +1081,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('memoryTextBoarder').style.visibility = "visible";
     let enteredText = document.getElementById('enterHeader').innerHTML;
     document.getElementById('memoryText').innerHTML = inputSolver(enteredText, "error adding to memory");
+    console.log(window.getSelection())
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function (e) { navigateButtons(false) });
   document.getElementById('rightOverlayNav').addEventListener("click", function (e) { navigateButtons(true) });
@@ -1559,24 +1559,40 @@ function pow(type) {
   let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
-  let baseOffset = sel.baseOffset;
+  let baseNode = sel.baseNode;
+  let baseOffset = sel.baseOffset
   let extentNode = sel.extentNode;
+  let extentOffset = sel.extentOffset
   let index = 0;
-  let inverse = sel.baseOffset > sel.extentOffset ? false : true
-  let higher = inverse ? sel.extentOffset : sel.baseOffset;
-  let lower = inverse ? sel.baseOffset : sel.extentOffset;
   /*for (let i = 0; i < display.childNodes.length; i++) {
     if (sel.focusNode == display.childNodes[i]) {
       index = i;
       break;
     }
   }*/
+
   let childNodes = display.childNodes;
   var nodes = [].slice.call(childNodes);
-  index = nodes.indexOf()
+  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode);
+  let superSr = document.createElement("sup");
+  superSr.appendChild(type == "2" ? document.createTextNode('‎2') : document.createTextNode('‎'));
+  if (display.contains(baseNode) && display.contains(extentNode)) {
+    if (!sel.isCollapsed) {
+      backPressed();
+    }
+      let postNode = document.createTextNode('‎' + baseNode.textContent.substring(baseOffset));
+      let targInd = nodes.indexOf(baseNode) + 1;
+      console.log(targInd)
+      baseNode.textContent = baseNode.textContent.substring(0, baseOffset);
+      display.insertAt(superSr, targInd)
+      targInd++
+      display.insertAt(postNode, targInd)
+      type == "2" ? setFocus(postNode, 1) : setFocus(superSr.lastChild, superSr.lastChild.textContent.length)
+  }
+  /*
+  
   let backend = sel.focusNode.nodeValue.substring(higher);
   sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
-  let superSr = document.createElement("sup");
   if (type == "2") {
     superSr.appendChild(document.createTextNode('‎2'));
   } else {
@@ -1599,7 +1615,7 @@ function pow(type) {
   }
   range.collapse(true);
   sel.removeAllRanges()
-  sel.addRange(range);
+  sel.addRange(range);*/
 }
 //Responsible for handling trig button presses
 function trigPressed(event) {
@@ -1749,10 +1765,10 @@ function backPressed() {
     }
   } else {
     let elems = elemArray(keyTargets.input.childNodes)
-    let lower = baseOffset > extentOffset ? extentOffset : baseOffset;
-    let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
     elems.find(elem => elem == baseNode)
     if (same) {
+      let lower = baseOffset > extentOffset ? extentOffset : baseOffset;
+      let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
       let removed = baseString.substring(lower, higher)
       if (removed.includes('‎')) {
         baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher)
@@ -1761,72 +1777,30 @@ function backPressed() {
       }
       setFocus(baseNode, lower)
     } else {
-      let nodes = keyTargets.input.childNodes;
-      for (let i = lower + 1; i < higher; i++) {
-        keyTargets.input.removeChild(nodes[i]);
-      }
-      var nodesArray = [].slice.call(nodes);
-      if (nodesArray.indexOf(baseNode) < nodesArray.indexOf(extentNode)) {
-        baseNode.nodeValue = baseString.substring(0, lower)
-        extentNode.nodeValue = extentNode.textContent.substring(higher)
-      } else {
-        baseNode.nodeValue = baseString.substring(higher)
-        extentNode.nodeValue = extentNode.textContent.substring(0, lower)
-      }
-    }
-  }
-  /*let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (!(plainSup(sel) && sel.focusNode.nodeValue.length <= 1)) {
-    if (sel.anchorOffset == sel.focusOffset) {
-      if (sel.focusNode.nodeValue.charAt(sel.anchorOffset - 1) != '‎' && uifCalculator.childNodes[1] != sel.focusNode) {
-        let short = sel.focusNode.nodeValue.substring(0, sel.anchorOffset - 1);
-        sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(sel.focusOffset);
-        range.setStart(sel.focusNode, short.length);
-        range.collapse(true);
-        sel.removeAllRanges()
-        sel.addRange(range);
-      } else {
-        let childNodes = keyTargets.input.childNodes;
-        for (let i = 0; i < childNodes.length; i++) {
-          if (childNodes[i] == sel.focusNode) {
-            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
+      let childern = uifCalculator.childNodes
+      let arryChd = [].slice.call(childern);
+      let inverse = arryChd.indexOf(getParent(baseNode)) > arryChd.indexOf(getParent(extentNode))
+      let startPar = getParent(inverse ? extentNode : baseNode);
+      let startInd = arryChd.indexOf(startPar)
+      let endPar = getParent(inverse ? baseNode : extentNode);
+      keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset: extentOffset)
+      if(uifCalculator.contains(startPar)){
+        if(startPar.nodeType != 3){
+          setFocus(getText(startPar), getText(startPar).textContent.length)
+        }else{
+          setFocus(startPar, startPar.textContent.length)
+        }
+      }else{
+        let pre = arryChd[startInd-1]
+        if(pre.nodeType != 3){
+          setFocus(getText(pre), getText(pre).textContent.length)
+        }else{
+          setFocus(pre, pre.textContent.length)
         }
       }
-    } else {
-      let short = sel.focusNode.nodeValue.substring(0, lower);
-      sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(higher);
-      range.setStart(sel.focusNode, short.length);
-      range.collapse(true);
-      sel.removeAllRanges()
-      sel.addRange(range);
-    }
-  } else {
-    let childNodes = sel.focusNode.parentNode.parentNode.childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-      if (childNodes[i] == sel.focusNode.parentNode) {
-        range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length)
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-        childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
-        keyTargets.input.removeChild(childNodes[i]);
-      }
+      autoStitch(uifCalculator)
     }
   }
-  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;*/
 }
 //Responsible for the ac button clearing all text from the enter header
 function clearMain() {
@@ -1866,8 +1840,6 @@ function navigateButtons(direction) {
   let childNodes = keyTargets.input.childNodes;
   var nodes = [].slice.call(childNodes);
   let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode) ? false : true;
-  console.log(direction)
-  console.log(extentNode.textContent)
   if (direction) {
     let elem = inverse ? baseNode : extentNode;
     let index = inverse ? baseOffset : extentOffset
@@ -1952,7 +1924,7 @@ function moveOne(elem, index, dire) {
   var nodes = [].slice.call(childNodes);
   if ((index == 1 && dire == false) || (index == elemString.length && dire == true)) {
     console.log('recursive pre')
-    recursiveNode(dire,elem)
+    recursiveNode(dire, elem)
   } else {
     dire ? setFocus(elem, index + 1) : setFocus(elem, index - 1);
   }
@@ -1963,7 +1935,7 @@ function recursiveNode(dire, elem) {
   var nodes = [].slice.call(childNodes);
   if (((nodes.indexOf(elem) == nodes.length - 1 && parent != keyTargets.input) && dire == true) || ((nodes.indexOf(elem) == 0 && parent != keyTargets.input) && dire == false)) {
     recursiveNode(dire, parent)
-  }else if (parent == keyTargets.input && (nodes.indexOf(elem) == nodes.length - 1 || nodes.indexOf(elem) == 0)){
+  } else if (parent == keyTargets.input && (nodes.indexOf(elem) == nodes.length - 1 || nodes.indexOf(elem) == 0)) {
     nodes.indexOf(elem) == nodes.length - 1 ? setFocus(elem, elem.textContent.length) : setFocus(elem, 1)
   } else {
     console.log('changing focus')
@@ -3858,6 +3830,113 @@ function getParent(node) {
     return node;
   } else {
     return getParent(node.parentNode);
+  }
+}
+Object.defineProperty(Node.prototype, 'insertAt', {
+  writable: false,
+  enumerable: false,
+  configurable: false,
+
+  value(child, index) {
+    let childern = this.childNodes
+    console.log(childern)
+    var nodes = [].slice.call(childern);
+    let nLength = nodes.length;
+    if (index > nLength) {
+      this.appendChild(child)
+    } else {
+      this.insertBefore(child, childern[index])
+    }
+  }
+});
+Object.defineProperty(Node.prototype, 'removeSection', {
+  writable: false,
+  enumerable: false,
+  configurable: false,
+
+  value(start, end, sIdx, eIdx) {
+    console.log(start)
+    console.log(end)
+    let startTree = createTree(start)
+    let endTree = createTree(end)
+    let unfiParent = undefined
+    let matchInx = undefined
+    for(let i = 0; i < startTree.length; i++){
+      if(startTree[i] == endTree[i]){
+        matchInx = i;
+        unfiParent = startTree[i]
+      }else{
+        break;
+      }
+    }
+    let uniChilern = unfiParent.childNodes;
+    var nodes = [].slice.call(uniChilern);
+    let sNIdx = Number(nodes.indexOf(getParent(start)))
+    console.log(sNIdx)
+    let eNIdx = Number(nodes.indexOf(getParent(end)))
+    /*matchInx == startTree.length -1 ? false : treeRemove(start, sIdx, unfiParent, true)
+    matchInx == startTree.length -1 ? false : treeRemove(end, eIdx, unfiParent,false)*/
+    
+    treeRemove(start, sIdx, unfiParent, false) ? false : sNIdx--
+    treeRemove(end, eIdx, unfiParent,true)
+
+    console.log(sNIdx)
+    for(let i = sNIdx+1; i < eNIdx; i++){
+      console.log(i)
+      console.log(nodes[i])
+      unfiParent.removeChild(nodes[i]);
+    }
+  }
+});
+function treeRemove(elem, inx, topPar, dire){
+  console.log(elem)
+  console.log(topPar)
+  elem.textContent = dire ? elem.textContent.substring(inx) : elem.textContent.substring(0, inx)
+  let parentElem = elem.parentNode
+  console.log(parentElem)
+  let targetElem = elem
+  while(parentElem != topPar){
+    console.log(parentElem)
+    let childern = parentElem.childNodes
+    let arryChd = [].slice.call(childern);
+    let indElem = arryChd.indexOf(targetElem)
+    for(let i = dire ? indElem + 1 : indElem - 1; dire ? i < arryChd.length: i > -1; dire ? i++ : i--){
+      parentElem.removeChild(arryChd)
+    }
+    targetElem = parentElem
+    parentElem = parentElem.parentNode
+  }
+  if(getParent(elem).childNodes.length > 0 || getText(getParent(elem)).textContent == '‎' && getParent(elem).nodeType != 3){
+    return false
+  }else{
+    return true
+  }
+}
+function createTree(elem){
+  let tree = [elem.parentNode];
+  console.log(tree)
+  while(tree[0] != keyTargets.input){
+    console.log(tree[0])
+    tree.unshift(tree[0].parentNode)
+  }
+  return tree;
+}
+function autoStitch(elem){
+  let childern = elem.childNodes
+  let nodesAry = [].slice.call(childern)
+  for(let i =  nodesAry.length-1; i > 0; i --){
+    if(nodesAry[i].nodeType == 3 && nodesAry[i-1].nodeType == 3){
+      nodesAry[i-1] += nodesAry[i].textContent.replaceAll('‎','')
+    }else if (nodesAry[i].nodeType == nodesAry[i-1].nodeType){
+      let childern = nodesAry[i].childNodes
+      let nods = [].slice.call(childern)
+      nods.every((elem, idx) => {
+        if(idx == 0 && elem.nodeType == 3){
+          elem.textContent.replaceAll('‎','')
+        }
+        nodesAry[i-1].nodeType.appendChild(elem)
+      })
+    }
   }
 }
 //END
