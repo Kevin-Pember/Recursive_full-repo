@@ -1550,7 +1550,7 @@ input[type="button"]:focus {
   top: 10px;
   width: 85%;
   position: absolute;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: var(--functionsColor);
 }
 
@@ -1607,13 +1607,14 @@ input[type="button"]:focus {
 .h2Settings {
   color: var(--textColor);
   text-align: center;
+  position: relative;
   width: fit-content;
-  left: 15px;
+  left: 5px;
   font-size: 30px;
-  top: 15px;
+  top: 5px;
+  margin-bottom: 5px;
   background-color: var(--numbersColor);
   padding: 5px 10px;
-  margin: 5px;
   border-radius: 25px;
 }
 
@@ -1642,7 +1643,6 @@ input[type="button"]:focus {
 }
 
 #ColorsDiv {
-  background-color: var(--functionsColor);
   height: 305px;
   border-radius: 25px;
   align-self: center;
@@ -2022,7 +2022,7 @@ input[type="button"]:focus {
 #VersionDiv {
   border-radius: 25px;
   position: relative;
-  height: auto;
+  height: 55px;
   margin-top: 20px;
   left: 2.5%;
   width: 95%;
