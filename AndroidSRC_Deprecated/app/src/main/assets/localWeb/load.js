@@ -1,4 +1,3 @@
-console.log(varInEquat("x+x"))
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
@@ -11,113 +10,6 @@ let definedPages = [
     "tab": document.getElementById("mainTab"),
   }
 ];
-let imgList = [
-  {
-    'name': 'aboutUS',
-    'white': 'Images/aboutUSWhite.svg',
-    'black': 'Images/aboutUS.svg'
-  },
-  {
-    'name': 'addObject',
-    'white': 'Images/addObjectWhite.svg',
-    'black': 'Images/addObject.svg'
-  },
-  {
-    'name': 'backIcon',
-    'white': 'Images/backIconWhite.svg',
-    'black': 'Images/backIcon.svg'
-  },
-  {
-    'name': 'calculatorIcon',
-    'white': 'Images/calculatorIconWhite.svg',
-    'black': 'Images/calculatorIcon.svg'
-  },
-  {
-    'name': 'Calipiers',
-    'white': 'Images/CalipiersWhite.svg',
-    'black': 'Images/Calipiers.svg'
-  },
-  {
-    'name': 'checkmark',
-    'white': 'Images/checkmarkWhite.svg',
-    'black': 'Images/checkmark.svg'
-  },
-  {
-    'name': 'Colors',
-    'white': 'Images/ColorsWhite.svg',
-    'black': 'Images/Colors.svg'
-  },
-  {
-    'name': 'customFunctionIcon',
-    'white': 'Images/customFunctionIconWhite.svg',
-    'black': 'Images/customFunctionIcon.svg'
-  },
-  {
-    'name': 'EditIcon',
-    'white': 'Images/EditIconWhite.svg',
-    'black': 'Images/EditIcon.svg'
-  },
-  {
-    'name': 'help',
-    'white': 'Images/helpWhite.svg',
-    'black': 'Images/help.svg'
-  },
-  {
-    'name': 'historyIcon',
-    'white': 'Images/historyIconWhite.svg',
-    'black': 'Images/historyIcon.svg'
-  },
-  {
-    'name': 'minusIcon',
-    'white': 'Images/minusIconWhite.svg',
-    'black': 'Images/minusIcon.svg'
-  },
-  {
-    'name': 'mobileTabsIcon',
-    'white': 'Images/mobileTabsIconWhite.svg',
-    'black': 'Images/mobileTabsIcon.svg'
-  },
-  {
-    'name': 'MoreFuncArrow',
-    'white': 'Images/MoreFuncArrowWhite.svg',
-    'black': 'Images/MoreFuncArrow.svg'
-  },
-  {
-    'name': 'resize',
-    'white': 'Images/resizeWhite.svg',
-    'black': 'Images/resize.svg'
-  },
-  {
-    'name': 'SettingsCog',
-    'white': 'Images/SettingsCogWhite.svg',
-    'black': 'Images/SettingsCog.svg'
-  },
-  {
-    'name': 'settingsPageIcon',
-    'white': 'Images/settingsPageIconWhite.svg',
-    'black': 'Images/settingsPageIcon.svg'
-  },
-  {
-    'name': 'xIcon',
-    'white': 'Images/xIconWhite.svg',
-    'black': 'Images/xIcon.svg'
-  },
-  {
-    'name': 'graphMode',
-    'white': 'Images/graphModeWhite.svg',
-    'black': 'Images/graphMode.svg'
-  },
-  {
-    'name': 'mainMode',
-    'white': 'Images/mainModeWhite.svg',
-    'black': 'Images/mainMode.svg'
-  },
-  {
-    'name': 'tableMode',
-    'white': 'Images/tableModeWhite.svg',
-    'black': 'Images/tableMode.svg'
-  }
-];
 let keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }
 var settings;
 if (localStorage.getItem("settings") != undefined) {
@@ -125,7 +17,7 @@ if (localStorage.getItem("settings") != undefined) {
   console.log("settings got");
   console.log(settings);
 } else {
-  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tS" : 1,"tC" : 5,"gDS" : 1,"gDMin" : -10,"gDMax" : 10,"gRS" : 1,"gRMin" : -10,"gRMax" : 10}');
+  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tC" : 5,"tMin" : -10,"tMax" : 10,"gR" : 100,"gMin" : -10,"gMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log(settings);
 }
@@ -191,6 +83,9 @@ if (document.getElementById("mainBody") != null) {
     .tabcontent {
       top: 40px;
       border-radius: 0 25px 0 0;
+    }
+    .tabIcons{
+      visibility: hidden;
     }
     #tab {
       height: 40px
@@ -744,6 +639,9 @@ if (document.getElementById("mainBody") != null) {
     let gEContainer = document.getElementById('graphFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
+    clon.getElementById('equation').addEventListener('input', () => {
+      graphInMode();
+    })
     gEContainer.insertBefore(clon, document.getElementById('addGraphEquation'))
   })
   initGraphEquation.addEventListener('input', function (e) {
@@ -757,8 +655,10 @@ if (document.getElementById("mainBody") != null) {
     let gEContainer = document.getElementById('tableFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
+    clon.addEventListener('input', function (e) { tableInMode() });
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
+  initTableEquation.addEventListener('input', function (e) { tableInMode() });
 
   document.getElementById('mobileTabs').addEventListener("click", function (e) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
@@ -1180,9 +1080,10 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('memoryTextBoarder').style.visibility = "visible";
     let enteredText = document.getElementById('enterHeader').innerHTML;
     document.getElementById('memoryText').innerHTML = inputSolver(enteredText, "error adding to memory");
+    console.log(window.getSelection())
   });
-  document.getElementById('leftOverlayNav').addEventListener("click", function () { navigateButtons(false) });
-  document.getElementById('rightOverlayNav').addEventListener("click", function () { navigateButtons(true) });
+  document.getElementById('leftOverlayNav').addEventListener("click", function (e) { navigateButtons(false) });
+  document.getElementById('rightOverlayNav').addEventListener("click", function (e) { navigateButtons(true) });
 
   /*
     document.getElementById('num1').addEventListener("click", function () {  });
@@ -1577,9 +1478,9 @@ function changeTabAs(change) {
   console.log(bases)
   if (change) {
     visibility = "visible";
-    tabstyle = "visibility: visible; left: 5%; width: 90%; height: 90%; border-radius: 20px; text-align: center;";
+    tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: 50% 50%; grid-auto-rows: 300px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: 100%; background-color: var(--translucent); border-radius: 25px 25px 0 0;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 195px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
@@ -1603,32 +1504,7 @@ function getSource(name) {
     return "Images/" + name + ".svg";
   }
 }
-function setImages(color) {
-  let type = true;
-  if (color == "#FFFFFF" || color == "#ffffff") {
-    type = false;
-  }
-  let images = document.getElementsByTagName('img');
-  for (let elem of images) {
-    let image = elem.src;
-    if (image.includes("White.svg")) {
-      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('White.svg'));
-    } else {
-      image = image.substring(image.indexOf('Images/') + 7, image.indexOf('.svg'));
-    }
-    for (let item of imgList) {
-      if (image == item.name) {
-        if (type) {
-          elem.src = item.black;
-          break;
-        } else {
-          elem.src = item.white;
-          break;
-        }
-      }
-    }
-  }
-}
+
 //END
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
@@ -1682,25 +1558,40 @@ function pow(type) {
   let display = keyTargets.input;
   let sel = window.getSelection();
   let range = document.createRange();
+  let baseNode = sel.baseNode;
+  let baseOffset = sel.baseOffset
+  let extentNode = sel.extentNode;
+  let extentOffset = sel.extentOffset
   let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  for (let i = 0; i < display.childNodes.length; i++) {
+  /*for (let i = 0; i < display.childNodes.length; i++) {
     if (sel.focusNode == display.childNodes[i]) {
       index = i;
       break;
     }
+  }*/
+
+  let childNodes = display.childNodes;
+  var nodes = [].slice.call(childNodes);
+  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode);
+  let superSr = document.createElement("sup");
+  superSr.appendChild(type == "2" ? document.createTextNode('‎2') : document.createTextNode('‎'));
+  if (display.contains(baseNode) && display.contains(extentNode)) {
+    if (!sel.isCollapsed) {
+      backPressed();
+    }
+      let postNode = document.createTextNode('‎' + baseNode.textContent.substring(baseOffset));
+      let targInd = nodes.indexOf(baseNode) + 1;
+      console.log(targInd)
+      baseNode.textContent = baseNode.textContent.substring(0, baseOffset);
+      display.insertAt(superSr, targInd)
+      targInd++
+      display.insertAt(postNode, targInd)
+      type == "2" ? setFocus(postNode, 1) : setFocus(superSr.lastChild, superSr.lastChild.textContent.length)
   }
+  /*
+  
   let backend = sel.focusNode.nodeValue.substring(higher);
   sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
-  let superSr = document.createElement("sup");
   if (type == "2") {
     superSr.appendChild(document.createTextNode('‎2'));
   } else {
@@ -1723,7 +1614,7 @@ function pow(type) {
   }
   range.collapse(true);
   sel.removeAllRanges()
-  sel.addRange(range);
+  sel.addRange(range);*/
 }
 //Responsible for handling trig button presses
 function trigPressed(event) {
@@ -1826,59 +1717,89 @@ function setArc() {
 function backPressed() {
   let uifCalculator = keyTargets.input;
   let sel = window.getSelection();
+  console.log(sel)
+  console.log(keyTargets.input.childNodes)
   let range = document.createRange();
-  let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (!(plainSup(sel) && sel.focusNode.nodeValue.length <= 1)) {
-    if (sel.anchorOffset == sel.focusOffset) {
-      if (sel.focusNode.nodeValue.charAt(sel.anchorOffset - 1) != '‎' && uifCalculator.childNodes[1] != sel.focusNode) {
-        let short = sel.focusNode.nodeValue.substring(0, sel.anchorOffset - 1);
-        sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(sel.focusOffset);
-        range.setStart(sel.focusNode, short.length);
-        range.collapse(true);
-        sel.removeAllRanges()
-        sel.addRange(range);
-      } else {
-        let childNodes = keyTargets.input.childNodes;
-        for (let i = 0; i < childNodes.length; i++) {
-          if (childNodes[i] == sel.focusNode) {
-            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+  let baseNode = sel.baseNode
+  let baseOffset = sel.baseOffset
+  let extentNode = sel.extentNode
+  let extentOffset = sel.extentOffset
+  let baseString = baseNode.textContent;
+  console.log(baseOffset)
+
+  //Conditions 
+  let front = baseString.charAt(baseOffset - 1) != '‎' && baseString.length != 1
+  let same = baseNode == extentNode;
+  let back = extentOffset > 0
+
+  //sel.isCollapsed is true if there is no selection
+  if (sel.isCollapsed) {
+    console.log(baseOffset - 1)
+    if (front) {
+      replacement = baseString.substring(0, baseOffset - 1) + baseString.substring(baseOffset)
+      console.log(replacement)
+      baseNode.nodeValue = replacement;
+      setFocus(baseNode, baseOffset - 1);
+    } else {
+      let sd = keyTargets.input.childNodes;
+      var nodesArray = [].slice.call(sd);
+      let childIndex = 0;
+      let childern = keyTargets.input.childNodes;
+
+      for (let value of childern.values()) {
+        if (value.contains(baseNode)) {
+          if (nodesArray.indexOf(baseNode) == -1) {
+            if (keyTargets.input.childNodes[childIndex - 1].nodeType == 3 && keyTargets.input.childNodes[childIndex + 1].nodeType == 3) {
+              keyTargets.input.childNodes[childIndex - 1].nodeValue += keyTargets.input.childNodes[childIndex + 1].nodeValue.substring(1);
+              keyTargets.input.removeChild(keyTargets.input.childNodes[childIndex + 1]);
+            }
+            keyTargets.input.removeChild(value);
           }
+          let target = getText(keyTargets.input.childNodes[childIndex - 1]);
+          console.log(target)
+          setFocus(target, target.textContent.length);
+        }
+        childIndex++;
+      }
+    }
+  } else {
+    let elems = elemArray(keyTargets.input.childNodes)
+    elems.find(elem => elem == baseNode)
+    if (same) {
+      let lower = baseOffset > extentOffset ? extentOffset : baseOffset;
+      let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
+      let removed = baseString.substring(lower, higher)
+      if (removed.includes('‎')) {
+        baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher)
+      } else {
+        baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher)
+      }
+      setFocus(baseNode, lower)
+    } else {
+      let childern = uifCalculator.childNodes
+      let arryChd = [].slice.call(childern);
+      let inverse = arryChd.indexOf(getParent(baseNode)) > arryChd.indexOf(getParent(extentNode))
+      let startPar = getParent(inverse ? extentNode : baseNode);
+      let startInd = arryChd.indexOf(startPar)
+      let endPar = getParent(inverse ? baseNode : extentNode);
+      keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset: extentOffset)
+      if(uifCalculator.contains(startPar)){
+        if(startPar.nodeType != 3){
+          setFocus(getText(startPar), getText(startPar).textContent.length)
+        }else{
+          setFocus(startPar, startPar.textContent.length)
+        }
+      }else{
+        let pre = arryChd[startInd-1]
+        if(pre.nodeType != 3){
+          setFocus(getText(pre), getText(pre).textContent.length)
+        }else{
+          setFocus(pre, pre.textContent.length)
         }
       }
-    } else {
-      let short = sel.focusNode.nodeValue.substring(0, lower);
-      sel.focusNode.nodeValue = short + sel.focusNode.nodeValue.substring(higher);
-      range.setStart(sel.focusNode, short.length);
-      range.collapse(true);
-      sel.removeAllRanges()
-      sel.addRange(range);
-    }
-  } else {
-    let childNodes = sel.focusNode.parentNode.parentNode.childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-      if (childNodes[i] == sel.focusNode.parentNode) {
-        range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length)
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-        childNodes[i + 1].nodeValue = childNodes[i + 1].nodeValue.substring(1)
-        keyTargets.input.removeChild(childNodes[i]);
-      }
+      autoStitch(uifCalculator)
     }
   }
-  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for the ac button clearing all text from the enter header
 function clearMain() {
@@ -1908,7 +1829,26 @@ function enterPressed(input) {
 }
 //Responsible for handling the navigation buttons on the main calc tab
 function navigateButtons(direction) {
-  let parentElement;
+  let sel = document.getSelection();
+  console.log(sel)
+  let baseNode = sel.baseNode;
+  let baseOffset = sel.baseOffset;
+  let extentNode = sel.extentNode;
+  let extentOffset = sel.extentOffset;
+  let collapsed = sel.isCollapsed;
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode) ? false : true;
+  if (direction) {
+    let elem = inverse ? baseNode : extentNode;
+    let index = inverse ? baseOffset : extentOffset
+    moveOne(elem, index, direction)
+  } else {
+    let elem = !inverse ? baseNode : extentNode;
+    let index = !inverse ? baseOffset : extentOffset
+    moveOne(elem, index, direction)
+  }
+  /*let parentElement;
   let sel = window.getSelection();
   let isSup = false;
   let range = document.createRange();
@@ -1975,6 +1915,45 @@ function navigateButtons(direction) {
       sel.removeAllRanges();
       sel.addRange(range);
     }
+  }*/
+}
+function moveOne(elem, index, dire) {
+  let elemString = elem.textContent
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if ((index == 1 && dire == false) || (index == elemString.length && dire == true)) {
+    console.log('recursive pre')
+    recursiveNode(dire, elem)
+  } else {
+    dire ? setFocus(elem, index + 1) : setFocus(elem, index - 1);
+  }
+}
+function recursiveNode(dire, elem) {
+  let parent = elem.parentNode;
+  let childNodes = parent.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if (((nodes.indexOf(elem) == nodes.length - 1 && parent != keyTargets.input) && dire == true) || ((nodes.indexOf(elem) == 0 && parent != keyTargets.input) && dire == false)) {
+    recursiveNode(dire, parent)
+  } else if (parent == keyTargets.input && (nodes.indexOf(elem) == nodes.length - 1 || nodes.indexOf(elem) == 0)) {
+    nodes.indexOf(elem) == nodes.length - 1 ? setFocus(elem, elem.textContent.length) : setFocus(elem, 1)
+  } else {
+    console.log('changing focus')
+    console.log(parent)
+    console.log(childNodes)
+    //console.log(nodes(elem))
+    nextText(dire, parent, elem)
+  }
+}
+function nextText(dire, parent, elem) {
+  let childNodes = parent.childNodes;
+  var nodes = [].slice.call(childNodes);
+  let index = nodes.indexOf(elem);
+  if (dire) {
+    let nextElem = getText(nodes[index + 1]);
+    setFocus(nextElem, 1)
+  } else {
+    let nextElem = getText(nodes[index - 1]);
+    setFocus(nextElem, nextElem.textContent.length)
   }
 }
 function switchMode(modeId) {
@@ -2125,8 +2104,16 @@ function setDegMode() {
     document.getElementById(elem).innerHTML = text;
   }
 }
+function setFocus(node, index) {
+  let sel = window.getSelection();
+  let range = document.createRange();
+  range.setStart(node, index);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
 //END
-/**************************************************|Graph Mode Methods|**************************************************/
+/**************************************************|Mode Methods|**************************************************/
 function graphInMode() {
   let equationGrid = document.getElementById("graphFuncGrid");
   let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
@@ -2160,7 +2147,7 @@ function graphInMode() {
       }
       let dataColor = accents[(datasets.length) % 11]
       datasets.push({
-        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top)),
+        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top), Number(graphVars.res)),
         label: "hidden",
         fontColor: '#FFFFFF',
         borderColor: dataColor,
@@ -2175,7 +2162,60 @@ function graphInMode() {
   console.log(datasets)
   def.chart.update();
 }
+function tableInMode() {
+  let equationGrid = document.getElementById("tableFuncGrid");
+  let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
+  let tableModeDef = document.getElementById("modeTable");
+  tableModeDef.innerHTML = "<tr><th>x</th></tr>"
+  let accents = [
+    "#e6cc4e",
+    "#4ecfe6",
+    "#b169f0",
+    "#f06970",
+    "#87f069",
+    "#69f0c5",
+    "#f0a469",
+    "#69f0ed",
+    "#697bf0",
+    "#69f077",
+  ]
+  let resulting = [];
+  for (let elem of equationElems) {
+    let equation = elem.innerHTML
+    let vars = varInEquat(equation)
+    if (vars.length <= 1) {
+      let parsedEquation = "";
+      let parsedArray = createParseable(equation);
+      for (let item of parsedArray) {
+        if (item == "v1") {
+          item = 'Æ';
+        }
+        parsedEquation += item;
+      }
+      let dataColor = accents[(resulting.length) % 10]
+      resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
 
+    } else {
+      report("Equation needs single variable", false)
+    }
+  }
+  resulting[0].forEach((val) => {
+    let newRow = tableModeDef.insertRow()
+    let newCell = newRow.insertCell()
+    newCell.innerHTML = val.x
+  })
+  resulting.forEach((val, index) => {
+    let tableElems = tableModeDef.childNodes[0].childNodes;
+    let titleHeader = document.createElement("TH");
+    titleHeader.innerHTML = "y" + (index + 1)
+    titleHeader.style.color = accents[(index) % 11]
+    tableElems[0].appendChild(titleHeader)
+    val.forEach((val2, index) => {
+      let newCell = tableElems[index + 1].insertCell()
+      newCell.innerHTML = val2.y;
+    })
+  });
+}
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
@@ -2279,9 +2319,14 @@ function createTab(config) {
     tabs[i].style.visibility = 'hidden';
   }
   if (config.type == "Function") {
-    definedPages.push((new EquatPage(config)).def);
+    let def = (new EquatPage(config)).def;
+    definedPages.push(def);
   } else if (config.type == "Hybrid") {
-    definedPages.push((new HybridPage(config)).def);
+    let def = (new HybridPage(config)).def;
+    definedPages.push(def);
+  } else if (config.type == "Code") {
+    let def = (new CustomPage(config)).def;
+    definedPages.push(def)
   }
 }
 //Responsible for the creation of a tab button that links to the tab
@@ -2291,14 +2336,13 @@ function newTabButton(config, tabPage) {
   let nameElem = tabClon.getElementById('newTabName');
   let buttonCopy = tabClon.getElementById('tabButton');
   tabClon.getElementById('newTabName').innerHTML = name;
-  tabClon.getElementById('nameDisplay').innerHTML = name;
-  if (config.type == "Function") {
+  /*if (config.type == "Function") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = config.equation
   } else if (config.type == "Code") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = "Code";
   } else if (config.type == "Hybrid") {
     tabClon.getElementById('equtDisplayFunc').innerHTML = "Hybrid";
-  }
+  }*/
   tabClon.getElementById('tabButton').dataset.tabmap = JSON.stringify(config);
   tabClon.getElementById('tabRemove').src = getSource('xIcon');
 
@@ -2422,6 +2466,8 @@ function openElement(name) {
 }
 //Responsible for matching a tab with its tab page
 function matchPage(name) {
+  console.log(definedPages)
+  console.log(name)
   for (let pageObj of definedPages) {
     console.log(pageObj)
     console.log(name)
@@ -2581,8 +2627,8 @@ function parseVar(parsedEquation, data) {
   console.log("Parse var types")
   console.log(typeof data.Value)
   for (let i = 0; i < parsedEquation.length; i++) {
-    if (funcMatch(parsedEquation.substring(i),true) != "") {
-      i += funcMatch(parsedEquation.substring(i),true).length;
+    if (funcMatch(parsedEquation.substring(i), true) != "") {
+      i += funcMatch(parsedEquation.substring(i), true).length;
     } else if (parsedEquation.charAt(i) == data.Name) {
       parsedEquation = parsedEquation.substring(0, i) + "(" + data.Value + ")" + parsedEquation.substring(i + 1);
     }
@@ -2646,17 +2692,24 @@ function solveEquation(method, clon) {
 function solveGraph(parsedEquation, def) {
   let vars = getGraphVars(def);
   //Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
-  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top));
+  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top), Number(vars.res));
+  console.log(result.length)
   def.chart.data.datasets[0].data = result;
   def.chart.update();
 }
 //Responsible for solving the parsedEquation with one open variable table wise
 function solveTable(parsedEquation, clon) {
-
-  let numValue = Number(clon.querySelector('#cellsTable').value);
-  let step = Number(clon.querySelector('#stepTable').value);
-  clon.querySelector("#funcTable").innerHTML = "<tr><th>x</th><th>y</th></tr>";
-  for (let i = 1; i <= numValue; i++) {
+  let table = clon.querySelector("#funcTable");
+  table.innerHTML = "<tr><th>x</th><th>y</th></tr>";
+  let result = calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC))
+  result.forEach((elem, index) => {
+    let newRow = table.insertRow()
+    let newXCell = newRow.insertCell()
+    newXCell.innerHTML = elem.x
+    let newYCell = newRow.insertCell()
+    newYCell.innerHTML = elem.y
+  });
+  /*for (let point of result) {
     let result;
     let currentVal = i * step;
     result = inputSolver(parsedEquation.replace('Æ', currentVal), "Error Making Table");
@@ -2668,14 +2721,15 @@ function solveTable(parsedEquation, clon) {
     console.log(i * step)
     newYCell.innerHTML = result;
     newYCell.id = "other shit"
-  }
+  }*/
+  //console.log(clon.querySelector("#funcTable").childNodes[0].childNodes)
 }
-function calculatePoints(parsedEquation, start, end) {
+function calculatePoints(parsedEquation, start, end, res) {
   let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
-  console.log(`calculating from ${start} to ${end}`)
-  let step = Math.abs(end - start) * 0.01
+  let invRes = 1 / res;
+  let step = Math.abs(end - start) * invRes;
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
@@ -2689,12 +2743,17 @@ function calculatePoints(parsedEquation, start, end) {
 }
 //creates an array of all variables needed for calculatePoints
 function getGraphVars(def) {
+  console.log(def)
   let varArray = {}
   console.log("chart scales");
   console.log(def.chart.scales);
+  if (def.chart.scales.x == undefined) {
+    console.log('No thats not true')
+  }
   varArray = {
-    "bottom": Number(def.chart.scales.x.min),
-    "top": Number(def.chart.scales.x.max),
+    "bottom": def.chart.scales.x == undefined ? settings.gMin : Number(def.chart.scales.x.min),
+    "top": def.chart.scales.x == undefined ? settings.gMax : Number(def.chart.scales.x.max),
+    'res': settings.gR
   }
   return varArray
 }
@@ -2977,7 +3036,7 @@ let facingBack = [
     "backElm": "",
     "prtCont": 'main',
     "mth": function () {
-      popup(); preventFocus();
+      popup();
     },
   },
   {
@@ -3210,11 +3269,10 @@ function setSettings() {
     }
   }
   let rootCss = document.querySelector(':root');
-  /*rootCss.style.setProperty('--displayColor', colorArray[2]);
+  rootCss.style.setProperty('--displayColor', colorArray[2]);
   rootCss.style.setProperty('--numbersColor', colorArray[1]);
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
-  setImages(colorArray[3]);*/
   TextColorGlobal = colorArray[3];
   if (!settings.degRad) {
     setDegMode();
@@ -3303,11 +3361,6 @@ function createNumHeader(parentElem, num) {
   console.log()
   parentElem.appendChild(initial)
 }
-//Responsible (I think) for preventing focus being lost while other element on a page are being clicked
-function preventFocus() {
-  var ae = document.activeElement;
-  setTimeout(function () { ae.focus() }, 1);
-}
 //Method for fining whether or not the focus is on a superscript element (might be implemented in back pressed because that is the only refrence)
 function plainSup(sel) {
   if (sel.focusNode.parentElement.tagName == "SUP") {
@@ -3393,7 +3446,7 @@ function varInList(list, varLetter) {
 }
 //Responsible for checking if a position in an equation is a variable or not
 function isVar(entry) {
-  let func = funcMatch(entry,true);
+  let func = funcMatch(entry, true);
   let ignore = ignoreTest(entry);
   console.log(ignore)
   if (func != "") {
@@ -3416,8 +3469,8 @@ function setVar(element, equation) {
   console.log(varData)
   for (let data of varData) {
     for (let i = 0; i < equation.length; i++) {
-      if (funcMatch(equation.substring(i),true) != "") {
-        i += funcMatch(equation.substring(i),true).length;
+      if (funcMatch(equation.substring(i), true) != "") {
+        i += funcMatch(equation.substring(i), true).length;
       } else if (equation.charAt(i) == data.Name) {
         if (data.Value != "") {
           equation = equation.substring(0, i) + "(" + data.Value + ")" + equation.substring(i + 1);
@@ -3464,7 +3517,7 @@ function createGraph(chart) {
     type: 'scatter',
     data: {
       datasets: [{
-        data: [{ "x": 3, "y": 4 }, { "x": 4, "y": 3 }, { "x": 50, "y": 90 }],
+        data: [],
         label: "hidden",
         fontColor: '#FFFFFF',
         borderColor: colorArray[1],
@@ -3493,7 +3546,7 @@ function createGraph(chart) {
           }
         },
       },
-      hover:{
+      hover: {
         intersect: false,
         mode: 'nearest',
         axis: 'xy',
@@ -3552,6 +3605,7 @@ function createGraph(chart) {
 */
 function keypadController(object) {
   console.log("keypadController ran")
+  console.log(keyTargets)
   if (object.reset != undefined && object.reset == false) {
     let styling = document.createElement('style');
     let builtInStyling = `
@@ -3610,53 +3664,57 @@ let keypadVis = (visible) => {
     document.getElementById('keypad').style.visibility = "hidden";
   }
 }
-function keypadEquationMapper(elem) {
+function keypadEquationMapper() {
+  let elem = arguments[0]
+  let newStyling = arguments[1]
   elem.addEventListener("focus", function (e) {
     if (document.getElementById('keypad').style.visibility == "hidden") {
       setSelect(elem, elem.innerHTML.length);
       keypadVis(true);
+      console.log(arguments)
+      let defaultStyle = `
+      #keypad {
+        top: calc(40% + 30px);
+        bottom: 10px;
+        width: calc(100% - 20px);
+        left: 10px;
+        position: absolute;
+      }
+      .dynamicModeContainer{
+        height: 40%;
+        grid-template-rows: 0px 100%;
+
+      }
+      #fullGraph{
+        visibility: hidden;
+      }
+      @media only screen and (max-height: 450px){
+        #keypad{
+          width: calc(33.3333% - 15px);
+          left: calc(66.6666% + 5px);
+          height: calc(100% - 60px);
+          top: 50px;
+          bottom: 0;
+          padding: 0px;
+          position: absolute;
+          border-radius: 25px;
+          overflow: hidden;
+        }
+        .dynamicModeContainer{
+          width: 66.6666%;
+          grid-template-columns: 50% 50%;
+          height: 100%;
+          grid-template-rows: unset;
+        }
+        #fullGraph{
+          visibility: visible;
+        }
+      }`;
       keypadController(
         {
           "keyElems": { "scroll": elem, "input": elem },
           "reset": false,
-          "keyStyling": `
-            #keypad {
-              top: calc(40% + 30px);
-              bottom: 10px;
-              width: calc(100% - 20px);
-              left: 10px;
-              position: absolute;
-            }
-            .dynamicModeContainer{
-              height: 40%;
-              grid-template-rows: 0px 100%;
-
-            }
-            #fullGraph{
-              visibility: hidden;
-            }
-            @media only screen and (max-height: 450px){
-              #keypad{
-                width: calc(33.3333% - 15px);
-                left: calc(66.6666% + 5px);
-                height: calc(100% - 60px);
-                top: 50px;
-                bottom: 0;
-                padding: 0px;
-                position: absolute;
-                border-radius: 25px;
-                overflow: hidden;
-              }
-              .dynamicModeContainer{
-                width: 66.6666%;
-                grid-template-columns: 50% 50%;
-                height: 100%;
-                grid-template-rows: unset;
-              }
-              #fullGraph{
-                visibility: visible;
-              }
-            }`
+          "keyStyling": newStyling == undefined ? defaultStyle : newStyling,
         }
       );
     }
@@ -3664,7 +3722,12 @@ function keypadEquationMapper(elem) {
   elem.addEventListener('focusout', (e) => {
     setTimeout(() => {
       let sel = window.getSelection();
-      if (!elem.contains(sel.focusNode) || sel.anchorOffset == 0) {
+      console.log(keyTargets)
+      console.log(sel)
+      let keypad = document.getElementById('keypad')
+      console.log(keypad)
+      console.log(keypad.contains(sel.focusNode))
+      if ((!elem.contains(sel.focusNode) || sel.anchorOffset == 0) && !keypad.contains(sel.focusNode)) {
         if (elem.innerHTML.length == 1) {
           elem.innerHTML = "";
         }
@@ -3712,20 +3775,20 @@ function buttonMapper(elemArray) {
         }, 200)
       };
       let mouseMove = (e) => {
-        if(evtTarget != e.currentTarget){
+        if (evtTarget != e.currentTarget) {
           clearInterval(repeater)
         }
       };
       let mouseUp = (e) => {
         clearInterval(repeater)
       }
-      elemDef.addEventListener("mousedown", (e) => {console.log(e); mouseDown(e) })
+      elemDef.addEventListener("mousedown", (e) => { console.log(e); mouseDown(e) })
       elemDef.addEventListener("mousemove", (e) => { mouseMove(e) })
-      elemDef.addEventListener('mouseup',(e) => {mouseUp(e)})
+      elemDef.addEventListener('mouseup', (e) => { mouseUp(e) })
       elemDef.addEventListener('touchstart', (e) => { mouseDown(e) })
       elemDef.addEventListener('touchmove', (e) => { mouseMove(e) })
-      elemDef.addEventListener('touchend',(e) => {mouseUp(e)})
-      elemDef.addEventListener('touchcancel',(e) => {mouseUp(e)})
+      elemDef.addEventListener('touchend', (e) => { mouseUp(e) })
+      elemDef.addEventListener('touchcancel', (e) => { mouseUp(e) })
       elemDef.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
     }
   }
@@ -3733,6 +3796,147 @@ function buttonMapper(elemArray) {
 
 function calculateGraph() {
 
+}
+function createElem(tag) {
+  let ele = document.createElement(tag);
+  return ele;
+}
+function codeFilter(code) {
+  if (code.includes("Navigator") || code.includes("XMLHttpRequest")) {
+    return "";
+  } else {
+    return code;
+  }
+}
+function elemArray(colect) {
+  let arry = [];
+  for (let value of colect.values()) {
+    arry.push(value);
+  }
+  return arry;
+}
+function getText(node) {
+  if (node.nodeType != 3) {
+    return getText(node.lastChild)
+  } else {
+    return node;
+  }
+}
+function getParent(node) {
+  let childNodes = keyTargets.input.childNodes;
+  var nodes = [].slice.call(childNodes);
+  if (nodes.includes(node)) {
+    return node;
+  } else {
+    return getParent(node.parentNode);
+  }
+}
+Object.defineProperty(Node.prototype, 'insertAt', {
+  writable: false,
+  enumerable: false,
+  configurable: false,
+
+  value(child, index) {
+    let childern = this.childNodes
+    console.log(childern)
+    var nodes = [].slice.call(childern);
+    let nLength = nodes.length;
+    if (index > nLength) {
+      this.appendChild(child)
+    } else {
+      this.insertBefore(child, childern[index])
+    }
+  }
+});
+Object.defineProperty(Node.prototype, 'removeSection', {
+  writable: false,
+  enumerable: false,
+  configurable: false,
+
+  value(start, end, sIdx, eIdx) {
+    console.log(start)
+    console.log(end)
+    let startTree = createTree(start)
+    let endTree = createTree(end)
+    let unfiParent = undefined
+    let matchInx = undefined
+    for(let i = 0; i < startTree.length; i++){
+      if(startTree[i] == endTree[i]){
+        matchInx = i;
+        unfiParent = startTree[i]
+      }else{
+        break;
+      }
+    }
+    let uniChilern = unfiParent.childNodes;
+    var nodes = [].slice.call(uniChilern);
+    let sNIdx = Number(nodes.indexOf(getParent(start)))
+    console.log(sNIdx)
+    let eNIdx = Number(nodes.indexOf(getParent(end)))
+    /*matchInx == startTree.length -1 ? false : treeRemove(start, sIdx, unfiParent, true)
+    matchInx == startTree.length -1 ? false : treeRemove(end, eIdx, unfiParent,false)*/
+    
+    treeRemove(start, sIdx, unfiParent, false) ? false : sNIdx--
+    treeRemove(end, eIdx, unfiParent,true)
+
+    console.log(sNIdx)
+    for(let i = sNIdx+1; i < eNIdx; i++){
+      console.log(i)
+      console.log(nodes[i])
+      unfiParent.removeChild(nodes[i]);
+    }
+  }
+});
+function treeRemove(elem, inx, topPar, dire){
+  console.log(elem)
+  console.log(topPar)
+  elem.textContent = dire ? elem.textContent.substring(inx) : elem.textContent.substring(0, inx)
+  let parentElem = elem.parentNode
+  console.log(parentElem)
+  let targetElem = elem
+  while(parentElem != topPar){
+    console.log(parentElem)
+    let childern = parentElem.childNodes
+    let arryChd = [].slice.call(childern);
+    let indElem = arryChd.indexOf(targetElem)
+    for(let i = dire ? indElem + 1 : indElem - 1; dire ? i < arryChd.length: i > -1; dire ? i++ : i--){
+      parentElem.removeChild(arryChd)
+    }
+    targetElem = parentElem
+    parentElem = parentElem.parentNode
+  }
+  if(getParent(elem).childNodes.length > 0 || getText(getParent(elem)).textContent == '‎' && getParent(elem).nodeType != 3){
+    return false
+  }else{
+    return true
+  }
+}
+function createTree(elem){
+  let tree = [elem.parentNode];
+  console.log(tree)
+  while(tree[0] != keyTargets.input){
+    console.log(tree[0])
+    tree.unshift(tree[0].parentNode)
+  }
+  return tree;
+}
+function autoStitch(elem){
+  let childern = elem.childNodes
+  let nodesAry = [].slice.call(childern)
+  for(let i =  nodesAry.length-1; i > 0; i --){
+    if(nodesAry[i].nodeType == 3 && nodesAry[i-1].nodeType == 3){
+      nodesAry[i-1] += nodesAry[i].textContent.replaceAll('‎','')
+    }else if (nodesAry[i].nodeType == nodesAry[i-1].nodeType){
+      let childern = nodesAry[i].childNodes
+      let nods = [].slice.call(childern)
+      nods.every((elem, idx) => {
+        if(idx == 0 && elem.nodeType == 3){
+          elem.textContent.replaceAll('‎','')
+        }
+        nodesAry[i-1].nodeType.appendChild(elem)
+      })
+    }
+  }
 }
 //END
 /************************************************|help page|**************************************************/
@@ -3845,10 +4049,32 @@ class FuncPage {
     this.def.srtConfig = config
   }
 }
+class CustomPage extends FuncPage {
+  constructor(config) {
+    super(config)
+    let temp = document.getElementById('custFuncTab'), clon = temp.content.cloneNode(true);
+    this.clone = clon;
+    let fullConfig = this.def;
+    let mainBody = clon.getElementById('customFuncTab');
+    let custPageWorker = new Worker('customFuncWorker.js');
+    fullConfig.pageWorker = custPageWorker;
+    custPageWorker.onmessage = function (e) {
+      if (e.data[0] == 'createElement') {
+        worker.postMessage(['newElem', createElem(e.data[1])]);
+      } else if (e.data[0] == 'error') {
+        report(e.data[1], false)
+      }
+    }
+    let object = ['init', mainBody, fullConfig.srtConfig.code];
+    console.log(object)
+    custPageWorker.postMessage(object);
+    document.getElementById("mainPage").appendChild(clon);
+  }
+}
 class TemplatePage extends FuncPage {
   constructor(config) {
     super(config)
-    let temp = document.getElementsByClassName("custFuncTabTemp")[0], clon = temp.content.cloneNode(true);
+    let temp = document.getElementById('templateFuncTab'), clon = temp.content.cloneNode(true);
     this.clone = clon;
     let parent = clon.getElementById('customFuncTab');
     let chart = clon.getElementById("funcChart");
@@ -3861,22 +4087,25 @@ class TemplatePage extends FuncPage {
     console.log(varGrid)
     let movable = clon.getElementById("selectorUnder");
     let updateElements = [
-      "stepTable",
-      "cellsTable"
+      "minGraph",
+      "maxGraph",
+      'resolutionGraph',
+      'minTable',
+      'maxTable',
+      "cellTable",
     ];
     movable.dataset.pos = 0;
 
     if (TextColorGlobal == "#000000") {
       clon.getElementById("editIcon").src = getSource('EditIcon');
     }
-    clon.getElementById("minDomainGraph").value = settings.gDMin;
-    clon.getElementById("maxDomainGraph").value = settings.gDMax;
-    clon.getElementById("stepDomainGraph").value = settings.gDS;
-    clon.getElementById("minRangeGraph").value = settings.gRMin;
-    clon.getElementById("maxRangeGraph").value = settings.gRMax;
-    clon.getElementById("stepRangeGraph").value = settings.gRS;
-    clon.getElementById("cellsTable").value = settings.tC;
-    clon.getElementById('stepTable').value = settings.tS;
+    //Graph settings that need to be updated
+    clon.getElementById("minGraph").value = settings.gMin;
+    clon.getElementById("maxGraph").value = settings.gMax;
+    clon.getElementById("resolutionGraph").value = settings.gR;
+    clon.getElementById("minTable").value = settings.tMin;
+    clon.getElementById("maxTable").value = settings.tMax;
+    clon.getElementById('cellTable').value = settings.tC;
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
 
@@ -3918,6 +4147,7 @@ class HybridPage extends TemplatePage {
     let clon = this.clone;
     let fullConfig = this.def;
     let tabCopy = fullConfig.tabPage;
+    let funcConfig = getByName(config.name)
 
     clon.getElementById("editIcon").style = "";
     clon.getElementById("editIcon").src = getSource("EditIcon");
@@ -3975,7 +4205,7 @@ class EquatPage extends TemplatePage {
     let tabCopy = fullConfig.tabPage;
     let equation = config.equation;
     let equationDIV = clon.getElementById("EquationFunc");
-
+    console.log(this.def)
 
     equationDIV.innerHTML = equation;
     equationDIV.dataset.baseE = equation;
@@ -3987,8 +4217,32 @@ class EquatPage extends TemplatePage {
 
       changeFunc(oldVal, newVal, fullConfig);
     });
-    equationDIV.addEventListener('focus', () => { })
-    equationDIV.addEventListener("focus", function (e) {
+    let styleVal = `
+    #keypad {
+      top: calc(40% + 40px);
+      bottom: 10px;
+      width: calc(100% - 20px);
+      left: 10px;
+      position: absolute;
+    }
+    @media only screen and (max-height: 450px){
+      #keypad{
+        width: calc(33.3333% - 15px);
+        left: calc(66.6666% + 5px);
+        height: calc(100% - 60px);
+        top: 50px;
+        bottom: 0;
+        padding: 0px;
+        position: absolute;
+        border-radius: 25px;
+        overflow: hidden;
+      }
+      #funcContainer{
+        width: calc(66.6666%)
+      }
+    }`;
+    keypadEquationMapper(equationDIV, styleVal)
+    /*equationDIV.addEventListener("focus", function (e) {
       if (document.getElementById('keypad').style.visibility == "hidden") {
         console.log("focusthrone")
         let initEquation = JSON.parse(e.target.parentNode.parentNode.parentNode.dataset.tab);
@@ -4043,7 +4297,7 @@ class EquatPage extends TemplatePage {
           );
         }
       })
-    });
+    });*/
     equationDIV.addEventListener("change", function (e) {
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
@@ -4069,12 +4323,3 @@ class EquatPage extends TemplatePage {
     }*/
   }
 }
-/**************************************Func filter**************************************************/
-let numLimit = [
-  "function",
-  "Function",
-  "cust",
-  "let",
-  "var",
-  ".log"
-]

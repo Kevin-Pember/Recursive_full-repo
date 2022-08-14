@@ -1,8 +1,17 @@
+@font-face{
+  font-family: ubuntu;
+  src: url(./fontAssets/Roboto-Regular.ttf);
+}
+@font-face {
+  font-family: ubuntu;
+  src: url(./fontAssets/Roboto-Bold.ttf);
+  font-weight: bold;
+}
 :root {
-  --displayColor: #22362F;
-  --numbersColor: #014D65;
-  --functionsColor: #191C1B;
-  --textColor: #CEE8DB;
+  --displayColor: #000000;
+  --numbersColor: #000000;
+  --functionsColor: #000000;
+  --textColor: #000000;
   --translucent: #00000033;
   --semi-transparent: #000000c5;
 }
@@ -11,7 +20,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: ubuntu;
   color: var(--textColor);
   -webkit-tap-highlight-color: transparent;
 }
@@ -68,11 +77,9 @@
 
 .modeSelectButton {
   width: calc(100% - 20px);
-  height: 200px;
+  height: calc(100% - 10px);
   border-radius: 25px;
   border: none;
-  margin-left: 10px;
-  margin-top: 20px;
 
   background-color: var(--functionsColor);
 }
@@ -142,7 +149,7 @@
   padding-top: 10px;
   width: calc(100% - 20px);
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-left: 10px;
   display: grid;
   grid-auto-rows: 80px;
@@ -176,6 +183,10 @@
 /*end*/
 #selectorMode {
   background-color: var(--displayColor);
+  display: grid;
+  grid-template-rows: 33.3333% 33.3333% 33.3333%;
+  justify-items: center;
+  align-items: center;
 }
 
 textarea {
@@ -351,7 +362,6 @@ input[type="button"]:focus {
   height: 14;
   top: 9.66665;
   font-size: 12px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #overlayContainer {
@@ -915,7 +925,6 @@ input[type="button"]:focus {
   background-color: var(--numbersColor);
   text-align: right;
   position: absolute;
-  font-family: Arial, Helvetica, sans-serif;
   padding: 5px 10px;
   border-radius: 25px;
 }
@@ -961,7 +970,6 @@ input[type="button"]:focus {
   height: 14;
   top: 9.66665;
   font-size: 12px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #sinSlideDiv {
@@ -1008,6 +1016,7 @@ input[type="button"]:focus {
   background-color: #00000000;
   position: absolute;
   z-index: 2;
+  height: 40px;
   pointer-events: all;
 }
 
@@ -1027,7 +1036,7 @@ input[type="button"]:focus {
 }
 
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1104,7 +1113,7 @@ input[type="button"]:focus {
   width: 100%;
   height: 100%;
   background-color: var(--translucent);
-  z-index: 1;
+  z-index: 5;
   display: grid;
   justify-items: center;
   align-items: center;
@@ -1541,6 +1550,7 @@ input[type="button"]:focus {
   top: 10px;
   width: 85%;
   position: absolute;
+  overflow-y: auto;
   background-color: var(--functionsColor);
 }
 
@@ -1565,7 +1575,6 @@ input[type="button"]:focus {
   margin-top: -30px;
   color: var(--textColor);
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .topLine {
@@ -1598,14 +1607,14 @@ input[type="button"]:focus {
 .h2Settings {
   color: var(--textColor);
   text-align: center;
+  position: relative;
   width: fit-content;
-  left: 15px;
-  font-family: Arial, Helvetica, sans-serif;
+  left: 5px;
   font-size: 30px;
-  top: 15px;
+  top: 5px;
+  margin-bottom: 5px;
   background-color: var(--numbersColor);
   padding: 5px 10px;
-  margin: 5px;
   border-radius: 25px;
 }
 
@@ -1614,7 +1623,6 @@ input[type="button"]:focus {
   text-align: left;
   text-overflow: ellipsis;
   position: inherit;
-  font-family: Arial, Helvetica, sans-serif;
   align-self: center;
   margin-right: 15px;
   margin-left: 5px;
@@ -1625,7 +1633,6 @@ input[type="button"]:focus {
   text-align: left;
   text-overflow: ellipsis;
   position: inherit;
-  font-family: Arial, Helvetica, sans-serif;
   align-self: center;
   margin-right: 15px;
   margin-left: 5px;
@@ -1636,7 +1643,6 @@ input[type="button"]:focus {
 }
 
 #ColorsDiv {
-  background-color: var(--functionsColor);
   height: 305px;
   border-radius: 25px;
   align-self: center;
@@ -1673,7 +1679,6 @@ input[type="button"]:focus {
   position: relative;
   align-self: center;
   align-content: center;
-  font-family: Arial, Helvetica, sans-serif;
   color: var(--textColor);
 }
 
@@ -1684,7 +1689,6 @@ input[type="button"]:focus {
   align-content: center;
   width: calc(100% - 15px);
   left: 15px;
-  font-family: Arial, Helvetica, sans-serif;
   color: var(--textColor);
 }
 
@@ -1752,7 +1756,6 @@ input[type="button"]:focus {
   text-align: center;
   position: absolute;
   left: 5;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #displayPreview {
@@ -1761,12 +1764,11 @@ input[type="button"]:focus {
 
 #displayMain {
   border-width: 0.0000000005px;
-  left: 2.5%;
+  left: 5px;
   top: 33px;
-  width: 95%;
   max-width: 300px;
-  border-radius: 20px;
-  visibility: hidden;
+  border-radius: 18px;
+  background-color: transparent;
 }
 
 #displayFunc {
@@ -1778,13 +1780,10 @@ input[type="button"]:focus {
   border-radius: 20px;
   visibility: hidden;
 }
-
 #nameDisplay {
-  margin-top: 5px;
-  font-size: 30px;
-  padding-right: 5px;
-  font-weight: lighter;
-  text-align: end;
+  right: 0;
+  top: 275.41px;
+  position: absolute;
 }
 
 #bodyFunc {
@@ -1829,7 +1828,7 @@ input[type="button"]:focus {
 
 .displayBase {
   background-color: var(--displayColor);
-  height: 230px;
+  height: 232px;
   width: 180px;
   position: absolute;
   border-color: var(--textColor);
@@ -1916,7 +1915,6 @@ input[type="button"]:focus {
   border: none;
   color: var(--backgroundColor);
   font-size: 15px;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   cursor: pointer;
   margin-left: 10px;
@@ -2024,7 +2022,7 @@ input[type="button"]:focus {
 #VersionDiv {
   border-radius: 25px;
   position: relative;
-  height: auto;
+  height: 55px;
   margin-top: 20px;
   left: 2.5%;
   width: 95%;
@@ -2045,7 +2043,6 @@ input[type="button"]:focus {
   color: var(--textColor);
   bottom: 0px;
   position: absolute;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #buyScreen {
@@ -2294,7 +2291,7 @@ input[type="button"]:focus {
   height: 25%;
   width: calc(100% - 20px);
   left: 10px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #varGrid {
@@ -2359,7 +2356,7 @@ input[type="button"]:focus {
 }
 
 .funcModes{
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 #editDiv {
@@ -2409,7 +2406,7 @@ input[type="button"]:focus {
 }
 
 #EquationFunc {
-  width: calc(101% - 20px);
+  width: calc(100% - 20px);
   border-radius: 20px;
   margin-top: 10px;
   margin-left: 10px;
@@ -2515,13 +2512,31 @@ input[type="button"]:focus {
 }
 
 #tableContainer {
-  height: calc(100% - 110px);
+  padding: 5px;
   margin-top: 10px;
-  width: 100%;
-  background-color: var(--displayColor);
   border-radius: 20px;
+  background-color: var(--displayColor);
 }
-
+#modeTable{
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  margin-left: 10px;
+  margin-top: 10px;
+  border-spacing: 5px;
+}
+#modeTable td {
+  background-color: var(--displayColor);
+}
+.templateTable{
+  width: 100%;
+  height: 100%;
+  border-spacing: 10px;
+}
+.tabIcons{
+  aspect-ratio: 1 / 1.45;
+  height: 240.1575px;
+  width: unset;
+}
 #settingsSelector {
   right: 2.5%;
   position: absolute;
@@ -2530,27 +2545,28 @@ input[type="button"]:focus {
 
 #funcTable {
   position: relative;
-  top: 10px;
-  width: calc(100% - 20px);
-  height: calc(100% - 20px);
-  margin-left: 10px;
-  border-collapse: collapse;
-  border-radius: 20px;
+  width: 100%;
+  height: calc(100% - 100px);
 }
 
-#funcTable,
-td,
-th {
-  border: 1px solid var(--textColor);
+td{
   border-radius: 20px;
   text-indent: 10px;
+  padding: 5px;
+  background-color: var(--functionsColor);
+}
+th {
+  width: 100px;
+  margin: 5px;
+  background-color: var(--numbersColor);
+  border-radius: 20px;
 }
 
 .selectorDiv {
   background-color: var(--numbersColor);
   padding: 5px;
-  border-radius: 0 25px 25px 25px;
-  ;
+  border-radius: 0 0 25px 25px;
+  width: 140px;
 }
 
 .funcDetails[open] summary {
@@ -2561,14 +2577,13 @@ th {
   color: var(--textColor);
   text-align: left;
   position: relative;
-  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 25px;
   background-color: var(--numbersColor);
   padding: 5px 10px;
   border-radius: 25px 25px 25px 25px;
   margin-top: 10px;
-  width: fit-content;
+  width: 140px;
 }
 
 .funcHeaders {
@@ -2651,7 +2666,6 @@ th {
   color: var(--textColor);
   text-align: left;
   position: relative;
-  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 25px;
   background-color: var(--functionsColor);
@@ -2665,7 +2679,6 @@ th {
   padding-top: 15px;
   padding-bottom: 15px;
   color: var(--textColor);
-  font-family: Arial, Helvetica, sans-serif;
   width: 95%;
   margin-left: 2.5%;
 }

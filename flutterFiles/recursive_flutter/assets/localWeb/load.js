@@ -1,7 +1,6 @@
 let TextColorGlobal = "";
 let BackgroundColorGlobal = "";
 let colorArray = [];
-let evalWork = new Worker('evalWorker.js')
 let definedPages = [
   {
     "srtConfig": {
@@ -1823,6 +1822,7 @@ function deleteHistory() {
 function enterPressed(input) {
   let display = keyTargets.input;
   let nonparse = input;
+  clearMain();
   display.innerHTML = inputSolver(input, "Couldn't calculate");
   historyMethod(nonparse)
   keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
