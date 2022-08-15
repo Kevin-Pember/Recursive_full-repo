@@ -1823,7 +1823,7 @@ function enterPressed(input) {
   let display = keyTargets.input;
   let nonparse = input;
   clearMain();
-  display.innerHTML = inputSolver(input, "Couldn't calculate");
+  frontButtonPressed(inputSolver(input, "Couldn't calculate"));
   historyMethod(nonparse)
   keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
   setSelect(display, display.lastChild.length);
