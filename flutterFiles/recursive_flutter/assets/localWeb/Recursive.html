@@ -780,13 +780,7 @@
                     </label>
                     <label class="colorsLabels">
                         <h5 class="h5Colors">Text</h5>
-                        <div id="textdropdown">
-                            <button id="dropbtn">Black</button>
-                            <div class="dropdown-content">
-                                <a id="selectorBlack" value="#000000">Black</a>
-                                <a id="selectorWhite" value="#000000">White</a>
-                            </div>
-                        </div>
+                        <input id="textColorPicker" class="colorPicker" value="#000000" type="color">
                     </label>
                 </div>
             </div>
@@ -856,10 +850,6 @@
                         <button class="settingsButton" id="degModeBut" style="right: 55px;">deg</button>
                         <button class="settingsButton" id="radModeBut">rad</button>
                     </label>
-                    <label class="calculationsLabels">
-                        <h5 class="h5Settings">Output Length</h5>
-                        <input type="text" id="outputLength" class="settingsTextInput">
-                    </label>
                 </div>
             </div>
             <div class="settingsDiv">
@@ -871,17 +861,8 @@
                     </label>
                     <label class="calculationsLabels">
                         <h5 class="h5Settings">Default Domain</h5>
-                        <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 70px;">
-                        <input type="text" id="domainTopG" class="settingsTextInput">
-                    </label>
-                    <label class="calculationsLabels">
-                        <h5 class="h5Settings">Range Steps</h5>
-                        <input type="text" id="graphRStep" class="settingsTextInput">
-                    </label>
-                    <label class="calculationsLabels">
-                        <h5 class="h5Settings">Default Range</h5>
-                        <input type="text" id="rangeBottomG" class="settingsTextInput" style="right: 70px;">
-                        <input type="text" id="rangeTopG" class="settingsTextInput">
+                        <input type="text" id="domainBottomG" class="settingsTextInput" style="right: 70px;" placeholder="min">
+                        <input type="text" id="domainTopG" class="settingsTextInput" placeholder="max">
                     </label>
                 </div>
             </div>

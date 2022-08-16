@@ -1299,25 +1299,11 @@ if (document.getElementById("mainBody") != null) {
   } else {
     document.getElementById('radModeBut').className = "settingsButton active";
   }
-  document.getElementById('outputLength').value = settings.oL;
-
-  document.getElementById("graphDStep").value = settings.gDS;
-  document.getElementById("domainBottomG").value = settings.gDMin;
-  document.getElementById("domainTopG").value = settings.gDMax;
-
-  document.getElementById("graphRStep").value = settings.gRS;
-  document.getElementById("rangeBottomG").value = settings.gRMin;
-  document.getElementById("rangeTopG").value = settings.gRMax;
-
-  document.getElementById("tableStep").value = settings.tS;
-  document.getElementById("tableCells").value = settings.tC;
 
   //Adding events to elements
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
-  document.getElementById('selectorBlack').addEventListener("click", function () { dropPressed('Black') });
-  document.getElementById('selectorWhite').addEventListener("click", function () { dropPressed('White') });
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -1480,7 +1466,7 @@ function changeTabAs(change) {
     visibility = "visible";
     tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 195px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
@@ -1778,10 +1764,10 @@ function backPressed() {
     } else {
       let childern = uifCalculator.childNodes
       let arryChd = [].slice.call(childern);
-      let inverse = arryChd.indexOf(getParent(baseNode)) > arryChd.indexOf(getParent(extentNode))
-      let startPar = getParent(inverse ? extentNode : baseNode);
+      let inverse = arryChd.indexOf(getParent(baseNode,keyTargets.input)) > arryChd.indexOf(getParent(extentNode,keyTargets.input))
+      let startPar = getParent(inverse ? extentNode : baseNode,keyTargets.input);
       let startInd = arryChd.indexOf(startPar)
-      let endPar = getParent(inverse ? baseNode : extentNode);
+      let endPar = getParent(inverse ? baseNode : extentNode,keyTargets.input);
       keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset: extentOffset)
       if(uifCalculator.contains(startPar)){
         if(startPar.nodeType != 3){
@@ -2349,7 +2335,9 @@ function newTabButton(config, tabPage) {
 
   let highlight = tabClon.getElementById('tabButton');
   tabClon.getElementById('tabButton').addEventListener("click", function (e) {
-    if (e.target.id != "tabRemove") {
+    console.log('think it was clicked')
+    console.log(e.target)
+    if (!highlight.querySelector('#tabRemove').contains(e.target)) {
       if (window.innerWidth / window.innerHeight < 3 / 4) {
         changeTabAs(false);
       }
@@ -2360,7 +2348,7 @@ function newTabButton(config, tabPage) {
     }
   });
   tabClon.getElementById('tabRemove').addEventListener('click', function (e) {
-    let tabLink = e.target.parentNode;
+    let tabLink = getParent(e.target, document.getElementById('tabContainer'));
     definedPages = definedPages.filter(function (item) {
       return !(item.srtConfig.name == config.name)
     });
@@ -2902,18 +2890,6 @@ function updatePreview(event) {
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
   }
 }
-//Responsible for handling the text color dropdown on the cust theme DLC
-function dropPressed(color) {
-  if (color == "Black") {
-    document.getElementById("showcaseTextColor").style.color = "#000000";
-    document.getElementById('dropbtn').innerHTML = "Black <h3 id='displayText' style='color: black;'>t</h3>";
-    settings.t = "#000000";
-  } else {
-    document.getElementById("showcaseTextColor").style.color = "#FFFFFF";
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-    settings.t = "#FFFFFF";
-  }
-}
 //Responsible for unlocking the custom theme on settings
 function unlockCustomTheme() {
   document.getElementById('buyCustTheme').style = "visibility: hidden; position: absolute; top: 0; left: 0;";
@@ -2954,12 +2930,12 @@ function settingExit() {
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
   }
-  newSettings.gDS = Number(document.getElementById("graphDStep").value);
+  /*newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
   newSettings.gDMax = Number(document.getElementById("domainTopG").value);
   newSettings.gRS = Number(document.getElementById("graphRStep").value);
   newSettings.gRMin = Number(document.getElementById("rangeBottomG").value);
-  newSettings.gRMax = Number(document.getElementById("rangeTopG").value);
+  newSettings.gRMax = Number(document.getElementById("rangeTopG").value);*/
   if (document.getElementById("degModeBut").className == "settingsButton active") {
     newSettings.degRad = true;
   } else {
@@ -3823,13 +3799,13 @@ function getText(node) {
     return node;
   }
 }
-function getParent(node) {
-  let childNodes = keyTargets.input.childNodes;
+function getParent(node,parent) {
+  let childNodes = parent.childNodes;
   var nodes = [].slice.call(childNodes);
   if (nodes.includes(node)) {
     return node;
   } else {
-    return getParent(node.parentNode);
+    return getParent(node.parentNode,parent);
   }
 }
 Object.defineProperty(Node.prototype, 'insertAt', {
@@ -3871,9 +3847,9 @@ Object.defineProperty(Node.prototype, 'removeSection', {
     }
     let uniChilern = unfiParent.childNodes;
     var nodes = [].slice.call(uniChilern);
-    let sNIdx = Number(nodes.indexOf(getParent(start)))
+    let sNIdx = Number(nodes.indexOf(getParent(start,keyTargets.input)))
     console.log(sNIdx)
-    let eNIdx = Number(nodes.indexOf(getParent(end)))
+    let eNIdx = Number(nodes.indexOf(getParent(end,keyTargets.input)))
     /*matchInx == startTree.length -1 ? false : treeRemove(start, sIdx, unfiParent, true)
     matchInx == startTree.length -1 ? false : treeRemove(end, eIdx, unfiParent,false)*/
     
@@ -3906,7 +3882,7 @@ function treeRemove(elem, inx, topPar, dire){
     targetElem = parentElem
     parentElem = parentElem.parentNode
   }
-  if(getParent(elem).childNodes.length > 0 || getText(getParent(elem)).textContent == '‎' && getParent(elem).nodeType != 3){
+  if(getParent(elem,keyTargets.input).childNodes.length > 0 || getText(getParent(elem,keyTargets.input)).textContent == '‎' && getParent(elem,keyTargets.input).nodeType != 3){
     return false
   }else{
     return true
