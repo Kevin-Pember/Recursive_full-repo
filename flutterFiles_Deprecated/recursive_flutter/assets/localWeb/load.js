@@ -76,8 +76,8 @@ if (document.getElementById("mainBody") != null) {
   });
 
   //new media queries
-  const shit = window.matchMedia("(screen and max-height: 450px)");
-  const mobileLandscape = {
+  var shit = window.matchMedia("(screen and max-height: 450px)");
+  var mobileLandscape = {
     "q": window.matchMedia("screen and (max-height: 450px)"),
     "styling": `
     .tabcontent {
@@ -292,7 +292,7 @@ if (document.getElementById("mainBody") != null) {
       text-indent: 50px;
     }`
   };
-  const mobilePortrait = {
+  var mobilePortrait = {
     "q": window.matchMedia("screen and (max-aspect-ratio: 3/4) and (max-width: 450px)"),
     "styling": `
     #tab {
@@ -1266,16 +1266,9 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('primaryColorPicker').value = settings.p
     document.getElementById('secondaryColorPicker').value = settings.s
     document.getElementById('accentColorPicker').value = settings.a
+    document.getElementById('textColorPicker').value = settings.t
     toggleCustTheme();
   }
-  if (settings.t == "#FFFFFF") {
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-  }
-  //coloring UI elements that are images but need sytling
-  if (TextColorGlobal != "#000000") {
-    //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-  }
-
   //Setting the values of elements
   let accents = getAccents();
   let defaultThemes = getThemes();
@@ -1304,6 +1297,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('textColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -2886,8 +2880,11 @@ function updatePreview(event) {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
   } else if (event.target.id == "accentColorPicker") {
     document.getElementById("numsPreview").style.backgroundColor = event.target.value;
-  } else {
+  } else if (event.target.id == "primaryColorPicker"){
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
+  } else if (event.target.id == 'textColorPicker') {
+    document.getElementById("showcaseTextColor").style.color = event.target.value;
+
   }
 }
 //Responsible for unlocking the custom theme on settings
@@ -2929,6 +2926,7 @@ function settingExit() {
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
+    newSettings.t = document.getElementById("textColorPicker").value;
   }
   /*newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);

@@ -77,7 +77,7 @@ if (document.getElementById("mainBody") != null) {
 
   //new media queries
   const shit = window.matchMedia("(screen and max-height: 450px)");
-  const mobileLandscape = {
+  var mobileLandscape = {
     "q": window.matchMedia("screen and (max-height: 450px)"),
     "styling": `
     .tabcontent {
@@ -292,7 +292,7 @@ if (document.getElementById("mainBody") != null) {
       text-indent: 50px;
     }`
   };
-  const mobilePortrait = {
+  var mobilePortrait = {
     "q": window.matchMedia("screen and (max-aspect-ratio: 3/4) and (max-width: 450px)"),
     "styling": `
     #tab {
@@ -1466,7 +1466,7 @@ function changeTabAs(change) {
     visibility = "visible";
     tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
