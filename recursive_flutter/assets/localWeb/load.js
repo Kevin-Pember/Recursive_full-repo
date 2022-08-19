@@ -76,7 +76,7 @@ if (document.getElementById("mainBody") != null) {
   });
 
   //new media queries
-  var shit = window.matchMedia("(screen and max-height: 450px)");
+  const shit = window.matchMedia("(screen and max-height: 450px)");
   var mobileLandscape = {
     "q": window.matchMedia("screen and (max-height: 450px)"),
     "styling": `
@@ -1266,9 +1266,16 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('primaryColorPicker').value = settings.p
     document.getElementById('secondaryColorPicker').value = settings.s
     document.getElementById('accentColorPicker').value = settings.a
-    document.getElementById('textColorPicker').value = settings.t
     toggleCustTheme();
   }
+  if (settings.t == "#FFFFFF") {
+    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+  }
+  //coloring UI elements that are images but need sytling
+  if (TextColorGlobal != "#000000") {
+    //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
+  }
+
   //Setting the values of elements
   let accents = getAccents();
   let defaultThemes = getThemes();
@@ -1297,7 +1304,6 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
-  document.getElementById('textColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -1460,7 +1466,7 @@ function changeTabAs(change) {
     visibility = "visible";
     tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;align-content: space-evenly;align-items: center;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
@@ -2880,11 +2886,8 @@ function updatePreview(event) {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
   } else if (event.target.id == "accentColorPicker") {
     document.getElementById("numsPreview").style.backgroundColor = event.target.value;
-  } else if (event.target.id == "primaryColorPicker"){
+  } else {
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
-  } else if (event.target.id == 'textColorPicker') {
-    document.getElementById("showcaseTextColor").style.color = event.target.value;
-
   }
 }
 //Responsible for unlocking the custom theme on settings
@@ -2926,7 +2929,6 @@ function settingExit() {
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
-    newSettings.t = document.getElementById("textColorPicker").value;
   }
   /*newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);

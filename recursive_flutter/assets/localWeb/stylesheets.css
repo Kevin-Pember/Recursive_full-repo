@@ -123,6 +123,7 @@
 
 .dynamicModePane{
   width: calc(100% - 20px);
+  height: calc(100% - 10px);
   margin-top: 10px;
   margin-left: 10px;
   bottom: calc(40% + 10px);
@@ -202,9 +203,17 @@ textarea {
   /*remove the resize handle on the bottom right*/
 }
 
-body {
-  overflow-x: hidden;
-  overflow-y: hidden;
+body {        /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none;         /* prevent copy paste, to allow, change 'none' to 'text' */
+  background-color:#E4E4E4;
+  background-image:linear-gradient(to bottom, #A7A7A7 0%, #E4E4E4 51%);
+  font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
+  height:100vh;
+  margin:0px;
+  padding:0px;
+  /* Padding to avoid the "unsafe" areas behind notches in the screen */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  width:100%;
 }
 
 hr {
@@ -470,6 +479,8 @@ input[type="button"]:focus {
 
 .specialElements {
   background-color: var(--functionsColor);
+  height: 100%;
+  width: 100%;
 }
 
 #tab button.active {

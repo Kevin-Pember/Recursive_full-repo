@@ -7,7 +7,7 @@ PODS:
   - flutter_inappwebview/Core (0.0.1):
     - Flutter
     - OrderedSet (~> 5.0)
-  - hexcolor (0.0.1):
+  - flutter_statusbarcolor_ns (0.0.1):
     - Flutter
   - OrderedSet (5.0.0)
   - webview_flutter_wkwebview (0.0.1):
@@ -16,7 +16,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
-  - hexcolor (from `.symlinks/plugins/hexcolor/ios`)
+  - flutter_statusbarcolor_ns (from `.symlinks/plugins/flutter_statusbarcolor_ns/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
@@ -28,15 +28,15 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_inappwebview:
     :path: ".symlinks/plugins/flutter_inappwebview/ios"
-  hexcolor:
-    :path: ".symlinks/plugins/hexcolor/ios"
+  flutter_statusbarcolor_ns:
+    :path: ".symlinks/plugins/flutter_statusbarcolor_ns/ios"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
-  hexcolor: fdfb9c4258ad96e949c2dbcdf790a62194b8aa89
+  flutter_statusbarcolor_ns: 68a360889d88d7915ae524e422aeab62e4063804
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 

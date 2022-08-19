@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:flutter_statusbarcolor_ns/flutter_statusbarcolor_ns.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,13 +45,31 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
+        bottom: false,
         child: InAppWebView(
           onWebViewCreated: (controller) {
-            controller.loadFile(assetFilePath: "assets/localWeb/Recursive.html");
+            controller.loadFile(assetFilePath: "assets/localWeb/index.html");
+            changeStatusColor(Colors.amber);
+            changeNavigationColor(Colors.amber);
           },
-          
         ),
       ),
     );
+  }
+}
+
+changeStatusColor(Color color) async {
+  try {
+    await FlutterStatusbarcolor.setStatusBarColor(color, animate: true);
+  } on PlatformException catch (e) {
+    debugPrint(e.toString());
+  }
+}
+
+changeNavigationColor(Color color) async {
+  try {
+    await FlutterStatusbarcolor.setNavigationBarColor(color, animate: true);
+  } on PlatformException catch (e) {
+    debugPrint(e.toString());
   }
 }
