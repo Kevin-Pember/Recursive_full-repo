@@ -49,8 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: InAppWebView(
           onWebViewCreated: (controller) {
             controller.loadFile(assetFilePath: "assets/localWeb/index.html");
-            changeStatusColor(Colors.amber);
-            changeNavigationColor(Colors.amber);
+            changeStatusColor(Colors.black);
+            changeNavigationColor(Colors.black);
           },
         ),
       ),

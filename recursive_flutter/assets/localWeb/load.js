@@ -244,7 +244,7 @@ if (document.getElementById("mainBody") != null) {
   
     .modeSelectButton{
       height: calc(100% - 20px);
-      width: calc(32% - 10px);
+      width: calc(100% - 10px);
       margin-top: 10px;
     }
     .modeIcon{
@@ -290,7 +290,12 @@ if (document.getElementById("mainBody") != null) {
     .navButtons{
       height: 50px;
       text-indent: 50px;
-    }`
+    }
+    #selectorMode{
+      grid-template-columns: 33.3333% 33.3333% 33.3333%;
+      grid-template-rows: unset;
+    }
+    `
   };
   var mobilePortrait = {
     "q": window.matchMedia("screen and (max-aspect-ratio: 3/4) and (max-width: 450px)"),
@@ -678,9 +683,21 @@ if (document.getElementById("mainBody") != null) {
   //modeSwitcher section
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
+    keypadController(
+      {
+        "reset": true,
+        "rePage": () => { },
+      }
+    );
   });
   document.getElementById('mainModeSelector').addEventListener("click", () => {
     switchMode('mainMode')
+    keypadController(
+      {
+        "reset": true,
+        "rePage": () => { },
+      }
+    );
   })
   document.getElementById('graphModeSelector').addEventListener("click", () => {
     switchMode('graphMainMode')
@@ -1266,6 +1283,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('primaryColorPicker').value = settings.p
     document.getElementById('secondaryColorPicker').value = settings.s
     document.getElementById('accentColorPicker').value = settings.a
+    document.getElementById('textColorPicker').value = settings.t
     toggleCustTheme();
   }
   if (settings.t == "#FFFFFF") {
@@ -1304,6 +1322,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
+  document.getElementById('textColorPicker').addEventListener('input', updatePreview, false)
   document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
   document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
   document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
@@ -1466,7 +1485,7 @@ function changeTabAs(change) {
     visibility = "visible";
     tabstyle = "visibility: visible; width: 175px; height: 280px; top: unset; border-radius: 20px; text-align: center;";
     document.getElementById("tab").style = "display: block; height:100%;";
-    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; bottom: 0; width: 100%; height: fit-content; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center;";
+    document.getElementById('tabContainer').style = "display: grid; grid-template-columns: repeat(auto-fill, 175px); padding-top: 20px; position: absolute; visibility: visible; top: 50px; width: 100%; height: 100%; background-color: var(--translucent); border-radius: 25px 25px 0 0; justify-content: space-evenly;justify-items: center; overflow-y: auto;";
   } else {
     visibility = "hidden";
     tabstyle = undefined;
@@ -2886,8 +2905,10 @@ function updatePreview(event) {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
   } else if (event.target.id == "accentColorPicker") {
     document.getElementById("numsPreview").style.backgroundColor = event.target.value;
-  } else {
+  } else if(event.target.id == "primaryColorPicker"){
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
+  } else if (event.target.id == "textColorPicker"){
+    document.getElementById('showcaseTextColor').style.color = event.target.value;
   }
 }
 //Responsible for unlocking the custom theme on settings
@@ -2905,11 +2926,11 @@ function unlockCustomTheme() {
 }
 //Responsible for handling a click event on cust themes
 function toggleCustTheme() {
-  if (document.getElementById('ColorsDiv').style.visibility == 'visible') {
+  if (document.getElementById('ColorsDiv').style.visibility == 'inherit') {
     document.getElementById('ColorsDiv').style = "visibility: hidden; position: absolute;";
-    document.getElementById('accentColorDiv').style = "visibility: visible; position: relative;";
+    document.getElementById('accentColorDiv').style = "visibility: inherit; position: relative;";
   } else {
-    document.getElementById('ColorsDiv').style = "visibility: visible; position: relative;";
+    document.getElementById('ColorsDiv').style = "visibility: inherit; position: relative;";
     document.getElementById('accentColorDiv').style = "visibility: hidden; position: absolute;";
   }
 }
@@ -2929,6 +2950,7 @@ function settingExit() {
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
     newSettings.a = document.getElementById("accentColorPicker").value;
+    newSettings.t = document.getElementById('textColorPicker').value;
   }
   /*newSettings.gDS = Number(document.getElementById("graphDStep").value);
   newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
