@@ -174,29 +174,29 @@ function getByName(name) {
 function funcMatch(equation, way) {
   var returned = "";
   for (let func of funcList) {
-      let check
-      if (way) {
-          check = equation.substring(0, (func.funcLength));
-      } else {
-          check = equation.substring(equation.length - func.funcLength);
-      }
-      if (check == func.func) {
-          returned = func;
-      }
+    let check
+    if (way) {
+      check = equation.substring(0, (func.funcLength));
+    } else {
+      check = equation.substring(equation.length - func.funcLength);
+    }
+    if (check == func.func) {
+      returned = func;
+    }
   }
   for (let func of secondList) {
-      let check = equation.substring(0, (func.length));
-      if (check == func) {
-          returned = "";
-      }
+    let check = equation.substring(0, (func.length));
+    if (check == func) {
+      returned = "";
+    }
   }
   return returned;
 }
-function ignoreTest(equation){
+function ignoreTest(equation) {
   const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
-  if(ignore != undefined){
+  if (ignore != undefined) {
     return ignore.length;
-  }else{
+  } else {
     return undefined;
   }
 }
@@ -238,22 +238,18 @@ function assembly(func, parsedFunc, values) {
 //A method which takes the inputs value from a func object in the funclist and gets how many inputs that function has and parses each
 function recrSolve(equation, func) {
   let inputs = func.inputs;
-  if (inputs == 1) {
-    return [equation];
-  } else {
-    let values = [];
-    for (let i = 1; i <= inputs; i++) {
-      if (i != inputs) {
-        values.push(equation.substring(0, equation.indexOf(",")));
-        equation = equation.substring(equation.indexOf(",") + 1);
-      } else {
-        values.push(equation);
-        break;
-      }
+  let values = [];
+  while (equation.length != 0) {
+    if (equation.includes(',')) {
+      values.push(equation.substring(0, equation.indexOf(",")));
+      equation = equation.substring(equation.indexOf(",") + 1);
+    } else {
+      values.push(equation);
+      break;
     }
-    values = values.filter(e => e != "");
-    return values
   }
+  values = values.filter(e => e != "");
+  return values
 }
 //A method to solve for the inner values of encapsulated functions
 function equatInner(equation, degRad) {
@@ -520,7 +516,7 @@ function getNameList() {
 }
 //Takes string and returns an array for funclist
 function createParseable(equation) {
-  
+
   for (let i = equation.length - 1; i >= 0; i--) {
     let func = funcMatch(equation.substring(i), true);
     if (func != "") {
@@ -542,7 +538,7 @@ function createParseable(equation) {
     for (let i = 0; i < equation.length; i++) {
       let ignore = ignoreTest(equation.substring(i));
       if (ignore != undefined) {
-        i += ignore-1;
+        i += ignore - 1;
       } else if (equation.charAt(i) == data.letter) {
         variableIndexes.push(i);
       }

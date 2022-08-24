@@ -4059,7 +4059,7 @@ class CustomPage extends FuncPage {
     fullConfig.pageWorker = custPageWorker;
     custPageWorker.onmessage = function (e) {
       if (e.data[0] == 'createElement') {
-        worker.postMessage(['newElem', createElem(e.data[1])]);
+        custPageWorker.postMessage(['newElem', createElem(e.data[1])]);
       } else if (e.data[0] == 'error') {
         report(e.data[1], false)
       }
