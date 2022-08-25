@@ -7,7 +7,20 @@ let settings = {
   "gMin": -10,
   "gMax": 10
 }
+
 let pageSettings = []
+Array.prototype.replaceAll = function (value,replacement) {
+    let idxs = [];
+    for(let i = 0; i < this.length; i++){
+      if(this[i] == value){
+        idxs.push(i)
+      }
+    }
+    for(let idx of idxs){
+      this[idx] = replacement
+    }
+    return this;
+  };
 onmessage = function (e) {
   let valArry = e.data;
   let port = e.ports[0];
@@ -18,7 +31,8 @@ onmessage = function (e) {
     } catch (eve) {
       port.postMessage({ error: eve })
     }
-  } else if (valArry[0] == "create") {
+  } else if (valArry[0] == "func") {
+    if(valArry[1] == 'add'){
     let list = Array.isArray(valArry[2]) ? valArry[2] : [valArry[2]]
     try {
       for (let def of list) {
@@ -41,13 +55,16 @@ onmessage = function (e) {
       port.postMessage({ error: eve })
       this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` })
     }
+  }else if (valArry[1] == 'change'){
+
+  }
   } else if (valArry[0] == 'calc') {
     let object = valArry[1]
     if (object.type == 'solve') {
       try {
-        port.postMessage({ result: solveInpr(object.text, settings) })
+        port.postMessage({ result: eval(solveInpr(object.text, settings.degRad)) })
       } catch (eve) {
-        port.postMessage({ error: eve })
+        port.postMessage({ error: 'eve' })
         this.postMessage({ 'type': 'posError', 'mes': `Error Solving` })
       }
     } else if (object.type == 'points') {
@@ -69,6 +86,8 @@ onmessage = function (e) {
     }
   }
 };
+let array = [5,4,3,5,4,6];
+console.log([5,4,3,5,4,6].replaceAll(5,7))
 /****************************************Settings Controll********************************************/
 function changeArg(arg, val) {
   settings[arg] = val;
@@ -217,7 +236,49 @@ let funcList = [
     "funcLength": 3,
   },
   {
-    'type': 'method'
+    'type': 'method',
+    'func': 'gamma',
+    'funcRadDeg': false,
+    "funcLength": 5,
+    'mth': (arry) => {
+      let g = 7;
+      let C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+      let z = arry[0]
+      if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+      else {
+        z -= 1;
+
+        let x = C[0];
+        for (let i = 1; i < g + 2; i++)
+          x += C[i] / (z + i);
+
+        let t = z + g + 0.5;
+        return trailingRound(Math.sqrt(2 * Math.PI) * Math.pow(t, (z + 0.5)) * Math.exp(-t) * x);
+      }
+    }
+  },
+  {
+    'type':'method',
+    'func': 'sigma',
+    'funcRadDeg': false,
+    'funcLength': 5,
+    'mth': (arry) => {
+      let srt = arry[0]
+      let end = arry[1]
+      let equat = arry[2]
+      let vars = varInEquat(equat)
+      let value
+      if(vars.length == 1){
+        let array = []
+        let inver = vars[0].positions.reverse();
+        for(let pos of inver){
+          array.unshift(equat.substring(pos+1))
+          array.unshift('VAR')
+          equat = equat.substring(0,pos)
+        }
+        
+      }
+    }
   }
 ];
 let ignoreList = [
@@ -1116,23 +1177,30 @@ function combineTerms(fullArray) {
   }
   //Mutiplican processing
   for (let i = 0; i < fullArray.length; i++) {
-    if (fullArray[i].subtype == 'Muti' || fullArray[i].subtype == "Div") {
+    if (fullArray[i].subtype == 'Muti' || fullArray[i].subtype == "Div" || fullArray[i].subtype == 'Percent') {
       let termBefore = fullArray[i - 1]
       let termAfter = fullArray[i + 1]
+      let sign = fullArray[i].subtype == 'Div' ? ['Div', '÷']: ['Muti', '×'];
+      if(fullArray[i].subtype == 'Percent'){
+        if(termAfter.type == 'def'){
+          let shortArry = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(' }, termAfter, { 'type': 'op', 'subtype': 'Div', 'text': '÷' }, { "type": "term", "text": '100', "pos": null }, { 'type': 'op', 'subtype': 'ParEnd', 'text': ')' }]; 
+          termAfter = cmpxTerm(0, shortArry.length - 1, shortArry, null, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 })
+        }else{
+          termAfter.text = Number(termAfter) / 100;
+        }
+      }
       if (termBefore.type == "defTerm" && termAfter.type == "defTerm") {
-        termBefore.changeMuti([{ 'type': 'op', 'subtype': 'Muti', 'text': '×' }, termAfter])
+        termBefore.changeMuti([{ 'type': 'op', 'subtype': sign[0], 'text': sign[1] }, termAfter])
         fullArray.splice(i, 2)
         i = i - 2
       } else if (termBefore.type == "defTerm" || termAfter.type == "defTerm") {
         let mutiElm = termBefore.type == 'defTerm' ? termAfter : termBefore;
         let elm = termBefore.type == 'defTerm' ? termBefore : termAfter;
-        let mutiplican = fullArray[i].subtype == 'Muti' ? mutiElm : { 'type': "term", "text": `${1 / Number(mutiElm.text)}` }
-        console.log(mutiplican)
-        elm.changeMuti([{ 'type': 'op', 'subtype': 'Muti', 'text': '×' }, mutiplican]);
+        elm.changeMuti([{ 'type': 'op', 'subtype': sign[0], 'text': sign[1] }, mutiElm]);
         fullArray.splice(i - 1, 3, elm)
         i = i - 2
       } else {
-        let result = eval(solveInpr(`${termBefore.text}×${termAfter.text}`, true));
+        let result = eval(solveInpr(`${termBefore.text}${sign[1]}${termAfter.text}`, true));
         let newTermBefore = { "type": 'term', 'text': `${result}` }
         fullArray.splice(i - 1, 3, newTermBefore)
         i = i - 2
@@ -1140,17 +1208,11 @@ function combineTerms(fullArray) {
     }
   }
   //Additive processing
-  console.log(fullArray)
-  console.log('started plus')
   for (let i = 0; i < fullArray.length; i++) {
     console.log(fullArray)
     if (fullArray[i].subtype == 'Plus' || fullArray[i].subtype == 'Minus') {
-      console.log('Plus caught')
-      console.log(fullArray[i])
-      let termBefore = fullArray[i - 1]
-      let termAfter = fullArray[i + 1]
-      console.log(termBefore)
-      console.log(termAfter)
+      let termBefore = fullArray[i - 1];
+      let termAfter = fullArray[i + 1];
       if (termBefore.type == "defTerm" || termAfter.type == "defTerm") {
         let complx = termBefore.type == "defTerm" ? termBefore : termAfter;
         let other = termBefore.type == "defTerm" ? termAfter : termBefore;
@@ -1344,4 +1406,21 @@ function calculatePoints(parsedEquation, start, end, res) {
   }
   return pointArray;
 }
+function trailingRound(num){
+  let stringDef = String(num)
+  stringDef = stringDef.substring(stringDef.indexOf('.'))
+  let arry = stringDef.split('')
+  let count = 0;
+  for(let val of arry){
+    if(val == '0'){
+      count++
+    }
+  }
+  if(count > 4){
+    return String(num).substring(0, String(num).indexOf('.'))
+  }else{
+    return num;
+  }
+}
 //end
+console.log(solveInpr('gamma(3)', true))

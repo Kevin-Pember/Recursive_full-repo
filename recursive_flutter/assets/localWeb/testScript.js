@@ -1,4 +1,5 @@
 let calcWorker = new Worker('evalWorker.js');
+
 const callCalc = (arry) => new Promise((res, rej) => {
 	const channel = new MessageChannel(); 
 
@@ -13,3 +14,7 @@ const callCalc = (arry) => new Promise((res, rej) => {
 
 	calcWorker.postMessage(arry, [channel.port2]);
 });
+//let value = await callCalc(['calc', {'type':"solve", 'text':"4+4*7"}])
+let array = ['calc', {'type':"solve", 'text':"gamma(4)"}];
+//console.log(await callCalc(array));
+callCalc(array).then(result => console.log(result))
