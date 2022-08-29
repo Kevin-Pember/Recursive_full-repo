@@ -9,60 +9,85 @@ let settings = {
 }
 
 let pageSettings = []
-Array.prototype.replaceAll = function (value,replacement) {
-    let idxs = [];
-    for(let i = 0; i < this.length; i++){
-      if(this[i] == value){
-        idxs.push(i)
-      }
+Array.prototype.replaceAll = function (value, replacement) {
+  let idxs = [];
+  for (let i = 0; i < this.length; i++) {
+    if (this[i] == value) {
+      idxs.push(i)
     }
-    for(let idx of idxs){
-      this[idx] = replacement
-    }
-    return this;
-  };
+  }
+  for (let idx of idxs) {
+    this[idx] = replacement
+  }
+  return this;
+};
 onmessage = function (e) {
   let valArry = e.data;
   let port = e.ports[0];
   if (valArry[0] == "set") {
-    try {
-      settings = valArry[1];
-      port.postMessage({ result: "Set Settings" })
-    } catch (eve) {
-      port.postMessage({ error: eve })
+    if (valArry[1] == 'set') {
+      try {
+        settings = valArry[2];
+        port.postMessage({ result: "Set Settings" })
+      } catch (eve) {
+        console.log(eve)
+        port.postMessage({ error: eve })
+        this.postMessage({ 'type': 'posError', 'mes': `Error Setting Calc settings` })
+      }
+    } else if (valArry[1] == 'change') {
+      try {
+        let newSet = valArry[2];
+        let nameArry = Object.getOwnPropertyNames(newSet)
+        for (let name of nameArry) {
+          settings[name] = newSet[name];
+        }
+      } catch (eve) {
+        console.log(eve)
+        port.postMessage({ error: eve })
+        this.postMessage({ 'type': 'posError', 'mes': `Issue Modifing Settings` })
+      }
     }
   } else if (valArry[0] == "func") {
-    if(valArry[1] == 'add'){
-    let list = Array.isArray(valArry[2]) ? valArry[2] : [valArry[2]]
-    try {
-      for (let def of list) {
-        if (def.type == 'func') {
-          try {
-            createNewFunction('function', def.name, def.text)
-          } catch (e) {
-            this.postMessage({ 'type': 'posError', 'mes': `Issue adding ${def.name} to algo` })
-          }
-        } else if (def.type == 'mthd') {
-          try {
-            port.postMessage({ result: createParseable('method', def.text) })
-          } catch (e) {
-            this.postMessage({ 'type': 'posError', 'mes': `Issue adding hybrid to algo` })
+    if (valArry[1] == 'add') {
+      let list = Array.isArray(valArry[2]) ? valArry[2] : [valArry[2]]
+      try {
+        for (let def of list) {
+          if (!getByName(def.name)) {
+            if (def.type == 'func') {
+              try {
+                createNewFunction('function', def.name, def.text)
+              } catch (eve) {
+                this.postMessage({ 'type': 'posError', 'mes': `Issue adding ${def.name} to algo` })
+              }
+            } else if (def.type == 'mthd') {
+              try {
+                port.postMessage({ result: createNewFunction('method', def.text) })
+              } catch (e) {
+                this.postMessage({ 'type': 'posError', 'mes': `Issue adding hybrid to algo` })
+              }
+            }
           }
         }
+        port.postMessage({ result: 'Added Functions' })
+      } catch (eve) {
+        port.postMessage({ error: eve })
+        this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` })
       }
-      port.postMessage({ result: 'Added Functions' })
-    } catch (eve) {
-      port.postMessage({ error: eve })
-      this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` })
+    } else if (valArry[1] == 'change') {
+      try{
+        let object = valArry[2]
+        changeImplemented(object.oldName, object.newParse)
+      }catch(eve){
+        console.log(eve)
+        port.postMessage({ error: eve })
+        this.postMessage({ 'type': 'posError', 'mes': `Error changing implemented`})
+      }
     }
-  }else if (valArry[1] == 'change'){
-
-  }
   } else if (valArry[0] == 'calc') {
     let object = valArry[1]
     if (object.type == 'solve') {
       try {
-        port.postMessage({ result: eval(solveInpr(object.text, settings.degRad)) })
+        port.postMessage({ result: fullSolve(object.text) })
       } catch (eve) {
         port.postMessage({ error: 'eve' })
         this.postMessage({ 'type': 'posError', 'mes': `Error Solving` })
@@ -86,8 +111,6 @@ onmessage = function (e) {
     }
   }
 };
-let array = [5,4,3,5,4,6];
-console.log([5,4,3,5,4,6].replaceAll(5,7))
 /****************************************Settings Controll********************************************/
 function changeArg(arg, val) {
   settings[arg] = val;
@@ -258,7 +281,7 @@ let funcList = [
     }
   },
   {
-    'type':'method',
+    'type': 'method',
     'func': 'sigma',
     'funcRadDeg': false,
     'funcLength': 5,
@@ -267,16 +290,32 @@ let funcList = [
       let end = arry[1]
       let equat = arry[2]
       let vars = varInEquat(equat)
-      let value
-      if(vars.length == 1){
+      let value = 0;
+      if (vars.length == 1) {
         let array = []
         let inver = vars[0].positions.reverse();
-        for(let pos of inver){
-          array.unshift(equat.substring(pos+1))
+        for (let pos of inver) {
+          let pre = (equat.charCodeAt(pos - 1) > 47 && equat.charCodeAt(pos - 1) < 58) || equat.charCodeAt(pos - 1) == 190 ? equat.substring(0, pos) + '*' : equat.substring(0, pos);
+          let post = (equat.charCodeAt(pos + 1) > 47 && equat.charCodeAt(pos + 1) < 58) || equat.charCodeAt(pos + 1) == 190 ? '*' + equat.substring(pos + 1) : equat.substring(pos + 1);
+          array.unshift(post)
           array.unshift('VAR')
-          equat = equat.substring(0,pos)
+          equat = pre
+          if (pos == inver[inver.length - 1]) {
+            array.unshift(equat)
+          }
         }
-        
+        console.log(array)
+        for (let i = srt; i <= end; i++) {
+          let dupilicate = [...array]
+          dupilicate.replaceAll('VAR', "(" + i + ')')
+          let ird = fullSolve(dupilicate.join(""))
+          if (srt == i) {
+            value = ird
+          } else {
+            value += ird
+          }
+        }
+        return value;
       }
     }
   }
@@ -315,12 +354,12 @@ function solveInpr(equation, degRad) {
 }
 //Func method to find if the current postion has a function defined in the funclist
 function getByName(name) {
-  for (let func of funcList) {
-    if (func.func == name) {
-      return func;
-    }
+  let match = funcList.find( elem => elem.func == name)
+  if(match){
+    return false;
+  }else{
+    return match;
   }
-  return null;
 }
 //A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
 function funcMatch(equation, way) {
@@ -405,7 +444,6 @@ function recrSolve(equation) {
 //A method to solve for the inner values of encapsulated functions
 function equatInner(equation, degRad) {
   equation = solveInpr(equation, degRad);
-  //eval(equation)
   return equation;
 }
 function solveFunc(equation, index) {
@@ -806,7 +844,7 @@ function createNewFunction() {
   let object = {};
   if (arguments[0] == "function") {
     object = parseFuncEntry(arguments[0], arguments[1], arguments[2]);
-  } else if (arguments[0] == "method") {
+  } else if (arguments[0] == "method" && arguments[1].includes('XMLHttpRequest')) {
     object = parseFuncEntry(arguments[0], arguments[1]);
   }
   funcList.push(object);
@@ -844,6 +882,13 @@ function indexOfAll(string, value) {
     index = newIndex + 1;
   }
   return array;
+}
+function fullSolve(input) {
+  if (!input.includes('XMLHttpRequest')) {
+    return eval(solveInpr(input, true))
+  } else {
+    return undefined;
+  }
 }
 //end
 /***********************************************Solve For Algo*****************************************/
@@ -1122,13 +1167,13 @@ function combineTerms(fullArray) {
       let changePos = undefined;
       let changeIndex = undefined;
       if (fullArray[startPos - 1].type != 'func') {
-        result = "" + eval(solveInpr(stringVer, true))
+        result = "" + fullSolve(stringVer)
         repElem.text = result;
         fullArray.splice(startPos, sub.length, repElem)
         changePos = -(stringVer.length - result.length - 1)
         changeIndex = (sub.length - 1)
       } else {
-        result = "" + eval(solveInpr(`${fullArray[startPos - 1].text}(${stringVer})`))
+        result = "" + fullSolve(`${fullArray[startPos - 1].text}(${stringVer})`)
         repElem.text = result;
         fullArray.splice(startPos - 1, sub.length + 1, repElem)
         changePos = -(stringVer.length + fullArray[startPos - 1].text.length - result.length - 2)
@@ -1169,7 +1214,7 @@ function combineTerms(fullArray) {
         fullArray.splice(index - 1, 3, newTermBefore)
         i = i - 2
       } else {
-        let returned = eval(solveInpr(`Math.pow(${termBefore},${termAfter})`, true));
+        let returned = fullSolve(`Math.pow(${termBefore},${termAfter})`);
         fullArray.splice(index - 1, 3, { 'type': "term", 'text': returned })
         i = i - 2
       }
@@ -1180,12 +1225,12 @@ function combineTerms(fullArray) {
     if (fullArray[i].subtype == 'Muti' || fullArray[i].subtype == "Div" || fullArray[i].subtype == 'Percent') {
       let termBefore = fullArray[i - 1]
       let termAfter = fullArray[i + 1]
-      let sign = fullArray[i].subtype == 'Div' ? ['Div', '÷']: ['Muti', '×'];
-      if(fullArray[i].subtype == 'Percent'){
-        if(termAfter.type == 'def'){
-          let shortArry = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(' }, termAfter, { 'type': 'op', 'subtype': 'Div', 'text': '÷' }, { "type": "term", "text": '100', "pos": null }, { 'type': 'op', 'subtype': 'ParEnd', 'text': ')' }]; 
+      let sign = fullArray[i].subtype == 'Div' ? ['Div', '÷'] : ['Muti', '×'];
+      if (fullArray[i].subtype == 'Percent') {
+        if (termAfter.type == 'def') {
+          let shortArry = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(' }, termAfter, { 'type': 'op', 'subtype': 'Div', 'text': '÷' }, { "type": "term", "text": '100', "pos": null }, { 'type': 'op', 'subtype': 'ParEnd', 'text': ')' }];
           termAfter = cmpxTerm(0, shortArry.length - 1, shortArry, null, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 })
-        }else{
+        } else {
           termAfter.text = Number(termAfter) / 100;
         }
       }
@@ -1200,7 +1245,7 @@ function combineTerms(fullArray) {
         fullArray.splice(i - 1, 3, elm)
         i = i - 2
       } else {
-        let result = eval(solveInpr(`${termBefore.text}${sign[1]}${termAfter.text}`, true));
+        let result = fullSolve(`${termBefore.text}${sign[1]}${termAfter.text}`);
         let newTermBefore = { "type": 'term', 'text': `${result}` }
         fullArray.splice(i - 1, 3, newTermBefore)
         i = i - 2
@@ -1221,7 +1266,7 @@ function combineTerms(fullArray) {
         i = i - 2
       } else {
         let op = fullArray[i].text;
-        let calculated = "" + eval(solveInpr(`${termBefore.text}${op}${termAfter.text}`))
+        let calculated = "" + fullSolve(`${termBefore.text}${op}${termAfter.text}`)
         fullArray.splice(i - 1, 3, { 'type': "term", "text": calculated })
         i = i - 2
       }
@@ -1406,21 +1451,43 @@ function calculatePoints(parsedEquation, start, end, res) {
   }
   return pointArray;
 }
-function trailingRound(num){
+function trailingRound(num) {
   let stringDef = String(num)
   stringDef = stringDef.substring(stringDef.indexOf('.'))
   let arry = stringDef.split('')
   let count = 0;
-  for(let val of arry){
-    if(val == '0'){
+  for (let val of arry) {
+    if (val == '0') {
       count++
     }
   }
-  if(count > 4){
+  if (count > 4) {
     return String(num).substring(0, String(num).indexOf('.'))
-  }else{
+  } else {
     return num;
   }
+}
+function isVar(entry) {
+  let func = funcMatch(entry, true);
+  let ignore = ignoreTest(entry);
+  console.log(ignore)
+  if (func != "") {
+    if (getByName(func) != false) {
+      let object = getByName(func);
+      return object.funcLength;
+    } else {
+      return func.func.length
+    }
+  } else if (ignore != undefined) {
+    return ignore
+  } else {
+    return 0;
+  }
+}
+function changeImplemented(oldName, newObject) {
+  let oldConfig = getByName(oldName)
+  let oldIndex = funcList.indexOf(oldConfig);
+  funcList.splice(oldIndex, 1 , newObject);
 }
 //end
 console.log(solveInpr('gamma(3)', true))
