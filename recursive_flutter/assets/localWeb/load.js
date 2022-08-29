@@ -1,5 +1,4 @@
 let TextColorGlobal = "";
-let BackgroundColorGlobal = "";
 let colorArray = [];
 let definedPages = [
   {
@@ -22,6 +21,32 @@ if (localStorage.getItem("settings") != undefined) {
   console.log(settings);
 }
 let themeElem = {};
+
+/*Implementation of Web Worker*/
+let calcWorker = new Worker('evalWorker.js');
+calcWorker.onmessage = (event) => {
+	let rtnObj =  event.data
+	if(rtnObj.type == 'posError'){
+		console.log("%c"+rtnObj.mes, "color: red;")
+    report(rtnObj.mes, false)
+	}else if (rtnObj.type == 'posComp'){
+    report(rtnObj.mes, true)
+  }
+} 
+const callCalc = (arry) => new Promise((res, rej) => {
+	const channel = new MessageChannel(); 
+	channel.port1.onmessage = ({data}) => {
+		channel.port1.close();
+		if (data.error) {
+			rej(data.error);
+		}else {
+			res(data.result);
+		}
+	};
+
+	calcWorker.postMessage(arry, [channel.port2]);
+});
+/*web work implementation end */
 setSettings();
 let graphVars = {};
 let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
@@ -3276,6 +3301,7 @@ function setSettings() {
   if (!settings.degRad) {
     setDegMode();
   }
+  callCalc(['set','set', settings])
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/

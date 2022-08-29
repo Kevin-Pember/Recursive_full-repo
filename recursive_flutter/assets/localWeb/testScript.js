@@ -1,5 +1,10 @@
 let calcWorker = new Worker('evalWorker.js');
-
+calcWorker.onmessage = (event) => {
+	let rtnObj =  event.data
+	if(rtnObj.type == 'posError'){
+		console.log("%c"+rtnObj.mes, "color: red;")
+	}
+} 
 const callCalc = (arry) => new Promise((res, rej) => {
 	const channel = new MessageChannel(); 
 

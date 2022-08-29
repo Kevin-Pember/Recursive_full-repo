@@ -111,22 +111,6 @@ onmessage = function (e) {
     }
   }
 };
-/****************************************Settings Controll********************************************/
-function changeArg(arg, val) {
-  settings[arg] = val;
-}
-function tempSetting(page, arg, val) {
-  let pset = pageSettings.find(e => e.name == page);
-  if (pset == undefined) {
-    pageSettings.push({ name: page, settings: {} });
-  } else {
-    pset.settings[arg] = val;
-  }
-}
-function pageChange() {
-
-}
-//end
 /*********************************************Solve Toothless****************************************** */
 let defaultAngle = true;
 let funcList = [
