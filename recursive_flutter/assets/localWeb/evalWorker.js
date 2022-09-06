@@ -47,21 +47,37 @@ onmessage = function (e) {
         this.postMessage({ 'type': 'posError', 'mes': `Issue Modifing Settings` })
       }
     }
+  } else if (valArry[0] == "get") {
+    let object = valArry[1]
+    if (object.item == 'list') {
+      port.postMessage({ result: getNameList() })
+    } else if (object.item == 'vars') {
+      if (object.type == 'equat') {
+        port.postMessage({ result: varInEquat(object.text) })
+      } else {
+        port.postMessage({ result: varInFunc(object.text) })
+      }
+    } else if (object.item == 'func') {
+      port.postMessage({ result: getMethod(object.name) })
+    } else if (object.item == 'parsedMethod') {
+      port.postMessage({ result: parseFunction(object.text) })
+    }
+
   } else if (valArry[0] == "func") {
     if (valArry[1] == 'add') {
       let list = Array.isArray(valArry[2]) ? valArry[2] : [valArry[2]]
       try {
         for (let def of list) {
           if (!getByName(def.name)) {
-            if (def.type == 'func') {
+            if (def.type == 'Function') {
               try {
-                createNewFunction('function', def.name, def.text)
+                createNewFunction('function', def.name, def.equation)
               } catch (eve) {
                 this.postMessage({ 'type': 'posError', 'mes': `Issue adding ${def.name} to algo` })
               }
-            } else if (def.type == 'mthd') {
+            } else if (def.type == 'Hybrid') {
               try {
-                port.postMessage({ result: createNewFunction('method', def.text) })
+                createNewFunction('method', def.code)
               } catch (e) {
                 this.postMessage({ 'type': 'posError', 'mes': `Issue adding hybrid to algo` })
               }
@@ -72,15 +88,14 @@ onmessage = function (e) {
       } catch (eve) {
         port.postMessage({ error: eve })
         this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` })
+        console.log('issues adding to algo')
       }
     } else if (valArry[1] == 'change') {
-      try{
-        let object = valArry[2]
-        changeImplemented(object.oldName, object.newParse)
-      }catch(eve){
-        console.log(eve)
-        port.postMessage({ error: eve })
-        this.postMessage({ 'type': 'posError', 'mes': `Error changing implemented`})
+      let object = valArry[2]
+      if(object.type == 'part'){
+        changeFunc('part',object.name, object.chgPara)
+      }else if (object.type == 'full'){
+        changeFunc('full', object.name, arguments[1])
       }
     }
   } else if (valArry[0] == 'calc') {
@@ -93,16 +108,19 @@ onmessage = function (e) {
         this.postMessage({ 'type': 'posError', 'mes': `Error Solving` })
       }
     } else if (object.type == 'points') {
+      console.log('geting points')
       if (object.target == 'graph') {
+        console.log('getting graph points')
         try {
-          this.postMessage(calculatePoints(object.text, settings.gMin, settings.gMax, settings.gR))
+          port.postMessage({"result":calculatePoints(object.text, object.min, object.max, object.res)})
         } catch (eve) {
           port.postMessage({ error: eve })
           this.postMessage({ 'type': 'posError', 'mes': `Error Calculating points for graph` })
         }
       } else {
+        console.log('Solving for table')
         try {
-          this.postMessage(calculatePoints(object.text, settings.tMin, settings.tMax, settings.tC))
+          port.postMessage({"result":calculatePoints(object.text, settings.tMin, settings.tMax, settings.tC)})
         } catch (eve) {
           port.postMessage({ error: eve })
           this.postMessage({ 'type': 'posError', 'mes': `Error Calculating points for table` })
@@ -338,10 +356,10 @@ function solveInpr(equation, degRad) {
 }
 //Func method to find if the current postion has a function defined in the funclist
 function getByName(name) {
-  let match = funcList.find( elem => elem.func == name)
-  if(match){
+  let match = funcList.find(elem => elem.func == name)
+  if (match) {
     return false;
-  }else{
+  } else {
     return match;
   }
 }
@@ -796,39 +814,28 @@ function stringFunction(object) {
   return Function(string);
 }
 function parseFunction(StringFunction) {
+  let preserved = StringFunction;
   StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
-  StringFunction = StringFunction.substring(StringFunction.indexOf("("))
-  let variableDefs = StringFunction.substring(1, StringFunction.indexOf(")")).trim();
-  let variables = [];
-  while (variableDefs.length > 0) {
-    if (variableDefs.includes(',')) {
-      variables.push({ "letter": variableDefs.substring(0, variableDefs.indexOf(',')) });
-      variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
-    } else {
-      variables.push({ "letter": variableDefs });
-      variableDefs = 0;
-    }
-  }
+  let variables = varInFunc(StringFunction)
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
   let finalObject = {
     "func": name,
     "type": "method",
     "string": StringFunction,
     "variables": variables,
+    'full': preserved,
     "inputs": variables.length,
     "funcRadDeg": false,
     "funcLength": name.length
   }
-  //stringFunction(name, StringFunction)
-  //funcList.push(finalObject)
   return finalObject;
 }
 function createNewFunction() {
   let object = {};
   if (arguments[0] == "function") {
     object = parseFuncEntry(arguments[0], arguments[1], arguments[2]);
-  } else if (arguments[0] == "method" && arguments[1].includes('XMLHttpRequest')) {
+  } else if (arguments[0] == "method" && !arguments[1].includes('XMLHttpRequest')) {
     object = parseFuncEntry(arguments[0], arguments[1]);
   }
   funcList.push(object);
@@ -1410,6 +1417,21 @@ function varInEquat(equation) {
   }
   return varArray;
 }
+function varInFunc(method) {
+  method = method.substring(method.indexOf("("))
+  let variableDefs = method.substring(1, method.indexOf(")")).trim();
+  let variables = [];
+  while (variableDefs.length > 0) {
+    if (variableDefs.includes(',')) {
+      variables.push({ "letter": variableDefs.substring(0, variableDefs.indexOf(',')) });
+      variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
+    } else {
+      variables.push({ "letter": variableDefs });
+      variableDefs = 0;
+    }
+  }
+  return variables;
+}
 function varInList(list, varLetter) {
   for (let item of list) {
     if (item.letter == varLetter) {
@@ -1419,6 +1441,7 @@ function varInList(list, varLetter) {
   return null;
 }
 function calculatePoints(parsedEquation, start, end, res) {
+  console.log('calculating Points')
   let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
@@ -1430,9 +1453,10 @@ function calculatePoints(parsedEquation, start, end, res) {
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
+    newPoint.y = fullSolve(parsedEquation.replaceAll('Æ', newPoint.x));
     pointArray.push(newPoint);
   }
+  console.log(pointArray)
   return pointArray;
 }
 function trailingRound(num) {
@@ -1471,7 +1495,38 @@ function isVar(entry) {
 function changeImplemented(oldName, newObject) {
   let oldConfig = getByName(oldName)
   let oldIndex = funcList.indexOf(oldConfig);
-  funcList.splice(oldIndex, 1 , newObject);
+  funcList.splice(oldIndex, 1, newObject);
+}
+function changeFunc(type) {
+  if (type == 'part') {
+    let name = arguments[1]
+    let changes = arguments[2]
+    let repNames = Object.getOwnPropertyNames(changes)
+    let target = getByName(name)
+    for (let prop of repNames) {
+      target[prop] = changes[prop]
+    }
+  }else{
+    let tarName = arguments[1]
+    let object = arguments[2]
+    let target = getByName(tarName)
+    let newFunc = {};
+    if(object.type == 'function'){
+      newFunc = parseFuncEntry(object.type, object.name, object.func);
+    }else if (object.type == 'method'){
+      newFunc = parseFuncEntry(object.type, object.text);
+    }
+    funcList.splice(funcList.indexOf(target), 1 , newFunc)
+  }
+}
+function getNameList() {
+  return funcList.map((elem) => elem = elem.func)
+}
+function getMethod(name) {
+  return JSON.parse(JSON.stringify(getByName(name)));
+}
+function getParsedMethod(text) {
+  return parseFunction(text)
 }
 //end
 console.log(solveInpr('gamma(3)', true))

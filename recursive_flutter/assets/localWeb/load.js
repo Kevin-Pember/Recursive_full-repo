@@ -11,6 +11,21 @@ let definedPages = [
 ];
 let keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }
 var settings;
+let ignoreList = [
+  "Math.sin",
+  "Math.cos",
+  "Math.tan",
+  "Math.log",
+  "Math.log10",
+  "Math.abs",
+  "Math.sqrt",
+  "Math.pow",
+  "Math.PI"
+
+];
+let secondList = [
+  "sup>",
+];
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
   console.log("settings got");
@@ -25,26 +40,26 @@ let themeElem = {};
 /*Implementation of Web Worker*/
 let calcWorker = new Worker('evalWorker.js');
 calcWorker.onmessage = (event) => {
-	let rtnObj =  event.data
-	if(rtnObj.type == 'posError'){
-		console.log("%c"+rtnObj.mes, "color: red;")
+  let rtnObj = event.data
+  if (rtnObj.type == 'posError') {
+    console.log("%c" + rtnObj.mes, "color: red;")
     report(rtnObj.mes, false)
-	}else if (rtnObj.type == 'posComp'){
+  } else if (rtnObj.type == 'posComp') {
     report(rtnObj.mes, true)
   }
-} 
+}
 const callCalc = (arry) => new Promise((res, rej) => {
-	const channel = new MessageChannel(); 
-	channel.port1.onmessage = ({data}) => {
-		channel.port1.close();
-		if (data.error) {
-			rej(data.error);
-		}else {
-			res(data.result);
-		}
-	};
+  const channel = new MessageChannel();
+  channel.port1.onmessage = ({ data }) => {
+    channel.port1.close();
+    if (data.error) {
+      rej(data.error);
+    } else {
+      res(data.result);
+    }
+  };
 
-	calcWorker.postMessage(arry, [channel.port2]);
+  calcWorker.postMessage(arry, [channel.port2]);
 });
 /*web work implementation end */
 setSettings();
@@ -73,7 +88,7 @@ if (document.getElementById("mainBody") != null) {
         break;
     }
   }
-
+  callCalc(['get',{'item': 'list'}]).then(value => console.log(value))
   document.getElementById('uifCalculator').addEventListener("click", function (e) {
     if (e.target != document.getElementById('enterHeader')) {
       let enterheader = document.getElementById('enterHeader');
@@ -1121,7 +1136,7 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('MAddOverlay').addEventListener("click", function () {
     document.getElementById('memoryTextBoarder').style.visibility = "visible";
     let enteredText = document.getElementById('enterHeader').innerHTML;
-    document.getElementById('memoryText').innerHTML = inputSolver(enteredText, "error adding to memory");
+    inputSolver(enteredText, "error adding to memory").then((value) => { document.getElementById('memoryText').innerHTML = value })
     console.log(window.getSelection())
   });
   document.getElementById('leftOverlayNav').addEventListener("click", function (e) { navigateButtons(false) });
@@ -1609,14 +1624,14 @@ function pow(type) {
     if (!sel.isCollapsed) {
       backPressed();
     }
-      let postNode = document.createTextNode('‎' + baseNode.textContent.substring(baseOffset));
-      let targInd = nodes.indexOf(baseNode) + 1;
-      console.log(targInd)
-      baseNode.textContent = baseNode.textContent.substring(0, baseOffset);
-      display.insertAt(superSr, targInd)
-      targInd++
-      display.insertAt(postNode, targInd)
-      type == "2" ? setFocus(postNode, 1) : setFocus(superSr.lastChild, superSr.lastChild.textContent.length)
+    let postNode = document.createTextNode('‎' + baseNode.textContent.substring(baseOffset));
+    let targInd = nodes.indexOf(baseNode) + 1;
+    console.log(targInd)
+    baseNode.textContent = baseNode.textContent.substring(0, baseOffset);
+    display.insertAt(superSr, targInd)
+    targInd++
+    display.insertAt(postNode, targInd)
+    type == "2" ? setFocus(postNode, 1) : setFocus(superSr.lastChild, superSr.lastChild.textContent.length)
   }
   /*
   
@@ -1808,22 +1823,22 @@ function backPressed() {
     } else {
       let childern = uifCalculator.childNodes
       let arryChd = [].slice.call(childern);
-      let inverse = arryChd.indexOf(getParent(baseNode,keyTargets.input)) > arryChd.indexOf(getParent(extentNode,keyTargets.input))
-      let startPar = getParent(inverse ? extentNode : baseNode,keyTargets.input);
+      let inverse = arryChd.indexOf(getParent(baseNode, keyTargets.input)) > arryChd.indexOf(getParent(extentNode, keyTargets.input))
+      let startPar = getParent(inverse ? extentNode : baseNode, keyTargets.input);
       let startInd = arryChd.indexOf(startPar)
-      let endPar = getParent(inverse ? baseNode : extentNode,keyTargets.input);
-      keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset: extentOffset)
-      if(uifCalculator.contains(startPar)){
-        if(startPar.nodeType != 3){
+      let endPar = getParent(inverse ? baseNode : extentNode, keyTargets.input);
+      keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset : extentOffset)
+      if (uifCalculator.contains(startPar)) {
+        if (startPar.nodeType != 3) {
           setFocus(getText(startPar), getText(startPar).textContent.length)
-        }else{
+        } else {
           setFocus(startPar, startPar.textContent.length)
         }
-      }else{
-        let pre = arryChd[startInd-1]
-        if(pre.nodeType != 3){
+      } else {
+        let pre = arryChd[startInd - 1]
+        if (pre.nodeType != 3) {
           setFocus(getText(pre), getText(pre).textContent.length)
-        }else{
+        } else {
           setFocus(pre, pre.textContent.length)
         }
       }
@@ -1853,10 +1868,13 @@ function enterPressed(input) {
   let display = keyTargets.input;
   let nonparse = input;
   clearMain();
-  frontButtonPressed(inputSolver(input, "Couldn't calculate"));
+  inputSolver(input, "Couldn't calculate").then((value) => {
+    console.log('then used')
+    frontButtonPressed(value)
+    setSelect(display, display.lastChild.length);
+  })
   historyMethod(nonparse)
   keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-  setSelect(display, display.lastChild.length);
 }
 //Responsible for handling the navigation buttons on the main calc tab
 function navigateButtons(direction) {
@@ -2045,7 +2063,6 @@ function closeConfirm() {
 function historyMethod(equation) {
   console.log(document.getElementsByClassName("historyDateHeader"));
   let historyHeader = document.getElementById('historyHeader');
-  let solved = inputSolver(equation, "Couldn't Calculate")
   /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
   let dates = document.getElementsByClassName('historyDateHeader');
   if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
@@ -2054,10 +2071,13 @@ function historyMethod(equation) {
     historyHeader.appendChild(clon);
   }
   let clon = document.getElementsByClassName("historyHeaders")[0].content.cloneNode(true);
+  let preEquat = clon.getElementById('previousEquation');
   clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
-  clon.getElementById('previousEquation').innerHTML = equation + "=" + inputSolver(equation);
+  inputSolver(equation, 'Issue calculating for history').then((value) => {
+    preEquat.innerHTML = equation + "=" + value;
+    localStorage.setItem("historyOut", historyHeader.innerHTML);
+  })
   historyHeader.appendChild(clon);
-  localStorage.setItem("historyOut", historyHeader.innerHTML);
 }
 //Responsible for handling the focusing certain elements on main calc page
 function setSelect(node, index) {
@@ -2166,28 +2186,33 @@ function graphInMode() {
   ]
   for (let elem of equationElems) {
     let equation = elem.innerHTML
-    let vars = varInEquat(equation)
-    if (vars.length <= 1) {
-      let parsedEquation = "";
-      let parsedArray = createParseable(equation);
-      for (let item of parsedArray) {
-        if (item == "v1") {
-          item = 'Æ';
+    queryVars(equation).then(value => {
+      let vars = value
+      if (vars.length <= 1) {
+        let parsedEquation = "";
+        let parsedArray = createParseable(equation);
+        for (let item of parsedArray) {
+          if (item == "v1") {
+            item = 'Æ';
+          }
+          parsedEquation += item;
         }
-        parsedEquation += item;
+        let dataColor = accents[(datasets.length) % 11]
+        getPoints('graph', { 'text': parsedEquation, 'min': Number(graphVars.bottom), 'max': Number(graphVars.top), 'res': Number(graphVars.res) }).then((value) => {
+          datasets.push({
+            data: value,
+            label: "hidden",
+            fontColor: '#FFFFFF',
+            borderColor: dataColor,
+            backgroundColor: dataColor,
+            showLine: true,
+          });
+        })
+      } else {
+        report("Equation needs single variable", false)
       }
-      let dataColor = accents[(datasets.length) % 11]
-      datasets.push({
-        data: calculatePoints(parsedEquation, Number(graphVars.bottom), Number(graphVars.top), Number(graphVars.res)),
-        label: "hidden",
-        fontColor: '#FFFFFF',
-        borderColor: dataColor,
-        backgroundColor: dataColor,
-        showLine: true,
-      });
-    } else {
-      report("Equation needs single variable", false)
-    }
+    })
+
   }
   def.chart.data.datasets = datasets;
   console.log(datasets)
@@ -2213,22 +2238,25 @@ function tableInMode() {
   let resulting = [];
   for (let elem of equationElems) {
     let equation = elem.innerHTML
-    let vars = varInEquat(equation)
-    if (vars.length <= 1) {
-      let parsedEquation = "";
-      let parsedArray = createParseable(equation);
-      for (let item of parsedArray) {
-        if (item == "v1") {
-          item = 'Æ';
+    queryVars(equation).then((value) => {
+      let vars = value;
+      if (vars.length <= 1) {
+        let parsedEquation = "";
+        let parsedArray = createParseable(equation);
+        for (let item of parsedArray) {
+          if (item == "v1") {
+            item = 'Æ';
+          }
+          parsedEquation += item;
         }
-        parsedEquation += item;
-      }
-      let dataColor = accents[(resulting.length) % 10]
-      resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
+        let dataColor = accents[(resulting.length) % 10]
+        getPoints('table',parsedEquation).then(value => {resulting.push(value)})
+        //resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
 
-    } else {
-      report("Equation needs single variable", false)
-    }
+      } else {
+        report("Equation needs single variable", false)
+      }
+    })
   }
   resulting[0].forEach((val) => {
     let newRow = tableModeDef.insertRow()
@@ -2600,11 +2628,12 @@ function changeImplemented(oldConfig, newObject) {
 }
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {
-  if (funcConfig.type == "Function") {
+  /*if (funcConfig.type == "Function") {
     createNewFunction("function", funcConfig.name, funcConfig.equation);
   } else if (funcConfig.type == "Hybrid") {
     createNewFunction("method", funcConfig.code)
-  }
+  }*/
+  callCalc(['func', 'add', [funcConfig]])
 }
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
 function setFuncList(array) {
@@ -2681,6 +2710,7 @@ function parseVariables(element, def) {
   let clon = def.tabPage
   console.log(clon)
   let varData = varListAssbely(element);
+  console.log(varData)
   console.log(def)
   console.log(clon)
   let name = clon.querySelector('#nameFunc').value;
@@ -2711,54 +2741,47 @@ function parseVariables(element, def) {
     solveGraph(method, def);
     solveTable(method, clon);
   } else if (first != undefined) {
+    console.log('graph ran')
     solveGraph(method, def);
     solveTable(method, clon);
   }
 }
 //Responsible for solving the parsedEquation on the default cust func page
 function solveEquation(method, clon) {
-  console.log("Solve Equation ran")
-  let result = "=" + inputSolver(method, "Couldn't Calculate");
-  clon.querySelector('#equalsHeader').innerHTML = result;
+  console.log(method)
+  inputSolver(method, "Couldn't Calculate").then((value) => {
+    clon.querySelector('#equalsHeader').innerHTML = '=' + value;
+  });
 }
 //Responsible for solving the parsedEquation with one open vairable graphically
 function solveGraph(parsedEquation, def) {
   let vars = getGraphVars(def);
   //Number(def.tabPage.querySelector('#stepDomainGraph').value) * mutplier;
-  let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top), Number(vars.res));
+  /*let result = calculatePoints(parsedEquation, Number(vars.bottom), Number(vars.top), Number(vars.res));
   console.log(result.length)
   def.chart.data.datasets[0].data = result;
-  def.chart.update();
+  def.chart.update();*/
+  getPoints('graph', { 'text': parsedEquation, 'min': Number(vars.bottom), 'max': Number(vars.top), 'res': Number(vars.res) }).then((value) => {
+    def.chart.data.datasets[0].data = value;
+    def.chart.update();
+  })
 }
 //Responsible for solving the parsedEquation with one open variable table wise
 function solveTable(parsedEquation, clon) {
   let table = clon.querySelector("#funcTable");
   table.innerHTML = "<tr><th>x</th><th>y</th></tr>";
-  let result = calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC))
-  result.forEach((elem, index) => {
-    let newRow = table.insertRow()
-    let newXCell = newRow.insertCell()
-    newXCell.innerHTML = elem.x
-    let newYCell = newRow.insertCell()
-    newYCell.innerHTML = elem.y
-  });
-  /*for (let point of result) {
-    let result;
-    let currentVal = i * step;
-    result = inputSolver(parsedEquation.replace('Æ', currentVal), "Error Making Table");
-    var newRow = clon.querySelector('#funcTable').insertRow(i);
-    var newXCell = newRow.insertCell(0);
-    var newYCell = newRow.insertCell(1);
-    newXCell.innerHTML = "" + currentVal;
-    newXCell.id = "shit"
-    console.log(i * step)
-    newYCell.innerHTML = result;
-    newYCell.id = "other shit"
-  }*/
-  //console.log(clon.querySelector("#funcTable").childNodes[0].childNodes)
+  getPoints('table', parsedEquation).then((value) => {
+    value.forEach((elem, index) => {
+      let newRow = table.insertRow()
+      let newXCell = newRow.insertCell()
+      newXCell.innerHTML = elem.x
+      let newYCell = newRow.insertCell()
+      newYCell.innerHTML = elem.y
+    });
+  })
 }
-function calculatePoints(parsedEquation, start, end, res) {
-  let pointArray = [];
+function getPoints() {
+  /*let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
   let invRes = 1 / res;
@@ -2769,10 +2792,24 @@ function calculatePoints(parsedEquation, start, end, res) {
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
-    pointArray.push(newPoint);
+    inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph").then((value) => {
+      newPoint.y = value
+      pointArray.push(newPoint)
+    })
+    //newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
+    //pointArray.push(newPoint);
   }
-  return pointArray;
+  return pointArray;*/
+
+  if (arguments[0] == 'graph') {
+    arguments[1].type = 'points';
+    arguments[1].target = 'graph'
+    console.log(arguments[1])
+    return callCalc(['calc', arguments[1]])
+  } else {
+    return callCalc(['calc',{'type':'points', 'target': 'table', 'text': arguments[1] }])
+  }
+
 }
 //creates an array of all variables needed for calculatePoints
 function getGraphVars(def) {
@@ -2780,9 +2817,6 @@ function getGraphVars(def) {
   let varArray = {}
   console.log("chart scales");
   console.log(def.chart.scales);
-  if (def.chart.scales.x == undefined) {
-    console.log('No thats not true')
-  }
   varArray = {
     "bottom": def.chart.scales.x == undefined ? settings.gMin : Number(def.chart.scales.x.min),
     "top": def.chart.scales.x == undefined ? settings.gMax : Number(def.chart.scales.x.max),
@@ -2791,52 +2825,59 @@ function getGraphVars(def) {
   return varArray
 }
 //Responsible for (IDFK work on this later)
-function checkVar(type, clon, checkList, def) {
-  let varGrid = clon.querySelector("#varGrid");
-  let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
-  let varExisting = varListAssbely(varGrid);
-  let newVars = [];
-  for (let eVar of checkList) {
-    matching = false;
-    for (let cVar of varExisting) {
-      if (eVar.letter == cVar.name) {
-        let indexOfVar = varExisting.indexOf(cVar);
-        varExisting.splice(indexOfVar, 1);
-        matching = true;
-        break;
-      }
-    }
-    if (!matching) {
-      newVars.push(eVar.letter);
-    }
-  }
-  //Ext var removal
-  for (let oldVar of varExisting) {
-    varGrid.removeChild(oldVar.element);
-  }
-  //Var Creatation part
-  for (let newVar of newVars) {
-    let name = newVar;
+function checkVar(type, clon, unpar, def) {
+  
+  callCalc(['get', { 'item': 'vars', 'type': type == 'function' ? 'equat' : 'method', 'text': unpar }]).then(value => {
+    let checkList = value;
     let varGrid = clon.querySelector("#varGrid");
+    let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
+    let varExisting = varListAssbely(varGrid);
+    let newVars = [];
+    for (let eVar of checkList) {
+      matching = false;
+      let match = varExisting.find((eElem, idx) => {
 
-    let tempvar = document.getElementsByClassName("variableTemplate")[0];
-    let varClon = tempvar.content.cloneNode(true);
-    varClon.getElementById('variableName').innerHTML = name;
-    varClon.getElementById('variableEntry').addEventListener('input', function (e) {
-      if (type == "function") {
-        let equationArea = clon.querySelector('#EquationFunc')
-        if (varClon.getElementById('variableEntry') != '') {
-          equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
+      })
+      for (let cVar of varExisting) {
+        if (eVar.letter == cVar.name) {
+          let indexOfVar = varExisting.indexOf(cVar);
+          varExisting.splice(indexOfVar, 1);
+          matching = true;
+          break;
         }
       }
-      if (varClon.getElementById('variableEntry') != '') {
-        try {
-          parseVariables(varGrid, def);
-        } catch (e) { }
+      if (!matching) {
+        newVars.push(eVar.letter);
       }
-    });
-    varGrid.appendChild(varClon);
-  }
+    }
+    //Ext var removal
+    for (let oldVar of varExisting) {
+      varGrid.removeChild(oldVar.element);
+    }
+    //Var Creatation part
+    for (let newVar of newVars) {
+      let name = newVar;
+      let varGrid = clon.querySelector("#varGrid");
+
+      let tempvar = document.getElementsByClassName("variableTemplate")[0];
+      let varClon = tempvar.content.cloneNode(true);
+      varClon.getElementById('variableName').innerHTML = name;
+      varClon.getElementById('variableEntry').addEventListener('input', function (e) {
+        if (type == "function") {
+          let equationArea = clon.querySelector('#EquationFunc')
+          if (varClon.getElementById('variableEntry') != '') {
+            equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
+          }
+        }
+        if (varClon.getElementById('variableEntry') != '') {
+          try {
+            parseVariables(varGrid, def);
+          } catch (e) { }
+        }
+      });
+      varGrid.appendChild(varClon);
+    }
+  })
 }
 //Matches a funcConfig from funclist with a name
 function findFuncConfig(name) {
@@ -2930,9 +2971,9 @@ function updatePreview(event) {
     document.getElementById("displayPreview").style.backgroundColor = event.target.value;
   } else if (event.target.id == "accentColorPicker") {
     document.getElementById("numsPreview").style.backgroundColor = event.target.value;
-  } else if(event.target.id == "primaryColorPicker"){
+  } else if (event.target.id == "primaryColorPicker") {
     document.getElementById("funcPreview").style.backgroundColor = event.target.value;
-  } else if (event.target.id == "textColorPicker"){
+  } else if (event.target.id == "textColorPicker") {
     document.getElementById('showcaseTextColor').style.color = event.target.value;
   }
 }
@@ -3301,7 +3342,7 @@ function setSettings() {
   if (!settings.degRad) {
     setDegMode();
   }
-  callCalc(['set','set', settings])
+  callCalc(['set', 'set', settings])
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/
@@ -3331,12 +3372,12 @@ function report(message, meaning) {
 //Called when ever something needs solving
 /*errorStatement is what appears in the popup console */
 function inputSolver(equation, errorStatement) {
-  equation = solveInpr(equation, settings.degRad)
+  //equation = solveInpr(equation, settings.degRad)
   try {
-    return eval(equation);
-  } catch (e) {
-    console.log(e)
-    report(errorStatement, false);
+    equation = callCalc(['calc', { 'type': 'solve', 'text': equation }])
+    return equation
+  } catch (eve) {
+    report(errorStatement, false)
   }
 }
 //Responsible for assebiling the code terminal throughout the program
@@ -3433,8 +3474,11 @@ function pullUpElements(elements) {
     }, 150);
   }
 }
+function queryVars(equat) {
+  return callCalc(['get', { 'item': 'vars', 'equation': equat }])
+}
 //Responsible for finding where variables are in a given equation
-function varInEquat(equation) {
+/*function varInEquat(equation) {
   console.log(`Equation is ${equation}`)
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
@@ -3486,7 +3530,7 @@ function isVar(entry) {
   } else {
     return 0;
   }
-}
+}*/
 //Responsible for parsing a variable to its value in an equation 
 function setVar(element, equation) {
   let varData = varListAssbely(element);
@@ -3847,13 +3891,13 @@ function getText(node) {
     return node;
   }
 }
-function getParent(node,parent) {
+function getParent(node, parent) {
   let childNodes = parent.childNodes;
   var nodes = [].slice.call(childNodes);
   if (nodes.includes(node)) {
     return node;
   } else {
-    return getParent(node.parentNode,parent);
+    return getParent(node.parentNode, parent);
   }
 }
 Object.defineProperty(Node.prototype, 'insertAt', {
@@ -3885,82 +3929,112 @@ Object.defineProperty(Node.prototype, 'removeSection', {
     let endTree = createTree(end)
     let unfiParent = undefined
     let matchInx = undefined
-    for(let i = 0; i < startTree.length; i++){
-      if(startTree[i] == endTree[i]){
+    for (let i = 0; i < startTree.length; i++) {
+      if (startTree[i] == endTree[i]) {
         matchInx = i;
         unfiParent = startTree[i]
-      }else{
+      } else {
         break;
       }
     }
     let uniChilern = unfiParent.childNodes;
     var nodes = [].slice.call(uniChilern);
-    let sNIdx = Number(nodes.indexOf(getParent(start,keyTargets.input)))
+    let sNIdx = Number(nodes.indexOf(getParent(start, keyTargets.input)))
     console.log(sNIdx)
-    let eNIdx = Number(nodes.indexOf(getParent(end,keyTargets.input)))
+    let eNIdx = Number(nodes.indexOf(getParent(end, keyTargets.input)))
     /*matchInx == startTree.length -1 ? false : treeRemove(start, sIdx, unfiParent, true)
     matchInx == startTree.length -1 ? false : treeRemove(end, eIdx, unfiParent,false)*/
-    
+
     treeRemove(start, sIdx, unfiParent, false) ? false : sNIdx--
-    treeRemove(end, eIdx, unfiParent,true)
+    treeRemove(end, eIdx, unfiParent, true)
 
     console.log(sNIdx)
-    for(let i = sNIdx+1; i < eNIdx; i++){
+    for (let i = sNIdx + 1; i < eNIdx; i++) {
       console.log(i)
       console.log(nodes[i])
       unfiParent.removeChild(nodes[i]);
     }
   }
 });
-function treeRemove(elem, inx, topPar, dire){
+function treeRemove(elem, inx, topPar, dire) {
   console.log(elem)
   console.log(topPar)
   elem.textContent = dire ? elem.textContent.substring(inx) : elem.textContent.substring(0, inx)
   let parentElem = elem.parentNode
   console.log(parentElem)
   let targetElem = elem
-  while(parentElem != topPar){
+  while (parentElem != topPar) {
     console.log(parentElem)
     let childern = parentElem.childNodes
     let arryChd = [].slice.call(childern);
     let indElem = arryChd.indexOf(targetElem)
-    for(let i = dire ? indElem + 1 : indElem - 1; dire ? i < arryChd.length: i > -1; dire ? i++ : i--){
+    for (let i = dire ? indElem + 1 : indElem - 1; dire ? i < arryChd.length : i > -1; dire ? i++ : i--) {
       parentElem.removeChild(arryChd)
     }
     targetElem = parentElem
     parentElem = parentElem.parentNode
   }
-  if(getParent(elem,keyTargets.input).childNodes.length > 0 || getText(getParent(elem,keyTargets.input)).textContent == '‎' && getParent(elem,keyTargets.input).nodeType != 3){
+  if (getParent(elem, keyTargets.input).childNodes.length > 0 || getText(getParent(elem, keyTargets.input)).textContent == '‎' && getParent(elem, keyTargets.input).nodeType != 3) {
     return false
-  }else{
+  } else {
     return true
   }
 }
-function createTree(elem){
+function createTree(elem) {
   let tree = [elem.parentNode];
   console.log(tree)
-  while(tree[0] != keyTargets.input){
+  while (tree[0] != keyTargets.input) {
     console.log(tree[0])
     tree.unshift(tree[0].parentNode)
   }
   return tree;
 }
-function autoStitch(elem){
+function autoStitch(elem) {
   let childern = elem.childNodes
   let nodesAry = [].slice.call(childern)
-  for(let i =  nodesAry.length-1; i > 0; i --){
-    if(nodesAry[i].nodeType == 3 && nodesAry[i-1].nodeType == 3){
-      nodesAry[i-1] += nodesAry[i].textContent.replaceAll('‎','')
-    }else if (nodesAry[i].nodeType == nodesAry[i-1].nodeType){
+  for (let i = nodesAry.length - 1; i > 0; i--) {
+    if (nodesAry[i].nodeType == 3 && nodesAry[i - 1].nodeType == 3) {
+      nodesAry[i - 1] += nodesAry[i].textContent.replaceAll('‎', '')
+    } else if (nodesAry[i].nodeType == nodesAry[i - 1].nodeType) {
       let childern = nodesAry[i].childNodes
       let nods = [].slice.call(childern)
       nods.every((elem, idx) => {
-        if(idx == 0 && elem.nodeType == 3){
-          elem.textContent.replaceAll('‎','')
+        if (idx == 0 && elem.nodeType == 3) {
+          elem.textContent.replaceAll('‎', '')
         }
-        nodesAry[i-1].nodeType.appendChild(elem)
+        nodesAry[i - 1].nodeType.appendChild(elem)
       })
     }
+  }
+}
+async function funcMatch(equation, way) {
+  let funcList = await callCalc(['get', { 'item': 'list' }]).then()
+  var returned = "";
+  for (let func of funcList) {
+    let check
+    if (way) {
+      check = equation.substring(0, (func.length));
+    } else {
+      check = equation.substring(equation.length - func.length);
+    }
+    if (check == func) {
+      returned = func;
+    }
+  }
+  for (let func of secondList) {
+    let check = equation.substring(0, (func.length));
+    if (check == func) {
+      returned = "";
+    }
+  }
+  return returned;
+}
+function ignoreTest(equation) {
+  const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
+  if (ignore != undefined) {
+    return ignore.length;
+  } else {
+    return undefined;
   }
 }
 //END
@@ -4172,7 +4246,6 @@ class HybridPage extends TemplatePage {
     let clon = this.clone;
     let fullConfig = this.def;
     let tabCopy = fullConfig.tabPage;
-    let funcConfig = getByName(config.name)
 
     clon.getElementById("editIcon").style = "";
     clon.getElementById("editIcon").src = getSource("EditIcon");
@@ -4212,14 +4285,15 @@ class HybridPage extends TemplatePage {
       let newVal = JSON.parse(JSON.stringify(oldVal));
       let newFunc = tabCopy.querySelector('#custEdit').value
 
-      let oldParse = parseFunction(newFunc)
-      newVal.name = oldParse.func;
-      newVal.code = stringifyMethod(oldParse);
+      callCalc(['get', { 'item': 'parsedMethod', 'text': newFunc }]).then(value => {
+        newVal.name = value.func;
+        newVal.code = value.full;
+      })
       changeFunc(oldVal, newVal, fullConfig);
       closeEdit(tabCopy)
     })
     document.getElementById("mainPage").appendChild(clon);
-    checkVar("hybrid", tabCopy, funcConfig.variables, fullConfig)
+    checkVar("hybrid", tabCopy, fullConfig.srtConfig.code, fullConfig)
   }
 }
 class EquatPage extends TemplatePage {
@@ -4326,7 +4400,7 @@ class EquatPage extends TemplatePage {
     equationDIV.addEventListener("change", function (e) {
       let oldVal = fullConfig.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
-      checkVar("function", tabCopy, varInEquat(e.target.innerHTML), fullConfig);
+      checkVar("function", tabCopy, e.target.innerHTML, fullConfig);
       newVal.equation = e.target.innerHTML;
       equationDIV.dataset.baseE = equationDIV.innerHTML;
       changeFunc(oldVal, newVal, fullConfig);
@@ -4340,7 +4414,7 @@ class EquatPage extends TemplatePage {
       console.log("shit")
     }
     document.getElementById("mainPage").appendChild(clon);
-    checkVar("function", tabCopy, varInEquat(equationDIV.innerHTML), fullConfig);
+    checkVar("function", tabCopy, equationDIV.innerHTML, fullConfig);
     //try {
     parseVariables(tabCopy.querySelector('#varGrid'), fullConfig);
     /*} catch (e) {
