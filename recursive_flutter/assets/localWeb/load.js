@@ -88,7 +88,7 @@ if (document.getElementById("mainBody") != null) {
         break;
     }
   }
-  callCalc(['get',{'item': 'list'}]).then(value => console.log(value))
+  callCalc(['get', { 'item': 'list' }]).then(value => console.log(value))
   document.getElementById('uifCalculator').addEventListener("click", function (e) {
     if (e.target != document.getElementById('enterHeader')) {
       let enterheader = document.getElementById('enterHeader');
@@ -690,17 +690,17 @@ if (document.getElementById("mainBody") != null) {
     gEContainer.insertBefore(clon, document.getElementById('addGraphEquation'))
   })
   initGraphEquation.addEventListener('input', function (e) {
-    console.log("change")
     graphInMode()
   })
 
   let initTableEquation = document.getElementById('initTableEquation');
   keypadEquationMapper(initTableEquation)
+  document.getElementById('tableControls').addEventListener('change', (e) => {tableInMode()})
   document.getElementById('addTableEquation').addEventListener('click', () => {
     let gEContainer = document.getElementById('tableFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
     keypadEquationMapper(clon.getElementById('equation'));
-    clon.addEventListener('input', function (e) { tableInMode() });
+    clon.getElementById('equation').addEventListener('input', function (e) { tableInMode() });
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
   initTableEquation.addEventListener('input', function (e) { tableInMode() });
@@ -1325,9 +1325,6 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('accentColorPicker').value = settings.a
     document.getElementById('textColorPicker').value = settings.t
     toggleCustTheme();
-  }
-  if (settings.t == "#FFFFFF") {
-    document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
   }
   //coloring UI elements that are images but need sytling
   if (TextColorGlobal != "#000000") {
@@ -2011,7 +2008,7 @@ function switchMode(modeId) {
   let showingElems = [document.getElementById(modeId)];
   let modeButton = document.getElementById('modeButton');
   for (let mode of modes) {
-    if (mode.style.visibility != 'hidden') {
+    if (mode.style.visibility != 'hidden' && mode.id != modeId) {
       hidingElems.push(mode)
     }
   }
@@ -2187,15 +2184,13 @@ function graphInMode() {
   for (let elem of equationElems) {
     let equation = elem.innerHTML
     queryVars(equation).then(value => {
+      console.log(value)
       let vars = value
+      let parsedEquation = equation
       if (vars.length <= 1) {
-        let parsedEquation = "";
-        let parsedArray = createParseable(equation);
-        for (let item of parsedArray) {
-          if (item == "v1") {
-            item = 'Æ';
-          }
-          parsedEquation += item;
+        let varPoses = vars[0].positions.reverse()
+        for (let pos of varPoses) {
+          parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
         }
         let dataColor = accents[(datasets.length) % 11]
         getPoints('graph', { 'text': parsedEquation, 'min': Number(graphVars.bottom), 'max': Number(graphVars.top), 'res': Number(graphVars.res) }).then((value) => {
@@ -2207,6 +2202,7 @@ function graphInMode() {
             backgroundColor: dataColor,
             showLine: true,
           });
+          def.chart.update();
         })
       } else {
         report("Equation needs single variable", false)
@@ -2216,41 +2212,36 @@ function graphInMode() {
   }
   def.chart.data.datasets = datasets;
   console.log(datasets)
-  def.chart.update();
+
 }
 function tableInMode() {
   let equationGrid = document.getElementById("tableFuncGrid");
   let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
   let tableModeDef = document.getElementById("modeTable");
-  tableModeDef.innerHTML = "<tr><th>x</th></tr>"
-  let accents = [
-    "#e6cc4e",
-    "#4ecfe6",
-    "#b169f0",
-    "#f06970",
-    "#87f069",
-    "#69f0c5",
-    "#f0a469",
-    "#69f0ed",
-    "#697bf0",
-    "#69f077",
-  ]
-  let resulting = [];
-  for (let elem of equationElems) {
+  tableModeDef.innerHTML = "<tr id='titleRow'></tr>"
+
+  let columns = [{ 'name': 'x', 'equat': 'x' }];
+  if (equationElems.length == 1) {
+    columns.push({ 'name': 'y', 'equat': equationElems[0].innerHTML })
+  } else {
+    for (let i = 0; i < equationElems.length; i++) {
+      columns.push({ 'name': `y<sup>${i + 1}</sup>`, 'equat': equationElems[i].innerHTML})
+    }
+  }
+  console.log(columns)
+  recursiveTable(tableModeDef, columns)
+  /*for (let elem of equationElems) {
     let equation = elem.innerHTML
     queryVars(equation).then((value) => {
       let vars = value;
       if (vars.length <= 1) {
-        let parsedEquation = "";
-        let parsedArray = createParseable(equation);
-        for (let item of parsedArray) {
-          if (item == "v1") {
-            item = 'Æ';
-          }
-          parsedEquation += item;
+        let parsedEquation = equation;
+        let varPoses = vars[0].positions.reverse()
+        for (let pos of varPoses) {
+          parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
         }
         let dataColor = accents[(resulting.length) % 10]
-        getPoints('table',parsedEquation).then(value => {resulting.push(value)})
+        getPoints('table', parsedEquation).then(value => { resulting.push(value) })
         //resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
 
       } else {
@@ -2273,7 +2264,7 @@ function tableInMode() {
       let newCell = tableElems[index + 1].insertCell()
       newCell.innerHTML = val2.y;
     })
-  });
+  });*/
 }
 //END
 /************************************************|Custom Func UI|****************************************************/
@@ -2301,6 +2292,96 @@ function createFunc(type, name, text) {
     addImplemented(object)
     setFuncList(funcList);
   }
+}
+function recursiveTable(target, colArry) {
+  let accents = [
+    "#e6cc4e",
+    "#4ecfe6",
+    "#b169f0",
+    "#f06970",
+    "#87f069",
+    "#69f0c5",
+    "#f0a469",
+    "#69f0ed",
+    "#697bf0",
+    "#69f077",
+  ]
+  let elem = colArry[0]
+  let equat = elem.equat
+  console.log(equat)
+  queryVars(equat).then((value) => {
+    let vars = value;
+    if (vars.length <= 1) {
+      let parsedEquation = equat;
+      let varPoses = vars[0].positions.reverse()
+      for (let pos of varPoses) {
+        parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
+      }
+      getPoints('table', parsedEquation).then(value => {
+        let table = target.childNodes[0];
+        let titleRow = table.querySelector('#titleRow')
+        let titleHeader = document.createElement("TH");
+        titleHeader.innerHTML = elem.name
+        titleHeader.style.color = accents[parseInt(Math.random() * 11)]
+        titleRow.appendChild(titleHeader)
+        /*value.forEach((val2, index) => {
+          let newCell = tableElems[index + 1].insertCell()
+          newCell.innerHTML = val2.y;
+        })*/
+        let rows = table.querySelectorAll('.tableRow')
+        let xDef = table.querySelectorAll('.xTDef')
+        if (rows.length != value.length || compareTable(xDef, value)) {
+          xDef.forEach(value => { table.removeChild(value) })
+          if (rows.length != value.length) {
+            let greater = value.length > rows.length
+            if (greater) {
+              for (let i = rows.length > 0 ? rows.length-1 : 0; i < value.length; i++) {
+                let tableRow = document.createElement('tr');
+                tableRow.className = "tableRow"
+                tableRow.id = `row${i+1}`
+                table.appendChild(tableRow)
+              }
+            } else {
+              for (let i = rows.length; i > value.length-1; i--) {
+                table.removeChild(table.querySelector(`#row${1}`))
+              }
+            }
+            rows = table.querySelectorAll('.tableRow');
+          }
+          /*value.forEach((sValue,index) => {
+            let matchRow = table.querySelector(`#row${index+1}`);
+            console.log(matchRow)
+            console.log(index)
+            let tableDef = document.createElement('td')
+            tableDef.className = "xTDef"
+            tableDef.innerHTML = sValue.x
+            matchRow.appendChild(tableDef)
+          });*/
+        }
+        value.forEach((sValue,idx) =>{
+          let elem = document.createElement('td')
+          elem.innerHTML = sValue.y
+          console.log(rows)
+          rows[idx].appendChild(elem)
+        })
+        if (colArry.length != 1) {
+          colArry.shift();
+          recursiveTable(target, colArry)
+        }
+      })
+
+    } else {
+      report(`${equat} needs single variable`, false)
+    }
+  })
+}
+function compareTable(elems, points) {
+  for (let i = 0; i < points.length; i++) {
+    if (points[i] != elems[i]) {
+      return true;
+    }
+  }
+  return false
 }
 //Responsible for creating the cust func buttons and adding them to the elements in target array
 function custButton(funcConfig, target) {
@@ -2807,7 +2888,7 @@ function getPoints() {
     console.log(arguments[1])
     return callCalc(['calc', arguments[1]])
   } else {
-    return callCalc(['calc',{'type':'points', 'target': 'table', 'text': arguments[1] }])
+    return callCalc(['calc', { 'type': 'points', 'target': 'table', 'text': arguments[1] }])
   }
 
 }
@@ -2826,7 +2907,7 @@ function getGraphVars(def) {
 }
 //Responsible for (IDFK work on this later)
 function checkVar(type, clon, unpar, def) {
-  
+
   callCalc(['get', { 'item': 'vars', 'type': type == 'function' ? 'equat' : 'method', 'text': unpar }]).then(value => {
     let checkList = value;
     let varGrid = clon.querySelector("#varGrid");
@@ -3475,7 +3556,7 @@ function pullUpElements(elements) {
   }
 }
 function queryVars(equat) {
-  return callCalc(['get', { 'item': 'vars', 'equation': equat }])
+  return callCalc(['get', { 'type': 'equat', 'item': 'vars', 'text': equat }])
 }
 //Responsible for finding where variables are in a given equation
 /*function varInEquat(equation) {
@@ -3726,7 +3807,7 @@ function keypadController(object) {
     keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') };
   }
 }
-let keypadVis = (visible) => {
+function keypadVis(visible) {
   if (visible) {
     document.getElementById('keypad').style.visibility = 'visible';
   } else {
@@ -3956,6 +4037,19 @@ Object.defineProperty(Node.prototype, 'removeSection', {
     }
   }
 });
+String.prototype.replaceAt = function () {
+  let repment = arguments[0]
+  let srt = arguments[1]
+  switch (arguments.length) {
+    case (2):
+      return this.substring(0, srt) + repment + this.substring(srt + repment.length)
+      break;
+    case (3):
+      let end = arguments[2]
+      return this.substring(0, srt) + repment + this.substring(end)
+      break;
+  }
+}
 function treeRemove(elem, inx, topPar, dire) {
   console.log(elem)
   console.log(topPar)
@@ -4155,7 +4249,10 @@ class CustomPage extends FuncPage {
     this.clone = clon;
     let fullConfig = this.def;
     let mainBody = clon.getElementById('customFuncTab');
-    let custPageWorker = new Worker('customFuncWorker.js');
+    let iframe = document.createElement('iframe');
+    iframe.style = 'width: 100%; height: 100%; background-color: gray; border: none;'
+    mainBody.appendChild(iframe)
+    /*let custPageWorker = new Worker('customFuncWorker.js');
     fullConfig.pageWorker = custPageWorker;
     custPageWorker.onmessage = function (e) {
       if (e.data[0] == 'createElement') {
@@ -4166,7 +4263,7 @@ class CustomPage extends FuncPage {
     }
     let object = ['init', mainBody, fullConfig.srtConfig.code];
     console.log(object)
-    custPageWorker.postMessage(object);
+    custPageWorker.postMessage(object);*/
     document.getElementById("mainPage").appendChild(clon);
   }
 }
