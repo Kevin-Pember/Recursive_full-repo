@@ -61,6 +61,13 @@ const callCalc = (arry) => new Promise((res, rej) => {
 
   calcWorker.postMessage(arry, [channel.port2]);
 });
+window.onmessage = function (e){
+  let valArry = e.data;
+  let object = valArry[0]
+  if(object.call == 'report'){
+    report(object.mes,object.meaning)
+  }
+}
 /*web work implementation end */
 setSettings();
 let graphVars = {};
@@ -4245,25 +4252,24 @@ class FuncPage {
 class CustomPage extends FuncPage {
   constructor(config) {
     super(config)
-    let temp = document.getElementById('custFuncTab'), clon = temp.content.cloneNode(true);
+    let temp = document.getElementById('custPageTab'), clon = temp.content.cloneNode(true);
     this.clone = clon;
-    let fullConfig = this.def;
-    let mainBody = clon.getElementById('customFuncTab');
-    let iframe = document.createElement('iframe');
-    iframe.style = 'width: 100%; height: 100%; background-color: gray; border: none;'
-    mainBody.appendChild(iframe)
-    /*let custPageWorker = new Worker('customFuncWorker.js');
-    fullConfig.pageWorker = custPageWorker;
-    custPageWorker.onmessage = function (e) {
-      if (e.data[0] == 'createElement') {
-        custPageWorker.postMessage(['newElem', createElem(e.data[1])]);
-      } else if (e.data[0] == 'error') {
-        report(e.data[1], false)
-      }
-    }
-    let object = ['init', mainBody, fullConfig.srtConfig.code];
-    console.log(object)
-    custPageWorker.postMessage(object);*/
+    let iframe = clon.getElementById('iframeTab');
+    this.frameCall = (obj) => new Promise((res, rej) => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = ({ data }) => {
+        channel.port1.close();
+        if (data.error) {
+          rej(data.error);
+        } else {
+          res(data.result);
+        }
+      };
+      iframe.contentWindow.postMessage(obj, [channel.port2]);
+    });
+    let feedObject = JSON.parse(JSON.stringify(this.def.srtConfig))
+    feedObject.call = 'init';
+    this.frameCall(feedObject)
     document.getElementById("mainPage").appendChild(clon);
   }
 }
