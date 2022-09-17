@@ -1266,6 +1266,7 @@ if (document.getElementById("mainBody") != null) {
       let object = parseFunction(document.getElementById('hybridEditor').value)
       createFunc("Hybrid", object.func, document.getElementById('hybridEditor').value)
     } else if (movable.dataset.pos == 150) {
+      console.log('right thing happened')
       createFunc("Code", document.getElementById('nameCreator').value, document.getElementById('hybridEditor').value)
     }
     universalBack();
@@ -2288,11 +2289,11 @@ function createFunc(type, name, text) {
         break;
       case "Code":
         object.code = text;
-        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
         break;
       case "Hybrid":
         object.code = text;
-        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
         break;
     }
     funcList.push(object);
@@ -2413,20 +2414,18 @@ function custButton(funcConfig, target) {
   for (let i = 0; i < target.length; i++) {
     let clonClone = clon.cloneNode(true);
     let buttonNode = clonClone.getElementById("customFuncButton");
-    buttonNode.querySelector('#removeFunc').src = getSource('xIcon');
+    let removeSVG = clonClone.getElementById("removeFunc");
 
     buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
       openConfirm("Are you sure you want to delete this Function?", function () {
-        funcRemove(e);
+        funcRemove(buttonNode);
       });
 
     });
     buttonNode.addEventListener('click', function (e) {
-      if (e.target.tagName != "IMG") {
-        let elem = e.target;
-        if (e.target.tagName != "BUTTON") {
-          elem = e.target.parentNode
-        }
+      if (!removeSVG.contains(e.target)) {
+        let elem = buttonNode;
+        console.log(elem.id)
         let funcName = elem.querySelector("#nameLabel").innerHTML;
         let funcParse = findFuncConfig(funcName);
         keypadVis(false);
@@ -2444,12 +2443,11 @@ function custButton(funcConfig, target) {
 }
 //Responsible for removing the cust func button from page after remove func is pressed
 function funcRemove(e) {
-  let link = e.target.parentNode
+  let link = e;
   let buttonName = link.querySelector("#nameLabel").innerHTML;
   removeFunc(link.querySelector("#nameLabel").innerHTML);
   let names = document.getElementsByClassName("custFuncNames");
   for (let i = 0; i < names.length; i++) {
-    console.log("looping")
     if (names[i].innerHTML == buttonName) {
       let parent = names[i].parentNode;
       parent.remove();
@@ -2495,7 +2493,6 @@ function newTabButton(config, tabPage) {
 
   let highlight = tabClon.getElementById('tabButton');
   tabClon.getElementById('tabButton').addEventListener("click", function (e) {
-    console.log('think it was clicked')
     console.log(e.target)
     if (!highlight.querySelector('#tabRemove').contains(e.target)) {
       if (window.innerWidth / window.innerHeight < 3 / 4) {
@@ -3481,6 +3478,7 @@ function createCodeTerminal(element, name) {
   let textarea = document.createElement('textarea')
   textarea.className = "codeEditor";
   textarea.id = name;
+  textarea.spellcheck = false;
   textarea.addEventListener("input", function (e) {
     this.style.height = "";
     this.style.height = this.scrollHeight + "px"
@@ -4138,6 +4136,15 @@ function ignoreTest(equation) {
     return undefined;
   }
 }
+function codeFilter(code) {
+  let blackListArray = [];
+  for (let block of blackListArray) {
+    if (code.includes(block)) {
+      return false
+    }
+  }
+  return true
+}
 //END
 /************************************************|help page|**************************************************/
 //Responsible for handling tab changes in help page (deprecated like everything on help page)
@@ -4252,10 +4259,18 @@ class FuncPage {
 class CustomPage extends FuncPage {
   constructor(config) {
     super(config)
-    let temp = document.getElementById('custPageTab'), clon = temp.content.cloneNode(true);
+    let temp = document.getElementById('customPageTab'), clon = temp.content.cloneNode(true);
     this.clone = clon;
     let iframe = clon.getElementById('iframeTab');
-    this.frameCall = (obj) => new Promise((res, rej) => {
+    clon.getElementById('iframeTab').src = 'packages/iframeHandler/frameBasic.html';
+    clon.getElementById('iframeTab').id = config.name;
+    document.getElementById("mainPage").appendChild(clon);
+    let newFrame = document.querySelector('#'+config.name);
+    newFrame.onload = function () {
+      newFrame.contentWindow.postMessage("heelo", '*');
+    }
+    console.log('post')
+    let frameCall = (obj) => new Promise((res, rej) => {
       const channel = new MessageChannel();
       channel.port1.onmessage = ({ data }) => {
         channel.port1.close();
@@ -4265,12 +4280,14 @@ class CustomPage extends FuncPage {
           res(data.result);
         }
       };
-      iframe.contentWindow.postMessage(obj, [channel.port2]);
+      newFrame.contentWindow.postMessage(obj, [channel.port2]);
     });
     let feedObject = JSON.parse(JSON.stringify(this.def.srtConfig))
     feedObject.call = 'init';
-    this.frameCall(feedObject)
-    document.getElementById("mainPage").appendChild(clon);
+    console.log(feedObject)
+    newFrame.onload = function () {
+      frameCall(feedObject)
+    }
   }
 }
 class TemplatePage extends FuncPage {
@@ -4510,11 +4527,9 @@ class EquatPage extends TemplatePage {
     });
     fullConfig.chart.options.plugins.zoom.zoom.onZoomComplete = function () {
       parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
-      console.log("shit")
     }
     fullConfig.chart.options.plugins.zoom.pan.onPanComplete = function () {
       parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
-      console.log("shit")
     }
     document.getElementById("mainPage").appendChild(clon);
     checkVar("function", tabCopy, equationDIV.innerHTML, fullConfig);

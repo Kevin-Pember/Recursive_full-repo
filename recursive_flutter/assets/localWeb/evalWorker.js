@@ -7,7 +7,15 @@ let settings = {
   "gMin": -10,
   "gMax": 10
 }
-
+let inverseList = [
+  {"reg": '+', 'inv': '-'},
+  {"reg": '-', 'inv': '+'},
+  {"reg": '*', 'inv': '/'},
+  {"reg": '/', 'inv': '*'},
+  {"reg": '+', 'inv': '-'},
+  {"reg": '+', 'inv': '-'},
+  {"reg": '+', 'inv': '-'},
+];
 let pageSettings = []
 Array.prototype.replaceAll = function (value, replacement) {
   let idxs = [];
@@ -1000,13 +1008,35 @@ class varTerm extends definedTerm {
   }
 
 }
+function findValueOf(tVar, equat){
+  let side1 = equat.substring(0,equat.indexOf('='));
+  let side2 = equat.substring(equat.indexOf('=')+1);
+  let conS1 = solveFor(side1,tVar);
+  let conS2 = solveFor(side2,tVar);
+  
+  if((hasVar(conS1,tVar).length == 0) != (hasVar(conS2,tVar).length == 0)){
+
+  }else{
+
+  }
+}
+function hasVar(arry, dVar){
+  let listOfIn = [];
+  for(let val of arry){
+    if(val.text.indexOf(dVar) != -1){
+      listOfIn.push(val)
+    }
+  }
+  return listOfIn;
+}
+function matchingPowers(array1, array2){
+
+}
 function solveFor(equat, varDef) {
   let returned = opsInEquat(equat);
   equat = returned.equat
   let fullArray = returned.arry;
   let termSheet = termsInEquat(equat, fullArray, varDef)
-
-  let toString = "";
 
   for (let term of termSheet) {
     let pos = term.pos
@@ -1037,13 +1067,14 @@ function solveFor(equat, varDef) {
   fullArray = parLinkMap(fullArray);
   fullArray = combineTerms(fullArray)
 
-  for (let item of fullArray) {
-    toString += item.text;
+  return fullArray
+}
+function hasTerm(item, target){
+  let fullArray = [];
+  let nextTrm = item[0]
+  while(nextTrm.ad.undefined ){
+
   }
-  console.log(fullArray)
-  console.log(toString)
-  console.log(equat)
-  console.log(equat.split(''))
 }
 
 function opsInEquat(equation) {
@@ -1249,13 +1280,7 @@ function combineTerms(fullArray) {
     if (fullArray[i].subtype == 'Plus' || fullArray[i].subtype == 'Minus') {
       let termBefore = fullArray[i - 1];
       let termAfter = fullArray[i + 1];
-      if (termBefore.type == "defTerm" || termAfter.type == "defTerm") {
-        let complx = termBefore.type == "defTerm" ? termBefore : termAfter;
-        let other = termBefore.type == "defTerm" ? termAfter : termBefore;
-        complx.changeAddition([{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, other])
-        fullArray.splice(i, 2)
-        i = i - 2
-      } else {
+      if (termBefore.type != "defTerm" && termAfter.type != "defTerm")  {
         let op = fullArray[i].text;
         let calculated = "" + fullSolve(`${termBefore.text}${op}${termAfter.text}`)
         fullArray.splice(i - 1, 3, { 'type': "term", "text": calculated })

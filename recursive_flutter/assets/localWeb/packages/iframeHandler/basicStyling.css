@@ -1,0 +1,17 @@
+:root{
+--displayColor: #000000;
+--numbersColor: #000000;
+--functionsColor: #000000;
+--textColor: #000000;
+--translucent: #00000033;
+--semi-transparent: #000000c5;
+}
+
+* {
+box-sizing: border-box;
+padding: 0;
+margin: 0;
+font-size: 25px;
+color: var(--textColor);
+-webkit-tap-highlight-color: transparent;
+}

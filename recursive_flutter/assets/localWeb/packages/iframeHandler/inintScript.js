@@ -1,13 +1,17 @@
-let calcWorker = new Worker('../../evalWorker.js');
-calcWorker.onmessage = (event) => {
-  let rtnObj = event.data
-  if (rtnObj.type == 'posError') {
-    report(rtnObj.mes, false)
-    window.top.postMessage({'call':'report','mes' : rtnObj.mes, "meaning": false})
-  } else if (rtnObj.type == 'posComp') {
-    window.top.postMessage({'call':'report','mes' : rtnObj.mes, "meaning": true})
+const workerCreator = () => {
+  let worker = new Worker('../../evalWorker.js');
+  worker.onmessage = (event) => {
+    let rtnObj = event.data
+    if (rtnObj.type == 'posError') {
+      report(rtnObj.mes, false)
+      window.top.postMessage({ 'call': 'report', 'mes': rtnObj.mes, "meaning": false })
+    } else if (rtnObj.type == 'posComp') {
+      window.top.postMessage({ 'call': 'report', 'mes': rtnObj.mes, "meaning": true })
+    }
   }
+  return worker;
 }
+const calcWorker = workerCreator();
 const callCalc = (arry) => new Promise((res, rej) => {
   const channel = new MessageChannel();
   channel.port1.onmessage = ({ data }) => {
@@ -21,13 +25,14 @@ const callCalc = (arry) => new Promise((res, rej) => {
 
   calcWorker.postMessage(arry, [channel.port2]);
 });
-window.onmessage = function (e){
-    let valArry = e.data;
-    let object = valArry[0]
-    if(object.call == 'init'){
-        eval(object.code)
-        if(typeof html !== 'undefined'){
-            document.body.innerHTML == html;
-        }
-    }
+window.onmessage = function (e) {
+  console.log(e)
+  let valArry = e.data;
+  let object = valArry
+  if (object.call == 'init') {
+    console.log('init called')
+    let html;
+    eval(object.code)
+    console.log(object.code)
+  }
 }
