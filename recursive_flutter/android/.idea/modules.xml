@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.iml" filepath="$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.main.iml" filepath="$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/761845833/android.flutter_inappwebview.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.iml" filepath="$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1007410688/android.flutter_statusbarcolor_ns.unitTest.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,3 +1,4 @@
+console.log('hello there')
 let TextColorGlobal = "";
 let colorArray = [];
 let definedPages = [
@@ -3132,12 +3133,12 @@ function settingExit() {
     newSettings.a = document.getElementById("accentColorPicker").value;
     newSettings.t = document.getElementById('textColorPicker').value;
   }
-  /*newSettings.gDS = Number(document.getElementById("graphDStep").value);
-  newSettings.gDMin = Number(document.getElementById("domainBottomG").value);
-  newSettings.gDMax = Number(document.getElementById("domainTopG").value);
-  newSettings.gRS = Number(document.getElementById("graphRStep").value);
-  newSettings.gRMin = Number(document.getElementById("rangeBottomG").value);
-  newSettings.gRMax = Number(document.getElementById("rangeTopG").value);*/
+  newSettings.gR = document.getElementById('graphDStep').value;
+  newSettings.gMin = document.getElementById('domainBottomG').value;
+  newSettings.gMax = document.getElementById('domainTopG').value;
+  newSettings.tMin = document.getElementById('rMinT').value;
+  newSettings.tMax = document.getElementById('rMaxT').value;
+  newSettings.tC = document.getElementById('tableCells').value;
   if (document.getElementById("degModeBut").className == "settingsButton active") {
     newSettings.degRad = true;
   } else {
