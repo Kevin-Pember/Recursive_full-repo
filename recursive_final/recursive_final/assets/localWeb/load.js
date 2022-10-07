@@ -3464,7 +3464,7 @@ function setSettings() {
   document.getElementById('rMinT').value = settings.tMin;
   document.getElementById('rMaxT').value = settings.tMax;
   document.getElementById('tableCells').value = settings.tC;
-  callCalc(['set', 'set', settings])
+  callCalc({'callType': 'set', 'method': 'init', 'settings': settings});
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/
