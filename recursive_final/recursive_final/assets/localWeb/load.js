@@ -96,7 +96,7 @@ if (document.getElementById("mainBody") != null) {
         break;
     }
   }
-  callCalc(['get', { 'item': 'list' }]).then(value => console.log(value))
+  callCalc({"callType":'get', 'item': 'list' }).then(value => console.log(value))
   document.getElementById('uifCalculator').addEventListener("click", function (e) {
     if (e.target != document.getElementById('enterHeader')) {
       let enterheader = document.getElementById('enterHeader');
@@ -1263,7 +1263,7 @@ if (document.getElementById("mainBody") != null) {
     if (movable.dataset.pos == 0) {
       createFunc("Function", document.getElementById('nameCreator').value, document.getElementById('creatorEquationFunc').innerHTML)
     } else if (movable.dataset.pos == 75) {
-      callCalc(['func', 'add', [{'type': "Hybrid", 'code': document.getElementById('hybridEditor').value}]]).then((value) => {
+      callCalc({"callType": 'func', "method": 'add','newFuncs':[{'type': "Hybrid", 'code': document.getElementById('hybridEditor').value}]}).then((value) => {
         createFunc("Hybrid", value, document.getElementById('hybridEditor').value)
       });
     } else if (movable.dataset.pos == 150) {
@@ -2106,6 +2106,7 @@ function historyMethod(equation) {
   let preEquat = clon.getElementById('previousEquation');
   clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
   inputSolver(equation, 'Issue calculating for history').then((value) => {
+    console.log(value)
     preEquat.innerHTML = equation + "=" + value;
     localStorage.setItem("historyOut", historyHeader.innerHTML);
   })
@@ -2748,7 +2749,9 @@ function addImplemented(funcConfig) {
   } else if (funcConfig.type == "Hybrid") {
     createNewFunction("method", funcConfig.code)
   }*/
-  callCalc(['func', 'add', [funcConfig]]);
+  funcConfig.callType = "func"
+  funcConfig.method =
+  callCalc({"callType":'func', "method":'add', "newFuncs":[funcConfig]});
 }
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
 function setFuncList(array) {
@@ -2823,11 +2826,7 @@ function parseVarFunc(name, varData) {
 //Responsible for checking and solving for varables on defaut cust func page depending on how many variables are filled
 function parseVariables(element, def) {
   let clon = def.tabPage
-  console.log(clon)
   let varData = varListAssbely(element);
-  console.log(varData)
-  console.log(def)
-  console.log(clon)
   let name = clon.querySelector('#nameFunc').value;
   let method = "";
   let all = true;
@@ -2856,7 +2855,6 @@ function parseVariables(element, def) {
     solveGraph(method, def);
     solveTable(method, clon);
   } else if (first != undefined) {
-    console.log('graph ran')
     solveGraph(method, def);
     solveTable(method, clon);
   }
@@ -2865,6 +2863,7 @@ function parseVariables(element, def) {
 function solveEquation(method, clon) {
   console.log(method)
   inputSolver(method, "Couldn't Calculate").then((value) => {
+    console.log(value)
     clon.querySelector('#equalsHeader').innerHTML = '=' + value;
   });
 }
@@ -2895,8 +2894,8 @@ function solveTable(parsedEquation, clon) {
     });
   })
 }
-function getPoints() {
-  /*let pointArray = [];
+/*function getPoints() {
+  let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
   let invRes = 1 / res;
@@ -2914,7 +2913,7 @@ function getPoints() {
     //newPoint.y = inputSolver(parsedEquation.replaceAll('Æ', newPoint.x), "Error Making Graph");
     //pointArray.push(newPoint);
   }
-  return pointArray;*/
+  return pointArray;
 
   if (arguments[0] == 'graph') {
     arguments[1].type = 'points';
@@ -2925,7 +2924,7 @@ function getPoints() {
     return callCalc(['calc', { 'type': 'points', 'target': 'table', 'text': arguments[1] }])
   }
 
-}
+}*/
 //creates an array of all variables needed for calculatePoints
 function getGraphVars(def) {
   console.log(def)
@@ -2941,8 +2940,7 @@ function getGraphVars(def) {
 }
 //Responsible for (IDFK work on this later)
 function checkVar(type, clon, unpar, def) {
-
-  callCalc(['get', { 'item': 'vars', 'type': type == 'function' ? 'equat' : 'method', 'text': unpar }]).then(value => {
+  callCalc({"callType": "get", 'method': 'vars', 'type': type == 'function' ? 'equat' : 'method', 'text': unpar }).then(value => {
     let checkList = value;
     let varGrid = clon.querySelector("#varGrid");
     let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
@@ -2984,13 +2982,17 @@ function checkVar(type, clon, unpar, def) {
             equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
           }
         }
-        if (varClon.getElementById('variableEntry') != '') {
+        if (varClon.getElementById('variableEntry').value != '') {
           try {
             parseVariables(varGrid, def);
           } catch (e) { }
         }
       });
       varGrid.appendChild(varClon);
+    }
+    let currentVars = varListAssbely(varGrid);
+    for(){
+      
     }
   })
 }
@@ -3496,7 +3498,8 @@ function report(message, meaning) {
 function inputSolver(equation, errorStatement) {
   //equation = solveInpr(equation, settings.degRad)
   try {
-    equation = callCalc(['calc', { 'type': 'solve', 'text': equation }])
+    equation = callCalc({"callType":"calc", 'method': 'solve', 'text': equation })
+    console.log(equation)
     return equation
   } catch (eve) {
     report(errorStatement, false)
@@ -3598,7 +3601,7 @@ function pullUpElements(elements) {
   }
 }
 function queryVars(equat) {
-  return callCalc(['get', { 'type': 'equat', 'item': 'vars', 'text': equat }])
+  return callCalc({"callType" : "get", 'method': 'vars', 'text': equat })
 }
 //Responsible for finding where variables are in a given equation
 /*function varInEquat(equation) {
@@ -4141,7 +4144,7 @@ function autoStitch(elem) {
   }
 }
 async function funcMatch(equation, way) {
-  let funcList = await callCalc(['get', { 'item': 'list' }]).then()
+  let funcList = await callCalc({"callType": 'get', 'method': 'list' }).then()
   var returned = "";
   for (let func of funcList) {
     let check
@@ -4298,6 +4301,14 @@ function custFuncExisting(name, duplicates) {
   }
   return exist;
 }
+//generates a number of vars for simplifying stuff
+function generateVars(length){
+  let newVars = [];
+  for(let i = 0; i < length; i++){
+    newVars.push(String.fromCharCode(97 + i));
+  }
+  return newVars;
+}
 class FuncPage {
   constructor(config) {
     this.def = {}
@@ -4347,6 +4358,12 @@ class TemplatePage extends FuncPage {
     let chart = clon.getElementById("funcChart");
     let funcTabs = [clon.getElementById('functionDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
     let name = config.name;
+    let varLength = 0; 
+    callCalc({ callType: 'get', method: 'vars', existing: true, funcName : name}).then(value =>{
+      varLength = value.length;
+      let obVars = generateVars(varLength);
+      callCalc({ callType: 'set', method: "env", envType : 'static'});
+    })
     let tabCopy = clon.getElementById('customFuncTab');
     this.def.tabPage = tabCopy;
     this.def.tab = newTabButton(config, tabCopy);
@@ -4453,7 +4470,7 @@ class HybridPage extends TemplatePage {
       let newVal = JSON.parse(JSON.stringify(oldVal));
       let newFunc = tabCopy.querySelector('#custEdit').value
 
-      callCalc(['get', { 'item': 'parsedMethod', 'text': newFunc }]).then(value => {
+      callCalc({"callType": 'get', 'method': 'parsedMethod', 'text': newFunc }).then(value => {
         newVal.name = value.func;
         newVal.code = value.full;
       })
