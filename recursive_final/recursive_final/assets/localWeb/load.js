@@ -2991,9 +2991,7 @@ function checkVar(type, clon, unpar, def) {
       varGrid.appendChild(varClon);
     }
     let currentVars = varListAssbely(varGrid);
-    for(){
-      
-    }
+    
   })
 }
 //Matches a funcConfig from funclist with a name
