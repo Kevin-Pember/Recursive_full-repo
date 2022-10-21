@@ -10,7 +10,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["asin(", "v1", ")"]
+    "inverse": "asin"
   },
   {
     'type': "function",
@@ -20,7 +20,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["sin(", "v1", ")"]
+    "inverse": "sin"
   },
   {
     'type': "function",
@@ -30,7 +30,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["acos(", "v1", ")"]
+    "inverse": "acos"
   },
   {
     'type': "function",
@@ -40,7 +40,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["cos(", "v1", ")"]
+    "inverse": "cos"
   },
   {
     'type': "function",
@@ -50,7 +50,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["atan(", "v1", ")"]
+    "inverse": "atan"
   },
   {
     'type': "function",
@@ -60,7 +60,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["tan(", "v1", ")"]
+    "inverse": "tan"
   },
   {
     'type': "function",
@@ -70,7 +70,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["acsc(", "v1", ")"]
+    "inverse": "acsc"
   },
   {
     'type': "function",
@@ -80,7 +80,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["csc(", "v1", ")"]
+    "inverse": "csc"
   },
   {
     'type': "function",
@@ -90,7 +90,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["asec(", "v1", ")"]
+    "inverse": "asec"
   },
   {
     'type': "function",
@@ -100,7 +100,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["sec(", "v1", ")"]
+    "inverse": "sec"
   },
   {
     'type': "function",
@@ -110,7 +110,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["acot(", "v1", ")"]
+    "inverse": "acot"
   },
   {
     'type': "function",
@@ -120,7 +120,7 @@ let funcList = [
     'funcRadDeg': true,
     'funcLength': 4,
     'inherant': true,
-    "inverse": ["acot(", "v1", ")"]
+    "inverse": "cot"
   },
   {
     'type': "function",
@@ -130,7 +130,7 @@ let funcList = [
     'funcRadDeg': false,
     'funcLength': 2,
     'inherant': true,
-    "inverse": ["e^(", "v1", ")"]
+    "inverseParse": ["e^(", "v1", ")"]
   },
   {
     'type': "function",
@@ -140,7 +140,7 @@ let funcList = [
     'funcRadDeg': false,
     'funcLength': 3,
     'inherant': true,
-    "inverse": ["10^(", "v1", ")"]
+    "inverseParse": ["10^(", "v1", ")"]
   },
   {
     'type': "function",
@@ -226,7 +226,7 @@ let funcList = [
   {
     'type': "function",
     "func": "thing",
-    "funcParse": ["v1", '*' ,"v2"],
+    "funcParse": ["v1", '*', "v2"],
     "inputs": 2,
     "funcRadDeg": false,
     "funcLength": 5,
@@ -260,6 +260,33 @@ Array.prototype.replaceAll = function (value, replacement) {
   }
   return this;
 };
+String.prototype.indexOfAll = function (value) {
+  let retArry = [];
+  let lastIndex = 0;
+  while(true){
+    let idx = this.indexOf(value, lastIndex);
+    if(idx == -1){
+      break;
+    }
+    retArry.push(idx);
+    lastIndex = idx + 1;
+  }
+  return retArry;
+};
+String.prototype.innerVar = function (tVar) {
+let posArry = this.indexOfAll(tVar);
+let posFunc = funcsContainingVar(tVar);
+for(let idx of posArry){
+  for(let func of posFunc){
+    if(idx >= func.idx && this.length - idx >= func.name.length - func.idx){
+      if(this.substring(idx - func.idx, idx - func.idx+func.name.length) != func.name){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+};
 class DefinedTerm {
   pow = [];
   mutiplican = [];
@@ -268,9 +295,9 @@ class DefinedTerm {
 
     this.type = "defTerm"
 
-    Array.isArray(mutiplican) ? this.mutiplican = mutiplican : this.mutiplican = [mutiplican];
+    Array.isArray(mutiplican) ? this.mutiplican = combineTerms(mutiplican) : this.mutiplican = [mutiplican];
 
-    Array.isArray(pow) ? this.pow = pow : this.pow = [pow]
+    Array.isArray(pow) ? this.pow = combineTerms(pow) : this.pow = [pow]
 
     this.additions = []
 
@@ -288,10 +315,10 @@ class DefinedTerm {
     return arryToString(this.additions);
   }
   get getComputedPow() {
-    return solveInpr(arryToString(this.pow), settings.degRad)
+    return arryToString(this.pow);
   }
   get getComputedMuti() {
-    return solveInpr(arryToString(this.mutiplican), settings.degRad)
+    return arryToString(this.mutiplican);
   }
   changeMuti(add) {
     let test = add.find(elem => {
@@ -354,14 +381,14 @@ class DefinedTerm {
   }
 }
 class CmpxTerm extends DefinedTerm {
-  constructor(start, end, fullArray, pos, mutiplican, pow) {
+  constructor(array, pos, mutiplican, pow, elemB) {
     super(mutiplican, pow, pos)
     this.subtype = "cmpxTerm";
-
-    this.textArray = combineTerms(fullArray.slice(start + 1, end))
-    if (start > 0)
-      if (fullArray[start - 1].type == "func") {
-        this.func = fullArray[start - 1]
+    console.log(array)
+    this.textArray = combineTerms(array)
+    if (elemB)
+      if (elemB.type == "func") {
+        this.func = elemB
       }
   }
   get text() {
@@ -370,7 +397,7 @@ class CmpxTerm extends DefinedTerm {
     let stringAddican = this.getAdditions.length != 0 ? '+' + this.getAdditions : '';
     let stringFunc = this.func != undefined ? this.func.text : '';
 
-    return stringFunc + stringMutiplican+ "(" + arryToString(this.textArray) + ")" + stringPow + stringAddican;
+    return stringFunc + stringMutiplican + "(" + arryToString(this.textArray) + ")" + stringPow + stringAddican;
   }
 }
 class VarTerm extends DefinedTerm {
@@ -654,25 +681,25 @@ function solveInpr(equation, degRad) {
 function getByName(name) {
   for (let func of funcList) {
     if (func.func == name) {
-        return func;
+      return func;
     }
-}
-return null;
+  }
+  return false;
 }
 //Func method to get the inverse of a given function
 function getFuncInv(cmpxTerm, sSide, tVar) {
   let func = getByName(cmpxTerm.func)
-  if(func.type == "function"){
+  if (func.type == "function") {
     let textArray = cmpxTerm.textArray;
     textArray.shift();
     textArray.pop();
     let terms = [];
-    while(true){
-      let foundTerm =  textArray.find(elem => elem.type == "comma");
-      if(foundTerm){
+    while (true) {
+      let foundTerm = textArray.find(elem => elem.type == "comma");
+      if (foundTerm) {
         let index = textArray.indexOf(foundTerm);
         terms.push(textArray.slice(0, index));
-        
+
       }
     }
   }
@@ -1217,36 +1244,30 @@ function findValueOf(tVar, equat) {
   }
 
 }
-function solveForSide(vSide, mSide, tVar) {
-  console.log(vSide)
-  console.log(mSide)
-  var targetedElem
-  let indOfElem = -1;
+function solveForSide(vSide, mSide, tVar,trace) {
+  let targetedElem = trace[0].term;
+  let indOfElem = trace[0].index;
+  /*let indOfElem = -1;
   vSide.forEach((sec, i) => {
     console.log(typeof sec)
     if (sec.type == "defTerm" && sec.text.includes(tVar)) {
       targetedElem = sec
       indOfElem = i
     }
-  })
+  })*/
   let addArry = [...vSide]
-  console.log(arryToString(addArry))
-  console.log(indOfElem)
   indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
-  addArry.splice(indOfElem, 1)
-  addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' })
-  mSide = mSide.concat(addArry)
-  console.log(mSide)
-  console.log(targetedElem.getComputedMuti)
-  if (targetedElem.getComputedMuti != '1') {
+  addArry.splice(indOfElem, 1);
+  addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
+  mSide = mSide.concat(addArry);
+  /*if (targetedElem.getComputedMuti != '1') {
     mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
     mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
     let newMuti = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': targetedElem.mutiplican.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
-    console.log(targetedElem.mutiplican)
     newMuti = newMuti.concat(targetedElem.mutiplican)
     newMuti.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-    console.log(mSide)
-    mSide = [new CmpxTerm(-1, mSide.length, mSide, 0, newMuti, { "type": "term", "text": '1', "pos": 0 })]
+
+    mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, newMuti, { "type": "term", "text": '1', "pos": 0 }, undefined)]
     targetedElem.mutiplican = []
   }
   if (targetedElem.getComputedPow != '1') {
@@ -1255,20 +1276,88 @@ function solveForSide(vSide, mSide, tVar) {
     if (mSide.length == 1 && mSide[0].type == 'cmpxTerm') {
       mSide[0].pow = newPow
     } else {
-      mSide = [new CmpxTerm(-1, mSide.length, mSide, 0, { "type": "term", "text": '1', "pos": 0 }, newPow)]
+      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, { "type": "term", "text": '1', "pos": 0 }, newPow, undefined)]
     }
     targetedElem.pow = []
-  }
+  }*/
   if (targetedElem === typeof CmpxTerm) {
     if (targetedElem.func) {
-      let funcDef = getByName(targetedElem.func)
-      let funcInversed = getFuncInv(func)
+      let funcDef = getByName(targetedElem.func);
+      if (funcDef.inverse) {
+        let arrayed = targetedElem.textArray
+        let termInOrder = []
+        while (true) {
+          let newVSide = [];
+          let comma = arrayed.find(elem => elem.type == 'op' && elem.subtype == 'Comma')
+          if (!comma) {
+            termInOrder.push(arrayed)
+            break;
+          } else {
+            let index = arrayed.indexOf(comma)
+            termInOrder.push(arrayed.slice(0, index))
+            arrayed = arrayed.slice(index + 1)
+          }
+        }
+        let replacementPoint = termInOrder.indexOf(targetedElem)
+        if(vSide.length>1){
+          
+        }else{
+          termInOrder.splice(replacementPoint,1, mSide)
+          vSide = targetedElem
+          mSide = new CmpxTerm(termInOrder,0, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 },{ 'type': 'func', 'text': funcDef.inverse })
+        }
+      } else {
+        return undefined
+      };
+    }else{
+      if(trace.loc == "textArray"){
+
+      }else if (trace.loc == "pow"){
+
+      }else if (trace.loc == "muti"){
+
+      }
     }
     let recur = solveForSide(targetedElem.textArray, mSide, tVar)
     vSide = recur[0]
     mSide = recur[1]
   }
   return [vSide, mSide]
+}
+function equatTrace(arry, tVar){
+  let termArry = []
+  console.log(arry)
+  arry.forEach((term, i) => {
+    let textualVal = ""+term.text
+    if(textualVal.innerVar(tVar)){
+      if(term.subtype == "cmpxTerm"){
+        console.log("term")
+        let textAryVar = arryToString(term.textArray);
+        let powVar = term.getComputedPow;
+        let mutiVar = term.getComputedMuti;
+        if(textAryVar.innerVar(tVar)){
+          termArry.push({"term" : term, "index" : i, "loc" : "textArray"})
+          termArry = termArry.concat(equatTrace(term.textArray, tVar))
+          return termArry;
+        }else if (powVar.innerVar(tVar)){
+          termArry.push({"term" : term, "index" : i, "loc" : "pow"})
+          termArry = termArry.concat(equatTrace(term.pow, tVar))
+          return termArry;
+        }else if (mutiVar.innerVar(tVar)){
+          termArry.push({"term" : term, "index" : i, "loc" : "muti"})
+          termArry = termArry.concat(equatTrace(term.mutiplican, tVar))
+          return termArry;
+        }
+      }else if (term.subtype == "var"){
+        if(term.letter == tVar){
+          console.log("var term found")
+          termArry.push({"term" : term, "index" : i, "loc" : "letter"})
+          return termArry
+        }
+      }
+    }
+  });
+  return termArry;
 }
 function highTerms(arry, varDef) {
   var highTerms = [];
@@ -1285,10 +1374,9 @@ function solveFor(equat, varDef) {
   let returned = opsInEquat(equat);
   equat = returned.equat
   let fullArray = returned.arry;
-  let termSheet = termsInEquat(equat, fullArray)
-  console.log(termSheet)
+  fullArray = termsInEquat(equat, fullArray)
 
-  for (let term of termSheet) {
+  /*for (let term of termSheet) {
     let pos = term.pos
     if (fullArray.length == 0) { fullArray.push(term) }
     for (let i = 0; i < fullArray.length; i++) {
@@ -1314,18 +1402,13 @@ function solveFor(equat, varDef) {
         }
       }
     }
-  }
-  console.log(fullArray)
+  }*/
   for (let i = 0; i < fullArray.length; i++) {
     fullArray[i] = fullArray[i].subtype == "varContainer" ? fullArray[i] = parseTextTerm(fullArray[i], varDef) : fullArray[i];
   }
   console.log(fullArray)
   console.log(fullArray)
   fullArray = parLinkMap(fullArray);
-  let thing = fullArray
-  console.log(thing)
-  fullArray = combineTerms(fullArray,varDef)
-
   return fullArray
 }
 function hasTerm(item, target) {
@@ -1375,6 +1458,7 @@ function opsInEquat(equation) {
 function termsInEquat(equation, fullArray) {
   let modEquat = equation
   let termArry = fullArray.length > 0 ? [] : [{ 'type': "term", "text": equation, "pos": 0 }]
+  let completeArray = fullArray.length > 0 ? fullArray : [{ 'type': "term", "text": equation, "pos": 0 }]
   let diff = 0;
   for (let item of fullArray) {
     let diff = equation.length - modEquat.length
@@ -1382,57 +1466,88 @@ function termsInEquat(equation, fullArray) {
     let modIndex = index - diff
     let termBefore = basicNumInter(forward(modEquat.substring(0, modIndex)));
     let termAfter = basicNumInter(backward(modEquat.substring(modIndex + 1)));
+    console.log(termBefore)
+    console.log(termAfter)
     let prelength = termAfter.length;
-    let afterFunc = null
-
-    if (index != diff && equation != modEquat) {
-      console.log(`%c Incont: diff and index don't match`, "color: red;")
-    }
+    let beforeFunc = false
     if (funcMatch(termBefore, false) != "") {
+      beforeFunc = true;
       let func = funcMatch(termBefore, false);
-      termArry.push({ 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
+      let aindex = completeArray.indexOf(item);
+      completeArray.splice(aindex, 0, { 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
+      //termArry.push({ 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
       termBefore = termBefore.substring(0, termBefore.length - (func.func.length))
 
     }
     if (funcMatch(termAfter, false) != "") {
       let func = funcMatch(termAfter, false)
-      afterFunc = { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] }
+      let aindex = completeArray.indexOf(item);
+      //afterFunc = { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] }
+      completeArray.splice(aindex+1, 0, { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] })
       termAfter = termAfter.substring(0, termAfter.length - (func.func.length))
     }
     if (termBefore) {
+      let aindex = completeArray.indexOf(item);
       let pos = termBefore.length > 1 ? [index - termBefore.length, index] : index - 1;
+      let term = {};
       if (varInEquat(termBefore).length != 0) {
-        termArry.push({ "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos });
+        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos });
+        term = { "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos }
       } else {
-        termArry.push({ "type": "term", "text": termBefore, "pos": pos });
+        //termArry.push({ "type": "term", "text": termBefore, "pos": pos });\
+        term = { "type": "term", "text": termBefore, "pos": pos }
+      }
+      if(beforeFunc){
+        completeArray.splice(aindex-1, 0, term)
+      }else{
+        completeArray.splice(aindex, 0, term)
       }
     }
     if (termAfter) {
+      let aindex = completeArray.indexOf(item);
       let pos = termAfter.length > 1 ? [index + 1, index + termAfter.length] : index + 1;
+      let term = {};
       if (varInEquat(termAfter).length != 0) {
-        termArry.push({ "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos });
+        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos });
+        term = { "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos }
       } else {
-        termArry.push({ "type": "term", "text": termAfter, "pos": pos });
+        //termArry.push({ "type": "term", "text": termAfter, "pos": pos });
+        term = { "type": "term", "text": termAfter, "pos": pos }
       }
+      completeArray.splice(aindex+1, 0, term)
     }
-    if (afterFunc != null) {
+    /*if (afterFunc != null) {
       termArry.push(afterFunc)
-    }
+    }*/
     modEquat = modEquat.substring(modIndex + prelength + 1)
     console.log(modEquat)
   }
-  return termArry;
+  //console.log(termArry)
+  console.log(completeArray)
+  return completeArray;
 }
 function combineTerms(fullArray, varDef) {
+  parLinkMap(fullArray)
   //par processing
+  
   let parStarts = fullArray.filter(elem => elem.subtype == "ParStart")
-  for (let start of parStarts) {
+  while (true) {
+    var start; 
+    if(parStarts[0] != undefined){
+      start = parStarts[0]
+    }else{
+      break;
+    }
+    
+    console.log(fullArray)
+    console.log(start)
     let endElem = fullArray[start.matchPar]
     let startPos = endElem.matchPar;
     let sub = fullArray.slice(startPos, start.matchPar + 1);
     let stringVer = arryToString(sub)
     if (sub.filter(elem => elem.type == 'defTerm').length > 0) {
-      let term = new CmpxTerm(endElem.matchPar, start.matchPar, fullArray, [start.pos+1, endElem.pos], { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 })
+      let termB = endElem.matchPar > 0 ? fullArray[endElem.matchPar - 1] : undefined;
+      let term = new CmpxTerm(fullArray.slice(endElem.matchPar + 1, start.matchPar), [start.pos + 1, endElem.pos], { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, termB)
       console.log("code Reached")
       console.log(term.func)
       if (term.func == undefined) {
@@ -1445,43 +1560,26 @@ function combineTerms(fullArray, varDef) {
         console.log(term.func.text)
         let func = getByName(term.func.text);
         console.log(getByName(term.func.text))
-        if(!func.inherant){
+        if (!func.inherant) {
           let arrayed = term.textArray
           let termInOrder = []
-          while(true){
+          while (true) {
             let comma = arrayed.find(elem => elem.type == 'op' && elem.subtype == 'Comma')
-            if(comma == undefined){
+            if (comma == undefined) {
               termInOrder.push(arrayed)
               break;
-            }else{
+            } else {
               let index = arrayed.indexOf(comma)
-              termInOrder.push(arrayed.slice(0,index))
-              arrayed = arrayed.slice(index+1)
+              termInOrder.push(arrayed.slice(0, index))
+              arrayed = arrayed.slice(index + 1)
             }
           }
-          let genVars = generateVars(termInOrder.length)
-          let funcParsable = func.funcParse
-          for(let i = 0; i < genVars.length; i++){
-            funcParsable.replaceAll("v"+(i+1), "("+genVars[i]+")")
-          }
-          console.log(funcParsable.join(""))
-          let resultArry = solveFor(funcParsable.join(""),varDef)
-          /*let filteredTerms = resultArry.filter(elem => elem.subtype == 'cmpxTerm')
-          for(let i = 0; i < genVars.length; i++){
-            for(let term of filteredTerms){
-
-              if(term.text.includes(genVars[i])){
-                resultArry[resultArry.indexOf(term)].termArray = termInOrder[i]
-              }
-            }
-          }*/
-          console.log(resultArry)
-          resultArry = replaceVars(resultArry,termInOrder)
-          fullArray.splice(startPos - 1, sub.length + 1, ...resultArry);
-        }else{
+          let resultValue = parseableConverter(func.funcParse, termInOrder, varDef);
+          fullArray.splice(startPos - 1, sub.length + 1, resultValue);
+        } else {
           fullArray.splice(startPos - 1, sub.length + 1, term)
-        let result = term.text
-        updateFullArray(startPos, fullArray, -(stringVer.length - result.length - 1), sub.length)
+          let result = term.text
+          updateFullArray(startPos, fullArray, -(stringVer.length - result.length - 1), sub.length)
         }
         /*let terms = fullArray[startPos, endElem.matchPar]
         terms = terms.filter(elem => elem.type == 'term' || elem.type == 'defTerm')
@@ -1533,7 +1631,7 @@ function combineTerms(fullArray, varDef) {
       console.log(fullArray)
       updateFullArray(startPos + 1, fullArray, changePos, changeIndex - additions)
     }
-
+    parStarts = fullArray.filter(elem => elem.subtype == "ParStart")
   }
   console.log(fullArray.text)
   //Pow processing
@@ -1551,7 +1649,8 @@ function combineTerms(fullArray, varDef) {
         fullArray.splice(index, 2);
         i = i - 2
       } else if (termAfter.type == "defTerm") {
-        let newTermBefore = new CmpxTerm(index - 2, index, fullArray, termBefore.pos, { 'type': 'term', 'text': 1 }, termAfter)
+        let termB = index - 2 > 0 ? fullArray[index - 3] : undefined;
+        let newTermBefore = new CmpxTerm(fullArray.slice(index - 1, index), termBefore.pos, { 'type': 'term', 'text': 1 }, termAfter, termB)
         fullArray.splice(index - 1, 3, newTermBefore)
         i = i - 2
       } else {
@@ -1570,7 +1669,7 @@ function combineTerms(fullArray, varDef) {
       if (fullArray[i].subtype == 'Percent') {
         if (termAfter.type == 'def') {
           let shortArry = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(' }, termAfter, { 'type': 'op', 'subtype': 'Div', 'text': '/' }, { "type": "term", "text": '100', "pos": null }, { 'type': 'op', 'subtype': 'ParEnd', 'text': ')' }];
-          termAfter = CmpxTerm(0, shortArry.length - 1, shortArry, null, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 })
+          termAfter = CmpxTerm(shortArry.slice(1, shortArry.length - 1), null, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, undefined)
         } else {
           termAfter.text = Number(termAfter) / 100;
         }
@@ -1677,7 +1776,7 @@ function parseTextTerm(elem, target) {
   let textualArry = []
   let locals = []
   let targetVar = varList.filter(elem => elem.letter == target)
-  if(targetVar.length == 0){
+  if (targetVar.length == 0) {
     targetVar = [varList[0]]
     //varList.shift();
   }
@@ -1698,25 +1797,25 @@ function parseTextTerm(elem, target) {
     temp.substring(0, pos) != '' ? textualArry.unshift({ "text": temp.substring(0, pos), "pos": 0 == pos ? 0 : [0, pos] }) : false
   }
   //filter out targeted var
-    console.log(targetVar[0].positions.length)
-    let targetVarDef = new VarTerm(targetVar[0].letter, pos, textualArry.length > 0 ? textualArry[0] : { "type": 'term', 'text': '1' }, { "type": 'term', 'text': targetVar[0].positions.length }, targetVar[0].positions);
-    console.log(targetVarDef.text)
-    if (varList.length > 1) {
-      let otherVars = varList.filter(elem => elem.letter != target)
-      let max = targetVar[0].positions[targetVar[0].positions.length - 1]
-      let targetMaxElem = targetVarDef
-      for (let oVar of otherVars) {
-        let newVarDef = new VarTerm(oVar.letter, pos, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': oVar.positions.length }, oVar.positions);
-        targetVarDef.changeMuti([{ 'type': 'op', 'subtype': 'Muti', 'text': '*' }, newVarDef])
-        if (oVar.positions[oVar.positions.length - 1] > max) {
-          max = oVar.positions[oVar.positions.length - 1]
-          targetMaxElem = newVarDef
-        }
+  console.log(targetVar[0].positions.length)
+  let targetVarDef = new VarTerm(targetVar[0].letter, pos, textualArry.length > 0 ? textualArry[0] : { "type": 'term', 'text': '1' }, { "type": 'term', 'text': targetVar[0].positions.length }, targetVar[0].positions);
+  console.log(targetVarDef.text)
+  if (varList.length > 1) {
+    let otherVars = varList.filter(elem => elem.letter != target)
+    let max = targetVar[0].positions[targetVar[0].positions.length - 1]
+    let targetMaxElem = targetVarDef
+    for (let oVar of otherVars) {
+      let newVarDef = new VarTerm(oVar.letter, pos, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': oVar.positions.length }, oVar.positions);
+      targetVarDef.changeMuti([{ 'type': 'op', 'subtype': 'Muti', 'text': '*' }, newVarDef])
+      if (oVar.positions[oVar.positions.length - 1] > max) {
+        max = oVar.positions[oVar.positions.length - 1]
+        targetMaxElem = newVarDef
       }
-      targetVarDef.endElem = targetMaxElem;
     }
-    console.log(targetVarDef.text)
-    return targetVarDef
+    targetVarDef.endElem = targetMaxElem;
+  }
+  console.log(targetVarDef.text)
+  return targetVarDef
 }
 function basicNumInter(equation) {
   let reverEquat = reverseString(equation)
@@ -1743,37 +1842,55 @@ function arrayEquals(a, b) {
 function solveParse(parseArry) {
 
 }
-function replaceVars(arry,vars){
+function replaceVars(arry, vars) {
   console.log(arry)
   console.log(vars)
-let value = vars.length
-let genVars = generateVars(value)
-console.log(genVars)
-genVars.forEach((elem,index) =>{
-  let varDef = {"varId":elem,"value":vars[index]}
-  arry = recursiveVariable(arry, varDef)
-})
-return arry
+  let value = vars.length
+  let genVars = generateVars(value)
+  console.log(genVars)
+  genVars.forEach((elem, index) => {
+    let varDef = { "varId": elem, "value": vars[index] }
+    arry = recursiveVariable(arry, varDef)
+  })
+  return arry
 }
-function recursiveVariable(array, varDef){
+function recursiveVariable(array, varDef) {
   console.log(array)
   console.log(varDef)
-  for(let elem of array){
-    if(elem.subtype == "cmpxTerm"){
-      elem.textArray = recursiveVariable(elem.textArray,varDef)
-      elem.pow = recursiveVariable(elem.pow,varDef)
-      elem.mutiplican = recursiveVariable(elem.mutiplican,varDef)
-    }else if (elem.subtype == 'var'){
-      if(elem.letter == varDef.varId){
+  for (let elem of array) {
+    if (elem.subtype == "cmpxTerm") {
+      elem.textArray = recursiveVariable(elem.textArray, varDef)
+      elem.pow = recursiveVariable(elem.pow, varDef)
+      elem.mutiplican = recursiveVariable(elem.mutiplican, varDef)
+    } else if (elem.subtype == 'var') {
+      if (elem.letter == varDef.varId) {
         console.log("found Value")
         array = varDef.value
-      }else{
-        elem.pow = elem.pow != undefined ? recursiveVariable(elem.pow,varDef) : elem.pow;
-        elem.mutiplican = elem.mutiplican != undefined ? recursiveVariable(elem.mutiplican,varDef) : elem.mutiplican;
+      } else {
+        elem.pow = elem.pow != undefined ? recursiveVariable(elem.pow, varDef) : elem.pow;
+        elem.mutiplican = elem.mutiplican != undefined ? recursiveVariable(elem.mutiplican, varDef) : elem.mutiplican;
       }
     }
   }
   return array;
+}
+function parseableConverter(parseArry, varsInOrder, varDef) {
+  let genVars = generateVars(varsInOrder.length)
+  for (let i = 0; i < genVars.length; i++) {
+    parseArry.replaceAll("v" + (i + 1), "(" + genVars[i] + ")")
+  }
+  let resultArry = solveFor(parseArry.join(""), varDef)
+  /*let filteredTerms = resultArry.filter(elem => elem.subtype == 'cmpxTerm')
+  for(let i = 0; i < genVars.length; i++){
+    for(let term of filteredTerms){
+
+      if(term.text.includes(genVars[i])){
+        resultArry[resultArry.indexOf(term)].termArray = termInOrder[i]
+      }
+    }
+  }*/
+  resultArry = replaceVars(resultArry, varsInOrder)
+  return new CmpxTerm(resultArry, 0, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, undefined);
 }
 //end
 /*********************************************************spill over***************************************** */
@@ -1927,13 +2044,27 @@ function setVarEquat(equation, varList) {
   }
   return equation;
 }
-function generateVars(length){
+function generateVars(length) {
   let newVars = [];
-  for(let i = 0; i < length; i++){
+  for (let i = 0; i < length; i++) {
     newVars.push(String.fromCharCode(97 + i));
   }
   return newVars;
 }
+function funcsContainingVar(varLetter) {
+  let funcs = [];
+  for (let func of funcList) {
+    if (func.func.includes(varLetter)) {
+      funcs.push({"name": func.func, "idx": func.func.indexOf(varLetter)});
+    }
+  }
+  return funcs;
+}
 //end
-let equat = "sin(x)+1+thing(5,2x)+1"
-console.log(arryToString(solveFor(equat, "x")))
+let equat = "sin(5)^x"
+console.log(equat)
+console.log(equat.innerVar("x"))
+let thing = solveFor(equat, "x");
+console.log(thing)
+console.log(arryToString(thing))
+console.log(arryToString(combineTerms(thing)))
