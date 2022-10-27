@@ -2473,7 +2473,7 @@ function custButton(funcConfig, target) {
 function funcRemove(e) {
   let link = e;
   let buttonName = link.querySelector("#nameLabel").innerHTML;
-  removeFunc(link.querySelector("#nameLabel").innerHTML);
+  removeFunc(buttonName);
   let names = document.getElementsByClassName("custFuncNames");
   for (let i = 0; i < names.length; i++) {
     if (names[i].innerHTML == buttonName) {
@@ -2775,8 +2775,8 @@ function setFuncList(array) {
 }
 //Responsible for removing a value for the funcList (main backend)
 function removeFunc(funcName) {
+  callCalc({"callType":'func', "method":'remove',"name": funcName});
   let array = getFuncList();
-  console.log(funcName)
   for (let item of array) {
     if (item.name == funcName) {
       //removeImplemented(item);

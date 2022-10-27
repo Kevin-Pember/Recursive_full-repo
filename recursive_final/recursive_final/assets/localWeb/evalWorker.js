@@ -3,162 +3,166 @@ let GlobalVars = [];
 let settings = { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 };
 let funcList = [
   {
-    'type': "function",
-    'func': "sin",
-    'funcParse': ["Math.sin(", "v1", "toDeg", ")"],
-    'inputs': 1,
+    'type': 'method',
+    'func': 'sin',
     'funcRadDeg': true,
     'funcLength': 3,
-    'inherant': true,
-    "inverse": "asin"
+    "inverse": "asin",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.sin(input * getAngleCon("deg"));
+    }
   },
   {
-    'type': "function",
-    'func': "asin",
-    'funcParse': ["Math.asin(", "v1", ")", "toRad"],
-    'inputs': 1,
+    'type': 'method',
+    'func': ['asin', "arcsin"],
     'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "sin"
+    'funcLength': [4, 6],
+    "inverse": "sin",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.asin(input) * getAngleCon("rad");
+    }
   },
   {
-    'type': "function",
-    'func': "cos",
-    'funcParse': ["Math.cos(", "v1", "toDeg", ")"],
-    'inputs': 1,
-    'funcRadDeg': true,
-    'funcLength': 3,
-    'inherant': true,
-    "inverse": "acos"
-  },
-  {
-    'type': "function",
-    'func': "acos",
-    'funcParse': ["Math.acos(", "v1", ")", "toRad"],
-    'inputs': 1,
-    'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "cos"
-  },
-  {
-    'type': "function",
-    'func': "tan",
-    'funcParse': ["Math.tan(", "v1", "toDeg", ")"],
-    'inputs': 1,
+    'type': 'method',
+    'func': 'cos',
     'funcRadDeg': true,
     'funcLength': 3,
-    'inherant': true,
-    "inverse": "atan"
+    "inverse": "acos",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.cos(input * getAngleCon("deg"));
+    }
   },
   {
-    'type': "function",
-    'func': "atan",
-    'funcParse': ["Math.atan(", "v1", ")", "toRad"],
-    'inputs': 1,
+    'type': 'method',
+    'func': ['acos', "arccos"],
     'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "tan"
+    'funcLength': [4, 6],
+    "inverse": "cos",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.acos(input) * getAngleCon("rad");
+    }
   },
   {
-    'type': "function",
-    'func': "csc",
-    'funcParse': ["1/Math.sin(", "v1", "toDeg", ")"],
-    'inputs': 1,
-    'funcRadDeg': true,
-    'funcLength': 3,
-    'inherant': true,
-    "inverse": "acsc"
-  },
-  {
-    'type': "function",
-    'func': "acsc",
-    'funcParse': ["Math.asin(1/", "v1", ")", "toRad"],
-    'inputs': 1,
-    'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "csc"
-  },
-  {
-    'type': "function",
-    'func': "sec",
-    'funcParse': ["1/Math.cos(1/", "v1", "toDeg", ")"],
-    'inputs': 1,
+    'type': 'method',
+    'func': 'tan',
     'funcRadDeg': true,
     'funcLength': 3,
-    'inherant': true,
-    "inverse": "asec"
+    "inverse": "atan",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.tan(input * getAngleCon("deg"));
+    }
   },
   {
-    'type': "function",
-    'func': "asec",
-    'funcParse': ["Math.acos(1/", "v1", ")", "toRad"],
-    'inputs': 1,
+    'type': 'method',
+    'func': ['atan', "arctan"],
     'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "sec"
+    'funcLength': [4, 6],
+    "inverse": "tan",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.atan(input) * getAngleCon("rad");
+    }
   },
   {
-    'type': "function",
-    'func': "cot",
-    'funcParse': ["1/Math.tan(1/", "v1", "toDeg", ")"],
-    'inputs': 1,
+    'type': 'method',
+    'func': 'csc',
     'funcRadDeg': true,
     'funcLength': 3,
-    'inherant': true,
-    "inverse": "acot"
+    "inverse": "acsc",
+    'mth': (arry) => {
+      let input = arry[0];
+      return 1 / Math.sin(input * getAngleCon("deg"));
+    }
   },
   {
-    'type': "function",
-    'func': "acot",
-    'funcParse': ["Math.atan(1/", "v1", ")", "toRad"],
-    'inputs': 1,
+    'type': 'method',
+    'func': ['acsc', "arccsc"],
     'funcRadDeg': true,
-    'funcLength': 4,
-    'inherant': true,
-    "inverse": "cot"
+    'funcLength': [4, 6],
+    "inverse": "csc",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.asin(1 / input) * getAngleCon("rad");
+    }
   },
   {
-    'type': "function",
-    'func': "ln",
-    'funcParse': ["Math.log(", "v1", ")"],
-    'inputs': 1,
-    'funcRadDeg': false,
-    'funcLength': 2,
-    'inherant': true,
-    "inverseParse": ["e^(", "v1", ")"]
-  },
-  {
-    'type': "function",
-    'func': "log",
-    'funcParse': ["Math.log10(", "v1", ")"],
-    'inputs': 1,
-    'funcRadDeg': false,
+    'type': 'method',
+    'func': 'sec',
+    'funcRadDeg': true,
     'funcLength': 3,
-    'inherant': true,
-    "inverseParse": ["10^(", "v1", ")"]
+    "inverse": "asec",
+    'mth': (arry) => {
+      let input = arry[0];
+      return 1 / Math.cos(input * getAngleCon("deg"));
+    }
   },
   {
-    'type': "function",
-    'func': "mod",
-    'funcParse': ["v1", "%", "v2"],
-    'inputs': 2,
+    'type': 'method',
+    'func': ['asec', "arcsec"],
+    'funcRadDeg': true,
+    'funcLength': [4, 6],
+    "inverse": "sec",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.acos(1 / input) * getAngleCon("rad");
+    }
+  },
+  {
+    'type': 'method',
+    'func': 'cot',
+    'funcRadDeg': true,
+    'funcLength': 3,
+    "inverse": "acot",
+    'mth': (arry) => {
+      let input = arry[0];
+      return 1 / Math.tan(input * getAngleCon("deg"));
+    }
+  },
+  {
+    'type': 'method',
+    'func': ['acot', "arccot"],
+    'funcRadDeg': true,
+    'funcLength': [4, 6],
+    "inverse": "cot",
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.atan(1 / input) * getAngleCon("rad");
+    }
+  },
+  {
+    'type': 'method',
+    'func': 'abs',
     'funcRadDeg': false,
     'funcLength': 3,
-    'inherant': true
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.abs(input);
+    }
   },
   {
-    'type': "function",
-    "func": "abs",
-    "funcParse": ["Math.abs(", "v1", ")"],
-    "inputs": 1,
-    "funcRadDeg": false,
-    "funcLength": 3,
-    'inherant': true
+    'type': 'method',
+    'func': 'mod',
+    'funcRadDeg': false,
+    'funcLength': 3,
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.abs(input);
+    }
+  },
+  {
+    'type': 'method',
+    'func': 'abs',
+    'funcRadDeg': false,
+    'funcLength': 3,
+    'mth': (arry) => {
+      let input = arry[0];
+      return Math.abs(input);
+    }
   },
   {
     'type': 'method',
@@ -188,7 +192,6 @@ let funcList = [
     'func': 'sigma',
     'funcRadDeg': false,
     'funcLength': 5,
-    'inherant': true,
     'mth': (arry) => {
       let srt = arry[0]
       let end = arry[1]
@@ -221,6 +224,17 @@ let funcList = [
         }
         return value;
       }
+    }
+  },
+  {
+    'type': 'method',
+    'func': 'logB',
+    'funcRadDeg': false,
+    'funcLength': 4,
+    'mth': (arry) => {
+      let base = arry[0]
+      let arg = arry[1]
+      return Math.log10(arg) / Math.log10(base)
     }
   },
   {
@@ -560,7 +574,17 @@ onmessage = function (e) {
       if (object.existing == undefined) {
         port.postMessage({ result: varInEquat(object.text) })
       } else if (object.existing == true) {
-        port.postMessage({ result: funcList.find(elem => elem.func == object.funcName).inputs })
+        port.postMessage({
+          result: funcList.find(elem => {
+            if (Array.isArray(elem.func)) {
+              return elem.func.includes(object.funcName);
+            } else {
+              return elem.func == object.funcName;
+            }
+
+          }
+          ).inputs
+        })
       }
 
     } else if (object.method == 'func') {
@@ -605,6 +629,8 @@ onmessage = function (e) {
       } else if (object.level == 'full') {
         changeFunc('full', object.name, arguments[1])
       }
+    } else if (object.remove == 'remove') {
+      removeFunction(object.name)
     }
   } else if (object.callType == 'calc') {
     if (object.method == 'solve') {
@@ -688,54 +714,33 @@ function solveInpr(equation, degRad) {
 //Func method to find if the current postion has a function defined in the funclist
 function getByName(name) {
   for (let func of funcList) {
-    if (func.func == name) {
-      return func;
+    if (Array.isArray(func.func)) {
+      return func.func.includes(name);
+    } else {
+      return func.func == name;
     }
   }
   return false;
 }
-//Func method to get the inverse of a given function
-function getFuncInv(cmpxTerm, sSide, tVar) {
-  let func = getByName(cmpxTerm.func)
-  if (func.type == "function") {
-    let textArray = cmpxTerm.textArray;
-    textArray.shift();
-    textArray.pop();
-    let terms = [];
-    while (true) {
-      let foundTerm = textArray.find(elem => elem.type == "comma");
-      if (foundTerm) {
-        let index = textArray.indexOf(foundTerm);
-        terms.push(textArray.slice(0, index));
-
-      }
-    }
-  }
-  /*if (func.type == "function") {
-    if (func.inherant && func.inverse) {
-      let inverse = func.inverse;
-      let genVars = generateVars(func.inputs);
-      for(let i = 0; i < func.inputs; i++){
-        inverse = inverse.replaceAll("v"+i, genVars[i]);
-      }
-      inverse.join("");
-      solveFor(inverse);
-    } else {
-
-    }
-  }*/
-}
 //A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
 function funcMatch(equation, way) {
   var returned = "";
+  var longestMatch = "";
   for (let func of funcList) {
-    let check
-    if (way) {
-      check = equation.substring(0, (func.funcLength));
+    let check = "";
+    if (Array.isArray(func.func)) {
+      for (let funcName of func.func) {
+        if (equation.includes(funcName)) {
+          check = funcName;
+        }
+      }
     } else {
-      check = equation.substring(equation.length - func.funcLength);
+      if (equation.includes(func.func)) {
+        check = func.func;
+      }
     }
-    if (check == func.func) {
+    if (check.length > longestMatch.length) {
+      longestMatch = check;
       returned = func;
     }
   }
@@ -1063,7 +1068,11 @@ function forward(sub) {
 function getNameList() {
   let nameList = [];
   for (let func of funcList) {
-    nameList.push(func.func);
+    if (Array.isArray(func.func)) {
+      nameList.concat(func.func)
+    } else {
+      nameList.push(func.func);
+    }
   }
   return nameList;
 }
@@ -1227,7 +1236,11 @@ function parseFuncEntry() {
 //Responsible for removal of functions from the func list
 function removeFunction(name) {
   funcList = funcList.filter(function (value, index, arr) {
-    return value.func != name;
+    if (Array.isArray(value.func)) {
+      return !value.func.includes(name);
+    } else {
+      return value.func != name;
+    }
   })
 }
 function fullSolve(input) {
@@ -1264,36 +1277,33 @@ function solveForSide(vSide, mSide, tVar, trace) {
     }
   })*/
   let addArry = [...vSide]
-  indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
-  addArry.splice(indOfElem, 1);
-  addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
-  mSide = mSide.concat(addArry);
-  /*if (targetedElem.getComputedMuti != '1') {
-    mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-    mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
-    let newMuti = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': targetedElem.mutiplican.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
-    newMuti = newMuti.concat(targetedElem.mutiplican)
-    newMuti.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-
-    mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, newMuti, { "type": "term", "text": '1', "pos": 0 }, undefined)]
-    targetedElem.mutiplican = []
+  if (vSide.length != 1) {
+    indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
+    addArry.splice(indOfElem, 1);
+    addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
+    mSide = mSide.concat(addArry);
   }
-  if (targetedElem.getComputedPow != '1') {
-    let newPow = [{ "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
-    newPow = newPow.concat(targetedElem.pow)
-    if (mSide.length == 1 && mSide[0].type == 'cmpxTerm') {
-      mSide[0].pow = newPow
-    } else {
-      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, { "type": "term", "text": '1', "pos": 0 }, newPow, undefined)]
+  if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
+    console.log("textArray ran")
+    if (vSide[0].getComputedMuti != 1) {
+      let postMuti = swapMuti(vSide[0], mSide)
+      vSide = postMuti[1]
+      mSide = postMuti[0]
     }
-    targetedElem.pow = []
-  }*/
-  if (trace.loc == "textArray") {
-
-  } else if (trace.loc == "pow") {
-
-  } else if (trace.loc == "muti") {
-
+    if (vSide[0].getComputedPow != 1) {
+      let postPow = swapPow(vSide[0], mSide)
+      vSide = postPow[1]
+      mSide = postPow[0]
+    }
+  } else if (trace[0].loc == "pow") {
+    if (vSide[0].getComputedMuti != 1) {
+      let postMuti = swapMuti(vSide[0], mSide)
+      vSide = postMuti[1]
+      mSide = postMuti[0]
+    }
+    let postBase = swapBase(vSide[0], mSide)
+    vSide = postBase[1]
+    mSide = postBase[0]
   }
   if (targetedElem === typeof CmpxTerm) {
     if (targetedElem.func) {
@@ -1348,6 +1358,7 @@ function swapMuti(term, mSide) {
     }
     term.mutiplican = []
   } else {
+    console.log(arryToString(mSide) + "*" + arryToString(newMuti));
     let solved = fullSolve(arryToString(mSide) + "*" + arryToString(newMuti))
     mSide = [{ "type": "term", "text": solved, "pos": 0 }]
     term.mutiplican = []
@@ -1374,6 +1385,14 @@ function swapPow(term, mSide) {
     mSide = [{ "type": "term", "text": solved, "pos": 0 }]
     term.pow = []
   }
+  return [mSide, term]
+}
+function swapBase(term, mSide) {
+  let newBase = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.textArray.length },]
+  newBase = newBase.concat(term.textArray)
+  newBase = newBase.concat([{ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 }, { "type": "op", "subtype": "Comma", "text": "," }, ...mSide])
+  mSide = [new CmpxTerm(newBase, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": "logB" })]
+  term = term.pow
   return [mSide, term]
 }
 function equatTrace(arry, tVar) {
@@ -1611,7 +1630,7 @@ function combineTerms(fullArray, varDef) {
         console.log(term.func.text)
         let func = getByName(term.func.text);
         console.log(getByName(term.func.text))
-        if (!func.inherant) {
+        if (func.type == "function") {
           let arrayed = term.textArray
           let termInOrder = []
           while (true) {
@@ -1632,21 +1651,6 @@ function combineTerms(fullArray, varDef) {
           let result = term.text
           updateFullArray(startPos, fullArray, -(stringVer.length - result.length - 1), sub.length)
         }
-        /*let terms = fullArray[startPos, endElem.matchPar]
-        terms = terms.filter(elem => elem.type == 'term' || elem.type == 'defTerm')
-        let tarFunc = funcList.find(elem => elem.func == term.func)
-        let parsable = tarFunc.funcParse
-        for (let i = 0; i < terms.length; i++) {
-          let term = term[i];
-          parsable = parsable.replace('v' + (i + 1), term.text)
-        }
-        let funcFull = solveFor(parsable.join(""), arguments[1])
-        fullArray.splice(startPos, sub.length + 1)
-        for (let i = funcFull.length - 1; i >= 0; i--) {
-          fullArray.splice(startPos, 0, funcFull[i])
-        }
-        console.log(fullArray)
-      }*/
       }
     } else {
       console.log(stringVer)
@@ -2072,9 +2076,6 @@ function changeFunc(type) {
     funcList.splice(funcList.indexOf(target), 1, newFunc)
   }
 }
-function getNameList() {
-  return funcList.map((elem) => elem = elem.func)
-}
 function getMethod(name) {
   return JSON.parse(JSON.stringify(getByName(name)));
 }
@@ -2105,19 +2106,40 @@ function generateVars(length) {
 function funcsContainingVar(varLetter) {
   let funcs = [];
   for (let func of funcList) {
-    if (func.func.includes(varLetter)) {
-      funcs.push({ "name": func.func, "idx": func.func.indexOf(varLetter) });
+    if (Array.isArray(func.func)) {
+      for (funcName of func.func) {
+        if (funcName.includes(varLetter)) {
+          funcs.push(funcName)
+        }
+      }
+    } else {
+      if (func.func.includes(varLetter)) {
+        funcs.push({ "name": func.func, "idx": func.func.indexOf(varLetter) });
+      }
     }
   }
   return funcs;
 }
+function getAngleCon(type) {
+  if (settings.degRad) {
+    if (type == 'deg') {
+      return (Math.PI / 180);
+    } else if (type = "rad") {
+      return 180 / Math.PI;
+    }
+  } else {
+    return 1;
+  }
+}
 //end
 let part1 = "6*5"
-let part2 = "x^2"
+let part2 = "sin(x)"
 console.log(part1)
 console.log(part2)
 let part1Parse = combineTerms(solveFor(part1, "x"))
 let part2Parse = combineTerms(solveFor(part2, "x"))
+let trace = equatTrace(part2Parse, "x")
+console.log(trace)
 console.log(part1Parse)
 console.log(part2Parse)
-console.log(swapPow(part2Parse[0], part1Parse))
+console.log(solveForSide(part2Parse, part1Parse, "x", trace))
