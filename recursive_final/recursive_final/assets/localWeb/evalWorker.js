@@ -236,14 +236,6 @@ let funcList = [
       let arg = arry[1]
       return Math.log10(arg) / Math.log10(base)
     }
-  },
-  {
-    'type': "function",
-    "func": "thing",
-    "funcParse": ["v1", '*', "v1"],
-    "inputs": 1,
-    "funcRadDeg": false,
-    "funcLength": 5,
   }
 ];
 let ignoreList = [
@@ -456,8 +448,9 @@ class solveEnv {
 class StaticEnv extends solveEnv {
   constructor(object) {
     super(object)
-    this.type = "static"
-    this.vars = varInEquat(object.equation);
+    this.envType = "static"
+    this.id = object.id
+    this.vars = object.vars;
     this.equation = object.equation;
     if (this.equation.includes('=')) {
       this.type = "mutiSide"
@@ -581,7 +574,6 @@ onmessage = function (e) {
             } else {
               return elem.func == object.funcName;
             }
-
           }
           ).inputs
         })
@@ -1180,7 +1172,7 @@ function stringifyMethod(object) {
 function stringFunction(object) {
   let name = object.func;
   let string = object.string;
-  let vars = object.variables;
+  let vars = object.vars;
   for (let i = vars.length - 1; i >= 0; i--) {
     string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
   }
@@ -1191,6 +1183,7 @@ function stringFunction(object) {
 function parseFunction(StringFunction) {
   let preserved = StringFunction;
   StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
+  console.log("%c"+StringFunction,"color: grey;")
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   let variables = varInFunc(StringFunction)
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
@@ -1198,7 +1191,7 @@ function parseFunction(StringFunction) {
     "func": name,
     "type": "method",
     "string": StringFunction,
-    "variables": variables,
+    "vars": variables,
     'full': preserved,
     "inputs": variables.length,
     "funcRadDeg": false,
@@ -1228,11 +1221,13 @@ function parseFuncEntry() {
     returnedObject.func = name;
     returnedObject.funcParse = parseable;
     returnedObject.inputs = cacInputs(parseable);
+    returnedObject.vars = varInEquat(func);
     returnedObject.funcRadDeg = false;
     returnedObject.funcLength = name.length;
   } else if (arguments[0] == "method") {
     let funcString = arguments[1];
     returnedObject = parseFunction(funcString);
+    console.log(returnedObject)
     returnedObject.mth = stringFunction(returnedObject)();
   }
   return returnedObject;
@@ -2055,7 +2050,7 @@ function setVarEquat(equation, varList) {
     for (let i = 0; i < equation.length; i++) {
       if (funcMatch(equation.substring(i), true) != "") {
         i += funcMatch(equation.substring(i), true).length;
-      } else if (equation.charAt(i) == data.letter) {
+      } else if (equation.substring(i,i+data.letter.length) == data.letter) {
         if (data.value != "") {
           equation = equation.substring(0, i) + "(" + data.value + ")" + equation.substring(i + 1);
         }
@@ -2100,6 +2095,8 @@ function getAngleCon(type) {
   }
 }
 //end
+console.log(parseFuncEntry("function",'testor', " x*5+y"))
+console.log(parseFuncEntry("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
 /*let part1 = "6*5"
 let part2 = "5^x"
 console.log(part1)
