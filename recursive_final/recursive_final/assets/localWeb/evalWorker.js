@@ -240,8 +240,8 @@ let funcList = [
   {
     'type': "function",
     "func": "thing",
-    "funcParse": ["v1", '*', "v2"],
-    "inputs": 2,
+    "funcParse": ["v1", '*', "v1"],
+    "inputs": 1,
     "funcRadDeg": false,
     "funcLength": 5,
   }
@@ -715,9 +715,13 @@ function solveInpr(equation, degRad) {
 function getByName(name) {
   for (let func of funcList) {
     if (Array.isArray(func.func)) {
-      return func.func.includes(name);
+      if (func.func.includes(name)) {
+        return func;
+      }
     } else {
-      return func.func == name;
+      if (func.func == name) {
+        return func;
+      }
     }
   }
   return false;
@@ -1265,84 +1269,62 @@ function findValueOf(tVar, equat) {
   }
 
 }
-function solveForSide(vSide, mSide, tVar, trace) {
-  let targetedElem = trace[0].term;
-  let indOfElem = trace[0].index;
-  /*let indOfElem = -1;
-  vSide.forEach((sec, i) => {
-    console.log(typeof sec)
-    if (sec.type == "defTerm" && sec.text.includes(tVar)) {
-      targetedElem = sec
-      indOfElem = i
+function solveForSide(vSide, mSide, trace) {
+  console.log(vSide)
+  console.log(mSide)
+  if (trace.length > 0) {
+    let targetedElem = trace[0].term;
+    let indOfElem = trace[0].index;
+    let addArry = [...vSide]
+    if (vSide.length != 1) {
+      indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
+      addArry.splice(indOfElem, 1);
+      addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
+      mSide = mSide.concat(addArry);
     }
-  })*/
-  let addArry = [...vSide]
-  if (vSide.length != 1) {
-    indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
-    addArry.splice(indOfElem, 1);
-    addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
-    mSide = mSide.concat(addArry);
-  }
-  if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
-    console.log("textArray ran")
-    if (vSide[0].getComputedMuti != 1) {
-      let postMuti = swapMuti(vSide[0], mSide)
-      vSide = postMuti[1]
-      mSide = postMuti[0]
-    }
-    if (vSide[0].getComputedPow != 1) {
-      let postPow = swapPow(vSide[0], mSide)
-      vSide = postPow[1]
-      mSide = postPow[0]
-    }
-  } else if (trace[0].loc == "pow") {
-    if (vSide[0].getComputedMuti != 1) {
-      let postMuti = swapMuti(vSide[0], mSide)
-      vSide = postMuti[1]
-      mSide = postMuti[0]
-    }
-    let postBase = swapBase(vSide[0], mSide)
-    vSide = postBase[1]
-    mSide = postBase[0]
-  }
-  if (targetedElem === typeof CmpxTerm) {
-    if (targetedElem.func) {
-      let funcDef = getByName(targetedElem.func);
-      if (funcDef.inverse) {
-        let arrayed = targetedElem.textArray
-        let termInOrder = []
-        while (true) {
-          let newVSide = [];
-          let comma = arrayed.find(elem => elem.type == 'op' && elem.subtype == 'Comma')
-          if (!comma) {
-            termInOrder.push(arrayed)
-            break;
-          } else {
-            let index = arrayed.indexOf(comma)
-            termInOrder.push(arrayed.slice(0, index))
-            arrayed = arrayed.slice(index + 1)
+    if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
+      if (vSide[0].getComputedMuti != 1) {
+        let postMuti = swapMuti(vSide[0], mSide)
+        mSide = postMuti[0]
+      }
+      if (vSide[0].getComputedPow != 1) {
+        let postPow = swapPow(vSide[0], mSide)
+        mSide = postPow[0]
+      }
+      if (targetedElem.subtype == "cmpxTerm") {
+        console.log("is complex term")
+        if (targetedElem.func) {
+          console.log("has func")
+          let intFunc = getByName(targetedElem.func.text)
+          console.log(targetedElem.func)
+          console.log(typeof intFunc)
+          if (intFunc.inverse) {
+            let replacement = [...targetedElem.textArray]
+            replacement.splice(trace[1].index, 1, ...mSide)
+            mSide = [new CmpxTerm(replacement, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": intFunc.inverse })]
           }
         }
-        let replacementPoint = termInOrder.indexOf(targetedElem)
-        if (vSide.length > 1) {
-
-        } else {
-          termInOrder.splice(replacementPoint, 1, mSide)
-          vSide = targetedElem
-          mSide = new CmpxTerm(termInOrder, 0, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, { 'type': 'func', 'text': funcDef.inverse })
-        }
-      } else {
-        return undefined
-      };
-    } else {
+      }
+      console.log(vSide)
+      vSide = vSide[0].textArray
+      console.log(vSide)
+    } else if (trace[0].loc == "pow") {
+      if (vSide[0].getComputedMuti != 1) {
+        let postMuti = swapMuti(vSide[0], mSide)
+        mSide = postMuti[0]
+      }
+      let postBase = swapBase(vSide[0], mSide)
+      mSide = postBase[0]
+      vSide = vSide[0].pow
     }
-    let recur = solveForSide(targetedElem.textArray, mSide, tVar)
-    vSide = recur[0]
-    mSide = recur[1]
+    let final = solveForSide(vSide, mSide, trace.slice(1));
+    vSide = final[0]
+    mSide = final[1]
   }
   return [vSide, mSide]
 }
 function swapMuti(term, mSide) {
+  console.log(term)
   mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
   mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
   let newMuti = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.mutiplican.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
@@ -1617,6 +1599,7 @@ function combineTerms(fullArray, varDef) {
     let stringVer = arryToString(sub)
     if (sub.filter(elem => elem.type == 'defTerm').length > 0) {
       let termB = endElem.matchPar > 0 ? fullArray[endElem.matchPar - 1] : undefined;
+      console.log("%c termB", "color: red", termB)
       let term = new CmpxTerm(fullArray.slice(endElem.matchPar + 1, start.matchPar), [start.pos + 1, endElem.pos], { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, termB)
       console.log("code Reached")
       console.log(term.func)
@@ -1903,31 +1886,13 @@ function replaceVars(arry, vars) {
   let value = vars.length
   let genVars = generateVars(value)
   console.log(genVars)
-  genVars.forEach((elem, index) => {
-    let varDef = { "varId": elem, "value": vars[index] }
-    arry = recursiveVariable(arry, varDef)
+  arry.forEach((eElem, idx) => {
+    if (eElem.subtype == "var") {
+      console.log(vars.at(genVars.indexOf(eElem.letter))[0])
+      arry.splice(idx, 1, ...vars[genVars.indexOf(eElem.letter)])
+    }
   })
   return arry
-}
-function recursiveVariable(array, varDef) {
-  console.log(array)
-  console.log(varDef)
-  for (let elem of array) {
-    if (elem.subtype == "cmpxTerm") {
-      elem.textArray = recursiveVariable(elem.textArray, varDef)
-      elem.pow = recursiveVariable(elem.pow, varDef)
-      elem.mutiplican = recursiveVariable(elem.mutiplican, varDef)
-    } else if (elem.subtype == 'var') {
-      if (elem.letter == varDef.varId) {
-        console.log("found Value")
-        array = varDef.value
-      } else {
-        elem.pow = elem.pow != undefined ? recursiveVariable(elem.pow, varDef) : elem.pow;
-        elem.mutiplican = elem.mutiplican != undefined ? recursiveVariable(elem.mutiplican, varDef) : elem.mutiplican;
-      }
-    }
-  }
-  return array;
 }
 function parseableConverter(parseArry, varsInOrder, varDef) {
   let genVars = generateVars(varsInOrder.length)
@@ -1935,6 +1900,7 @@ function parseableConverter(parseArry, varsInOrder, varDef) {
     parseArry.replaceAll("v" + (i + 1), "(" + genVars[i] + ")")
   }
   let resultArry = solveFor(parseArry.join(""), varDef)
+
   /*let filteredTerms = resultArry.filter(elem => elem.subtype == 'cmpxTerm')
   for(let i = 0; i < genVars.length; i++){
     for(let term of filteredTerms){
@@ -1944,7 +1910,9 @@ function parseableConverter(parseArry, varsInOrder, varDef) {
       }
     }
   }*/
+
   resultArry = replaceVars(resultArry, varsInOrder)
+  console.log("%c result", "color: yellow", arryToString(resultArry))
   return new CmpxTerm(resultArry, 0, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, undefined);
 }
 //end
@@ -2133,13 +2101,18 @@ function getAngleCon(type) {
 }
 //end
 let part1 = "6*5"
-let part2 = "sin(x)"
+let part2 = "sin(thing(x))"
 console.log(part1)
 console.log(part2)
-let part1Parse = combineTerms(solveFor(part1, "x"))
-let part2Parse = combineTerms(solveFor(part2, "x"))
+let part1pre = solveFor(part1, "x");
+let part2pre = solveFor(part2, "x");
+console.log("%c here", "color:blue")
+console.log(part1pre)
+console.log(part2pre)
+let part1Parse = combineTerms(part1pre)
+let part2Parse = combineTerms(part2pre)
+console.log(arryToString(part1Parse))
+console.log(arryToString(part2Parse))
 let trace = equatTrace(part2Parse, "x")
 console.log(trace)
-console.log(part1Parse)
-console.log(part2Parse)
-console.log(solveForSide(part2Parse, part1Parse, "x", trace))
+console.log(arryToString(solveForSide(part2Parse, part1Parse, trace)[1]))
