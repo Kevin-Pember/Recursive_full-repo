@@ -47,6 +47,8 @@ calcWorker.onmessage = (event) => {
     report(rtnObj.mes, false)
   } else if (rtnObj.type == 'posComp') {
     report(rtnObj.mes, true)
+  } else if (rtnObj.type == "dataPack"){
+
   }
 }
 const callCalc = (arry) => new Promise((res, rej) => {
@@ -4309,8 +4311,10 @@ function generateVars(length){
 }
 class FuncPage {
   constructor(config) {
-    this.def = {}
-    this.def.srtConfig = config
+    //this.def = {}
+    this.srtConfig = config
+    this.id = config.name
+    console.log(config)
   }
 }
 class CustomPage extends FuncPage {
@@ -4339,7 +4343,7 @@ class CustomPage extends FuncPage {
       };
       newFrame.contentWindow.postMessage(obj, [channel.port2]);
     });
-    let feedObject = JSON.parse(JSON.stringify(this.def.srtConfig))
+    let feedObject = JSON.parse(JSON.stringify(this.srtConfig))
     feedObject.call = 'init';
     console.log(feedObject)
     newFrame.onload = function () {
@@ -4363,8 +4367,8 @@ class TemplatePage extends FuncPage {
       callCalc({ callType: 'set', method: "env", envType : 'static'});
     })
     let tabCopy = clon.getElementById('customFuncTab');
-    this.def.tabPage = tabCopy;
-    this.def.tab = newTabButton(config, tabCopy);
+    this.tabPage = tabCopy;
+    this.tab = newTabButton(config, tabCopy);
     let varGrid = clon.getElementById("varGrid");
     console.log(varGrid)
     let movable = clon.getElementById("selectorUnder");
@@ -4391,7 +4395,7 @@ class TemplatePage extends FuncPage {
     clon.getElementById('customFuncTab').dataset.tab = JSON.stringify(config);
     clon.getElementById("nameFunc").value = name;
 
-    this.def.chart = createGraph(chart)
+    this.chart = createGraph(chart)
     clon.getElementById('functionMode').addEventListener("click", function () {
       funcTabs[0].style.visibility = "inherit";
       hidModes(parseInt(movable.dataset.pos), funcTabs);
@@ -4411,11 +4415,11 @@ class TemplatePage extends FuncPage {
     });
     for (let element of updateElements) {
       clon.getElementById(element).addEventListener("input", function (e) {
-        try {
-          parseVariables(varGrid, this.def);
+        /*try {
+          parseVariables(varGrid, this);
         } catch (e) {
           report("Couldn't Calculate", false);
-        }
+        }*/
 
       });
     }
@@ -4425,10 +4429,8 @@ class HybridPage extends TemplatePage {
 
   constructor(config) {
     super(config)
-    console.log(this.def)
     let clon = this.clone;
-    let fullConfig = this.def;
-    let tabCopy = fullConfig.tabPage;
+    let tabCopy = this.tabPage;
 
     clon.getElementById("editIcon").style = "";
     clon.getElementById("editIcon").src = getSource("EditIcon");
@@ -4443,7 +4445,7 @@ class HybridPage extends TemplatePage {
     subElem.contentEditable = false;
 
     nameElem.addEventListener("input", function (e) {
-      let oldVal = fullConfig.srtConfig;
+      let oldVal = this.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
       let oldParse = parseFunction(oldVal.code)
       oldParse.func = e.target.value;
@@ -4451,8 +4453,7 @@ class HybridPage extends TemplatePage {
 
       newVal.name = e.target.value;
       newVal.code = newStringifyFunc;
-      console.log(fullConfig)
-      changeFunc(oldVal, newVal, fullConfig);
+      changeFunc(oldVal, newVal, this);
     });
 
     clon.getElementById('editIcon').addEventListener("click", function (e) {
@@ -4464,7 +4465,7 @@ class HybridPage extends TemplatePage {
       closeEdit(tabCopy)
     });
     clon.getElementById('confirmEdit').addEventListener('click', function () {
-      let oldVal = fullConfig.srtConfig;
+      let oldVal = this.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
       let newFunc = tabCopy.querySelector('#custEdit').value
 
@@ -4472,19 +4473,19 @@ class HybridPage extends TemplatePage {
         newVal.name = value.func;
         newVal.code = value.full;
       })
-      changeFunc(oldVal, newVal, fullConfig);
+      changeFunc(oldVal, newVal, this);
       closeEdit(tabCopy)
     })
     document.getElementById("mainPage").appendChild(clon);
-    checkVar("hybrid", tabCopy, fullConfig.srtConfig.code, fullConfig)
+    checkVar("hybrid", tabCopy, this.srtConfig.code, this)
   }
 }
 class EquatPage extends TemplatePage {
   constructor(config) {
     super(config)
+    console.log("%c Page Def:","color: yellow", this)
     let clon = this.clone;
-    let fullConfig = this.def;
-    let tabCopy = fullConfig.tabPage;
+    let tabCopy = this.tabPage;
     let equation = config.equation;
     let equationDIV = clon.getElementById("EquationFunc");
     console.log(this.def)
@@ -4493,11 +4494,11 @@ class EquatPage extends TemplatePage {
     equationDIV.dataset.baseE = equation;
 
     clon.getElementById('nameFunc').addEventListener("input", function (e) {
-      let oldVal = fullConfig.srtConfig;
+      let oldVal = this.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
       newVal.name = e.target.value;
 
-      changeFunc(oldVal, newVal, fullConfig);
+      changeFunc(oldVal, newVal, this);
     });
     let styleVal = `
     #keypad {
@@ -4524,82 +4525,22 @@ class EquatPage extends TemplatePage {
       }
     }`;
     keypadEquationMapper(equationDIV, styleVal)
-    /*equationDIV.addEventListener("focus", function (e) {
-      if (document.getElementById('keypad').style.visibility == "hidden") {
-        console.log("focusthrone")
-        let initEquation = JSON.parse(e.target.parentNode.parentNode.parentNode.dataset.tab);
-        equationDIV.innerHTML = initEquation.equation;
-        setSelect(equationDIV, equationDIV.innerHTML.length);
-        keypadVis(true);
-        keypadController(
-          {
-            "keyElems": { "scroll": equationDIV, "input": equationDIV },
-            "reset": false,
-            "keyStyling": `
-              #keypad {
-                top: calc(40% + 40px);
-                bottom: 10px;
-                width: calc(100% - 20px);
-                left: 10px;
-                position: absolute;
-              }
-              @media only screen and (max-height: 450px){
-                #keypad{
-                  width: calc(33.3333% - 15px);
-                  left: calc(66.6666% + 5px);
-                  height: calc(100% - 60px);
-                  top: 50px;
-                  bottom: 0;
-                  padding: 0px;
-                  position: absolute;
-                  border-radius: 25px;
-                  overflow: hidden;
-                }
-                #funcContainer{
-                  width: calc(66.6666%)
-                }
-              }`
-          }
-        );
-      }
-    });
-    equationDIV.addEventListener('focusout', () => {
-      setTimeout(() => {
-        let sel = window.getSelection();
-        if (!equationDIV.contains(sel.focusNode)) {
-          keypadVis(false);
-          keypadController(
-            {
-              "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-              "reset": true,
-              "rePage": () => {
-
-              },
-            }
-          );
-        }
-      })
-    });*/
     equationDIV.addEventListener("change", function (e) {
-      let oldVal = fullConfig.srtConfig;
+      let oldVal = this.srtConfig;
       let newVal = JSON.parse(JSON.stringify(oldVal));
-      checkVar("function", tabCopy, e.target.innerHTML, fullConfig);
+      checkVar("function", tabCopy, e.target.innerHTML, this);
       newVal.equation = e.target.innerHTML;
       equationDIV.dataset.baseE = equationDIV.innerHTML;
-      changeFunc(oldVal, newVal, fullConfig);
+      changeFunc(oldVal, newVal, this);
     });
-    fullConfig.chart.options.plugins.zoom.zoom.onZoomComplete = function () {
-      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+    this.chart.options.plugins.zoom.zoom.onZoomComplete = function () {
+      parseVariables(tabCopy.querySelector('#varGrid'), this)
     }
-    fullConfig.chart.options.plugins.zoom.pan.onPanComplete = function () {
-      parseVariables(tabCopy.querySelector('#varGrid'), fullConfig)
+    this.chart.options.plugins.zoom.pan.onPanComplete = function () {
+      parseVariables(tabCopy.querySelector('#varGrid'), this)
     }
     document.getElementById("mainPage").appendChild(clon);
-    checkVar("function", tabCopy, equationDIV.innerHTML, fullConfig);
-    //try {
-    parseVariables(tabCopy.querySelector('#varGrid'), fullConfig);
-    /*} catch (e) {
-      report("Couldn't Calculate", false);
-    }*/
-  }
+    checkVar("function", tabCopy, equationDIV.innerHTML, this);
+    parseVariables(tabCopy.querySelector('#varGrid'), this);
+    }
 }

@@ -2100,8 +2100,8 @@ function getAngleCon(type) {
   }
 }
 //end
-let part1 = "6*5"
-let part2 = "sin(thing(x))"
+/*let part1 = "6*5"
+let part2 = "5^x"
 console.log(part1)
 console.log(part2)
 let part1pre = solveFor(part1, "x");
@@ -2115,4 +2115,4 @@ console.log(arryToString(part1Parse))
 console.log(arryToString(part2Parse))
 let trace = equatTrace(part2Parse, "x")
 console.log(trace)
-console.log(arryToString(solveForSide(part2Parse, part1Parse, trace)[1]))
+console.log(arryToString(solveForSide(part2Parse, part1Parse, trace)[1]))*/
