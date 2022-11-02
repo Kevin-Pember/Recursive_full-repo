@@ -48,7 +48,14 @@ calcWorker.onmessage = (event) => {
   } else if (rtnObj.type == 'posComp') {
     report(rtnObj.mes, true)
   } else if (rtnObj.type == "dataPack") {
-
+    console.log("dataPack Recived")
+    console.log(definedPages)
+    console.log(rtnObj.name)
+    let targetedElem = definedPages.find(function (item) {
+      return item.id == rtnObj.name
+    });
+    console.log(targetedElem)
+    targetedElem.packageHandler(rtnObj.packet)
   }
 }
 const callCalc = (arry) => new Promise((res, rej) => {
@@ -2494,13 +2501,13 @@ function createTab(config) {
     tabs[i].style.visibility = 'hidden';
   }
   if (config.type == "Function") {
-    let def = (new EquatPage(config)).def;
+    let def = (new EquatPage(config));
     definedPages.push(def);
   } else if (config.type == "Hybrid") {
-    let def = (new HybridPage(config)).def;
+    let def = (new HybridPage(config));
     definedPages.push(def);
   } else if (config.type == "Code") {
-    let def = (new CustomPage(config)).def;
+    let def = (new CustomPage(config));
     definedPages.push(def)
   }
 }
@@ -2658,16 +2665,6 @@ function matchPage(name) {
 }
 //END
 /*********************************************|Custom Func Updating|************************************************/
-//Responsible for handle UI changes in order to open the editor section of custom functions
-function openEdit(elem, definition) {
-  hideElements([elem.querySelector('#varEquationContainer'), elem.querySelector('#resultPane'), elem.querySelector('#nameFunc')]);
-  pullUpElements([elem.querySelector('#editDiv')])
-  elem.querySelector('#custEdit').value = definition;
-}
-function closeEdit(elem) {
-  hideElements([elem.querySelector('#editDiv')]);
-  pullUpElements([elem.querySelector('#varEquationContainer'), elem.querySelector('#resultPane'), elem.querySelector('#nameFunc')]);
-}
 //Responsible for handing the changing of a cust func on the default tab page
 function changeFunc(og, newString, def) {
   let tab = def.tab;
@@ -2724,9 +2721,9 @@ function updateCustomButtons(oldVal, newValue) {
   }
 }
 //Responsible for changing a cust func entry in the interpreter 
-function changeImplemented(oldConfig, newObject) {
+function changeImplemented(name, newObject) {
   let object = {};
-  if (oldConfig.type == "Function") {
+  /*if (oldConfig.type == "Function") {
     object = parseFuncEntry("function", oldConfig.name, oldConfig.equation);
   } else if (oldConfig.type == "Hybrid") {
     object = parseFuncEntry("method", oldConfig.code)
@@ -2742,7 +2739,17 @@ function changeImplemented(oldConfig, newObject) {
   } else if (oldConfig.type == "Hybrid") {
     newObject = parseFuncEntry("method", newObject.code);
   }
-  funcList[i] = newObject;
+  funcList[i] = newObject;*/
+  let funcList = getFuncList()
+  let targetIdx = -1;
+  funcList.find((func, idx) => {
+    if(func.name == name){
+      targetIdx = idx;
+      return true
+    }
+  })
+  funcList[idx] = newObject
+  setFuncList(funcList)
 }
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {
@@ -2941,18 +2948,15 @@ function getGraphVars(def) {
   return varArray
 }
 //Responsible for (IDFK work on this later)
-function checkVar(type, clon, unpar, def) {
-  callCalc({ "callType": "get", 'method': 'vars', 'type': type == 'function' ? 'equat' : 'method', 'text': unpar }).then(value => {
+function checkVar(name, def) {
+  callCalc({ "callType": "get", 'method': 'vars', "existing": true, "funcName": name }).then(value => {
     let checkList = value;
-    let varGrid = clon.querySelector("#varGrid");
-    let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
+    //let varGrid = clon.querySelector("#varGrid");
+    //let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
     let varExisting = varListAssbely(varGrid);
     let newVars = [];
     for (let eVar of checkList) {
       matching = false;
-      let match = varExisting.find((eElem, idx) => {
-
-      })
       for (let cVar of varExisting) {
         if (eVar.letter == cVar.name) {
           let indexOfVar = varExisting.indexOf(cVar);
@@ -2971,25 +2975,7 @@ function checkVar(type, clon, unpar, def) {
     }
     //Var Creatation part
     for (let newVar of newVars) {
-      let name = newVar;
-      let varGrid = clon.querySelector("#varGrid");
-      let tempvar = document.getElementsByClassName("variableTemplate")[0];
-      let varClon = tempvar.content.cloneNode(true);
-      varClon.getElementById('variableName').innerHTML = name;
-      varClon.getElementById('variableEntry').addEventListener('input', function (e) {
-        if (type == "function") {
-          let equationArea = clon.querySelector('#EquationFunc')
-          if (varClon.getElementById('variableEntry') != '') {
-            equationArea.innerHTML = setVar(varGrid, equationArea.dataset.baseE);
-          }
-        }
-        if (varClon.getElementById('variableEntry').value != '') {
-          try {
-            parseVariables(varGrid, def);
-          } catch (e) { }
-        }
-      });
-      varGrid.appendChild(varClon);
+      def.generateVar(newVar);
     }
     let currentVars = varListAssbely(varGrid);
 
@@ -3715,19 +3701,21 @@ function createGraph(chart) {
           id: "base",
           data: [],
           label: "hidden",
-          fontColor: colorArray[1],
-          borderColor: colorArray[1],
-          backgroundColor: colorArray[1],
+          fontColor: getCSS("--numbersColor"),
+          borderColor: getCSS("--numbersColor"),
+          backgroundColor: getCSS("--numbersColor"),
           showLine: true,
+          pointRadius: 0,
         },
         {
           id: "extrema",
           data: [],
           label: "hidden",
-          fontColor: colorArray[1],
-          borderColor: colorArray[1],
-          backgroundColor: colorArray[1],
+          fontColor: getCSS("--numbersColor"),
+          borderColor: getCSS("--numbersColor"),
+          backgroundColor: getCSS("--numbersColor"),
           showLine: false,
+          pointRadius: 5,
         }
       ]
     },
@@ -3762,11 +3750,6 @@ function createGraph(chart) {
       },
       responsive: true,
       maintainAspectRatio: false,
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
       plugins: {
         legend: {
           display: false
@@ -4207,6 +4190,9 @@ function animate(elem, animation) {
     elem.style.animation = animation;
   });
 }
+function getCSS(value){
+  return getComputedStyle(document.documentElement).getPropertyValue(value);
+}
 //END
 /************************************************|help page|**************************************************/
 //Responsible for handling tab changes in help page (deprecated like everything on help page)
@@ -4370,9 +4356,9 @@ class TemplatePage extends FuncPage {
     let funcTabs = [clon.getElementById('functionDiv'), clon.getElementById('graphDiv'), clon.getElementById('tableDiv')];
     let tabCopy = clon.getElementById('customFuncTab');
     let movable = clon.getElementById("selectorUnder");
+    let thisElem = this
     movable.dataset.pos = 0;
 
-    this.funcDef = 
     this.vars = [];
     this.name = config.name;
     this.clone = clon;
@@ -4380,17 +4366,15 @@ class TemplatePage extends FuncPage {
     this.tabPage = tabCopy;
     this.tab = newTabButton(config, tabCopy);
     this.chart = createGraph(chart)
-    callCalc({ callType: 'get', method: 'func', "name": this.name}).then(value => {
+    callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
       this.funcDef = value;
-      let varArry = value.vars
-      varArry.forEach((value) => {
-        this.generateVar(value.letter)
-      })
-      let varNames = varArry.map(val => { val = val.letter})
-      callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, vars: value.vars, equation : `${this.name}(${varNames.join(',')})`})
-      //start here
+      this.vars = this.funcDef.vars;
+      let varNames = []
+      this.vars.forEach(val => { varNames.push(val.letter) })
+      console.log(varNames)
+      console.log(this.vars)
+      callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` })
     });
-    
 
     //Graph settings that need to be updated
     clon.getElementById("minGraph").value = settings.gMin;
@@ -4418,6 +4402,20 @@ class TemplatePage extends FuncPage {
       hidModes(parseInt(movable.dataset.pos), funcTabs);
       animateModes(parseInt(movable.dataset.pos), 150, movable);
     });
+    this.chart.options.plugins.zoom.zoom.onZoomComplete = function () {
+      let varArray = {
+        "gMin": thisElem.chart.scales.x == undefined ? settings.gMin : Number(thisElem.chart.scales.x.min),
+        "gMax": thisElem.chart.scales.x == undefined ? settings.gMax : Number(thisElem.chart.scales.x.max)
+      }
+      callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": thisElem.id, "newVars": varArray });
+    }
+    this.chart.options.plugins.zoom.pan.onPanComplete = function () {
+      let varArray = {
+        "gMin": thisElem.chart.scales.x == undefined ? settings.gMin : Number(thisElem.chart.scales.x.min),
+        "gMax": thisElem.chart.scales.x == undefined ? settings.gMax : Number(thisElem.chart.scales.x.max)
+      }
+      callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": thisElem.id, "newVars": varArray });
+    }
 
     let updateElements = [
       "minGraph",
@@ -4427,38 +4425,24 @@ class TemplatePage extends FuncPage {
       'maxTable',
       "cellTable",
     ];
-    for (let element of updateElements) {
-      clon.getElementById(element).addEventListener("input", function (e) {
-        /*try {
-          parseVariables(varGrid, this);
-        } catch (e) {
-          report("Couldn't Calculate", false);
-        }*/
-
-      });
-    }
   }
   generateVar(name) {
     let tempvar = document.getElementsByClassName("variableTemplate")[0];
-    let varClon = tempvar.content.cloneNode(true);
-    let varCon = varClon.getElementById('variableContainer')
+    let varClon = tempvar.content.cloneNode(true);8
+    let thisElem = this;
     varClon.getElementById('variableName').innerHTML = name;
     varClon.getElementById('variableEntry').addEventListener('input', function (e) {
-      if (type == "function") {
-        let equationArea = clon.querySelector('#EquationFunc')
-        if (varClon.getElementById('variableEntry') != '') {
-          equationArea.innerHTML = setVar(this.varGrid, equationArea.dataset.baseE);
-        }
-      }
-      
+      callCalc({ callType: "set", method: "var", targetEnv: thisElem.name, target: name, value: variableEntry.value });
     });
     this.varGrid.appendChild(varClon);
-    this.vars.push({"name": name, 'elem': varClon})
+    this.vars.push({ "name": name, 'elem': varClon })
+    //this.serioShit.thing = "test";
   }
   packageHandler(packet) {
     this.tabPage.querySelector('#equalsHeader').innerHTML = '=' + packet.result;
     this.chart.data.datasets[0].data = packet.graph.points;
-    this.chart.data.datasets[1].data = packet.graph.extrema
+    this.chart.data.datasets[1].data = packet.graph.extrema;
+    console.log("%c extrema here","color: blue;",packet.graph.extrema)
     this.chart.update();
     let table = this.tabPage.querySelector("#funcTable");
     table.innerHTML = "<tr><th>x</th><th>y</th></tr>";
@@ -4477,6 +4461,7 @@ class HybridPage extends TemplatePage {
     super(config)
     let clon = this.clone;
     let tabCopy = this.tabPage;
+    let code = config.code
 
     clon.getElementById("editIcon").style = "";
     clon.getElementById("editIcon").src = getSource("EditIcon");
@@ -4486,44 +4471,50 @@ class HybridPage extends TemplatePage {
     clon.getElementById('creatorEditor').style = "height: fit-content; max-height: calc(100% - 20px); top: 10px; overflow: scroll; ";
     let nameElem = clon.getElementById('nameFunc');
     let subElem = clon.getElementById("EquationFunc");
-    let equationContain = clon.getElementById('EquationFunc');
     subElem.innerHTML = "Hybrid";
     subElem.contentEditable = false;
 
     nameElem.addEventListener("input", function (e) {
-      let oldVal = this.srtConfig;
-      let newVal = JSON.parse(JSON.stringify(oldVal));
-      let oldParse = parseFunction(oldVal.code)
-      oldParse.func = e.target.value;
-      let newStringifyFunc = stringifyMethod(oldParse);
-
-      newVal.name = e.target.value;
-      newVal.code = newStringifyFunc;
-      changeFunc(oldVal, newVal, this);
+      changed('name')
     });
 
     clon.getElementById('editIcon').addEventListener("click", function (e) {
-      let json = JSON.parse(tabCopy.dataset.tab)
-      openEdit(tabCopy, json.code);
-      recaculateNums(tabCopy.querySelector('#lineLabel'), json.code)
+      this.openEdit(this.code);
+      recaculateNums(tabCopy.querySelector('#lineLabel'), this.code)
     });
     clon.getElementById('editExit').addEventListener('click', function () {
-      closeEdit(tabCopy)
+      this.closeEdit()
     });
     clon.getElementById('confirmEdit').addEventListener('click', function () {
-      let oldVal = this.srtConfig;
-      let newVal = JSON.parse(JSON.stringify(oldVal));
-      let newFunc = tabCopy.querySelector('#custEdit').value
-
-      callCalc({ "callType": 'get', 'method': 'parsedMethod', 'text': newFunc }).then(value => {
-        newVal.name = value.func;
-        newVal.code = value.full;
-      })
-      changeFunc(oldVal, newVal, this);
-      closeEdit(tabCopy)
+      this.changed("method")
     })
     document.getElementById("mainPage").appendChild(clon);
     //checkVar("hybrid", tabCopy, this.srtConfig.code, this)
+  }
+  openEdit(definition) {
+    hideElements([this.tabPage.querySelector('#varEquationContainer'), this.tabPage.querySelector('#resultPane'), this.tabPage.querySelector('#nameFunc')]);
+    pullUpElements([this.tabPage.querySelector('#editDiv')])
+    this.tabPage.querySelector('#custEdit').value = definition;
+  }
+  closeEdit() {
+    hideElements([this.tabPage.querySelector('#editDiv')]);
+    pullUpElements([this.tabPage.querySelector('#varEquationContainer'), this.tabPage.querySelector('#resultPane'), this.tabPage.querySelector('#nameFunc')]);
+  }
+  changed(type){
+    let name = this.tabPage.querySelector("#nameFunc")
+    var code;
+    if(type == "method"){
+      code = tabCopy.querySelector('#custEdit').value
+    }else if(type == "name"){
+      let tempCode = tabCopy.querySelector('#custEdit').value
+      tempCode = tempCode.substring(tempCode.indexOf("("))
+      code = `function ${name}${tempCode}`
+      tabCopy.querySelector('#custEdit').value = code;
+    }
+    callCalc({ callType: "func", method: "change", name: this.id, changes: { "type": "method", "name": name, "code": code } }).then(value => {
+      changeImplemented(this.id, {"type": "Hybrid", 'name': name, "code": code})
+      this.id = value;
+    })
   }
 }
 class EquatPage extends TemplatePage {
@@ -4534,18 +4525,19 @@ class EquatPage extends TemplatePage {
     let tabCopy = this.tabPage;
     let equation = config.equation;
     let equationDIV = clon.getElementById("EquationFunc");
+    this.type = "function"
     console.log(this.def)
 
     equationDIV.innerHTML = equation;
     equationDIV.dataset.baseE = equation;
 
     clon.getElementById('nameFunc').addEventListener("input", function (e) {
-      let oldVal = this.srtConfig;
-      let newVal = JSON.parse(JSON.stringify(oldVal));
-      newVal.name = e.target.value;
-
-      changeFunc(oldVal, newVal, this);
+      this.changed()
     });
+    equationDIV.addEventListener("change", function (e) {
+      this.changed()
+    });
+
     let styleVal = `
     #keypad {
       top: calc(40% + 40px);
@@ -4571,22 +4563,17 @@ class EquatPage extends TemplatePage {
       }
     }`;
     keypadEquationMapper(equationDIV, styleVal)
-    equationDIV.addEventListener("change", function (e) {
-      let oldVal = this.srtConfig;
-      let newVal = JSON.parse(JSON.stringify(oldVal));
-      //checkVar("function", tabCopy, e.target.innerHTML, this);
-      newVal.equation = e.target.innerHTML;
-      equationDIV.dataset.baseE = equationDIV.innerHTML;
-      changeFunc(oldVal, newVal, this);
-    });
-    this.chart.options.plugins.zoom.zoom.onZoomComplete = function () {
-      parseVariables(tabCopy.querySelector('#varGrid'), this)
-    }
-    this.chart.options.plugins.zoom.pan.onPanComplete = function () {
-      parseVariables(tabCopy.querySelector('#varGrid'), this)
-    }
     document.getElementById("mainPage").appendChild(clon);
-    //checkVar("function", tabCopy, equationDIV.innerHTML, this);
-    parseVariables(tabCopy.querySelector('#varGrid'), this);
+    checkVar(this.id, this);
+    //parseVariables(tabCopy.querySelector('#varGrid'), this);
+  }
+  changed() {
+    let name = this.tabPage.querySelector("#nameFunc")
+    let equation = this.tabPage.querySelector("#EquationFunc")
+    callCalc({ callType: "func", method: "change", name: this.id, changes: { "type": "function", "name": name, "equation": equation } }).then(value => {
+      changeImplemented(this.id, {"type": "Function", 'name': name, "equation": equation})
+      this.id = value;
+      checkVar(this.id, this)
+    })
   }
 }

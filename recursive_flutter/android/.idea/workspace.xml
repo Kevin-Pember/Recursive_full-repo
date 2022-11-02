@@ -7,7 +7,10 @@
     <list default="true" id="920130fe-3b77-4937-af16-e567afed286a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/assets/localWeb/evalWorker.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/assets/localWeb/evalWorker.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/assets/localWeb/load.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/assets/localWeb/load.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/macos/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/macos/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../recursive_final/recursive_final/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../recursive_final/recursive_final/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,6 +50,7 @@
       <option name="PM_INSTALL_OPTIONS" value="" />
       <option name="ALL_USERS" value="false" />
       <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="CLEAR_APP_STORAGE" value="false" />
       <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
       <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="default_activity" />
@@ -86,6 +90,7 @@
         <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
         <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
         <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+        <option name="PROFILING_MODE" value="NOT_SET" />
       </Profilers>
       <option name="DEEP_LINK" value="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -104,6 +109,7 @@
       <option name="PM_INSTALL_OPTIONS" value="" />
       <option name="ALL_USERS" value="false" />
       <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="CLEAR_APP_STORAGE" value="false" />
       <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
       <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="default_activity" />
@@ -143,6 +149,7 @@
         <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
         <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
         <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+        <option name="PROFILING_MODE" value="NOT_SET" />
       </Profilers>
       <option name="DEEP_LINK" value="" />
       <option name="ACTIVITY_CLASS" value="" />

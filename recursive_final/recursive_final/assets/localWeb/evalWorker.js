@@ -1,4 +1,5 @@
 let runners = [];
+let self = this;
 let GlobalVars = [];
 let settings = { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 };
 let funcList = [
@@ -293,6 +294,19 @@ String.prototype.innerVar = function (tVar) {
     return true;
   }
 };
+String.prototype.varIns = function (tVar){
+  let count = 0;
+  let temp = this
+  while(true){
+    if(temp.includes(tVar)){
+      temp = temp.substring(temp.indexOf(tVar) + tVar.length)
+      count++;
+    }else{
+      break;
+    }
+  }
+  return count;
+}
 String.prototype.hasVar = function () {
   if (varInEquat(this).length > 0) {
     return true
@@ -449,6 +463,10 @@ class StaticEnv extends solveEnv {
   constructor(object) {
     super(object)
     this.envType = "static"
+    this.envVars = {
+      "gMin": settings.gMin,
+      "gMax": settings.gMax
+    };
     this.id = object.id
     this.vars = object.vars;
     this.equation = object.equation;
@@ -462,21 +480,24 @@ class StaticEnv extends solveEnv {
     }
   }
   calcSingle() {
-    if (this.type === "mutiSide") {
-      let target = arguments[0]
-      let tarElem = this.vars.find(elem => elem.letter == target)
-      return fullSolve(setVarEquat(arryToString(tarElem.equalTo), this.vars))
-    } else {
-      return fullSolve(setVarEquat(this.equation, this.vars), this.vars)
+    var usedEquat;
+    if(this.tempEquation != undefined){
+      usedEquat = this.tempEquation
+    }else{
+      usedEquat = this.equation
     }
+    let solvableEquat = setVarEquat(usedEquat, this.vars);
+    console.log(solvableEquat)
+    return fullSolve(solvableEquat, this.vars)
   }
-  calcPoints(type, target) {
-    let tarElem = this.vars.find(elem => elem.letter == target)
+  calcPoints(type) {
+    console.log(this.equation)
+    let solvableEquat = setVarEquat(this.equation,this.vars);
     if (type == "graph") {
       let param = arguments[2]
-      return calculatePoints(setVarEquat(arryToString(tarElem.equalTo)), param.min, param.max, param.res, settings)
+      return {"points":calculatePoints(solvableEquat, this.envVars.gMin, this.envVars.gMax, settings.gR, settings),"extrema": calculateExtrema(setVarEquat(this.equation,this.vars))}
     } else {
-      return calculatePoints(setVarEquat(arryToString(tarElem.equalTo)), settings.tMin, settings.tMax, settings.tC, settings)
+      return calculatePoints(solvableEquat, settings.tMin, settings.tMax, settings.tC, settings)
     }
   }
   changeEquat(equat) {
@@ -484,16 +505,57 @@ class StaticEnv extends solveEnv {
     this.equation = equat;
     if (this.equation.includes('=')) {
       this.type = "mutiSide"
-      for (let varI of this.vars) {
-        varI.equalTo = findValueOf(varI.letter, this.equation)
-      }
     } else {
       this.type = "singleSide"
     }
+    this.checkCalculable();
   }
   setVar(target, value) {
     let targElem = this.vars.find(elem => elem.letter == target);
     targElem.value = value
+    console.log(this.vars)
+    this.checkCalculable();
+  }
+  checkCalculable(){
+    console.log("%c Checking Calculatable","color: brown;")
+    let thisElem = this;
+    let undef = [];
+    let rtnVal = {}
+    this.vars.forEach(elem => {
+      if(elem.value == undefined || elem.value == ""){
+       undef.push(elem)
+      }
+    });
+    let retObj = {type: "dataPack", name: this.id};
+    console.log("%c"+undef.length,"color:red;")
+    if(undef.length == 1){
+      if(this.type == "mutiSide"){
+        this.tempEquation = arryToString(createSidedEquation(this.equation, undef[0].letter))
+      }
+      let graphing = thisElem.calcPoints("graph");
+      console.log(graphing)
+      rtnVal = {
+        result: "",
+        graph: graphing,
+        table: thisElem.calcPoints("table")
+      }
+      this.tempEquation = undefined;
+    }else if (undef.length == 0){
+      rtnVal = {
+        result: thisElem.calcSingle(),
+        graph: thisElem.calcPoints("graph"),
+        table: thisElem.calcPoints("table")
+      }
+    }
+    console.log("%c ending here","color: brown;")
+    self.postMessage({"type": "dataPack", "name": this.id, "packet": rtnVal})
+  }
+  setEnvVar(object){
+    this.envVars = {
+      ...this.envType, 
+      ...object
+    }
+    this.checkCalculable();
   }
 }
 class DynamicEnv extends solveEnv {
@@ -526,7 +588,6 @@ class DynamicEnv extends solveEnv {
 }
 onmessage = function (e) {
   let object = e.data;
-  console.log(object)
   let port = e.ports[0];
 
   if (object.callType == "set") {
@@ -546,7 +607,7 @@ onmessage = function (e) {
         targVar.value = object.value
         port.postMessage({ result: "Set Var" })
       } else {
-        runners.find(elem => elem.id == object.targetEnv).setVar(object.target, object.value)
+        runners.find(elem => {return elem.id == object.targetEnv}).setVar(object.target, object.value)
         port.postMessage({ result: "Set Var" })
       }
 
@@ -558,6 +619,8 @@ onmessage = function (e) {
       }
     } else if (object.method == "envEquat") {
       runners.find(elem => elem.id == object.targetEnv).changeEquat(object.equation)
+    } else if (object.method == "envVar"){
+      runners.find(elem => elem.id == object.targetEnv).setEnvVar(object.newVars)
     }
   } else if (object.callType == "get") {
     if (object.method == 'list') {
@@ -567,15 +630,17 @@ onmessage = function (e) {
       if (object.existing == undefined) {
         port.postMessage({ result: varInEquat(object.text) })
       } else if (object.existing == true) {
-        port.postMessage({
-          result: funcList.find(elem => {
-            if (Array.isArray(elem.func)) {
-              return elem.func.includes(object.funcName);
-            } else {
-              return elem.func == object.funcName;
-            }
+        let thing = funcList.find(elem => {
+          if (Array.isArray(elem.func)) {
+            return elem.func.includes(object.funcName);
+          } else {
+            return elem.func == object.funcName;
           }
-          ).inputs
+        }
+        )
+        console.log("%c result", "color: yellow", object.funcName)
+        port.postMessage({
+          result: thing.vars
         })
       }
 
@@ -589,7 +654,6 @@ onmessage = function (e) {
 
   } else if (object.callType == "func") {
     if (object.method == 'add') {
-      //{callType: "func", method: "add", newFuncs : blank for brevity}
       let list = Array.isArray(object.newFuncs) ? object.newFuncs : [object.newFuncs]
       try {
         for (let def of list) {
@@ -615,12 +679,7 @@ onmessage = function (e) {
         console.log('issues adding to algo')
       }
     } else if (object.method == 'change') {
-      //{callType: "func", method: "change", level: blank for brevity, name: blank for brevity, params: blank for brevity, equation: blank for brevity}
-      if (object.level == 'part') {
-        changeFunc('part', object.name, object.params)
-      } else if (object.level == 'full') {
-        changeFunc('full', object.name, arguments[1])
-      }
+      port.postMessage({"name":changeFunc(object.name, object.changes)});
     } else if (object.remove == 'remove') {
       removeFunction(object.name)
     }
@@ -779,14 +838,10 @@ function findMethod(funcUn, degRad) {
 }
 //A method to parse a function array into a string so it can be add to the equation string
 function assembly(func, parsedFunc, values) {
-  inputs = func.inputs;
+  let inputs = func.inputs;
   for (let i = 1; i <= inputs; i++) {
     let numVar = "v" + i;
-    let vararray = parsedFunc.filter(elem => elem == numVar);
-    for (let vare of vararray) {
-      let index = parsedFunc.indexOf(numVar);
-      parsedFunc[index] = values[i - 1];
-    }
+    parsedFunc = parsedFunc.replaceAll(numVar,values[i-1])
   }
   let parsedString = parsedFunc.join("");
   return parsedString;
@@ -1074,7 +1129,6 @@ function getNameList() {
 }
 //Takes string and returns an array for funclist
 function createParseable(equation) {
-
   for (let i = equation.length - 1; i >= 0; i--) {
     let func = funcMatch(equation.substring(i), true);
     if (func != "") {
@@ -1183,7 +1237,6 @@ function stringFunction(object) {
 function parseFunction(StringFunction) {
   let preserved = StringFunction;
   StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
-  console.log("%c"+StringFunction,"color: grey;")
   let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
   let variables = varInFunc(StringFunction)
   StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
@@ -1264,25 +1317,47 @@ function findValueOf(tVar, equat) {
   }
 
 }
+function createSidedEquation(equation,target){
+  let decSide = false;
+  let side1 = equation.substring(0, equation.indexOf('='))
+  let side2 = equation.substring(equation.indexOf('=') + 1)
+  if(side1.varIns(target) > side2.varIns(target)){
+    decSide = true;
+  }else{
+    decSide = false;
+  }
+  let part1Parse = combineTerms(solveFor(side1, target));
+  let part2Parse = combineTerms(solveFor(side2, target));
+  let trace = equatTrace(decSide ? part1Parse : part2Parse, target)
+  let sided = solveForSide(decSide ? part1Parse : part2Parse, decSide ? part2Parse : part1Parse, trace)
+  return arryToString(sided[1])
+}
 function solveForSide(vSide, mSide, trace) {
-  console.log(vSide)
-  console.log(mSide)
   if (trace.length > 0) {
     let targetedElem = trace[0].term;
     let indOfElem = trace[0].index;
     let addArry = [...vSide]
     if (vSide.length != 1) {
-      indOfElem != addArry.length - 1 ? addArry.splice(indOfElem + 1, 1) : null;
+      console.log("%c index Issue","color: green;", indOfElem)
+      console.log(addArry.length - 1)
+      if(indOfElem != addArry.length - 1){
+        addArry.splice(indOfElem+1, 1)
+      }else{
+        addArry.splice(indOfElem-1, 2)
+      }
       addArry.splice(indOfElem, 1);
       addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
       mSide = mSide.concat(addArry);
+      console.log(mSide)
+      vSide = [targetedElem]
     }
     if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
-      if (vSide[0].getComputedMuti != 1) {
+      if (vSide[0].getComputedMuti != 1 && vSide[0].getComputedMuti != undefined) {
+        console.log(vSide[0])
         let postMuti = swapMuti(vSide[0], mSide)
         mSide = postMuti[0]
       }
-      if (vSide[0].getComputedPow != 1) {
+      if (vSide[0].getComputedPow != 1 && vSide[0].getComputedPow != undefined) {
         let postPow = swapPow(vSide[0], mSide)
         mSide = postPow[0]
       }
@@ -1454,8 +1529,6 @@ function solveFor(equat, varDef) {
   for (let i = 0; i < fullArray.length; i++) {
     fullArray[i] = fullArray[i].subtype == "varContainer" ? fullArray[i] = parseTextTerm(fullArray[i], varDef) : fullArray[i];
   }
-  console.log(fullArray)
-  console.log(fullArray)
   fullArray = parLinkMap(fullArray);
   return fullArray
 }
@@ -1622,7 +1695,7 @@ function combineTerms(fullArray, varDef) {
               arrayed = arrayed.slice(index + 1)
             }
           }
-          let resultValue = parseableConverter(func.funcParse, termInOrder, varDef);
+          let resultValue = parseableConverter([...func.funcParse], termInOrder, varDef);
           fullArray.splice(startPos - 1, sub.length + 1, resultValue);
         } else {
           fullArray.splice(startPos - 1, sub.length + 1, term)
@@ -1896,16 +1969,6 @@ function parseableConverter(parseArry, varsInOrder, varDef) {
   }
   let resultArry = solveFor(parseArry.join(""), varDef)
 
-  /*let filteredTerms = resultArry.filter(elem => elem.subtype == 'cmpxTerm')
-  for(let i = 0; i < genVars.length; i++){
-    for(let term of filteredTerms){
-
-      if(term.text.includes(genVars[i])){
-        resultArry[resultArry.indexOf(term)].termArray = termInOrder[i]
-      }
-    }
-  }*/
-
   resultArry = replaceVars(resultArry, varsInOrder)
   console.log("%c result", "color: yellow", arryToString(resultArry))
   return new CmpxTerm(resultArry, 0, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, undefined);
@@ -1962,7 +2025,6 @@ function varInList(list, varLetter) {
   return null;
 }
 function calculatePoints(parsedEquation, start, end, res) {
-  console.log('calculating Points')
   let pointArray = [];
   start = Math.floor(start)
   end = Math.ceil(end)
@@ -1977,8 +2039,16 @@ function calculatePoints(parsedEquation, start, end, res) {
     newPoint.y = fullSolve(parsedEquation.replaceAll('Æ', newPoint.x));
     pointArray.push(newPoint);
   }
-  console.log(pointArray)
   return pointArray;
+}
+function calculateExtrema(parsedEquation){
+  let extrema = [];
+  let copy = parsedEquation
+  copy = copy.replaceAll('Æ', "x")
+  extrema.push({x:fullSolve(createSidedEquation(copy+"=0","x"), settings.degRad), y : 0})
+
+  extrema.push({x:0, y: fullSolve(parsedEquation.replaceAll("Æ","0"))})
+  return extrema;
 }
 function trailingRound(num) {
   let stringDef = String(num)
@@ -2017,27 +2087,16 @@ function changeImplemented(oldName, newObject) {
   let oldIndex = funcList.indexOf(oldConfig);
   funcList.splice(oldIndex, 1, newObject);
 }
-function changeFunc(type) {
-  if (type == 'part') {
-    let name = arguments[1]
-    let changes = arguments[2]
-    let repNames = Object.getOwnPropertyNames(changes)
-    let target = getByName(name)
-    for (let prop of repNames) {
-      target[prop] = changes[prop]
-    }
-  } else {
-    let tarName = arguments[1]
-    let object = arguments[2]
-    let target = getByName(tarName)
-    let newFunc = {};
-    if (object.type == 'function') {
-      newFunc = parseFuncEntry(object.type, object.name, object.func);
-    } else if (object.type == 'method') {
-      newFunc = parseFuncEntry(object.type, object.text);
-    }
-    funcList.splice(funcList.indexOf(target), 1, newFunc)
-  }
+function changeFunc(name, newObject){
+let target = funcList.find(elem => { elem.func == name});
+let object = {};
+if (newObject.type == "function") {
+  object = parseFuncEntry("function", newObject.name, newObject.equation);
+} else if (newObject.type == "method" && !newObject.code.includes('XMLHttpRequest')) {
+  object = parseFuncEntry("method", newObject.code);
+}
+target = object
+return object.func;
 }
 function getMethod(name) {
   return JSON.parse(JSON.stringify(getByName(name)));
@@ -2046,13 +2105,18 @@ function getParsedMethod(text) {
   return parseFunction(text)
 }
 function setVarEquat(equation, varList) {
+  console.log(varList)
   for (let data of varList) {
     for (let i = 0; i < equation.length; i++) {
+      console.log(equation.substring(i,i+data.letter.length))
       if (funcMatch(equation.substring(i), true) != "") {
-        i += funcMatch(equation.substring(i), true).length;
+        i += funcMatch(equation.substring(i), true).func.length-1;
+        console.log()
       } else if (equation.substring(i,i+data.letter.length) == data.letter) {
-        if (data.value != "") {
+        if (data.value != "" && data.value != undefined) {
           equation = equation.substring(0, i) + "(" + data.value + ")" + equation.substring(i + 1);
+        }else {
+          equation = equation.substring(0,i) + "Æ" + equation.substring(i+1);
         }
       }
     }
@@ -2097,6 +2161,7 @@ function getAngleCon(type) {
 //end
 console.log(parseFuncEntry("function",'testor', " x*5+y"))
 console.log(parseFuncEntry("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
+console.log(createSidedEquation("x+4=0","x"))
 /*let part1 = "6*5"
 let part2 = "5^x"
 console.log(part1)

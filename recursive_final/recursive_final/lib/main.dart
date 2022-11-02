@@ -1,52 +1,49 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-void main() {
+final InAppLocalhostServer localhostServer = new InAppLocalhostServer();
+
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  // start the localhost server
+  await localhostServer.start();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Recursive',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'main'),
-    );
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+
+  runApp(MaterialApp(home: MyApp()));
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
+class MyApp extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyAppState createState() => new _MyAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        bottom: false,
-        child: InAppWebView(
-          onWebViewCreated: (controller) {
-            controller.loadFile(assetFilePath: "assets/localWeb/index.html");
-          },
-          
-        ),
+      appBar: AppBar(
+        title: const Text('InAppLocalhostServer Example'),
+      ),
+      body: Container(
+          child: Column(children: <Widget>[
+            Expanded(
+              child: InAppWebView(
+                initialUrlRequest: URLRequest(
+                    url: Uri.parse("https://localhost:8080/assets/localWeb/index.html")
+                ),
+                onWebViewCreated: (controller) {},
+                onLoadStart: (controller, url) {},
+                onLoadStop: (controller, url) {},
+              ),
+            )]
+          )
       ),
     );
   }
