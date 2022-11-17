@@ -1,4 +1,5 @@
 console.log('hello there')
+
 let TextColorGlobal = "";
 let colorArray = [];
 let definedPages = [
@@ -29,12 +30,9 @@ let secondList = [
 ];
 if (localStorage.getItem("settings") != undefined) {
   settings = JSON.parse(localStorage.getItem("settings"));
-  console.log("settings got");
-  console.log(settings);
 } else {
   localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tC" : 5,"tMin" : -10,"tMax" : 10,"gR" : 100,"gMin" : -10,"gMax" : 10}');
   settings = JSON.parse(localStorage.getItem("settings"));
-  console.log(settings);
 }
 let themeElem = {};
 
@@ -48,7 +46,6 @@ calcWorker.onmessage = (event) => {
   } else if (rtnObj.type == 'posComp') {
     report(rtnObj.mes, true)
   } else if (rtnObj.type == "dataPack") {
-    console.log("dataPack Recived")
     console.log(definedPages)
     console.log(rtnObj.name)
     let targetedElem = definedPages.find(function (item) {
@@ -200,8 +197,10 @@ if (document.getElementById("mainBody") != null) {
       left: calc(33.3333% + 5px);
       top: 10px;
       visibility: inherit;
+      animation: fadeEffect 0.50s linear 1 none;
     }
     #extendedFuncGrid {
+      position: absolute;
       top: 0;
       height: 100%;
       width: 100%;
@@ -989,10 +988,17 @@ if (document.getElementById("mainBody") != null) {
     },
 
     {
-      "id": 'functionPopup',
-      "name": " deprecated Button",
-      "function": () => {
-      },
+      "id": 'keyboardPopup',
+      "name": "Open Keyboard",
+      "function": function () {
+        let target = keyTargets.input;
+        target.setAttribute("inputmode", "text")
+        target.focus();
+        target.addEventListener("focusout", () => {
+          target.setAttribute("inputmode", "none")
+          target.removeEventListener(this)
+        })
+       },
       "repeatable": false,
     },
 
@@ -1217,6 +1223,9 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('factorialEx').addEventListener("click", function () { frontButtonPressed('!'); });
   document.getElementById('log10Ex').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
   document.getElementById('lnEx').addEventListener("click", function () { frontButtonPressed('ln('); });
+
+  
+
   document.getElementById('backExMini').addEventListener("click", function () {
     document.getElementById('customFuncDisplay').style.animation = null;
     document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
@@ -1503,7 +1512,7 @@ function closePage(id) {
     element.style.zIndex = 1;
   });
 }
-//Responsible for handling the popup part of the virtKeyboard on the page
+//Responsible for handling the popup part of the virtuKeyboard on the page
 function popup() {
   if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
     document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
@@ -2136,7 +2145,7 @@ function setSelect(node, index) {
   sel.removeAllRanges();
   sel.addRange(range);
 }
-//Responsible for getting the funclist from local Storage
+//Responsible for getting the func list from local Storage
 function getFuncList() {
   let parseString = localStorage.getItem("funcList");
   let array = [];
@@ -2723,32 +2732,13 @@ function updateCustomButtons(oldVal, newValue) {
 //Responsible for changing a cust func entry in the interpreter 
 function changeImplemented(name, newObject) {
   let object = {};
-  /*if (oldConfig.type == "Function") {
-    object = parseFuncEntry("function", oldConfig.name, oldConfig.equation);
-  } else if (oldConfig.type == "Hybrid") {
-    object = parseFuncEntry("method", oldConfig.code)
-  }
-  let indexOf = -1;
-  for (let i = 0; i < funcList.length; i++) {
-    if (JSON.stringify(object) == JSON.stringify(funcList[i])) {
-      indexOf = i;
-    }
-  }
-  if (oldConfig.type == "Function") {
-    newObject = parseFuncEntry("function", newObject.name, newObject.equation);
-  } else if (oldConfig.type == "Hybrid") {
-    newObject = parseFuncEntry("method", newObject.code);
-  }
-  funcList[i] = newObject;*/
   let funcList = getFuncList()
-  let targetIdx = -1;
-  funcList.find((func, idx) => {
+  let target = funcList.find((func, idx) => {
     if(func.name == name){
-      targetIdx = idx;
       return true
     }
   })
-  funcList[idx] = newObject
+  funcList.splice(funcList.indexOf(target), 1, newObject);
   setFuncList(funcList)
 }
 //Responsible for adding a cust func entry into interpreter
@@ -4373,7 +4363,7 @@ class TemplatePage extends FuncPage {
       this.vars.forEach(val => { varNames.push(val.letter) })
       console.log(varNames)
       console.log(this.vars)
-      callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` })
+      callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` })
     });
 
     //Graph settings that need to be updated
@@ -4439,10 +4429,10 @@ class TemplatePage extends FuncPage {
     //this.serioShit.thing = "test";
   }
   packageHandler(packet) {
-    this.tabPage.querySelector('#equalsHeader').innerHTML = '=' + packet.result;
+    this.tabPage.querySelector("#EquationFunc").innerHTML = packet.result;
+    this.tabPage.querySelector('#equalsHeader').innerHTML = '=' + packet.point;
     this.chart.data.datasets[0].data = packet.graph.points;
     this.chart.data.datasets[1].data = packet.graph.extrema;
-    console.log("%c extrema here","color: blue;",packet.graph.extrema)
     this.chart.update();
     let table = this.tabPage.querySelector("#funcTable");
     table.innerHTML = "<tr><th>x</th><th>y</th></tr>";
@@ -4501,7 +4491,7 @@ class HybridPage extends TemplatePage {
     pullUpElements([this.tabPage.querySelector('#varEquationContainer'), this.tabPage.querySelector('#resultPane'), this.tabPage.querySelector('#nameFunc')]);
   }
   changed(type){
-    let name = this.tabPage.querySelector("#nameFunc")
+    let name = this.tabPage.querySelector("#nameFunc").innerHTML
     var code;
     if(type == "method"){
       code = tabCopy.querySelector('#custEdit').value
@@ -4521,21 +4511,22 @@ class EquatPage extends TemplatePage {
   constructor(config) {
     super(config)
     console.log("%c Page Def:", "color: yellow", this)
+    let thisElem = this;
     let clon = this.clone;
     let tabCopy = this.tabPage;
     let equation = config.equation;
-    let equationDIV = clon.getElementById("EquationFunc");
+    this.equationDIV = clon.getElementById("EquationFunc");
     this.type = "function"
     console.log(this.def)
 
-    equationDIV.innerHTML = equation;
-    equationDIV.dataset.baseE = equation;
+    this.equationDIV.innerHTML = equation;
+    this.equationDIV.dataset.baseE = equation;
 
     clon.getElementById('nameFunc').addEventListener("input", function (e) {
-      this.changed()
+      thisElem.changed()
     });
-    equationDIV.addEventListener("change", function (e) {
-      this.changed()
+    this.equationDIV.addEventListener("input", function (e) {
+      thisElem.changed()
     });
 
     let styleVal = `
@@ -4562,17 +4553,18 @@ class EquatPage extends TemplatePage {
         width: calc(66.6666%)
       }
     }`;
-    keypadEquationMapper(equationDIV, styleVal)
+    keypadEquationMapper(this.equationDIV, styleVal)
     document.getElementById("mainPage").appendChild(clon);
     checkVar(this.id, this);
     //parseVariables(tabCopy.querySelector('#varGrid'), this);
   }
   changed() {
-    let name = this.tabPage.querySelector("#nameFunc")
-    let equation = this.tabPage.querySelector("#EquationFunc")
+    let name = this.tabPage.querySelector("#nameFunc").value
+    let equation = this.tabPage.querySelector("#EquationFunc").innerHTML
+    this.equationDIV.dataset.baseE = equation;
     callCalc({ callType: "func", method: "change", name: this.id, changes: { "type": "function", "name": name, "equation": equation } }).then(value => {
       changeImplemented(this.id, {"type": "Function", 'name': name, "equation": equation})
-      this.id = value;
+      this.id = name;
       checkVar(this.id, this)
     })
   }

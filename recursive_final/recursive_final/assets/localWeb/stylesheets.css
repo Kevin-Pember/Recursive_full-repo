@@ -25,6 +25,10 @@
   color: var(--textColor);
   -webkit-tap-highlight-color: transparent;
 }
+body{
+  background: var(--displayColor);
+  overflow: hidden;
+}
 
 [contenteditable=true]:empty:before {
   content: attr(placeholder);
@@ -62,12 +66,28 @@
 .text{
   fill: var(--textColor)
 }
+.scrollable{
+  overflow-y: auto;
+}
 .mode {
   width: calc(100% + 1px);
   height: 100%;
   left: 0px;
   border-radius: 25px 25px 0 0;
   position: absolute;
+}
+.helpTextContainer{
+  height: 100%;
+  width: 175px;
+  margin-right: 20px;
+}
+.helpTitles{
+  text-align: right;
+  margin-bottom: 20px;
+}
+p{
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .pane{
@@ -211,19 +231,6 @@ textarea {
 
   resize: none;
   /*remove the resize handle on the bottom right*/
-}
-
-body {        /* prevent callout to copy image, etc when tap to hold */
-  -webkit-text-size-adjust: none;         /* prevent copy paste, to allow, change 'none' to 'text' */
-  background-color:#E4E4E4;
-  background-image:linear-gradient(to bottom, #A7A7A7 0%, #E4E4E4 51%);
-  font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
-  height:100vh;
-  margin:0px;
-  padding:0px;
-  /* Padding to avoid the "unsafe" areas behind notches in the screen */
-  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-  width:100%;
 }
 
 hr {
@@ -666,12 +673,13 @@ input[type="button"]:focus {
 }
 .keypadButton{
   overflow: hidden;
+  text-align: center;
 }
-.keypadButton:before{
+.keypadButton:after{
   content: "";
-  background: var(--textColor);
-  display: block;
+  background: transparent;
   position: absolute;
+  display: block;
   top: 2.5px;
   left: 2.5px;
   border-radius: 25px;
@@ -681,9 +689,11 @@ input[type="button"]:focus {
   z-index: 1;
   transition: all 0.5s ease
 }
-.keypadButton:active:before{
+.keypadButton:active:after{
   transform: scale(0.5);
+  background: var(--textColor);
   border-radius: 50%;
+  margin-left: 25%;
   width: unset;
   aspect-ratio: 1/1;
   opacity: 0.2;
@@ -1596,27 +1606,31 @@ input[type="button"]:focus {
 }
 
 .navButtons {
+  font-weight: bold;
   font-size: 18px;
   color: var(--textColor);
   background-color: var(--numbersColor);
   position: relative;
   text-align: left;
+  padding-bottom: 10px;
   border: none;
   left: 2%;
-  height: 100px;
   width: 96%;
   margin-top: 10px;
   border-radius: 50px;
-  min-width: 0;
+  display: inline-flex;
   overflow-x: auto;
   filter: drop-shadow(-5px 5px 5px var(--translucent));
+  justify-content: space-evenly;
+  justify-items: center;
+  align-content: space-evenly;
+  align-items: center;
 }
 
 .settingsIcon {
   left: 0;
   top: 0;
   align-self: center;
-  position: absolute;
 }
 
 .settingTabContent {
@@ -1661,6 +1675,15 @@ input[type="button"]:focus {
 }
 
 #settingsTitle {
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: calc(100% - 20px);
+  text-align: center;
+}
+.settingsTitle {
   margin-left: 10px;
   padding-left: 10px;
   padding-right: 10px;
@@ -2187,12 +2210,10 @@ input[type="button"]:focus {
 @keyframes toSlideLeft {
   0% {
     left: 100%;
-    filter: blur(5px);
   }
 
   100% {
     left: 0%;
-    filter: none;
   }
 }
 

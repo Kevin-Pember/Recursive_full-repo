@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   flutter_inappwebview: ^5.7.1
+  webview_flutter: ^3.0.4
+  flutter_statusbarcolor_ns: ^0.5.0
 dependency_overrides:
   flutter_inappwebview:
     git:
