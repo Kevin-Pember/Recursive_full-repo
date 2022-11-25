@@ -1514,25 +1514,23 @@ function closePage(id) {
 }
 //Responsible for handling the popup part of the virtuKeyboard on the page
 function popup() {
-  if (document.getElementById('arrowIcon').style.animation == "0.25s ease-in 0s 1 normal forwards running toUp") {
-    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toDown";
-    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 reverse forwards running extendFuncAnim";
-    animate(document.getElementById('extraFuncPopUp'), "0.25s ease-in 0s 1 reverse none running extendFuncAnim").then(() => {
+  if (document.getElementById('arrowIcon').style.animation == "0.125s ease-in 0s 1 normal forwards running toUp") {
+    document.getElementById('arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toDown";
+    document.getElementById('extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 reverse forwards running extendFuncAnim";
+    animate(document.getElementById('extraFuncPopUp'), "0.125s ease-in 0s 1 reverse none running extendFuncAnim").then(() => {
       document.getElementById('extraFuncPopUp').style.animation = undefined;
       document.getElementById('extraFuncPopUp').style.top = "100%";
     });
     sessionStorage.setItem("facing", "");
-    setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
   } else {
-    document.getElementById('arrowIcon').style.animation = "0.25s ease-in 0s 1 normal forwards running toUp";
-    document.getElementById('extraFuncPopUp').style.animation = "0.25s ease-in 0s 1 normal forwards running extendFuncAnim";
-    animate(document.getElementById('extraFuncPopUp'), "0.25s ease-in 0s 1 normal none running extendFuncAnim").then(() => {
+    document.getElementById('arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toUp";
+    document.getElementById('extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 normal forwards running extendFuncAnim";
+    animate(document.getElementById('extraFuncPopUp'), "0.125s ease-in 0s 1 normal none running extendFuncAnim").then(() => {
       document.getElementById('extraFuncPopUp').style.animation = undefined;
       document.getElementById('extraFuncPopUp').style.top = "0%";
     });
     sessionStorage.setItem("facing", "mainPopup");
-    setTimeout(donothing, 500);
     document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
   }
 
@@ -4266,8 +4264,6 @@ function helpBack(tab) {
 }
 //END
 /*********************************************|Deprecated Beyond use|**************************************************/
-//Probably should delete this but I think I breaks everthing if I remember right
-function donothing() { }
 //Seemingly deprecated method that will soon be deleted
 function backMoreFunction() {
   if (document.getElementById('newFunctionsPage').style.animation == "0.25s ease-in 0s 1 normal forwards running toSlideLeft") {

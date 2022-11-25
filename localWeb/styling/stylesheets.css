@@ -1,10 +1,10 @@
 @font-face{
   font-family: ubuntu;
-  src: url(./fontAssets/Roboto-Regular.ttf);
+  src: url(../fontAssets/Roboto-Regular.ttf);
 }
 @font-face {
   font-family: ubuntu;
-  src: url(./fontAssets/Roboto-Bold.ttf);
+  src: url(../fontAssets/Roboto-Bold.ttf);
   font-weight: bold;
 }
 :root {
@@ -28,6 +28,9 @@
 body{
   background: var(--displayColor);
   overflow: hidden;
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 
 [contenteditable=true]:empty:before {
@@ -624,16 +627,6 @@ input[type="button"]:focus {
     "d-f fact"
     "ln log"
     "log10 e";
-}
-
-.button-item {
-  padding: 0px;
-  height: 100%;
-  width: 100%;
-  font-size: 100%;
-  position: absolute;
-  background-color: var(--displayColor);
-  text-align: center;
 }
 .specialElements {
   background-color: var(--functionsColor);
@@ -1457,7 +1450,6 @@ input[type="button"]:focus {
 @keyframes fadeEffect {
   from {
     opacity: 0;
-    filter: blur(5px);
     transform: translateY(50px);
   }
 
@@ -1470,7 +1462,6 @@ input[type="button"]:focus {
 @keyframes fadeEffect2 {
   from {
     opacity: 0;
-    filter: blur(5px);
     transform: translateY(-50px);
   }
 
@@ -1513,12 +1504,10 @@ input[type="button"]:focus {
 @keyframes extendFuncAnim {
   0% {
     top: 100%;
-    filter: blur(5px);
   }
 
   100% {
     top: 0%;
-    filter: none;
   }
 }
 
@@ -1577,12 +1566,10 @@ input[type="button"]:focus {
 @keyframes pageup {
   0% {
     bottom: 100%;
-    filter: blur(5px);
   }
 
   100% {
     bottom: 0px;
-    filter: blur(5px);
   }
 }
 
