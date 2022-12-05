@@ -11,7 +11,8 @@ let definedPages = [
     "tab": document.getElementById("mainTab"),
   }
 ];
-let keyTargets = { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') }
+let keypad = document.getElementById('mainKeypad');
+
 var settings;
 let ignoreList = [
   "Math.sin",
@@ -71,6 +72,7 @@ const callCalc = (arry) => new Promise((res, rej) => {
 window.onmessage = function (e) {
   let valArry = e.data;
   let object = valArry[0]
+  console.log(object)
   if (object.call == 'report') {
     report(object.mes, object.meaning)
   }
@@ -92,13 +94,13 @@ if (document.getElementById("mainBody") != null) {
     addImplemented(funcObject);
     switch (funcObject.type) {
       case "Function":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcObject, ['mainKeypad']);
         break;
       case "Code":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcObject, ['mainKeypad']);
         break;
       case "Hybrid":
-        custButton(funcObject, ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcObject, ['mainKeypad']);
         break;
     }
   }
@@ -695,11 +697,13 @@ if (document.getElementById("mainBody") != null) {
   })
   //new event listeners for the portable keypad
   let initGraphEquation = document.getElementById('initGraphEquation');
-  keypadEquationMapper(initGraphEquation)
+  //keypadEquationMapper(initGraphEquation)
+  keypad.setTemp(initGraphEquation)
   document.getElementById('addGraphEquation').addEventListener('click', () => {
     let gEContainer = document.getElementById('graphFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
-    keypadEquationMapper(clon.getElementById('equation'));
+    //keypadEquationMapper(clon.getElementById('equation'));
+    keypad.setTemp(clon.getElementById('equation'))
     clon.getElementById('equation').addEventListener('input', () => {
       graphInMode();
     })
@@ -710,12 +714,14 @@ if (document.getElementById("mainBody") != null) {
   })
 
   let initTableEquation = document.getElementById('initTableEquation');
-  keypadEquationMapper(initTableEquation)
+  //keypadEquationMapper(initTableEquation)
+  keypad.setTemp(initTableEquation)
   document.getElementById('tableControls').addEventListener('change', (e) => { tableInMode() })
   document.getElementById('addTableEquation').addEventListener('click', () => {
     let gEContainer = document.getElementById('tableFuncGrid')
     let clon = document.getElementById('dynamicEquationTemp').content.cloneNode(true);
-    keypadEquationMapper(clon.getElementById('equation'));
+    //keypadEquationMapper(clon.getElementById('equation'));
+    keypad.setTemp(clon.getElementById('equation'))
     clon.getElementById('equation').addEventListener('input', function (e) { tableInMode() });
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
@@ -725,7 +731,7 @@ if (document.getElementById("mainBody") != null) {
     if (document.getElementById('tabContainer').style.visibility != "visible") {
       console.log("toggled")
       hideAllTabs();
-      document.getElementById('keypad').style.visibility = 'hidden'
+      keypad.setVisibility(false)
       changeTabAs(true, "");
     } else {
       console.log("toggled other")
@@ -739,21 +745,23 @@ if (document.getElementById("mainBody") != null) {
   //modeSwitcher section
   document.getElementById('modeButton').addEventListener("click", () => {
     switchMode('selectorMode')
-    keypadController(
+    keypad.reset();
+    /*keypadController(
       {
         "reset": true,
         "rePage": () => { },
       }
-    );
+    );*/
   });
   document.getElementById('mainModeSelector').addEventListener("click", () => {
     switchMode('mainMode')
-    keypadController(
+    keypad.reset();
+    /*keypadController(
       {
         "reset": true,
         "rePage": () => { },
       }
-    );
+    );*/
   })
   document.getElementById('graphModeSelector').addEventListener("click", () => {
     switchMode('graphMainMode')
@@ -762,389 +770,8 @@ if (document.getElementById("mainBody") != null) {
     switchMode('tableMainMode')
   })
   //keypad button Elems
-  let keypadButtons = [
-    {
-      "id": 'num1',
-      "name": "one",
-      "function": () => {
-        frontButtonPressed('1');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num2',
-      "name": "two",
-      "function": () => {
-        frontButtonPressed('2');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num3',
-      "name": "three",
-      "function": () => {
-        frontButtonPressed('3');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'moreFunctionsButton',
-      "name": "Functions Page",
-      "function": () => {
-        sessionStorage.setItem("facing", "moreFunctionsPage");
-        openPage("moreFunctionsPage");
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'arrowIcon',
-      "name": "More Functions Menu",
-      "function": () => {
-        popup();
-        setSelect(keyTargets.input, keyTargets.input.lastChild.length);
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'num4',
-      "name": "four",
-      "function": () => {
-        frontButtonPressed('4');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num5',
-      "name": "five",
-      "function": () => {
-        frontButtonPressed('5');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num6',
-      "name": "six",
-      "function": () => {
-        frontButtonPressed('6');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'backspace',
-      "name": "back space",
-      "function": () => {
-        backPressed();
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num7',
-      "name": "seven",
-      "function": () => {
-        frontButtonPressed('7');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num8',
-      "name": "eight",
-      "function": () => {
-        frontButtonPressed('8');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num9',
-      "name": "nine",
-      "function": () => {
-        frontButtonPressed('9');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'plus',
-      "name": "plus",
-      "function": () => {
-        frontButtonPressed('+');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'piButton',
-      "name": "pie",
-      "function": () => {
-        frontButtonPressed('π');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'num0',
-      "name": "zero",
-      "function": () => {
-        frontButtonPressed('0');
-      },
-      "repeatable": true,
-    }, {
-      "id": 'pointButton',
-      "name": "point",
-      "function": () => {
-        frontButtonPressed('.');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'minus',
-      "name": "minus",
-      "function": () => {
-        frontButtonPressed('-');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'percent',
-      "name": "percent",
-      "function": () => {
-        frontButtonPressed('%');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'pars',
-      "name": "Parenthesis",
-      "function": () => {
-        parsMethod();
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'pow',
-      "name": "Parenthesis",
-      "function": () => {
-        pow('1');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'mutiplication',
-      "name": "mutiplication",
-      "function": () => {
-        frontButtonPressed('×');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'enter',
-      "name": "enter",
-      "function": () => {
-        enterPressed(keyTargets.input.innerHTML);
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'pow2',
-      "name": "power of 2",
-      "function": () => {
-        pow('2');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'sqrt',
-      "name": "square root",
-      "function": () => {
-        frontButtonPressed('√');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'divison',
-      "name": "divison",
-      "function": () => {
-        frontButtonPressed('÷');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'addIconPopup',
-      "name": "add Custom Function",
-      "function": () => {
-        if (keyTargets.input.innerHTML != "‎" && keyTargets.input.innerHTML != "") {
-          openPopup();
-        } else {
-          sessionStorage.setItem("facing", "creatorPage")
-          openPage("custCreatorPage")
-        }
-      },
-      "repeatable": false,
-    },
-
-    {
-      "id": 'minusIconPopup',
-      "name": "remove Custom Function",
-      "function": () => {
-        //method needs to be added
-      },
-      "repeatable": false,
-    },
-
-    {
-      "id": 'keyboardPopup',
-      "name": "Open Keyboard",
-      "function": function () {
-        let target = keyTargets.input;
-        target.setAttribute("inputmode", "text")
-        target.focus();
-        target.addEventListener("focusout", () => {
-          target.setAttribute("inputmode", "none")
-          target.removeEventListener(this)
-        })
-       },
-      "repeatable": false,
-    },
-
-    {
-      "id": 'acPopup',
-      "name": "Clear all",
-      "function": () => {
-        clearMain();
-        keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-      },
-      "repeatable": false,
-    },
-
-    {
-      "id": 'deciToFracPopup',
-      "name": "decimal to fraction",
-      "function": () => {
-        frontButtonPressed('d→f(');
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'helpPopup',
-      "name": "Help Page",
-      "function": () => {
-        document.location = 'help.html';
-        setState();
-        sessionStorage.setItem("facing", "helpOut");
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'log10Popup',
-      "name": "log ten",
-      "function": () => {
-        frontButtonPressed('log₁₀(')
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'lnPopup',
-      "name": "natural log",
-      "function": () => {
-        frontButtonPressed('ln(');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'ePopup',
-      "name": "Euler's number",
-      "function": () => {
-        frontButtonPressed('e');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'factorialPopup',
-      "name": "factorial",
-      "function": () => {
-        frontButtonPressed('!');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'degPopup',
-      "name": "Angle Mode :" + document.getElementById('degPopup').innerHTML,
-      "function": () => {
-        setDegMode();
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'arcPopup',
-      "name": "arc is :" + document.getElementById('arcPopup').innerHTML,
-      "function": () => {
-        setArc();
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'invPopup',
-      "name": "Inverse is :" + document.getElementById('invPopup').innerHTML,
-      "function": () => {
-        setInverse();
-      },
-      "repeatable": false,
-    },
-    {
-      "id": 'sinPopup',
-      "name": "sine",
-      "function": (e) => {
-        trigPressed(e);
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'cosPopup',
-      "name": "cosine",
-      "function": (e) => {
-        trigPressed(e);
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'tanPopup',
-      "name": "tangent",
-      "function": (e) => {
-        trigPressed(e);
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'absPopup',
-      "name": "absolute Value",
-      "function": (e) => {
-        frontButtonPressed('|');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'modPopup',
-      "name": "Modulo",
-      "function": (e) => {
-        frontButtonPressed('mod(');
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'sinPopup',
-      "name": "sine",
-      "function": (e) => {
-        trigPressed(e);
-      },
-      "repeatable": true,
-    },
-    {
-      "id": 'sinPopup',
-      "name": "sine",
-      "function": (e) => {
-        trigPressed(e);
-      },
-      "repeatable": true,
-    },
-
-  ];
-  buttonMapper(keypadButtons)
+  
+  //buttonMapper(keypadButtons)
 
   document.getElementById('MRCOverlay').addEventListener("click", function () {
     let enteredText = document.getElementById('enterHeader').innerHTML
@@ -1463,7 +1090,7 @@ if (document.getElementById("mainBody") != null) {
     let funcGrid = document.getElementById('funcGrid');
     removeAllChildNodes(funcGrid)
     for (let item of filtered) {
-      custButton(item, ['funcGrid']);
+      custButton(item, ['mainKeypad']);
     }
   })
 } else if (document.getElementById("settingsBody") != null) {
@@ -1513,33 +1140,12 @@ function closePage(id) {
   });
 }
 //Responsible for handling the popup part of the virtuKeyboard on the page
-function popup() {
-  if (document.getElementById('arrowIcon').style.animation == "0.125s ease-in 0s 1 normal forwards running toUp") {
-    document.getElementById('arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toDown";
-    document.getElementById('extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 reverse forwards running extendFuncAnim";
-    animate(document.getElementById('extraFuncPopUp'), "0.125s ease-in 0s 1 reverse none running extendFuncAnim").then(() => {
-      document.getElementById('extraFuncPopUp').style.animation = undefined;
-      document.getElementById('extraFuncPopUp').style.top = "100%";
-    });
-    sessionStorage.setItem("facing", "");
-    document.getElementById('arrowIcon').style.transform = 'rotate(90deg);';
-  } else {
-    document.getElementById('arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toUp";
-    document.getElementById('extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 normal forwards running extendFuncAnim";
-    animate(document.getElementById('extraFuncPopUp'), "0.125s ease-in 0s 1 normal none running extendFuncAnim").then(() => {
-      document.getElementById('extraFuncPopUp').style.animation = undefined;
-      document.getElementById('extraFuncPopUp').style.top = "0%";
-    });
-    sessionStorage.setItem("facing", "mainPopup");
-    document.getElementById('arrowIcon').style.transform = 'rotate(270deg);';
-  }
 
-}
 //Responsible for hiding elements on main screen
 function hideAllTabs() {
   let tabs = document.getElementsByClassName('tabcontent');
-  if (document.getElementById('keypad').style.visibility == "visible") {
-    keypadVis(false);
+  if (keypad.style.visibility == "visible") {
+    keypad.setVisibility(false);
   }
   for (let tab of tabs) {
     tab.style.visibility = "hidden";
@@ -1596,328 +1202,10 @@ function getSource(name) {
 //END
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
-function frontButtonPressed(input) {
-  let display = keyTargets.input;
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let index = 0;
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (keyTargets.input.contains(sel.focusNode) && sel.focusNode != null) {
-    let appendString = sel.focusNode.nodeValue.substring(0, lower) + input;
-    sel.focusNode.nodeValue = appendString + sel.focusNode.nodeValue.substring(higher);
-    range.setStart(sel.focusNode, appendString.length);
-  } else {
-    display.innerHTML = display.innerHTML + input;
-    range.setStart(display.childNodes[0], input.length + 1)
-  }
-  range.collapse(true);
-  sel.removeAllRanges()
-  sel.addRange(range);
-  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-}
-//Responsible for handling the pars button on main calc buttons
-function parsMethod() {
-  let badIdea = keyTargets.input.selectionStart;
-  let lazyAfterthought = 0;
-  for (let i = 0; i < keyTargets.input.innerHTML.length; i++) {
-    if (document.getElementById("enterHeader").innerHTML.charAt(i) == '(') {
-      lazyAfterthought = lazyAfterthought + 1;
-    }
-    if (document.getElementById("enterHeader").innerHTML.charAt(i) == ')') {
-      lazyAfterthought = lazyAfterthought - 1;
-    }
-  }
-  if (lazyAfterthought >= 1 && keyTargets.input.innerHTML.charAt(badIdea - 1) != '(') {
-    frontButtonPressed(')');
-  } else {
-    frontButtonPressed('(');
-  }
-}
-//Responsible (I Think) for handling all power of event for main calc buttons
-function pow(type) {
-  let display = keyTargets.input;
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let baseNode = sel.baseNode;
-  let baseOffset = sel.baseOffset
-  let extentNode = sel.extentNode;
-  let extentOffset = sel.extentOffset
-  let index = 0;
-  /*for (let i = 0; i < display.childNodes.length; i++) {
-    if (sel.focusNode == display.childNodes[i]) {
-      index = i;
-      break;
-    }
-  }*/
-
-  let childNodes = display.childNodes;
-  var nodes = [].slice.call(childNodes);
-  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode);
-  let superSr = document.createElement("sup");
-  superSr.appendChild(type == "2" ? document.createTextNode('‎2') : document.createTextNode('‎'));
-  if (display.contains(baseNode) && display.contains(extentNode)) {
-    if (!sel.isCollapsed) {
-      backPressed();
-    }
-    let postNode = document.createTextNode('‎' + baseNode.textContent.substring(baseOffset));
-    let targInd = nodes.indexOf(baseNode) + 1;
-    console.log(targInd)
-    baseNode.textContent = baseNode.textContent.substring(0, baseOffset);
-    display.insertAt(superSr, targInd)
-    targInd++
-    display.insertAt(postNode, targInd)
-    type == "2" ? setFocus(postNode, 1) : setFocus(superSr.lastChild, superSr.lastChild.textContent.length)
-  }
-  /*
-  
-  let backend = sel.focusNode.nodeValue.substring(higher);
-  sel.focusNode.nodeValue = sel.focusNode.nodeValue.substring(0, lower);
-  if (type == "2") {
-    superSr.appendChild(document.createTextNode('‎2'));
-  } else {
-    superSr.appendChild(document.createTextNode('‎'));
-  }
-  if (backend == '') {
-    backend = '‎';
-  }
-  if (index == display.childNodes.length) {
-    display.appendChild(document.createTextNode(backend));
-  } else {
-    display.insertBefore(document.createTextNode(backend), display.childNodes[index + 1]);
-  }
-  window.addEventListener('keydown', keepBlank);
-  display.insertBefore(superSr, display.childNodes[index + 1]);
-  if (type == "2") {
-    range.setStart(display.childNodes[index + 2], 1);
-  } else {
-    range.setStart(superSr.childNodes[0], 1);
-  }
-  range.collapse(true);
-  sel.removeAllRanges()
-  sel.addRange(range);*/
-}
-//Responsible for handling trig button presses
-function trigPressed(event) {
-  let eventTarget = event.target;
-  frontButtonPressed(eventTarget.innerHTML + "(");
-}
-//Responsible (I Think) to patch weird behavior with default HTML behavior SUP
-function keepBlank(eve) {
-  let sel = window.getSelection();
-  let range = document.createRange();
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (eve.keyCode == 8 && (sel.focusNode.nodeValue.substring(lower, higher).includes('‎') || sel.focusNode.nodeValue == '‎') && sel.focusNode.parentNode == keyTargets.input) {
-    eve.preventDefault();
-    let childNodes = keyTargets.input.childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-      if (childNodes[i] == sel.focusNode) {
-        range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length)
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    }
-  }
-}
-//Responsible for controlling the angle mode switch in settings
-function degRadSwitch(mode) {
-  document.getElementById('degModeBut').className = "settingsButton";
-  document.getElementById('radModeBut').className = "settingsButton";
-  if (mode) {
-    document.getElementById('degModeBut').className = "settingsButton active";
-  } else {
-    document.getElementById('radModeBut').className = "settingsButton active";
-  }
-}
-//Responsible for inverse settings on main calc bittons (main input)
-function setInverse() {
-  let trig = [{ "base": "sin", "inverse": "csc" }, { "base": "cos", "inverse": "sec" }, { "base": "tan", "inverse": "cot" }];
-  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
-  let invButtons = ['invPopup', 'invEx'];
-  let arc = false;
-  let text = "";
-  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
-    arc = true;
-  }
-  //sets the text of inv buttons 
-  if (document.getElementById('invPopup').innerHTML == "inv") {
-    text = "reg"
-  } else {
-    text = "inv"
-  }
-  for (let elem of invButtons) {
-    document.getElementById(elem).innerHTML = text;
-  }
-  //sets the text of trig buttons based on values
-  for (let elem of elements) {
-    let elemText = document.getElementById(elem).innerHTML;
-    let outText = "";
-    if (arc) {
-      elemText = elemText.substring(1);
-    }
-    for (let tr of trig) {
-      if (elemText == tr.base) {
-        outText = tr.inverse;
-      } else if (elemText == tr.inverse) {
-        outText = tr.base;
-      }
-    }
-    if (arc) {
-      outText = "a" + outText;
-    }
-    document.getElementById(elem).innerHTML = outText;
-  }
-}
-//Responsible for arc settings on main calc buttons (main input)
-function setArc() {
-  let elements = ['sinEx', 'cosEx', 'tanEx', 'sinPopup', 'cosPopup', 'tanPopup'];
-  let invButtons = ['arcPopup', 'arcEx'];
-  let arc = false;
-  if (document.getElementById('sinPopup').innerHTML.substring(0, 1) == "a") {
-    arc = true;
-  }
-  for (let elem of elements) {
-    let text = document.getElementById(elem).innerHTML;
-    if (!arc) {
-      document.getElementById(elem).innerHTML = "a" + text;
-    } else {
-      document.getElementById(elem).innerHTML = text.substring(1);
-    }
-  }
-}
-//Responsible for the backspace button on the main calc buttons
-function backPressed() {
-  let uifCalculator = keyTargets.input;
-  let sel = window.getSelection();
-  console.log(sel)
-  console.log(keyTargets.input.childNodes)
-  let range = document.createRange();
-  let baseNode = sel.baseNode
-  let baseOffset = sel.baseOffset
-  let extentNode = sel.extentNode
-  let extentOffset = sel.extentOffset
-  let baseString = baseNode.textContent;
-  console.log(baseOffset)
-
-  //Conditions 
-  let front = baseString.charAt(baseOffset - 1) != '‎' && baseString.length != 1
-  let same = baseNode == extentNode;
-  let back = extentOffset > 0
-
-  //sel.isCollapsed is true if there is no selection
-  if (sel.isCollapsed) {
-    console.log(baseOffset - 1)
-    if (front) {
-      replacement = baseString.substring(0, baseOffset - 1) + baseString.substring(baseOffset)
-      console.log(replacement)
-      baseNode.nodeValue = replacement;
-      setFocus(baseNode, baseOffset - 1);
-    } else {
-      let sd = keyTargets.input.childNodes;
-      var nodesArray = [].slice.call(sd);
-      let childIndex = 0;
-      let childern = keyTargets.input.childNodes;
-
-      for (let value of childern.values()) {
-        if (value.contains(baseNode)) {
-          if (nodesArray.indexOf(baseNode) == -1) {
-            if (keyTargets.input.childNodes[childIndex - 1].nodeType == 3 && keyTargets.input.childNodes[childIndex + 1].nodeType == 3) {
-              keyTargets.input.childNodes[childIndex - 1].nodeValue += keyTargets.input.childNodes[childIndex + 1].nodeValue.substring(1);
-              keyTargets.input.removeChild(keyTargets.input.childNodes[childIndex + 1]);
-            }
-            keyTargets.input.removeChild(value);
-          }
-          let target = getText(keyTargets.input.childNodes[childIndex - 1]);
-          console.log(target)
-          setFocus(target, target.textContent.length);
-        }
-        childIndex++;
-      }
-    }
-  } else {
-    let elems = elemArray(keyTargets.input.childNodes)
-    elems.find(elem => elem == baseNode)
-    if (same) {
-      let lower = baseOffset > extentOffset ? extentOffset : baseOffset;
-      let higher = baseOffset > extentOffset ? baseOffset : extentOffset;
-      let removed = baseString.substring(lower, higher)
-      if (removed.includes('‎')) {
-        baseNode.nodeValue = "‎" + baseString.substring(0, lower) + baseString.substring(higher)
-      } else {
-        baseNode.nodeValue = baseString.substring(0, lower) + baseString.substring(higher)
-      }
-      setFocus(baseNode, lower)
-    } else {
-      let childern = uifCalculator.childNodes
-      let arryChd = [].slice.call(childern);
-      let inverse = arryChd.indexOf(getParent(baseNode, keyTargets.input)) > arryChd.indexOf(getParent(extentNode, keyTargets.input))
-      let startPar = getParent(inverse ? extentNode : baseNode, keyTargets.input);
-      let startInd = arryChd.indexOf(startPar)
-      let endPar = getParent(inverse ? baseNode : extentNode, keyTargets.input);
-      keyTargets.input.removeSection(inverse ? extentNode : baseNode, inverse ? baseNode : extentNode, inverse ? extentOffset : baseOffset, inverse ? baseOffset : extentOffset)
-      if (uifCalculator.contains(startPar)) {
-        if (startPar.nodeType != 3) {
-          setFocus(getText(startPar), getText(startPar).textContent.length)
-        } else {
-          setFocus(startPar, startPar.textContent.length)
-        }
-      } else {
-        let pre = arryChd[startInd - 1]
-        if (pre.nodeType != 3) {
-          setFocus(getText(pre), getText(pre).textContent.length)
-        } else {
-          setFocus(pre, pre.textContent.length)
-        }
-      }
-      autoStitch(uifCalculator)
-    }
-  }
-}
-//Responsible for the ac button clearing all text from the enter header
-function clearMain() {
-  let enterHeader = keyTargets.input;
-  let range = document.createRange();
-  let sel = document.getSelection();
-  console.log(sel)
-  enterHeader.innerHTML = '‎';
-  range.setStart(enterHeader.lastChild, enterHeader.firstChild.data.length);
-  range.collapse(true);
-  sel.removeAllRanges()
-  sel.addRange(range);
-}
 //Responsible for removing all element form the history header and the local storage element
 function deleteHistory() {
   document.getElementById('historyHeader').innerHTML = "";
   localStorage.setItem("historyOut", "");
-}
-//Responsible for handling enter events on main cac button
-function enterPressed(input) {
-  let display = keyTargets.input;
-  let nonparse = input;
-  clearMain();
-  inputSolver(input, "Couldn't calculate").then((value) => {
-    console.log('then used')
-    frontButtonPressed(value)
-    setSelect(display, display.lastChild.length);
-  })
-  historyMethod(nonparse)
-  keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
 }
 //Responsible for handling the navigation buttons on the main calc tab
 function navigateButtons(direction) {
@@ -1940,74 +1228,6 @@ function navigateButtons(direction) {
     let index = !inverse ? baseOffset : extentOffset
     moveOne(elem, index, direction)
   }
-  /*let parentElement;
-  let sel = window.getSelection();
-  let isSup = false;
-  let range = document.createRange();
-  let higher = 0;
-  let lower = 0;
-  if (sel.anchorOffset > sel.focusOffset) {
-    higher = sel.anchorOffset;
-    lower = sel.focusOffset;
-  } else {
-    higher = sel.focusOffset;
-    lower = sel.anchorOffset;
-  }
-  if (sel.focusNode.parentNode.tagName == 'SUP') {
-    parentElement = sel.focusNode.parentNode.parentNode;
-    isSup = true;
-  } else {
-    parentElement = sel.focusNode.parentNode;
-  }
-  let childNodes = parentElement.childNodes;
-  if (!direction) {
-    if (lower == 0 || sel.focusNode.nodeValue.charAt(lower - 1) == '‎') {
-      for (let i = 0; i < childNodes.length; i++) {
-        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
-          if (childNodes[i - 1].tagName != 'SUP') {
-            range.setStart(childNodes[i - 1], childNodes[i - 1].nodeValue.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            break;
-          } else {
-            range.setStart(childNodes[i - 1].childNodes[0], childNodes[i - 1].childNodes[0].nodeValue.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            break;
-          }
-
-        }
-      }
-    } else {
-      range.setStart(sel.focusNode, lower - 1);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  } else {
-    if (lower == sel.focusNode.nodeValue.length) {
-      for (let i = 0; i < childNodes.length; i++) {
-        if ((isSup && sel.focusNode.parentNode == childNodes[i]) || sel.focusNode == childNodes[i]) {
-          if (childNodes[i + 1].tagName != 'SUP') {
-            range.setStart(childNodes[i + 1], 1);
-          } else {
-            range.setStart(childNodes[i + 1].childNodes[0], 1);
-          }
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-          break;
-        }
-      }
-    } else {
-      range.setStart(sel.focusNode, lower + 1);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }*/
 }
 function moveOne(elem, index, dire) {
   let elemString = elem.textContent
@@ -2058,7 +1278,7 @@ function switchMode(modeId) {
       hidingElems.push(mode)
     }
   }
-  keypadVis(false);
+  keypad.setVisibility(false);
   if (modeId == "selectorMode") {
     hidingElems.push(modeButton);
     document.getElementById('selectorMode').style.visibility = 'inherit';
@@ -2067,7 +1287,7 @@ function switchMode(modeId) {
     })
   } else {
     if (modeId == "mainMode") {
-      showingElems.push(document.getElementById('keypad'))
+      showingElems.push(document.getElementById('mainKeypad'))
     }
     showingElems.push(modeButton)
     pullUpElements(showingElems)
@@ -2190,20 +1410,6 @@ function getFuncList() {
   return finalArray;
 }
 //Responsible for setting global angle mode main calc buttons (main input)
-function setDegMode() {
-  let text = "";
-  let elements = ['degEx', 'degPopup'];
-  if (document.getElementById('degPopup').innerHTML == "deg") {
-    text = "rad"
-    settings.degRad = false;
-  } else {
-    text = "deg"
-    settings.degRad = true;
-  }
-  for (let elem of elements) {
-    document.getElementById(elem).innerHTML = text;
-  }
-}
 function setFocus(node, index) {
   let sel = window.getSelection();
   let range = document.createRange();
@@ -2329,16 +1535,16 @@ function createFunc(type, name, text) {
     switch (type) {
       case "Function":
         object.equation = text;
-        custButton(funcAssebly(type, name, text), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcAssebly(type, name, text), ['mainKeypad']);
         addImplemented(object)
         break;
       case "Code":
         object.code = text;
-        custButton(funcAssebly(type, name, "Code"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcAssebly(type, name, "Code"), ['mainKeypad']);
         break;
       case "Hybrid":
         object.code = text;
-        custButton(funcAssebly(type, name, "Hybrid"), ['customFuncDisplayGrid', 'custFuncGridPopup', 'funcGrid']);
+        custButton(funcAssebly(type, name, "Hybrid"), ['mainKeypad']);
         break;
     }
     funcList.push(object);
@@ -2437,7 +1643,6 @@ function compareTable(elems, points) {
 }
 //Responsible for creating the cust func buttons and adding them to the elements in target array
 function custButton(funcConfig, target) {
-  let temp = document.getElementsByClassName("customFuncTemplate")[0], clon = temp.content.cloneNode(true);
   let type = funcConfig.type;
   let name = funcConfig.name;
   let equation = "";
@@ -2452,35 +1657,9 @@ function custButton(funcConfig, target) {
       equation = "Hybrid";
       break;
   }
-  clon.getElementById('equationLabel').innerHTML = equation;
-  clon.getElementById('nameLabel').innerHTML = name;
-  let button = clon.getElementById('customFuncButton');
   for (let i = 0; i < target.length; i++) {
-    let clonClone = clon.cloneNode(true);
-    let buttonNode = clonClone.getElementById("customFuncButton");
-    let removeSVG = clonClone.getElementById("removeFunc");
-
-    buttonNode.querySelector('#removeFunc').addEventListener('click', function (e) {
-      openConfirm("Are you sure you want to delete this Function?", function () {
-        funcRemove(buttonNode);
-      });
-
-    });
-    buttonNode.addEventListener('click', function (e) {
-      if (!removeSVG.contains(e.target)) {
-        let elem = buttonNode;
-        console.log(elem.id)
-        let funcName = elem.querySelector("#nameLabel").innerHTML;
-        let funcParse = findFuncConfig(funcName);
-        keypadVis(false);
-        if (matchPage(funcName) == null) {
-          createTab(funcParse)
-        } else {
-          openElement(funcName);
-        }
-      }
-    });
-    document.getElementById(target[i]).appendChild(clonClone);
+    let targetElem = document.getElementById(target[i]);
+    targetElem.addCard(name,equation);
     setNumOfTabs();
   }
 
@@ -2504,6 +1683,7 @@ function funcRemove(e) {
 function createTab(config) {
 
   let tabs = document.getElementsByClassName('tabcontent');
+  keypad.setVisibility(false)
   for (let i = 0; i < tabs.length; i++) {
     tabs[i].style.visibility = 'hidden';
   }
@@ -2636,18 +1816,19 @@ function openElement(name) {
   let tabs = document.getElementsByClassName('tabcontent');
   if (name != "mainPage") {
     document.getElementById('customFuncDisplay').style.visibility = "hidden";
-    keypadVis(false);
+    keypad.setVisibility(false);
   } else {
     document.getElementById('customFuncDisplay').style.visibility = "";
     if (mainMode.style.visibility == "inherit") {
-      keypadVis(true);
+      keypad.setVisibility(true);
     }
-    keypadController(
+    keypad.reset();
+    /*keypadController(
       {
         "reset": true,
         "rePage": () => { },
       }
-    );
+    );*/
   }
   for (let i = 0; i < tabs.length; i++) {
     if (match.tabPage != tabs[i]) {
@@ -3565,7 +2746,9 @@ function hideElements(elements) {
 }
 //Intended for animating the enter of an element to the page but again im lazy and may not get implemented
 function pullUpElements(elements) {
+  console.log(elements)
   for (let element of elements) {
+    console.log(element)
     element.style.visibility = "inherit";
     element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
     setTimeout(function () {
@@ -3781,8 +2964,6 @@ function createGraph(chart) {
 }
 */
 function keypadController(object) {
-  console.log("keypadController ran")
-  console.log(keyTargets)
   if (object.reset != undefined && object.reset == false) {
     let styling = document.createElement('style');
     let builtInStyling = `
@@ -3844,7 +3025,7 @@ function keypadEquationMapper() {
   elem.addEventListener("focus", function (e) {
     if (document.getElementById('keypad').style.visibility == "hidden") {
       setSelect(elem, elem.innerHTML.length);
-      keypadVis(true);
+      keypad.setVisibility(true);
       console.log(arguments)
       let defaultStyle = `
       #keypad {
@@ -3884,13 +3065,9 @@ function keypadEquationMapper() {
           visibility: visible;
         }
       }`;
-      keypadController(
-        {
-          "keyElems": { "scroll": elem, "input": elem },
-          "reset": false,
-          "keyStyling": newStyling == undefined ? defaultStyle : newStyling,
-        }
-      );
+      keypad.setAttribute("input", elem);
+      keypad.setAttribute("history", elem);
+      keypad.setStyle(newStyling == undefined ? defaultStyle : newStyling);
     }
   });
   elem.addEventListener('focusout', (e) => {
@@ -3905,16 +3082,8 @@ function keypadEquationMapper() {
         if (elem.innerHTML.length == 1) {
           elem.innerHTML = "";
         }
-        keypadVis(false);
-        keypadController(
-          {
-            "keyElems": { "scroll": document.getElementById('uifCalculator'), "input": document.getElementById('enterHeader') },
-            "reset": true,
-            "rePage": () => {
-
-            },
-          }
-        );
+        keypad.setVisibility(false);
+        keypad.reset();
       }
     })
   });
@@ -4549,7 +3718,8 @@ class EquatPage extends TemplatePage {
         width: calc(66.6666%)
       }
     }`;
-    keypadEquationMapper(this.equationDIV, styleVal)
+    //keypadEquationMapper(this.equationDIV, styleVal)
+    keypad.setTemp(this.equationDIV, styleVal);
     document.getElementById("mainPage").appendChild(clon);
     checkVar(this.id, this);
     //parseVariables(tabCopy.querySelector('#varGrid'), this);

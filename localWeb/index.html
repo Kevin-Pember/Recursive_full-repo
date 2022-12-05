@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <title>Awesome Capacitor App</title>
+    <title>App Thing</title>
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -27,8 +27,9 @@
     <script src="packages/chart.js"></script>
     <script src="packages/hammer.js"></script>
     <script src="packages/chartjs-plugin-zoom.js"></script>
+    <script src="componets.js"></script>
   </head>
-  <body id="mainBody">
+  <body id="mainBody" onclick="console.log(window.getSelection())">
     <div class="page" id="mainPage">
       <div id="tab">
           <button id="mobileTabs">
@@ -155,7 +156,7 @@
                           <h4 id='previousEquation'></h4>
                           <br>
                       </template>
-                      <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled>‎</h2>
+                      <h2 id="enterHeader" inputmode="none" contenteditable="true" name="Enter Text" enabled placeholder="here we are">‎</h2>
                   </div>
                   <div id="overlayContainer">
                       <div id="overlayDiv">
@@ -278,7 +279,7 @@
                           <button class="customFuncLinks" id="customFuncButton">
                               <h2 id="equationLabel">Equation</h2>
                               <h5 id="nameLabel" class="custFuncNames">New Function</h5>
-                              <svg id="removeFunc" class="removeFuncIcons imgDivClass;height: 40px; isolation:isolate" viewBox="0 0 1080 1080"
+                              <svg id="removeFunc" class="removeFuncIcons imgDivClass"style="height: 40px; isolation:isolate" viewBox="0 0 1080 1080"
                                   xmlns="http://www.w3.org/2000/svg">
                                   <path
                                       d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
@@ -944,165 +945,7 @@
           <button id="newFunction">+</button>
       </div>
   </div>
-  <div id="keypad" class="pane" style="visibility: visible;">
-      <div class="mainCacGrid">
-          <div id="Container" name="1" class="button-item" style="grid-area: num1;">
-              <button class="numsbutton keypadButton" name="1" id="num1" focusable="false">1</button>
-          </div>
-          <div class="button-item" name="2" style="grid-area: num2;">
-              <button class="numsbutton keypadButton" id="num2">2</button>
-          </div>
-          <div class="specialElements button-item" style="grid-area: num3;">
-              <button class="numsbutton keypadButton" id="num3">3</button>
-          </div>
-          <div class="button-item fI" style="grid-area: moreFuncBut;">
-              <button id="moreFunctionsButton" class="keypadButton" tabindex="-1">More<br>Functions</button>
-              <svg id="arrowIcon" class="arrows imgDivClass" style="isolation:isolate"
-                  viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="1080" height="1080" fill-opacity="0" />
-                  <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                  <path class="svgText"
-                      d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-              </svg>
-          </div>
-          <div class="button-item" style="grid-area: num4;">
-              <button class="numsbutton keypadButton" id="num4">4</button>
-          </div>
-          <div class="button-item" style="grid-area: num5;">
-              <button class="numsbutton keypadButton" id="num5">5</button>
-          </div>
-          <div class="button-item" style="grid-area: num6;">
-              <button class="numsbutton keypadButton" id="num6">6</button>
-          </div>
-          <div class="button-item fI" id="backspaceDiv" style="grid-area: backspace;">
-              <button class="funcbutton keypadButton" id="backspace"
-                  style="display: grid;justify-content: center;align-content: center;">
-                  <svg id="backspcaeIcon" style="height: 20px; width: 40px;isolation:isolate"
-                      viewBox="0 0 1080 540" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="1080" height="540" fill-opacity="0" />
-                      <path class="svgText"
-                          d="m657.21 270-147.56 147.13 37.394 37.284 147.56-147.13 147.56 147.13 37.395-37.284-147.56-147.13 147.56-147.13-37.395-37.284-147.56 147.13-147.56-147.13-37.394 37.284 147.56 147.13zm-231.69-247.29v-1.106l-403.92 248.4 403.92 248.4v-1.106c14.803 14.068 34.815 22.706 56.829 22.706h515.12c45.548 0 82.527-36.979 82.527-82.527v-374.95c0-45.548-36.979-82.527-82.527-82.527h-515.12c-22.014 0-42.026 8.638-56.829 22.706z"
-                          fill-rule="evenodd" />
-                  </svg>
-              </button>
-          </div>
-          <div class="button-item" style="grid-area: num7;">
-              <button class="numsbutton keypadButton" id="num7">7</button>
-          </div>
-          <div class="button-item" style="grid-area: num8;">
-              <button class="numsbutton keypadButton" id="num8">8</button>
-          </div>
-          <div class="button-item" style="grid-area: num9;">
-              <button class="numsbutton keypadButton" id="num9">9</button>
-          </div>
-          <div class="button-item fI" style="grid-area: plus;">
-              <button class="funcbutton keypadButton" id="plus">+</button>
-          </div>
-          <div class="button-item specialElements" style="grid-area: pi;">
-              <button class="numsbutton keypadButton" id="piButton">π</button>
-          </div>
-          <div class="button-item" style="grid-area: num0;">
-              <button class="numsbutton keypadButton" id="num0">0</button>
-          </div>
-          <div class="specialElements button-item" style="grid-area: point;">
-              <button class="numsbutton keypadButton" id="pointButton">.</button>
-          </div>
-          <div class="button-item fI" style="grid-area: minus;">
-              <button class="funcbutton keypadButton" id="minus">-</button>
-          </div>
-          <div class="button-item fI" style="grid-area: percent;">
-              <button class="funcbutton keypadButton" id="percent">%</button>
-          </div>
-          <div class="button-item fI" style="grid-area: pars;">
-              <button class="funcbutton keypadButton" id="pars">( )</button>
-          </div>
-          <div class="button-item fI" style="grid-area: pow;">
-              <button class="funcbutton keypadButton" id="pow">^</button>
-          </div>
-          <div class="button-item fI" style="grid-area: mutiplication;">
-              <button class="funcbutton keypadButton" id="mutiplication">×</button>
-          </div>
-          <div class="button-item fI" style="grid-area: enter;">
-              <button class="funcbutton keypadButton" id="enter">enter</button>
-          </div>
-          <div class="button-item fI" style="grid-area: pow2;">
-              <button class="funcbutton keypadButton" id="pow2">x²</button>
-          </div>
-          <div class="button-item fI" style="grid-area: sqrt;">
-              <button class="funcbutton keypadButton" id="sqrt">√x</button>
-          </div>
-          <div class="button-item fI" style="grid-area: division;">
-              <button class="funcbutton keypadButton" id="divison">÷</button>
-          </div>
-      </div>
-      <div id="extraFuncPopUp">
-          <div id="customFuncDisplayPopup" data-element="popup">
-              <svg id="addIconPopup" class="addIcon imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                      d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                      fill-opacity=".2" />
-                  <path class="svgText"
-                      d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
-              </svg>
-              <svg id="minusIconPopup" class="minusIcon imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                      d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                      fill-opacity=".2" />
-                  <rect class="svgText" transform="matrix(-1,0,0,-1,1080,1080)" x="287.12" y="481.64" width="505.75"
-                      height="116.71" />
-              </svg>
-              <div id="custFuncGridPopup">
-
-              </div>
-          </div>
-          <div class="customFuncDisplayBackgroundPopup" width="100%">
-          </div>
-          <div id="extraFuncPopUpGrid">
-              <div class="button-item fI" style="grid-area: help;"><button class="funcbutton keypadButton" id="helpPopup"
-                      style="display: grid;justify-content: center;align-content: center;">
-                      <svg class="helpIcon imgDivClass" style="height: 30px;isolation:isolate"
-                          viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg">
-                          <path class="svgText"
-                              d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
-                              fill-rule="evenodd" />
-                      </svg>
-                  </button></div>
-              <div class="button-item" style="grid-area: dToF;"><button class="funcbutton keypadButton"
-                      id="deciToFracPopup">d→f</button></div>
-              <div class="button-item" style="grid-area: vars;"><button class="funcbutton keypadButton"
-                      id="keyboardPopup">xyz</button></div>
-              <div class="button-item" style="grid-area: ac;"><button class="funcbutton keypadButton" id="acPopup">ac</button>
-              </div>
-              <div class="button-item" style="grid-area: log;"><button class="funcbutton keypadButton"
-                      id="log10Popup">log<sub>10</sub></button></div>
-              <div class="button-item" style="grid-area: ln;"><button class="funcbutton keypadButton" id="lnPopup">ln</button>
-              </div>
-              <div class="button-item" style="grid-area: e;"><button class="funcbutton keypadButton" id="ePopup">e</button>
-              </div>
-              <div class="button-item fI" style="grid-area: fact;"><button class="funcbutton keypadButton"
-                      id="factorialPopup">n!</button></div>
-              <div class="button-item fI" style="grid-area: deg;"><button class="funcbutton keypadButton"
-                      id="degPopup">deg</button></div>
-              <div class="button-item fI" style="grid-area: arc;"><button class="funcbutton keypadButton"
-                      id="arcPopup">arc</button></div>
-              <div class="button-item fI" style="grid-area: inv;"><button class="funcbutton keypadButton"
-                      id="invPopup">inv</button></div>
-              <div class="button-item fI" style="grid-area: abs;"><button class="funcbutton keypadButton" id="absPopup">|
-                      |</button></div>
-              <div class="button-item fI" style="grid-area: sin;"><button class="trigButton keypadButton"
-                      id="sinPopup">sin</button></div>
-              <div class="button-item fI" style="grid-area: cos;"><button class="trigButton keypadButton"
-                      id="cosPopup">cos</button></div>
-              <div class="button-item fI" style="grid-area: tan;"><button class="trigButton keypadButton"
-                      id="tanPopup">tan</button></div>
-              <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton keypadButton"
-                      id="modPopup">mod</button></div>
-          </div>
-      </div>
-      
-  </div>
+  <func-keypad id="mainKeypad" history="uifCalculator" input="enterHeader"></func-keypad>
   <script>
     console.log("hello World");
   </script>

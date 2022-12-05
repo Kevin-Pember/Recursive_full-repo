@@ -1,17 +1,19 @@
-@font-face{
+@font-face {
   font-family: ubuntu;
   src: url(../fontAssets/Roboto-Regular.ttf);
 }
+
 @font-face {
   font-family: ubuntu;
   src: url(../fontAssets/Roboto-Bold.ttf);
   font-weight: bold;
 }
+
 :root {
-  --displayColor: #b8b8b8;
-  --numbersColor: #8a6b6b;
-  --functionsColor: #ea7070;
-  --textColor: #000000;
+  --displayColor: #3d3d3d;
+  --numbersColor: #15ad6e;
+  --functionsColor: #1b1b1b;
+  --textColor: #48fea6;
   --translucent: #00000033;
   --semi-transparent: #000000c5;
   --neutralColor: #80808080;
@@ -25,7 +27,8 @@
   color: var(--textColor);
   -webkit-tap-highlight-color: transparent;
 }
-body{
+
+body {
   background: var(--displayColor);
   overflow: hidden;
   position: absolute;
@@ -48,30 +51,38 @@ body{
   background-color: var(--displayColor);
 }
 
-.imgDivClass{
+.imgDivClass {
   aspect-ratio: 1 / 1;
 }
-.svgText{
+
+.svgText {
   fill: var(--textColor);
 }
-.settingCircle{
+
+.settingCircle {
   fill: var(--textColor)
 }
-.primary{
-  fill:var(--functionsColor);
+
+.primary {
+  fill: var(--functionsColor);
 }
-.secondary{
-  fill:var(--displayColor);
+
+.secondary {
+  fill: var(--displayColor);
 }
-.accent{
- fill: var(--numbersColor);
+
+.accent {
+  fill: var(--numbersColor);
 }
-.text{
+
+.text {
   fill: var(--textColor)
 }
-.scrollable{
+
+.scrollable {
   overflow-y: auto;
 }
+
 .mode {
   width: calc(100% + 1px);
   height: 100%;
@@ -79,21 +90,24 @@ body{
   border-radius: 25px 25px 0 0;
   position: absolute;
 }
-.helpTextContainer{
+
+.helpTextContainer {
   height: 100%;
   width: 175px;
   margin-right: 20px;
 }
-.helpTitles{
+
+.helpTitles {
   text-align: right;
   margin-bottom: 20px;
 }
-p{
+
+p {
   font-size: 18px;
   font-weight: normal;
 }
 
-.pane{
+.pane {
   border-radius: 25px;
   background-color: var(--functionsColor);
   filter: drop-shadow(-5px 5px 5px var(--translucent));
@@ -127,13 +141,13 @@ p{
   left: 0;
 }
 
-.dynamicModeContainer{
+.dynamicModeContainer {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-areas: 
-  "graph" 
-  "controls";
+  grid-template-areas:
+    "graph"
+    "controls";
   grid-template-rows: 66.6666% 33.3333%;
   position: absolute;
   filter: drop-shadow(-5px 5px 5px var(--translucent));
@@ -146,14 +160,14 @@ p{
   margin-top: 10px;
 }
 
-#tableContain{
+#tableContain {
   width: calc(100% - 20px);
   margin-left: 10px;
   height: calc(100% - 20px);
   margin-top: 10px;
 }
 
-.dynamicModePane{
+.dynamicModePane {
   width: calc(100% - 20px);
   height: calc(100% - 10px);
   margin-top: 10px;
@@ -178,7 +192,7 @@ p{
   overflow: hidden;
 }
 
-.dynamicFuncGrid{
+.dynamicFuncGrid {
   padding-top: 10px;
   width: calc(100% - 20px);
   height: 100%;
@@ -188,6 +202,7 @@ p{
   grid-auto-rows: 80px;
   filter: drop-shadow(-5px 5px 5px var(--translucent));
 }
+
 .dynamicEquation {
   width: 100%;
   height: calc(100% - 10px);
@@ -389,8 +404,8 @@ input[type="button"]:focus {
   position: absolute;
   text-align: center;
   width: 33px;
-  height: 14;
-  top: 9.66665;
+  height: 14px;
+  top: 9.66665px;
   font-size: 12px;
 }
 
@@ -405,7 +420,7 @@ input[type="button"]:focus {
   left: 10px;
 }
 
-#deleteHistory{
+#deleteHistory {
   top: 10px;
   left: 10px;
   z-index: 1;
@@ -482,21 +497,7 @@ input[type="button"]:focus {
   right: 0px;
 }
 
-#num1 {
-  border-radius: 15px 0 0 0;
-}
 
-#num3 {
-  border-radius: 0 15px 0 0;
-}
-
-#piButton {
-  border-radius: 0 0 0 15px;
-}
-
-#pointButton {
-  border-radius: 0 0 15px 0;
-}
 
 #tab button.active {
   background-color: var(--displayColor);
@@ -579,31 +580,15 @@ input[type="button"]:focus {
   direction: ltr;
 }
 
-.mainCacGrid {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-gap: 0px 0px;
-  margin: 0px;
-  grid-template-columns: 25% 25% 25% 25%;
-  grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
-  background-color: #00000000;
-  grid-template-areas:
-    "num1 num2 num3 moreFuncBut"
-    "num4 num5 num6 backspace"
-    "num7 num8 num9 plus"
-    "pi num0 point minus"
-    "percent pars pow mutiplication"
-    "enter pow2 sqrt division";
-}
 
-#extendedKeypad{
+
+#extendedKeypad {
   height: fit-content;
   width: fit-content;
   overflow: hidden;
   visibility: hidden;
 }
+
 #extendedFuncGrid {
   height: 100%;
   top: 33.3333%;
@@ -628,9 +613,7 @@ input[type="button"]:focus {
     "ln log"
     "log10 e";
 }
-.specialElements {
-  background-color: var(--functionsColor);
-}
+
 .fI {
   background-color: var(--displayColor);
 }
@@ -650,6 +633,16 @@ input[type="button"]:focus {
   box-shadow: none;
 }
 
+.button-item {
+  padding: 0px;
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  position: absolute;
+  background-color: var(--displayColor);
+  text-align: center;
+}
+
 .funcbutton {
   height: 100%;
   width: 100%;
@@ -660,15 +653,21 @@ input[type="button"]:focus {
   border-style: none;
 }
 
+.specialElements {
+  background-color: var(--functionsColor);
+}
+
 .funcbutton:focus {
   outline: none;
   box-shadow: none;
 }
-.keypadButton{
+
+.keypadButton {
   overflow: hidden;
   text-align: center;
 }
-.keypadButton:after{
+
+.keypadButton:after {
   content: "";
   background: transparent;
   position: absolute;
@@ -682,7 +681,8 @@ input[type="button"]:focus {
   z-index: 1;
   transition: all 0.5s ease
 }
-.keypadButton:active:after{
+
+.keypadButton:active:after {
   transform: scale(0.5);
   background: var(--textColor);
   border-radius: 50%;
@@ -693,52 +693,12 @@ input[type="button"]:focus {
   transition: 0s
 }
 
-#extraFuncPopUp {
-  height: 100%;
-  width: 100%;
-  top: 100%;
-  display: block;
-  position: absolute;
-  z-index: 1;
-  visibility: inherit;
-}
-
-#custFuncGridPopup {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: 40px;
-  bottom: 10px;
-  display: inline-flex;
-  overflow-x: auto;
-}
-
-#custFuncGridPopup button {
-  margin-left: 3.3333%;
-  bottom: 5px;
-  position: relative;
-  background-color: var(--displayColor);
-  color: var(--textColor);
-  width: 45%;
-  z-index: 2;
-  flex-shrink: 0;
-  border: none;
-  border-radius: 25px;
-  top: 2.5%;
-  height: 95%
-}
-
 .custFuncNames {
   margin-bottom: -40px;
 }
 
 .removeFuncIcons {
   margin-right: -75%;
-}
-
-#customFuncButton {
-  width: 30.33333333333333333%;
-  margin-left: 2.25%;
 }
 
 .trigButton {
@@ -777,20 +737,6 @@ input[type="button"]:focus {
   background-color: transparent;
   border: none;
   position: absolute;
-}
-
-#customFuncDisplayPopup {
-  height: 33.3333%;
-  width: 100%;
-  top: 0;
-  background-color: var(--numbersColor);
-  border-radius: 15px;
-  position: absolute;
-  z-index: 1;
-  overflow-x: auto;
-  flex-wrap: nowrap;
-  display: flex;
-  flex-shrink: 0;
 }
 
 #funcModify {
@@ -837,6 +783,18 @@ input[type="button"]:focus {
   -webkit-tap-highlight-color: transparent;
 }
 
+.customFuncLinks{
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: relative;
+  background-color: var(--displayColor);
+  color: var(--textColor);
+  border: none;
+  border-radius: 25px;
+}
+
 .customFuncDisplayBackgroundPopup {
   height: 44.4444%;
   left: 0;
@@ -857,49 +815,19 @@ input[type="button"]:focus {
   grid-template-columns: 25% 25% 25% 25%;
   grid-template-rows: 25% 25% 25% 25%;
   background-color: #00000000;
-  grid-template-areas: 
-  "help dToF vars ac"
-  "log ln e fact"
-  "deg arc inv abs"
-  "sin cos tan mod"
+  grid-template-areas:
+    "help dToF vars ac"
+    "log ln e fact"
+    "deg arc inv abs"
+    "sin cos tan mod"
   ;
 }
-/*
-.mainCacGrid {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-gap: 0px 0px;
-  margin: 0px;
-  grid-template-columns: 25% 25% 25% 25%;
-  grid-template-rows: 16.6666% 16.6666% 16.6666% 16.6666% 16.6666% 16.6666%;
-  background-color: #00000000;
-  grid-template-areas:
-    "num1 num2 num3 moreFuncBut"
-    "num4 num5 num6 backspace"
-    "num7 num8 num9 plus"
-    "pi num0 point minus"
-    "percent pars pow mutiplication"
-    "enter pow2 sqrt division";
-}*/
 
 #minusFunctionPopup {
   left: 48px;
 }
 
-#moreFunctionsButton {
-  height: 100%;
-  width: 100%;
-  font-size: 15px;
-  color: var(--textColor);
-  background-color: var(--functionsColor);
-  text-align: center;
-  text-indent: -30px;
-  border-style: none;
-  position: relative;
-  grid-area: moreFuncBut;
-}
+
 
 #customFuncDisplay {
   visibility: hidden;
@@ -1054,39 +982,17 @@ input[type="button"]:focus {
   flex-shrink: 0;
 }
 
-#backspace {
-  flex-shrink: 0;
-  grid-area: backspace;
-}
 
-#backspaceDiv {
-  display: flex;
-}
 
-#arrowPosition{
+#arrowPosition {
   width: 25%;
   height: 16.6666%;
   position: absolute;
   top: 0;
-  pointer-events:none
+  pointer-events: none
 }
 
-#arrowIcon {
-  transform: rotate(270deg);
-  animation: "0.25s linear 0s 1 normal forwards running toDown";
-  visibility: inherit;
-  top: 5px;
-  right: 5px;
-  font-size: 15px;
-  text-align: center;
-  stroke: transparent;
-  stroke-width: 0px;
-  background-color: #00000000;
-  position: absolute;
-  z-index: 2;
-  height: 40px;
-  pointer-events: all;
-}
+
 
 .backIcon {
   transform: rotate(180deg);
@@ -1459,6 +1365,7 @@ input[type="button"]:focus {
     filter: unset;
   }
 }
+
 @keyframes fadeEffect2 {
   from {
     opacity: 0;
@@ -1471,6 +1378,7 @@ input[type="button"]:focus {
     filter: unset;
   }
 }
+
 @keyframes slideFromSide {
   from {
     left: 100%;
@@ -1670,6 +1578,7 @@ input[type="button"]:focus {
   width: calc(100% - 20px);
   text-align: center;
 }
+
 .settingsTitle {
   margin-left: 10px;
   padding-left: 10px;
@@ -1868,6 +1777,7 @@ input[type="button"]:focus {
   border-radius: 20px;
   visibility: hidden;
 }
+
 #nameDisplay {
   right: 0;
   top: 275.41px;
@@ -2244,7 +2154,7 @@ input[type="button"]:focus {
   opacity: 0.2;
 }
 
-#funcContainer{
+#funcContainer {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -2271,7 +2181,7 @@ input[type="button"]:focus {
   position: absolute;
   border-radius: 25px 25px 0 0;
   background-color: var(--functionsColor);
-  
+
   display: grid;
   grid-template-columns: 50% 50%;
   grid-auto-rows: 130px;
@@ -2444,7 +2354,7 @@ input[type="button"]:focus {
   filter: drop-shadow(-5px 5px 5px var(--translucent));
 }
 
-.funcModes{
+.funcModes {
   overflow-y: scroll;
 }
 
@@ -2607,26 +2517,31 @@ input[type="button"]:focus {
   border-radius: 20px;
   background-color: var(--displayColor);
 }
-#modeTable{
+
+#modeTable {
   width: 100%;
   height: 100%;
   border-spacing: 5px;
 }
+
 #modeTable td {
   background-color: var(--displayColor);
 }
-.templateTable{
+
+.templateTable {
   width: 100%;
   height: 100%;
   border-spacing: 10px;
 }
-.tabIcons{
+
+.tabIcons {
   aspect-ratio: 1 / 1.45;
   height: 240.1575px;
   border: none;
   width: unset;
   filter: drop-shadow(-5px 5px 5px var(--translucent));
 }
+
 #settingsSelector {
   right: 2.5%;
   position: absolute;
@@ -2639,12 +2554,13 @@ input[type="button"]:focus {
   height: calc(100% - 100px);
 }
 
-td{
+td {
   border-radius: 20px;
   text-indent: 10px;
   padding: 5px;
   background-color: var(--functionsColor);
 }
+
 th {
   width: 100px;
   margin: 5px;
@@ -2802,6 +2718,7 @@ th {
 #tabRemove {
   right: 0;
 }
+
 #keypad {
   animation: fadeEffect 0.50s linear 1 none;
   width: calc(100% - 20px);
@@ -2814,6 +2731,7 @@ th {
   overflow: hidden;
   filter: drop-shadow(-5px 5px 5px var(--translucent));
 }
+
 /*@media only screen and (max-aspect-ratio: 3/4) {
   
 }*/
@@ -2826,9 +2744,6 @@ th {
   
 }*/
 
-@media only screen and (min-aspect-ratio: 5/3) and (min-height: 451px) {
- 
-}
-@media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {
-  
-}
+@media only screen and (min-aspect-ratio: 5/3) and (min-height: 451px) {}
+
+@media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {}
