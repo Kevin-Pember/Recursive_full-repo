@@ -1,7 +1,7 @@
 console.log('hello there')
-
+console.log(document)
 let TextColorGlobal = "";
-let colorArray = [];
+
 let definedPages = [
   {
     "srtConfig": {
@@ -12,7 +12,11 @@ let definedPages = [
   }
 ];
 let keypad = document.getElementById('mainKeypad');
-
+let mainHistory = inputs.filter((elem) => elem.id == "mainHistory")[0];
+let mainEntry = inputs.filter((input) => input.id == "mainEntry")[0];
+let quickSettingsPane = document.getElementById('quickSettings');
+//console.log(inputs[0].alert())
+console.log(mainEntry)
 var settings;
 let ignoreList = [
   "Math.sin",
@@ -29,16 +33,11 @@ let ignoreList = [
 let secondList = [
   "sup>",
 ];
-if (localStorage.getItem("settings") != undefined) {
-  settings = JSON.parse(localStorage.getItem("settings"));
-} else {
-  localStorage.setItem("settings", '{"version": 1,"oL":"auto","degRad": true,"notation": "simple","theme": "darkMode","acc":"blue","tC" : 5,"tMin" : -10,"tMax" : 10,"gR" : 100,"gMin" : -10,"gMax" : 10}');
-  settings = JSON.parse(localStorage.getItem("settings"));
-}
+
 let themeElem = {};
 
 /*Implementation of Web Worker*/
-let calcWorker = new Worker('evalWorker.js');
+
 calcWorker.onmessage = (event) => {
   let rtnObj = event.data
   if (rtnObj.type == 'posError') {
@@ -56,19 +55,6 @@ calcWorker.onmessage = (event) => {
     targetedElem.packageHandler(rtnObj.packet)
   }
 }
-const callCalc = (arry) => new Promise((res, rej) => {
-  const channel = new MessageChannel();
-  channel.port1.onmessage = ({ data }) => {
-    channel.port1.close();
-    if (data.error) {
-      rej(data.error);
-    } else {
-      res(data.result);
-    }
-  };
-
-  calcWorker.postMessage(arry, [channel.port2]);
-});
 window.onmessage = function (e) {
   let valArry = e.data;
   let object = valArry[0]
@@ -79,15 +65,11 @@ window.onmessage = function (e) {
 }
 /*web work implementation end */
 setSettings();
-let graphVars = {};
-let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
-graphModeChart.options.plugins.zoom.zoom.onZoomComplete = function () {
-  graphInMode()
-}
-graphModeChart.options.plugins.zoom.pan.onPanComplete = function () {
-  graphInMode()
-}
+//let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
 if (document.getElementById("mainBody") != null) {
+
+  
+  //Responsible for creating and implementing the custom functions at runtime ********************************
   var funcs = getFuncList();
   for (let funcObject of funcs) {
     console.log(funcObject);
@@ -104,34 +86,35 @@ if (document.getElementById("mainBody") != null) {
         break;
     }
   }
-  callCalc({ "callType": 'get', 'item': 'list' }).then(value => console.log(value))
-  document.getElementById('uifCalculator').addEventListener("click", function (e) {
-    if (e.target != document.getElementById('enterHeader')) {
-      let enterheader = document.getElementById('enterHeader');
-      let range = document.createRange();
-      let sel = window.getSelection();
-      if (enterheader.innerHTML.length == 0) {
-        let textNode = document.createTextNode("‎");
-        enterheader.appendChild(textNode);
-      }
-      range.setStart(enterheader.lastChild, enterheader.firstChild.data.length);
-      range.collapse(true);
-      sel.removeAllRanges()
-      sel.addRange(range);
-      document.getElementById("uifCalculator").scrollTop = document.getElementById("uifCalculator").scrollHeight;
-    }
-  });
+  //*********************************************************************************************************
+  
 
-  document.getElementById('historyHeader').innerHTML = localStorage.getItem("historyOut");
-  document.getElementById("uifCalculator").scrollTop = document.getElementById("uifCalculator").scrollHeight;
+  //Tab handling code *************************************************************************************
   document.getElementById('mainTab').addEventListener("click", function (e) {
     if (window.innerWidth / window.innerHeight < 3 / 4) {
       changeTabAs(false, 'openElement("mainPage")');
     }
 
   });
+  document.getElementById('mobileTabs').addEventListener("click", function (e) {
+    if (document.getElementById('tabContainer').style.visibility != "visible") {
+      console.log("toggled")
+      hideAllTabs();
+      keypad.setVisibility(false)
+      changeTabAs(true, "");
+    } else {
+      console.log("toggled other")
 
-  //new media queries
+      changeTabAs(false, "openElement('mainPage');document.getElementById('keypad').style = undefined;");
+
+    }
+  });
+  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
+  //********************************************************************************************************
+
+
+
+  //Media query for resizing the calculator***********************************
   const shit = window.matchMedia("(screen and max-height: 450px)");
   var mobileLandscape = {
     "q": window.matchMedia("screen and (max-height: 450px)"),
@@ -695,9 +678,12 @@ if (document.getElementById("mainBody") != null) {
   largeFormat.q.addEventListener("change", () => {
     queryMethod();
   })
-  //new event listeners for the portable keypad
+  //*****************************************************************
+
+
+  /*
+  //Graph equation switcher********************************************
   let initGraphEquation = document.getElementById('initGraphEquation');
-  //keypadEquationMapper(initGraphEquation)
   keypad.setTemp(initGraphEquation)
   document.getElementById('addGraphEquation').addEventListener('click', () => {
     let gEContainer = document.getElementById('graphFuncGrid')
@@ -712,9 +698,12 @@ if (document.getElementById("mainBody") != null) {
   initGraphEquation.addEventListener('input', function (e) {
     graphInMode()
   })
+  //*******************************************************************
 
+
+
+  //Table equation switcher********************************************
   let initTableEquation = document.getElementById('initTableEquation');
-  //keypadEquationMapper(initTableEquation)
   keypad.setTemp(initTableEquation)
   document.getElementById('tableControls').addEventListener('change', (e) => { tableInMode() })
   document.getElementById('addTableEquation').addEventListener('click', () => {
@@ -726,103 +715,11 @@ if (document.getElementById("mainBody") != null) {
     gEContainer.insertBefore(clon, document.getElementById('addTableEquation'))
   })
   initTableEquation.addEventListener('input', function (e) { tableInMode() });
-
-  document.getElementById('mobileTabs').addEventListener("click", function (e) {
-    if (document.getElementById('tabContainer').style.visibility != "visible") {
-      console.log("toggled")
-      hideAllTabs();
-      keypad.setVisibility(false)
-      changeTabAs(true, "");
-    } else {
-      console.log("toggled other")
-
-      changeTabAs(false, "openElement('mainPage');document.getElementById('keypad').style = undefined;");
-
-    }
-  });
-  document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
-
-  //modeSwitcher section
-  document.getElementById('modeButton').addEventListener("click", () => {
-    switchMode('selectorMode')
-    keypad.reset();
-    /*keypadController(
-      {
-        "reset": true,
-        "rePage": () => { },
-      }
-    );*/
-  });
-  document.getElementById('mainModeSelector').addEventListener("click", () => {
-    switchMode('mainMode')
-    keypad.reset();
-    /*keypadController(
-      {
-        "reset": true,
-        "rePage": () => { },
-      }
-    );*/
-  })
-  document.getElementById('graphModeSelector').addEventListener("click", () => {
-    switchMode('graphMainMode')
-  })
-  document.getElementById('tableModeSelector').addEventListener("click", () => {
-    switchMode('tableMainMode')
-  })
-  //keypad button Elems
-  
-  //buttonMapper(keypadButtons)
-
-  document.getElementById('MRCOverlay').addEventListener("click", function () {
-    let enteredText = document.getElementById('enterHeader').innerHTML
-    let mrmText = document.getElementById('memoryText').innerHTML;
-    if (mrmText == enteredText.substring(enteredText.length - mrmText.length)) {
-      document.getElementById('memoryText').innerHTML = ""
-      document.getElementById('memoryTextBoarder').style = undefined;
-    } else {
-      document.getElementById('enterHeader').innerHTML = document.getElementById('enterHeader').innerHTML + document.getElementById('memoryText').innerHTML;
-    }
-  });
-  document.getElementById('MAddOverlay').addEventListener("click", function () {
-    document.getElementById('memoryTextBoarder').style.visibility = "visible";
-    let enteredText = document.getElementById('enterHeader').innerHTML;
-    inputSolver(enteredText, "error adding to memory").then((value) => { document.getElementById('memoryText').innerHTML = value })
-    console.log(window.getSelection())
-  });
-  document.getElementById('leftOverlayNav').addEventListener("click", function (e) { navigateButtons(false) });
-  document.getElementById('rightOverlayNav').addEventListener("click", function (e) { navigateButtons(true) });
-
-  /*
-    document.getElementById('num1').addEventListener("click", function () {  });
-    document.getElementById('num2').addEventListener("click", function () { frontButtonPressed('2'); });
-    document.getElementById('num3').addEventListener("click", function () { frontButtonPressed('3'); });
-    document.getElementById('moreFunctionsButton').addEventListener("click", function () { sessionStorage.setItem("facing", "moreFunctionsPage"); openPage("moreFunctionsPage") });
-    document.getElementById('arrowIcon').addEventListener("click", function () {
-      popup();
-      setSelect(keyTargets.input, keyTargets.input.lastChild.length);
-    });
-    document.getElementById('num4').addEventListener("click", function () { frontButtonPressed('4'); });
-    document.getElementById('num5').addEventListener("click", function () { frontButtonPressed('5'); });
-    document.getElementById('num6').addEventListener("click", function () { frontButtonPressed('6'); });
-    document.getElementById('backspace').addEventListener("click", function () { backPressed(); });
-    document.getElementById('num7').addEventListener("click", function () { frontButtonPressed('7'); });
-    document.getElementById('num8').addEventListener("click", function () { frontButtonPressed('8'); });
-    document.getElementById('num9').addEventListener("click", function () { frontButtonPressed('9'); });
-    document.getElementById('plus').addEventListener("click", function () { frontButtonPressed('+'); });
-    document.getElementById('piButton').addEventListener("click", function () { frontButtonPressed('π'); });
-    document.getElementById('num0').addEventListener("click", function () { frontButtonPressed('0'); });
-    document.getElementById('pointButton').addEventListener("click", function () { frontButtonPressed('.'); });
-    document.getElementById('minus').addEventListener("click", function () { frontButtonPressed('-'); });
-    document.getElementById('percent').addEventListener("click", function () { frontButtonPressed('%'); });
-    document.getElementById('pars').addEventListener("click", function () { parsMethod(); });
-    document.getElementById('pow').addEventListener("click", function () { pow('1'); });
-    document.getElementById('mutiplication').addEventListener("click", function () { frontButtonPressed('×'); });
-    document.getElementById('enter').addEventListener("click", function () { enterPressed(keyTargets.input.innerHTML) });
-    document.getElementById('pow2').addEventListener("click", function () { pow('2'); });
-    document.getElementById('sqrt').addEventListener("click", function () { frontButtonPressed('√'); });
-    document.getElementById('divison').addEventListener("click", function () { frontButtonPressed('÷'); });
+  //********************************************************************
   */
 
+/*
+  //Extend Keypad mappings*****************************************************
   document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
   document.getElementById('functionEx').addEventListener("click", function () {
     if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
@@ -850,9 +747,6 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('factorialEx').addEventListener("click", function () { frontButtonPressed('!'); });
   document.getElementById('log10Ex').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
   document.getElementById('lnEx').addEventListener("click", function () { frontButtonPressed('ln('); });
-
-  
-
   document.getElementById('backExMini').addEventListener("click", function () {
     document.getElementById('customFuncDisplay').style.animation = null;
     document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
@@ -867,7 +761,11 @@ if (document.getElementById("mainBody") != null) {
     openPopup();
   });
   document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
+  //***************************************************************************************************
+*/
 
+
+  //Name entry handler*********************************************************************************
   document.getElementById('confirmNameEntry').addEventListener("click", function () {
     createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
     universalBack();
@@ -875,11 +773,19 @@ if (document.getElementById("mainBody") != null) {
   document.getElementById('exitNameEntry').addEventListener("click", function () {
     universalBack();
   });
+  //***************************************************************************************************
 
+
+
+  //Confrim Page handler*******************************************************************************
   document.getElementById('exitConfirmPage').addEventListener("click", function () {
     closeConfirm();
   });
+  //***************************************************************************************************
 
+
+
+  //Creator Handler************************************************************************************
   document.getElementById('backCreator').addEventListener("click", function () {
     universalBack();
   });
@@ -918,74 +824,14 @@ if (document.getElementById("mainBody") != null) {
     universalBack();
   });
   createCodeTerminal(document.getElementById('creatorEditor'), "hybridEditor")
+  //***************************************************************************************************
 
-  const elem = document.getElementById("memoryTextBoarder");
-  let isDown = false;
-  let startX;
-  let scrollLeft;
 
-  elem.addEventListener('mousedown', (e) => {
-    isDown = true;
-    elem.classList.add('active');
-    startX = e.pageX - elem.offsetLeft;
-    scrollLeft = elem.scrollLeft;
-  });
-  elem.addEventListener('mouseleave', () => {
-    isDown = false;
-    elem.classList.remove('active');
-  });
-  elem.addEventListener('mouseup', () => {
-    isDown = false;
-    elem.classList.remove('active');
-  });
-  elem.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - elem.offsetLeft;
-    const walk = (x - startX) * 3;
-    elem.scrollLeft = scrollLeft - walk;
-  });
-  let letToSybol = [
-    {
-      'lets': ["pi", "PI", "Pi"],
-      "symbol": "π"
-    },
-    {
-      'lets': ["abs", "Abs", "ABS"],
-      "symbol": "|"
-    }
-  ]
-  document.getElementById("enterHeader").addEventListener("input", function (e) {
-    console.log("checking enter")
-    let text = document.getElementById("enterHeader").innerHTML;
-    for (let item of letToSybol) {
-      for (let letItem of item.lets) {
-        if (text.includes(letItem)) {
-          text = text.replace(letItem, item.symbol);
-          console.log(text + " : " + letItem + " : " + item.symbol);
-          document.getElementById("enterHeader").innerHTML = text;
-          let sel = window.getSelection();
-          let range = document.createRange();
-          document.getElementById("enterHeader").childNodes
-          break;
-        }
-      }
-    }
-  });
-  //point of half assed settings merge
-  if (settings.theme == "custPurchasable") {
-    document.getElementById('primaryColorPicker').value = settings.p
-    document.getElementById('secondaryColorPicker').value = settings.s
-    document.getElementById('accentColorPicker').value = settings.a
-    document.getElementById('textColorPicker').value = settings.t
-    toggleCustTheme();
-  }
-  //coloring UI elements that are images but need sytling
-  if (TextColorGlobal != "#000000") {
-    //document.getElementById('dropbtn').innerHTML = "White <h3 id='displayText' style='color: white;'>t</h3>";
-  }
+  //Settings Merge Start location 
 
-  //Setting the values of elements
+
+  //Theme Handling*************************************************************************************
+  
   let accents = getAccents();
   let defaultThemes = getThemes();
   let catalog = getCatalog();
@@ -1002,42 +848,23 @@ if (document.getElementById("mainBody") != null) {
       unlockCustomTheme();
     }
   }
-  document.getElementById(settings.theme).className = "themeElem active";
-  if (settings.degRad == true) {
-    document.getElementById('degModeBut').className = "settingsButton active";
-  } else {
-    document.getElementById('radModeBut').className = "settingsButton active";
+  if (settings.theme == "custPurchasable") {
+    document.getElementById('primaryColorPicker').value = settings.p
+    document.getElementById('secondaryColorPicker').value = settings.s
+    document.getElementById('accentColorPicker').value = settings.a
+    document.getElementById('textColorPicker').value = settings.t
+    toggleCustTheme();
   }
+  document.getElementById(settings.theme).className = "themeElem active";
+  //***************************************************************************************************
 
-  //Adding events to elements
+
+
+  //Colors page ***************************************************************************************
   document.getElementById('primaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('secondaryColorPicker').addEventListener("input", updatePreview, false);
   document.getElementById('accentColorPicker').addEventListener("input", updatePreview, false);
-  document.getElementById('textColorPicker').addEventListener('input', updatePreview, false)
-  document.getElementById('backButton').addEventListener("click", function () { universalBack(); });
-  document.getElementById('LooknFeel').addEventListener("click", function () { settingsTabChange('colorsTab') });
-  document.getElementById('Preferences').addEventListener("click", function () { settingsTabChange('PreferencesTab') });
-  document.getElementById('About').addEventListener("click", function () { settingsTabChange('AboutTab') });
-  document.getElementById('colorsBack').addEventListener("click", function () { universalBack(); });
-  document.getElementById('PreferencesBack').addEventListener("click", function () { universalBack(); });
-  document.getElementById('degModeBut').addEventListener("click", function () { degRadSwitch(true) });
-  document.getElementById('radModeBut').addEventListener("click", function () { degRadSwitch(false) });
-  document.getElementById('AboutBack').addEventListener("click", function () {
-    universalBack();
-  });
-  document.getElementById('buyCustTheme').addEventListener('click', function () {
-    document.getElementById('buyScreen').style.visibility = "visible";
-    sessionStorage.setItem("facing", "buyPageOut");
-
-  });
-  document.getElementById('buyExit').addEventListener('click', function () {
-    universalBack();
-  });
-  document.getElementById('buyButton').addEventListener('click', function () {
-    unlockCustomTheme();
-    setPurchase('custPurchasable');
-    universalBack();
-  });
+  document.getElementById('textColorPicker').addEventListener('input', updatePreview, false);
   let accElems = document.getElementsByClassName('accButton');
   for (let item of accElems) {
     item.addEventListener("click", function () {
@@ -1070,9 +897,40 @@ if (document.getElementById("mainBody") != null) {
       }
     });
   }
-  let themes = document.getElementsByClassName('themeButton');
+  //***************************************************************************************************
 
-  document.getElementById('backIconFunc').addEventListener("click", function () { universalBack(); });
+
+
+  //Preferences page **********************************************************************************
+  document.getElementById('degModeBut').addEventListener("click", function () { degRadSwitch(true) });
+  document.getElementById('radModeBut').addEventListener("click", function () { degRadSwitch(false) });
+  if (settings.degRad == true) {
+    document.getElementById('degModeBut').className = "settingsButton active";
+  } else {
+    document.getElementById('radModeBut').className = "settingsButton active";
+  }
+  //***************************************************************************************************
+  
+
+
+  //Buy Page*******************************************************************************************
+  document.getElementById('buyCustTheme').addEventListener('click', function () {
+    document.getElementById('buyScreen').style.visibility = "visible";
+    sessionStorage.setItem("facing", "buyPageOut");
+
+  });
+  document.getElementById('buyExit').addEventListener('click', function () {
+    universalBack();
+  });
+  document.getElementById('buyButton').addEventListener('click', function () {
+    unlockCustomTheme();
+    setPurchase('custPurchasable');
+    universalBack();
+  });
+  //***************************************************************************************************
+
+  
+  //Custom Functions Page******************************************************************************
   document.getElementById('addIcon').addEventListener('click', function () {
     console.log('clicked')
     openPage("custCreatorPage")
@@ -1093,32 +951,7 @@ if (document.getElementById("mainBody") != null) {
       custButton(item, ['mainKeypad']);
     }
   })
-} else if (document.getElementById("settingsBody") != null) {
-
-} else if (document.getElementById('helpBody') != null) {
-  /*&let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', localStorage.getItem('displayColor'));
-  rootCss.style.setProperty('--numbersColor', localStorage.getItem('numsColor'));
-  rootCss.style.setProperty('--functionsColor', localStorage.getItem('funcColor'));
-  rootCss.style.setProperty('--textColor', localStorage.getItem('textColor'));*/
-  if (TextColorGlobal == "#000000") {
-    let addIcons = document.getElementsByClassName('backIcon');
-    for (let item of addIcons) {
-      item.src = getSource('MoreFuncArrow');
-    }
-    document.getElementById('calcIcon').src = getSource('CalculatorIcon');
-
-    document.getElementById('funcsIcon').src = getSource('customFunctionIcon');
-
-    document.getElementById('setIcon').src = getSource('settingsPageIcon');
-  }
-  document.getElementById('backButton').addEventListener("click", function () { document.location = 'Recursive.html'; });
-  document.getElementById('LooknFeel').addEventListener("click", function () { helpTabChange('mainCalculatorHelp') });
-  document.getElementById('Preferences').addEventListener("click", function () { helpTabChange('customFuncHelp') });
-  document.getElementById('About').addEventListener("click", function () { helpTabChange('settingsHelp') });
-  document.getElementById('mainCalBack').addEventListener("click", function () { helpBack('mainCalculatorHelp'); });
-  document.getElementById('customFuncBack').addEventListener("click", function () { helpBack('customFuncHelp') });
-  document.getElementById('settingsBack').addEventListener("click", function () { helpBack('settingsHelp') });
+  //***************************************************************************************************
 }
 /**********************************************|Main Page UI|*********************************************************/
 //Responsible for animating pages on top of the main calculator (currently only used for creator page)
@@ -1202,60 +1035,9 @@ function getSource(name) {
 //END
 /********************************************|Main Page Button Handling|*********************************************/
 //Responsible for most keypresses on main input. Handles focus and adding of characters to method
-//Responsible for removing all element form the history header and the local storage element
-function deleteHistory() {
-  document.getElementById('historyHeader').innerHTML = "";
-  localStorage.setItem("historyOut", "");
-}
+
 //Responsible for handling the navigation buttons on the main calc tab
-function navigateButtons(direction) {
-  let sel = document.getSelection();
-  console.log(sel)
-  let baseNode = sel.baseNode;
-  let baseOffset = sel.baseOffset;
-  let extentNode = sel.extentNode;
-  let extentOffset = sel.extentOffset;
-  let collapsed = sel.isCollapsed;
-  let childNodes = keyTargets.input.childNodes;
-  var nodes = [].slice.call(childNodes);
-  let inverse = nodes.indexOf(baseNode) > nodes.indexOf(extentNode) ? false : true;
-  if (direction) {
-    let elem = inverse ? baseNode : extentNode;
-    let index = inverse ? baseOffset : extentOffset
-    moveOne(elem, index, direction)
-  } else {
-    let elem = !inverse ? baseNode : extentNode;
-    let index = !inverse ? baseOffset : extentOffset
-    moveOne(elem, index, direction)
-  }
-}
-function moveOne(elem, index, dire) {
-  let elemString = elem.textContent
-  let childNodes = keyTargets.input.childNodes;
-  var nodes = [].slice.call(childNodes);
-  if ((index == 1 && dire == false) || (index == elemString.length && dire == true)) {
-    console.log('recursive pre')
-    recursiveNode(dire, elem)
-  } else {
-    dire ? setFocus(elem, index + 1) : setFocus(elem, index - 1);
-  }
-}
-function recursiveNode(dire, elem) {
-  let parent = elem.parentNode;
-  let childNodes = parent.childNodes;
-  var nodes = [].slice.call(childNodes);
-  if (((nodes.indexOf(elem) == nodes.length - 1 && parent != keyTargets.input) && dire == true) || ((nodes.indexOf(elem) == 0 && parent != keyTargets.input) && dire == false)) {
-    recursiveNode(dire, parent)
-  } else if (parent == keyTargets.input && (nodes.indexOf(elem) == nodes.length - 1 || nodes.indexOf(elem) == 0)) {
-    nodes.indexOf(elem) == nodes.length - 1 ? setFocus(elem, elem.textContent.length) : setFocus(elem, 1)
-  } else {
-    console.log('changing focus')
-    console.log(parent)
-    console.log(childNodes)
-    //console.log(nodes(elem))
-    nextText(dire, parent, elem)
-  }
-}
+
 function nextText(dire, parent, elem) {
   let childNodes = parent.childNodes;
   var nodes = [].slice.call(childNodes);
@@ -1327,30 +1109,10 @@ function closeConfirm() {
 }
 //END
 /***********************************************|Main Page Backend|*************************************************/
-//Responsible for adding current equation to history header
-function historyMethod(equation) {
-  console.log(document.getElementsByClassName("historyDateHeader"));
-  let historyHeader = document.getElementById('historyHeader');
-  /*let exportedValue = "<h3 id='historyTimeSubHeader'>" + getTime() + "</h3><h4 id='previousEquation'>" + equation + "=" + inputSolver(equation) + "</h4><br> <br> ";*/
-  let dates = document.getElementsByClassName('historyDateHeader');
-  if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
-    let clon = document.getElementsByClassName("historyDateTemp")[0].content.cloneNode(true);
-    clon.getElementById('header').innerHTML = getDate();
-    historyHeader.appendChild(clon);
-  }
-  let clon = document.getElementsByClassName("historyHeaders")[0].content.cloneNode(true);
-  let preEquat = clon.getElementById('previousEquation');
-  clon.getElementById('historyTimeSubHeader').innerHTML = getTime();
-  inputSolver(equation, 'Issue calculating for history').then((value) => {
-    console.log(value)
-    preEquat.innerHTML = equation + "=" + value;
-    localStorage.setItem("historyOut", historyHeader.innerHTML);
-  })
-  historyHeader.appendChild(clon);
-}
 //Responsible for handling the focusing certain elements on main calc page
 function setSelect(node, index) {
   let sel = window.getSelection();
+  console.log("focus Modified")
   let range = document.createRange();
   let higher = 0;
   let lower = 0;
@@ -1409,121 +1171,6 @@ function getFuncList() {
   }
   return finalArray;
 }
-//Responsible for setting global angle mode main calc buttons (main input)
-function setFocus(node, index) {
-  let sel = window.getSelection();
-  let range = document.createRange();
-  range.setStart(node, index);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-//END
-/**************************************************|Mode Methods|**************************************************/
-function graphInMode() {
-  let equationGrid = document.getElementById("graphFuncGrid");
-  let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
-  let def = { "chart": graphModeChart }
-  let graphVars = getGraphVars(def)
-  let datasets = [];
-  let accents = [
-    colorArray[1],
-    "#e6cc4e",
-    "#4ecfe6",
-    "#b169f0",
-    "#f06970",
-    "#87f069",
-    "#69f0c5",
-    "#f0a469",
-    "#69f0ed",
-    "#697bf0",
-    "#69f077",
-  ]
-  for (let elem of equationElems) {
-    let equation = elem.innerHTML
-    queryVars(equation).then(value => {
-      console.log(value)
-      let vars = value
-      let parsedEquation = equation
-      if (vars.length <= 1) {
-        let varPoses = vars[0].positions.reverse()
-        for (let pos of varPoses) {
-          parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
-        }
-        let dataColor = accents[(datasets.length) % 11]
-        getPoints('graph', { 'text': parsedEquation, 'min': Number(graphVars.bottom), 'max': Number(graphVars.top), 'res': Number(graphVars.res) }).then((value) => {
-          datasets.push({
-            data: value,
-            label: "hidden",
-            fontColor: '#FFFFFF',
-            borderColor: dataColor,
-            backgroundColor: dataColor,
-            showLine: true,
-          });
-          def.chart.update();
-        })
-      } else {
-        report("Equation needs single variable", false)
-      }
-    })
-
-  }
-  def.chart.data.datasets = datasets;
-  console.log(datasets)
-
-}
-function tableInMode() {
-  let equationGrid = document.getElementById("tableFuncGrid");
-  let equationElems = equationGrid.querySelectorAll('.dynamicEquation')
-  let tableModeDef = document.getElementById("modeTable");
-  tableModeDef.innerHTML = "<tr id='titleRow'></tr>"
-
-  let columns = [{ 'name': 'x', 'equat': 'x' }];
-  if (equationElems.length == 1) {
-    columns.push({ 'name': 'y', 'equat': equationElems[0].innerHTML })
-  } else {
-    for (let i = 0; i < equationElems.length; i++) {
-      columns.push({ 'name': `y<sup>${i + 1}</sup>`, 'equat': equationElems[i].innerHTML })
-    }
-  }
-  console.log(columns)
-  recursiveTable(tableModeDef, columns)
-  /*for (let elem of equationElems) {
-    let equation = elem.innerHTML
-    queryVars(equation).then((value) => {
-      let vars = value;
-      if (vars.length <= 1) {
-        let parsedEquation = equation;
-        let varPoses = vars[0].positions.reverse()
-        for (let pos of varPoses) {
-          parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
-        }
-        let dataColor = accents[(resulting.length) % 10]
-        getPoints('table', parsedEquation).then(value => { resulting.push(value) })
-        //resulting.push(calculatePoints(parsedEquation, Number(settings.tMin), Number(settings.tMax), Number(settings.tC)));
-
-      } else {
-        report("Equation needs single variable", false)
-      }
-    })
-  }
-  resulting[0].forEach((val) => {
-    let newRow = tableModeDef.insertRow()
-    let newCell = newRow.insertCell()
-    newCell.innerHTML = val.x
-  })
-  resulting.forEach((val, index) => {
-    let tableElems = tableModeDef.childNodes[0].childNodes;
-    let titleHeader = document.createElement("TH");
-    titleHeader.innerHTML = "y" + (index + 1)
-    titleHeader.style.color = accents[(index) % 11]
-    tableElems[0].appendChild(titleHeader)
-    val.forEach((val2, index) => {
-      let newCell = tableElems[index + 1].insertCell()
-      newCell.innerHTML = val2.y;
-    })
-  });*/
-}
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
@@ -1551,88 +1198,7 @@ function createFunc(type, name, text) {
     setFuncList(funcList);
   }
 }
-function recursiveTable(target, colArry) {
-  let accents = [
-    "#e6cc4e",
-    "#4ecfe6",
-    "#b169f0",
-    "#f06970",
-    "#87f069",
-    "#69f0c5",
-    "#f0a469",
-    "#69f0ed",
-    "#697bf0",
-    "#69f077",
-  ]
-  let elem = colArry[0]
-  let equat = elem.equat
-  console.log(equat)
-  queryVars(equat).then((value) => {
-    let vars = value;
-    if (vars.length <= 1) {
-      let parsedEquation = equat;
-      let varPoses = vars[0].positions.reverse()
-      for (let pos of varPoses) {
-        parsedEquation = parsedEquation.replaceAt('Æ', pos, pos + 1)
-      }
-      getPoints('table', parsedEquation).then(value => {
-        let table = target.childNodes[0];
-        let titleRow = table.querySelector('#titleRow')
-        let titleHeader = document.createElement("TH");
-        titleHeader.innerHTML = elem.name
-        titleHeader.style.color = accents[parseInt(Math.random() * 11)]
-        titleRow.appendChild(titleHeader)
-        /*value.forEach((val2, index) => {
-          let newCell = tableElems[index + 1].insertCell()
-          newCell.innerHTML = val2.y;
-        })*/
-        let rows = table.querySelectorAll('.tableRow')
-        let xDef = table.querySelectorAll('.xTDef')
-        if (rows.length != value.length || compareTable(xDef, value)) {
-          xDef.forEach(value => { table.removeChild(value) })
-          if (rows.length != value.length) {
-            let greater = value.length > rows.length
-            if (greater) {
-              for (let i = rows.length > 0 ? rows.length - 1 : 0; i < value.length; i++) {
-                let tableRow = document.createElement('tr');
-                tableRow.className = "tableRow"
-                tableRow.id = `row${i + 1}`
-                table.appendChild(tableRow)
-              }
-            } else {
-              for (let i = rows.length; i > value.length - 1; i--) {
-                table.removeChild(table.querySelector(`#row${1}`))
-              }
-            }
-            rows = table.querySelectorAll('.tableRow');
-          }
-          /*value.forEach((sValue,index) => {
-            let matchRow = table.querySelector(`#row${index+1}`);
-            console.log(matchRow)
-            console.log(index)
-            let tableDef = document.createElement('td')
-            tableDef.className = "xTDef"
-            tableDef.innerHTML = sValue.x
-            matchRow.appendChild(tableDef)
-          });*/
-        }
-        value.forEach((sValue, idx) => {
-          let elem = document.createElement('td')
-          elem.innerHTML = sValue.y
-          console.log(rows)
-          rows[idx].appendChild(elem)
-        })
-        if (colArry.length != 1) {
-          colArry.shift();
-          recursiveTable(target, colArry)
-        }
-      })
 
-    } else {
-      report(`${equat} needs single variable`, false)
-    }
-  })
-}
 function compareTable(elems, points) {
   for (let i = 0; i < points.length; i++) {
     if (points[i] != elems[i]) {
@@ -2053,7 +1619,7 @@ function solveGraph(parsedEquation, def) {
   console.log(result.length)
   def.chart.data.datasets[0].data = result;
   def.chart.update();*/
-  getPoints('graph', { 'text': parsedEquation, 'min': Number(vars.bottom), 'max': Number(vars.top), 'res': Number(vars.res) }).then((value) => {
+  getPoints('graph', { 'text': parsedEquation, 'min': Number(vars.gMin), 'max': Number(vars.gMan), 'res': Number(vars.gR) }).then((value) => {
     def.chart.data.datasets[0].data = value;
     def.chart.update();
   })
@@ -2104,18 +1670,7 @@ function solveTable(parsedEquation, clon) {
 
 }*/
 //creates an array of all variables needed for calculatePoints
-function getGraphVars(def) {
-  console.log(def)
-  let varArray = {}
-  console.log("chart scales");
-  console.log(def.chart.scales);
-  varArray = {
-    "bottom": def.chart.scales.x == undefined ? settings.gMin : Number(def.chart.scales.x.min),
-    "top": def.chart.scales.x == undefined ? settings.gMax : Number(def.chart.scales.x.max),
-    'res': settings.gR
-  }
-  return varArray
-}
+
 //Responsible for (IDFK work on this later)
 function checkVar(name, def) {
   callCalc({ "callType": "get", 'method': 'vars', "existing": true, "funcName": name }).then(value => {
@@ -2255,7 +1810,6 @@ function unlockCustomTheme() {
   let colors = themeElem.getMth();
   settings.p = colors[0];
   settings.s = colors[2];
-  settings.a = colors[1];
   settings.t = colors[3];
   document.getElementById('primaryColorPicker').value = settings.p
   document.getElementById('secondaryColorPicker').value = settings.s
@@ -2286,7 +1840,7 @@ function settingExit() {
     newSettings.theme = selTheme.id;
     newSettings.p = document.getElementById("primaryColorPicker").value;
     newSettings.s = document.getElementById("secondaryColorPicker").value;
-    newSettings.a = document.getElementById("accentColorPicker").value;
+    newSettings.acc = document.getElementById("accentColorPicker").value;
     newSettings.t = document.getElementById('textColorPicker').value;
   }
   newSettings.gR = document.getElementById('graphDStep').value;
@@ -2511,39 +2065,6 @@ function getCatalog() {
     }
   ];
 }
-//Responsible for geting a list of avable themes and how to get the theme colors for them
-function getThemes() {
-  return [
-    {
-      "name": "lightMode",
-      "primary": "#ffffff",
-      "secondary": "#dedede",
-      'text': '#000000',
-      'getMth': function () {
-        return ["#ffffff", getColorAcc(settings.acc), "#dedede", "#000000"];
-      }
-    },
-    {
-      "name": "darkMode",
-      "primary": "#000000",
-      "secondary": "#1f1f1f",
-      'text': '#FFFFFF',
-      'getMth': function () {
-
-        return ["#1f1f1f", getColorAcc(settings.acc), "#383838", '#FFFFFF'];
-      }
-    },
-    {
-      "name": "custPurchasable",
-      "primary": settings.p,
-      "secondary": settings.s,
-      "text": settings.t,
-      'getMth': function () {
-        return [settings.p, settings.a, settings.s, settings.t]
-      }
-    }
-  ];
-}
 //Responsible for geting the colors for whatever theme is listed in the settings
 function getColors() {
   let themes = getThemes();
@@ -2554,47 +2075,7 @@ function getColors() {
   }
 }
 //Responsible for getting a list of accent colors
-function getAccents() {
-  return [
-    {
-      "id": 'red',
-      "val": '#d6564d'
-    },
-    {
-      "id": 'orange',
-      "val": '#fca31e'
-    },
-    {
-      "id": 'yellow',
-      "val": '#e9e455'
-    },
-    {
-      "id": 'green',
-      "val": '#68c43e'
-    },
-    {
-      "id": 'blue',
-      "val": '#4193ff'
-    },
-    {
-      "id": 'purple',
-      "val": '#6a2bfd'
-    },
-    {
-      "id": 'grey',
-      "val": '#b8b8b8'
-    }
-  ];
-}
-//Responsible for matching its respected accent name with its color
-function getColorAcc(acc) {
-  let accents = getAccents();
-  for (let accent of accents) {
-    if (accent.id == acc) {
-      return accent.val;
-    }
-  }
-}
+
 //Responsible for setting the root values of a page which controll all color styling
 function setSettings() {
   let themes = getThemes();
@@ -2863,96 +2344,7 @@ function removeAllChildNodes(parent) {
     parent.removeChild(parent.firstChild);
   }
 }
-function createGraph(chart) {
-  let defChart = new Chart(chart, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          id: "base",
-          data: [],
-          label: "hidden",
-          fontColor: getCSS("--numbersColor"),
-          borderColor: getCSS("--numbersColor"),
-          backgroundColor: getCSS("--numbersColor"),
-          showLine: true,
-          pointRadius: 0,
-        },
-        {
-          id: "extrema",
-          data: [],
-          label: "hidden",
-          fontColor: getCSS("--numbersColor"),
-          borderColor: getCSS("--numbersColor"),
-          backgroundColor: getCSS("--numbersColor"),
-          showLine: false,
-          pointRadius: 5,
-        }
-      ]
-    },
-    options: {
-      scales: {
-        x: {
-          grid: {
-            drawBorder: false,
-            color: colorArray[3],
-          },
-          ticks: {
-            color: colorArray[3],
-          }
-        },
-        y: {
-          grid: {
-            drawBorder: false,
-            color: colorArray[3],
-          },
-          ticks: {
-            color: colorArray[3],
-          }
-        },
-      },
-      hover: {
-        intersect: false,
-        mode: 'nearest',
-        axis: 'xy',
-      },
-      animation: {
-        duration: 0
-      },
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        zoom: {
-          animation: {
-            duration: 0
-          },
-          limits: {
-          },
-          pan: {
-            enabled: true,
-            mode: 'xy',
-          },
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-            pinch: {
-              enabled: true
-            },
-            mode: 'xy',
-            onZoomComplete({ chart }) {
-              chart.update('none');
-            }
-          }
-        }
-      }
-    }
-  })
-  return defChart;
-}
+
 /*
   keyController object dev guide
 {
@@ -3073,6 +2465,7 @@ function keypadEquationMapper() {
   elem.addEventListener('focusout', (e) => {
     setTimeout(() => {
       let sel = window.getSelection();
+      console.log("focus Modified")
       console.log(keyTargets)
       console.log(sel)
       let keypad = document.getElementById('keypad')
@@ -3346,9 +2739,6 @@ function animate(elem, animation) {
 
     elem.style.animation = animation;
   });
-}
-function getCSS(value){
-  return getComputedStyle(document.documentElement).getPropertyValue(value);
 }
 //END
 /************************************************|help page|**************************************************/

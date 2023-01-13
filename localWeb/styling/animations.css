@@ -1,0 +1,170 @@
+@keyframes buttonSlide {
+    from {}
+  
+    to {}
+  }
+  
+  @keyframes fadeEffect {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+  
+    to {
+      transform: translateY(unset);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeEffect2 {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+  
+    to {
+      transform: translateY(unset);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideFromSide {
+    from {
+      left: 100%;
+    }
+  
+    to {
+      left: 66.66666%;
+    }
+  }
+  
+  @keyframes toUp {
+    0% {
+      transform: rotate(-90deg)
+    }
+  
+    100% {
+      transform: rotate(90deg)
+    }
+  }
+  
+  @keyframes toDown {
+    0% {
+      transform: rotate(90deg)
+    }
+  
+    100% {
+      transform: rotate(-90deg)
+    }
+  }
+  
+  @keyframes extendFuncAnim {
+    0% {
+      top: 100%;
+    }
+  
+    100% {
+      top: 0%;
+    }
+  }
+  
+  @keyframes modeSwitch {
+    0% {
+      left: 0px;
+    }
+  
+    50% {
+      left: 75px;
+    }
+  
+    100% {
+      left: 150px
+    }
+  }
+  
+  @keyframes slideToUpFromBottom {
+    0% {
+      top: 0%;
+    }
+  
+    6.5217% {
+      top: 80px;
+    }
+  
+    93.478% {
+      top: 80px;
+    }
+  
+    100% {
+      top: 0%;
+    }
+  }
+  
+  @keyframes sveForSwitch {
+    0% {
+      left: 75px;
+    }
+  
+    100% {
+      left: 0px
+    }
+  }
+  
+  @keyframes sveBacSwitch {
+    0% {
+      left: 75px;
+    }
+  
+    100% {
+      left: 150px
+    }
+  }
+  
+  @keyframes pageup {
+    0% {
+      bottom: 100%;
+    }
+  
+    100% {
+      bottom: 0px;
+    }
+  }
+  @keyframes toSlideLeft {
+    0% {
+      left: 100%;
+    }
+  
+    100% {
+      left: 0%;
+    }
+  }
+  
+  @keyframes toSlideRight {
+    0% {
+      left: 0%;
+    }
+  
+    100% {
+      left: 100%;
+    }
+  }
+  
+  @keyframes toSlideOut {
+    0% {
+      left: 0%;
+    }
+  
+    100% {
+      left: -100%;
+    }
+  }
+  
+  @keyframes toSlideIn {
+    0% {
+      left: -100%;
+    }
+  
+    100% {
+      left: 0%;
+    }
+  }  

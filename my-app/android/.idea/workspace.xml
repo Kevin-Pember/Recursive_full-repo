@@ -10,16 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f00232ec-8163-478f-9a5a-d28af2d36ca6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../CriterSitters/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../CriterSitters/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../../CriterSitters/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../CriterSitters/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../../CriterSitters/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../CriterSitters/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../../CriterSitters/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.." beforeDir="false" afterPath="$PROJECT_DIR$/../.." afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../localWeb/packages/safariSelectionPolyfill.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../localWeb/styling/test.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../localWeb/componets.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/componets.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../localWeb/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../localWeb/load.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/load.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../localWeb/packages/chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/packages/chart.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../localWeb/styling/stylesheets.css" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/styling/stylesheets.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../localWeb/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../localWeb/test.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
