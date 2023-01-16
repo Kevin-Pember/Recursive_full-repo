@@ -24,11 +24,54 @@
     <script src="packages/hammer.js"></script>
     <script src="packages/chartjs-plugin-zoom.js"></script>
     <script src="packages/safariSelectionPolyfill.js"></script>
-   
+
 </head>
 <script src="componets.js"></script>
 
 <body id="mainBody">
+    <script>
+        let stylers = [
+
+        ]
+        let formats = [
+            {
+                "name": "mobilePortrait",
+                "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
+                "methods": []
+            },
+            {
+                "name": "mobileLandscape",
+                "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
+                "methods": []
+            },
+            /*{
+                "name": "tabletPortrait",
+                "query": window.matchMedia("(orientation: portrait) and (min-width: 600px) and (max-width: 1000px)"),
+                "methods": []
+            },
+            {
+                "name": "tabletLandscape",
+                "query": window.matchMedia("(orientation: landscape) and (min-width: 600px) and (max-width: 1000px)"),
+                "methods": []
+            },
+            {
+                "name": "desktop",
+                "query": window.matchMedia("(min-width: 1000px)"),
+                "methods": []
+            }*/
+        ]
+        let appendMethod = (format, method) => {
+            formats.find((elem) => {
+                if (elem.name == format) {
+                    elem.methods.push(method)
+                }
+            })
+        }
+        let array = []
+    </script>
+    <style id="bodyStyle"></style>
+    <script>stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
+    
     <div class="page" id="mainPage">
         <div id="tab">
             <button id="mobileTabs">
@@ -156,552 +199,92 @@
                             d="m367 280h120c9.383 0 17 7.617 17 17v2c0 9.383-7.617 17-17 17h-120c-9.383 0-17-7.617-17-17v-2c0-9.383 7.617-17 17-17z"
                             fill="#D9D9D9" />
                     </svg>
-                    <style>
-                        @font-face {
-                            font-family: ubuntu;
-                            src: url(../fontAssets/Roboto-Regular.ttf);
-                        }
-
-                        @font-face {
-                            font-family: ubuntu;
-                            src: url(../fontAssets/Roboto-Bold.ttf);
-                            font-weight: bold;
-                        }
-
-                        :root {
-                            --displayColor: #3d3d3d;
-                            --numbersColor: #15ad6e;
-                            --functionsColor: #1b1b1b;
-                            --textColor: #48fea6;
-                            --translucent: #00000033;
-                            --semi-transparent: #000000c5;
-                            --neutralColor: #80808080;
-                        }
-
-                        * {
-                            box-sizing: border-box;
-                            padding: 0;
-                            margin: 0;
-                            font-family: ubuntu;
-                            color: var(--textColor);
-                            -webkit-tap-highlight-color: transparent;
-                        }
-
-                        body {
-                            background: var(--displayColor);
-                            overflow: hidden;
-                            position: absolute;
-                            left: 0;
-                            right: 0;
-                        }
-
-                        .imgDivClass {
-                            aspect-ratio: 1 / 1;
-                        }
-
-                        .svgText {
-                            fill: var(--textColor);
-                        }
-
-                        .pane {
-                            border-radius: 25px;
-                            background-color: var(--functionsColor);
-                            filter: drop-shadow(-5px 5px 5px var(--translucent));
-                        }
-
-                        /*********************************Injected css from mode***********************************/
-
-                        /*end*/
-
-                        #uifCalculator::-webkit-scrollbar {
-                            width: 2vh;
-
-                        }
-
-                        #uifCalculator::-webkit-scrollbar-track {
-                            background: transparent;
-                            margin-bottom: 40px;
-                        }
-
-                        #uifCalculator::-webkit-scrollbar-thumb {
-                            width: 5;
-                            min-height: 30px;
-                            background: var(--translucent);
-                            border-radius: 10px;
-                        }
-
-                        #uifCalculator::-webkit-scrollbar-button:end:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        #uifCalculator::-webkit-scrollbar-button:start:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        [contenteditable] {
-                            outline: 0px solid transparent;
-                        }
-
-                        button:focus {
-                            outline: none;
-                        }
-
-                        .textOverlay {
-                            position: absolute;
-                            z-index: 1;
-                            background-color: transparent;
-                            color: var(--textColor);
-                            border: none;
-                            font-size: 15px;
-                        }
-
-                        .matchCircle {
-                            position: absolute;
-                            top: 3.33335px;
-                            left: 3.33335px;
-                            height: 33.3333px;
-                            width: 33.3333px;
-                            background-color: var(--translucent);
-                            text-align: center;
-                            justify-content: center;
-                            border-radius: 50%;
-                        }
-
-                        .memText {
-                            color: var(--textColor);
-                            position: absolute;
-                            text-align: center;
-                            width: 33px;
-                            height: 14px;
-                            top: 9.66665px;
-                            font-size: 12px;
-                        }
-
-                        #overlayContainer {
-                            width: calc(100% - 20px);
-                            height: fit-content;
-                            position: absolute;
-                            bottom: 10px;
-                            background-color: var(--displayColor);
-                            border-radius: 25px;
-                            padding: 5px;
-                            left: 10px;
-                        }
-
-                        #deleteHistory {
-                            top: 10px;
-                            left: 10px;
-                            z-index: 1;
-                            padding: 2.5px;
-                            border-radius: 50%;
-                            background-color: var(--displayColor);
-                            position: absolute;
-                        }
-
-                        #overlayDiv {
-                            height: 40px;
-                            width: 100%;
-                        }
-
-                        #MRCOverlay {
-                            height: 40px;
-                            width: 40px;
-                            left: 0px;
-                        }
-
-                        #MAddOverlay {
-                            height: 40px;
-                            width: 40px;
-                            left: 40px;
-                        }
-
-                        #memoryDiv {
-                            height: 40px;
-                            left: 80px;
-                            right: 80px;
-                            position: absolute;
-                        }
-
-                        #memoryTextBoarder {
-                            left: 0;
-                            top: 3.33335px;
-                            background-color: var(--translucent);
-                            max-width: 100%;
-                            width: auto;
-                            position: absolute;
-                            overflow-x: hidden;
-                            border-radius: 25px;
-                            visibility: hidden;
-                        }
-
-                        #memoryText {
-                            width: auto;
-                            max-width: inherit;
-                            color: var(--textColor);
-                            position: relative;
-                            height: 33.3333px;
-                            padding-left: 10px;
-                            padding-right: 10px;
-                            text-align: center;
-                            font-weight: lighter;
-                            font-size: 30px;
-                        }
-
-                        #memoryText::-webkit-scrollbar-thumb {
-                            width: 2px;
-                            background: #00000080;
-                            border-radius: 10px;
-                        }
-
-                        #leftOverlayNav {
-                            position: absolute;
-                            z-index: 1;
-                            right: 40px;
-                        }
-
-                        #rightOverlayNav {
-                            position: absolute;
-                            z-index: 1;
-                            right: 0px;
-                        }
-
-                        #displayClip {
-                            position: absolute;
-                            animation: fadeEffect 0.5s ease-in 1 none;
-                            width: 75%;
-                            height: calc(35% - 10px);
-                            top: 10px;
-                            overflow: hidden;
-                            width: calc(100% - 20px);
-                            left: 10px;
-                            filter: drop-shadow(-5px 5px 5px var(--translucent));
-                        }
-
-                        .text-area {
-                            width: 100%;
-                            height: 100%;
-                            overflow-y: auto;
-                            overflow-x: hidden;
-                            padding-bottom: 70px;
-                            border: none;
-                            color: var(--textColor);
-                            background-color: transparent;
-                            position: absolute;
-                        }
-
-                        .text-area:focus {
-                            border: transparent;
-                        }
-
-                        #historyHeader {
-                            padding-top: 62.5px;
-                            margin-left: 5px;
-                            font-weight: lighter;
-                            font-size: 25px;
-                            color: var(--numbersColor);
-                            direction: ltr
-                        }
-
-                        #enterHeader {
-                            width: 100%;
-                            font-weight: lighter;
-                            padding-left: 10px;
-                            font-size: 40px;
-                            text-indent: 5px;
-                            direction: ltr;
-                        }
-
-
-
-                        #extendedKeypad {
-                            height: fit-content;
-                            width: fit-content;
-                            overflow: hidden;
-                            visibility: hidden;
-                        }
-
-                        #extendedFuncGrid {
-                            height: 100%;
-                            top: 33.3333%;
-                            width: relative;
-                            left: 400px;
-                            right: 0;
-                            max-width: 200px;
-                            display: grid;
-                            grid-gap: 0px 0px;
-                            grid-template-columns: 50% 50%;
-                            grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
-                            background-color: #00000000;
-                            z-index: 1;
-                            grid-template-areas:
-                                "help func"
-                                "vars ac"
-                                "mod abs"
-                                "sin deg"
-                                "cos arc"
-                                "tan inv"
-                                "d-f fact"
-                                "ln log"
-                                "log10 e";
-                        }
-
-                        .fI {
-                            background-color: var(--displayColor);
-                        }
-
-                        .button-item {
-                            padding: 0px;
-                            height: 100%;
-                            width: 100%;
-                            font-size: 100%;
-                            position: absolute;
-                            background-color: var(--displayColor);
-                            text-align: center;
-                        }
-
-                        .funcbutton {
-                            height: 100%;
-                            width: 100%;
-                            font-size: 20px;
-                            color: var(--textColor);
-                            background-color: var(--functionsColor);
-                            text-align: center;
-                            border-style: none;
-                        }
-
-                        .funcbutton:focus {
-                            outline: none;
-                            box-shadow: none;
-                        }
-
-                        .trigButton {
-                            height: 100%;
-                            width: 100%;
-                            font-size: 20px;
-                            color: var(--textColor);
-                            background-color: var(--functionsColor);
-                            text-align: center;
-                            border-style: none;
-                        }
-
-                        .addIcon {
-                            top: 5px;
-                            left: 5px;
-                            width: 40px;
-                            height: 40px;
-                            background-color: transparent;
-                            border: none;
-                            position: absolute;
-                        }
-
-                        .minusIcon {
-                            left: 45px;
-                            top: 5px;
-                            width: 40px;
-                            height: 40px;
-                            background-color: transparent;
-                            border: none;
-                            position: absolute;
-                        }
-
-
-
-                        #customFuncDisplay {
-                            visibility: hidden;
-                            height: 100%;
-                            left: 0;
-                            overflow-y: auto;
-                            background-color: var(--functionsColor);
-                            position: relative;
-                            z-index: 1;
-                        }
-
-                        #customFuncDisplay::-webkit-scrollbar {
-                            width: 2vh;
-
-                        }
-
-                        #customFuncDisplay::-webkit-scrollbar-track {
-                            background: transparent;
-                            margin-bottom: 40px;
-                        }
-
-                        #customFuncDisplay::-webkit-scrollbar-thumb {
-                            width: 5;
-                            min-height: 30px;
-                            background: var(--translucent);
-                            border-radius: 10px;
-                        }
-
-                        #customFuncDisplay::-webkit-scrollbar-button:end:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        #customFuncDisplay::-webkit-scrollbar-button:start:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        #customFuncDisplayGrid {
-                            top: 60px;
-                            bottom: 0px;
-                            left: 0;
-                            right: 0;
-                            position: absolute;
-                            display: grid;
-                            grid-template-columns: 50% 50%;
-                            grid-auto-rows: 120px;
-                        }
-
-                        #customFuncDisplayRecentText {
-                            right: 5px;
-                            top: 5px;
-                            left: 2.5%;
-                            width: 95%;
-                            text-align: left;
-                            color: transparent;
-                            color: var(--textColor);
-                            background-color: var(--numbersColor);
-                            text-align: right;
-                            position: absolute;
-                            padding: 5px 10px;
-                            border-radius: 25px;
-                        }
-
-                        ::-webkit-scrollbar {
-                            width: 10px;
-                        }
-
-                        ::-webkit-scrollbar-track {
-                            background: transparent;
-                        }
-
-                        ::-webkit-scrollbar-thumb {
-                            width: 5px;
-                            background: #00000080;
-                            border-radius: 10px;
-                        }
-
-                        ::-webkit-scrollbar-button:end:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        ::-webkit-scrollbar-button:start:increment {
-                            height: 7px;
-                            display: block;
-                            background: transparent;
-                        }
-
-                        #addFunctionEx {
-                            z-index: 1;
-                            left: unset;
-                            right: 60px;
-                            top: 8.5px;
-                        }
-
-                        #minusFunctionEx {
-                            z-index: 1;
-                            left: unset;
-                            right: 20px;
-                            top: 8.5px;
-                        }
-
-                        #creatorEditor::-webkit-scrollbar-button:end:increment {
-                            height: 0px;
-                            background: transparent;
-                        }
-
-                        #creatorEditor::-webkit-scrollbar-button:start:increment {
-                            height: 0px;
-                            background: transparent;
-
-                        }
-
-                        @keyframes fadeEffect {
-                            from {
-                                opacity: 0;
-                                transform: translateY(50px);
-                            }
-
-                            to {
-                                transform: translateY(unset);
-                                opacity: 1;
-                            }
-                        }
-                    </style>
-                    <history-display id="mainScroll" style="position: absolute;animation: fadeEffect 0.5s ease-in 1 none;height: calc(35% - 10px);top: 10px;width: calc(100% - 20px);left: 10px;"></history-display>
-                    <div id="extendedKeypad" class="pane">
-                        <div id="extendedFuncGrid">
-                            <div class="button-item fI" style="grid-area: help;"><button class="funcbutton" id="helpEx">
-                                    <svg class="helpIcon imgDivClass" style="height: 40px;isolation:isolate"
-                                        viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg">\
-                                        <path class="svgText"
-                                            d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
-                                            fill-rule="evenodd" />
-                                    </svg>
-                                </button></div>
-                            <div class="button-item fI" style="grid-area: func;"><button class="funcbutton"
-                                    id="functionEx">Func</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: ac;"><button class="funcbutton"
-                                    id="acEx">ac</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: vars;"><button class="funcbutton"
-                                    id="varEx">xyz</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: arc;"><button class="funcbutton"
-                                    id="arcEx">arc</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: inv;"><button class="funcbutton"
-                                    id="invEx">inv</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: sin;"><button class="trigButton"
-                                    id="sinEx">sin</button>
-                            </div>
-                            <div class="button-itemfI" style="grid-area: deg;"><button class="funcbutton"
-                                    id="degEx">deg</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: cos;"><button class="trigButton"
-                                    id="cosEx">cos</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton"
-                                    id="modEx">mod</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: tan;"><button class="trigButton"
-                                    id="tanEx">tan</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
-                                    |</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: d-f;"><button class="funcbutton"
-                                    id="deciToFracEx">d→f</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: fact;"><button class="funcbutton"
-                                    id="factorialEx">n!</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: ln;"><button class="funcbutton"
-                                    id="lnEx">ln</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: log;"><button class="funcbutton"
-                                    id="log10Ex">log</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: log10;"><button
-                                    class="funcbutton">log<sub>10</sub></button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: e;"><button class="funcbutton">e</button>
-                            </div>
-                        </div>
+                    <div id="mainPageContainer">
+                        <history-display id="mainScroll" style="">
+                        </history-display>
+                        <keypad-ex id="extendedMainKeypad"></keypad-ex>
                     </div>
-
+                    <style id="formatStyle"></style>
+                    <script>
+                        let extendedMainKeypad = document.getElementById("extendedMainKeypad");
+                        let mainScroll = document.getElementById("mainScroll");
+                        let styler = document.getElementById("formatStyle");
+                        appendMethod('mobileLandscape', () => {
+                            console.log(styler)
+                            styler.innerHTML = `
+                                #mainPageContainer{
+                                    display: grid;
+                                    grid-template-columns: 33.3333% 33.3333% 33.3333%;
+                                    position: absolute;
+                                    grid-template-areas: "display exKeypad keypad";
+                                    height: 100%;
+                                    width: 100%;
+                                }
+                                #mainScroll{
+                                    grid-area: display;
+                                    position: absolute;
+                                    height: calc(100% - 20px);
+                                    width: calc(100% - 15px);
+                                    left: 10px;
+                                    top: 10px;
+                                }
+                                #extendedMainKeypad{
+                                    grid-area: exKeypad;
+                                    position: absolute;
+                                    visibility: inherit;
+                                    height: calc(100% - 20px);
+                                    width: calc(100% - 10px);
+                                    left: 5px;
+                                    top: 10px;
+                                }
+                            `;
+                            console.log(styler.innerHTML)
+                            extendedMainKeypad.setAttribute("mode", 'triple');
+                            let bodyStyler = stylers.find((elem) => elem.id == "mainBody" ).styler;
+                            bodyStyler.innerHTML = `
+                                #mainKeypad{
+                                    position: absolute;
+                                    animation: 0.15s ease-in 0s 1 normal forwards running fadeEffect;
+                                    width: calc(33.3333% - 15px);
+                                    height: calc(100% - 60px);
+                                    left: 66.6666%;
+                                    top: 50px;
+                                    margin-left: 5px;
+                                    z-index: 3;
+                                }
+                            `;
+                        })
+                        appendMethod('mobilePortrait', () => {
+                            styler.innerHTML = `
+                            #mainScroll {
+                                position: absolute;
+                                animation: fadeEffect 0.5s ease-in 1 none;
+                                height: calc(35% - 10px);
+                                top: 10px;
+                                width: calc(100% - 20px);
+                                left: 10px;
+                            }
+                            #extendedMainKeypad {
+                                visibility: hidden;
+                            }
+                            `
+                            let bodyStyler = stylers.find((elem) => elem.id == "mainBody" ).styler;
+                            bodyStyler.innerHTML = `
+                                #mainKeypad{
+                                    animation: fadeEffect 0.50s linear 1 none;
+                                    width: calc(100% - 20px);
+                                    left: 10px;
+                                    bottom: 10px;
+                                    border-radius: 25px;
+                                    z-index: 2;
+                                    top: calc(35% + 45px);
+                                    position: absolute;
+                                    overflow: hidden;
+                                    filter: drop-shadow(-5px 5px 5px var(--translucent));
+                                }
+                            `;
+                        });
+                    </script>
                 </menu-page>
                 <menu-page name="Graphing">
                     <svg id="icon" class="modeIcon" height="100%" style="isolation:isolate; aspect-ratio: 1/1;"
@@ -1417,10 +1000,27 @@
             <button id="newFunction">+</button>
         </div>
     </div>
-    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" ></func-keypad>
     <quick-settings id="quickSettings" style="visibility: hidden;"></quick-settings>
+    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry"></func-keypad>
     <script>
-        console.log("hello World");
+        for (let qElem of formats) {
+            let format = () => {
+                console.log("Format styling method")
+                console.log(qElem.methods)
+                for (let method of qElem.methods) {
+                    method();
+                }
+            }
+            qElem.query.addEventListener('change', () => {
+                if (qElem.query.matches) {
+                    format()
+                }
+            })
+            if (qElem.query.matches == true) {
+                console.log("is true Value")
+                format()
+            }
+        }
     </script>
     <script src="load.js"></script>
 </body>

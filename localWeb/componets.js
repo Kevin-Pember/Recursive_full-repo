@@ -27,7 +27,6 @@ let defStyle = `
 let inputs = [];
 let colorArray = [];
 
-
 function setFocus(node, index) {
     console.log("focus Modified")
     console.log(index)
@@ -934,7 +933,7 @@ class historyDisplay extends HTMLElement {
         console.log(equation)
         let memoryText = this.memoryTextBoarder
         let memoryTextBoarder = this.memoryTextBoarder
-        memoryTextBoarder.style.visibility = "inherit";
+        //memoryTextBoarder.style.visibility = "inherit";
         pullUpElements([memoryTextBoarder]);
         if (equation != '') {
             inputSolver(equation, "error adding to memory").then((value) => { memoryText.innerHTML = value })
@@ -1249,18 +1248,18 @@ class inputMethod extends HTMLElement {
         }
         searchElems.push(this);
 
-        if (this.shadowRoot.querySelector("#"+target.trigButtons[0]).innerHTML.substring(0, 1) == "a") {
+        if (this.shadowRoot.querySelector("#" + target.trigButtons[0]).innerHTML.substring(0, 1) == "a") {
             arc = true;
         }
         //sets the text of inv buttons 
-        if (this.shadowRoot.querySelector("#"+target.trigSwitches[0]).innerHTML == "inv") {
+        if (this.shadowRoot.querySelector("#" + target.trigSwitches[0]).innerHTML == "inv") {
             text = "reg"
         } else {
             text = "inv"
         }
         for (let elem of searchElems) {
             let tempTarget = elem.shadowRoot.querySelector('#keypad') ? trigElements[0] : trigElements[1];
-            elem.shadowRoot.querySelector("#"+tempTarget.trigSwitches[0]).innerHTML = text;
+            elem.shadowRoot.querySelector("#" + tempTarget.trigSwitches[0]).innerHTML = text;
             console.log(tempTarget)
             //sets the text of trig buttons based on values
             for (let id of tempTarget.trigButtons) {
@@ -1308,13 +1307,13 @@ class inputMethod extends HTMLElement {
             });
         }
         searchElems.push(this);
-        if (this.shadowRoot.querySelector("#"+target.trigButtons[0]).innerHTML.substring(0, 1) == "a") {
+        if (this.shadowRoot.querySelector("#" + target.trigButtons[0]).innerHTML.substring(0, 1) == "a") {
             arc = true;
         }
         for (let elem of searchElems) {
             let tempTarget = elem.shadowRoot.querySelector('#keypad') ? trigElements[0] : trigElements[1];
             console.log(tempTarget);
-            elem.shadowRoot.querySelector("#"+tempTarget.trigSwitches[0]).innerHTML = arc ? "arc" : "deg";
+            elem.shadowRoot.querySelector("#" + tempTarget.trigSwitches[0]).innerHTML = arc ? "arc" : "deg";
             for (let id of tempTarget.trigButtons) {
                 if (elem.shadowRoot.querySelector("#" + id) != undefined) {
                     let text = shadowRef.querySelector("#" + id).innerHTML;
@@ -1373,6 +1372,12 @@ class Keypad extends inputMethod {
             position: absolute;
             z-index: 1;
             visibility: inherit;
+        }
+        #keypad {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            filter: drop-shadow(-5px 5px 5px var(--translucent));
         }
         #mainCacGrid {
             position: absolute;
@@ -1499,15 +1504,6 @@ class Keypad extends inputMethod {
       "deg arc inv abs"
       "sin cos tan mod"
       ;
-    }
-    #keypad {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        filter: drop-shadow(-5px 5px 5px var(--translucent));
     }
     .button-item {
         padding: 0px;
@@ -2422,18 +2418,6 @@ class Keypad extends inputMethod {
     }
     connectedCallback() {
         setTimeout(() => {
-            this.style = `
-            animation: fadeEffect 0.50s linear 1 none;
-            width: calc(100% - 20px);
-            left: 10px;
-            bottom: 10px;
-            border-radius: 25px;
-            z-index: 2;
-            top: calc(35% + 45px);
-            position: absolute;
-            overflow: hidden;
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
-        `;
         })
     }
     attributeChangedCallback(name, oldValue, newValue) {
@@ -3008,21 +2992,27 @@ class menuPane extends HTMLElement {
     pageSelector(tPage) {
         let selectorType = "";
         if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
-            if (this.type == "mode" && this.type == "simpleMenu") {
+            if (this.type != "mode" && this.type == "simpleMenu") {
+                selectorType = "full";
+            } else {
                 selectorType = "full";
             }
         } else {
             selectorType = "full";
         }
+        console.log(selectorType)
         if (selectorType == "full") {
             this.container.style.zIndex = 1;
-            this.switcher.style.visibility = "hidden";
+            hideElements([this.switcher])
+            //this.switcher.style.visibility = "hidden";
         }
         let hiddenPages = [...this.pages].filter((page) => {
             return page != tPage;
         })
         if (tPage.hasKeypad) {
+            console.log("has keypad")
             if (typeof keypad !== 'undefined') {
+                console.log(keypad)
                 keypad.setVisibility(true);
             }
         }
@@ -3031,6 +3021,7 @@ class menuPane extends HTMLElement {
     }
     pageReturn() {
         this.container.style.zIndex = -1;
+        console.log(this.pages)
         hideElements([...this.pages, this.shadowRoot.querySelector("#modeButton")]);
         if (keypad != undefined) {
             keypad.setVisibility(false);
@@ -3286,7 +3277,13 @@ class menuPane extends HTMLElement {
             this.pageReturn();
         });
         this.container = this.shadowRoot.querySelector("#paneContainer");
-        this.container.addEventListener("resize", () => {
+        appendMethod('mobileLandscape', () => {
+            this.setStyling();
+        })
+        appendMethod('mobilePortrait', () => {
+            this.setStyling();
+        });
+        this.container.addEventListener("change", () => {
             this.setStyling();
         })
     }
@@ -3358,19 +3355,21 @@ class menuPane extends HTMLElement {
             this.setStyling();
             console.log(this.childNodes)
             //this.shadowRoot.querySelector("#modeContainer").append(...this.childNodes)
-            this.pages = this.shadowRoot.querySelectorAll("menu-page")
+            this.pages = []
             this.switcher = this.shadowRoot.querySelector("#modeSwitcher")
             this.container = this.shadowRoot.querySelector("#modeContainer")
             if (this.shadowRoot.querySelector("#modeContainer").createButton == undefined) {
                 this.shadowRoot.querySelector("#modeContainer").createButton = (name, icon, page) => {
                     let button = document.createElement("button")
                     button.classList.add("modeButton");
+                    this.pages.push(page)
                     button.innerHTML = `
                 <h3 id="modeText" class="text"></h3>
                 `
                     button.insertBefore(icon, button.firstChild);
                     button.querySelector("#modeText").innerHTML = name
                     button.addEventListener("click", () => {
+                        console.log("hello you clicked")
                         this.pageSelector(page)
                     })
                     console.dir(page)
@@ -3550,16 +3549,11 @@ class templateMode extends HTMLElement {
         width: 100%;
         height: 100%;
         display: grid;
-        grid-template-areas:
-          "content"
-          "controls";
-        grid-template-rows: 66.6666% 33.3333%;
         position: absolute;
         filter: drop-shadow(-5px 5px 5px var(--translucent));
         transition: 0.5s;
       }
       .modeContainerClass.fullScreen {
-        grid-template-rows: 100%;
         grid-template-areas: "content";
         transition: 0.5s;
       }
@@ -3655,6 +3649,7 @@ class templateMode extends HTMLElement {
         background: transparent;
       }
         </style>
+        <style id="orientationStyle"></style>
         <div id="modeContainer" class="modeContainerClass">
                     <div id="contentPane" style="grid-area: content;">
                         <div id="contentContainer" class="dynamicContent">
@@ -3703,17 +3698,61 @@ class templateMode extends HTMLElement {
         this.shadowRoot.querySelector('#fullContent').addEventListener('click', () => {
             if (this.modeContainer.classList.contains('fullScreen')) {
                 this.modeContainer.classList.remove('fullScreen')
-                this.contentControls.style.visibility = 'visible'
-                this.contentPane.style.height = 'calc(100% - 10px)'
+                //this.contentControls.style.visibility = 'visible'
+                pullUpElements([this.contentControls])
+                this.contentPane.style.height = ''
+                this.contentPane.style.width = ''
                 this.contentMethod()
             } else {
                 this.modeContainer.classList.add('fullScreen')
-                this.contentControls.style.visibility = 'hidden'
+                //this.contentControls.style.visibility = 'hidden'
+                hideElements([this.contentControls])
                 this.contentPane.style.height = 'calc(100% - 20px)'
+                this.contentPane.style.width = 'calc(100% - 20px)'
                 this.contentMethod()
             }
 
         })
+    }
+    setStyling() {
+        let orientation = "";
+        let styling = "";
+        if (this.modeContainer.offsetWidth / this.modeContainer.offsetHeight > 3 / 4) {
+            orientation = "horizontal";
+            styling = `
+             .modeContainerClass{
+                grid-template-areas:
+                    "content controls";
+                grid-template-columns: 66.6666% 33.3333%;
+                grid-template-rows: 100%;
+             }
+             #contentPane{
+                height: calc(100% - 20px);
+                width: calc(100% - 10px);
+                
+             }
+             .modeContainerClass.fullScreen {
+                grid-template-columns: 100%;
+              }
+             .
+            `
+        } else {
+            orientation = "vertical";
+            styling= `
+            .modeContainerClass {
+                grid-template-areas:
+                  "content"
+                  "controls";
+                grid-template-rows: 66.6666% 33.3333%;
+                grid-template-columns: 100%;
+              }
+              .modeContainerClass.fullScreen {
+                grid-template-rows: 100%;
+              }
+            `
+        }
+
+        this.shadowRoot.querySelector("#orientationStyle").innerHTML = styling;
     }
     connectedInit() {
         if (!this.connectedOnce) {
@@ -3721,6 +3760,13 @@ class templateMode extends HTMLElement {
                 this.inputMethod();
             });
             this.connectedOnce = true
+            this.setStyling();
+            appendMethod('mobileLandscape', () => {
+                this.setStyling();
+            })
+            appendMethod('mobilePortrait', () => {
+                this.setStyling();
+            });
         }
     }
     contentMethod() {
@@ -3945,7 +3991,6 @@ class tableMode extends templateMode {
         this.inputMethod = () => {
             this.tableInMode()
         }
-
     }
     connectedCallback() {
         setTimeout(() => {
@@ -4427,7 +4472,8 @@ class quickSettings extends HTMLElement {
     }
     exit() {
         this.defExit()
-        this.style.visibility = "hidden";
+        //this.style.visibility = "hidden";
+        hideElements([this.style])
         this.style.zIndex = "0";
         this.clearSettings()
     }
@@ -4435,7 +4481,8 @@ class quickSettings extends HTMLElement {
         this.settingsTitle.innerHTML = title;
         this.populateSettings(setArry);
         this.defExit = exitMethod;
-        this.style.visibility = "visible";
+        //this.style.visibility = "visible";
+        pullUpElements([this.style])
         this.style.zIndex = "10";
     }
 }

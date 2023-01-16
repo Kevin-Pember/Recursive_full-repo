@@ -32,6 +32,8 @@ body {
   background: var(--displayColor);
   overflow: hidden;
   position: absolute;
+  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
 }
@@ -505,8 +507,6 @@ input[type="button"]:focus {
 
 #mainBody {
   background-color: var(--functionsColor);
-  min-height: 600px;
-  min-width: 310px;
   overflow-y: hidden;
   overflow-x: hidden;
   height: 100%;
