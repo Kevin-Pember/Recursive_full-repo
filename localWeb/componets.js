@@ -2648,6 +2648,7 @@ class Keypad extends inputMethod {
     }
     reset() {
         this.shadowRoot.querySelector('#styleInjector').innerHTML = "";
+        this.style = "";
         this.setAttribute('mode', this.ogMode);
         this.keyTargets.input = this.firstTargets.input
         this.keyTargets.scroll = this.firstTargets.scroll;
