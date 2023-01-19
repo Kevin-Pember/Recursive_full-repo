@@ -11,7 +11,7 @@ let definedPages = [
     "tab": document.getElementById("mainTab"),
   }
 ];
-let keypad = document.getElementById('mainKeypad');
+//let keypad = document.getElementById('mainKeypad');
 let mainHistory = inputs.filter((elem) => elem.id == "mainHistory")[0];
 let mainEntry = inputs.filter((input) => input.id == "mainEntry")[0];
 let quickSettingsPane = document.getElementById('quickSettings');

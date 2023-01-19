@@ -253,6 +253,9 @@
                                     z-index: 3;
                                 }
                             `;
+                            keypad.setAttribute("mode", "half");
+                            keypad.ogMode = "half";
+                            console.log(keypad)
                         })
                         appendMethod('mobilePortrait', () => {
                             styler.innerHTML = `
@@ -1003,6 +1006,7 @@
     <quick-settings id="quickSettings" style="visibility: hidden;"></quick-settings>
     <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry"></func-keypad>
     <script>
+        let keypad = document.getElementById("mainKeypad");
         for (let qElem of formats) {
             let format = () => {
                 console.log("Format styling method")

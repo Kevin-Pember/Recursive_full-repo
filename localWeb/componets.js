@@ -296,10 +296,10 @@ function getGraphVars(chart) {
     return varArray
 }
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
+    var letters = '23456789ABCD';
     var color = '#';
     for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * letters.length)];
     }
     return color;
 }
@@ -324,6 +324,10 @@ function pullUpElements(elements) {
             element.style.animation = undefined;
         }, 150);
     }
+}
+function isHidden(el) {
+    var style = window.getComputedStyle(el);
+    return (style.display === 'none')
 }
 class EquatInput extends HTMLElement {
     constructor() {
@@ -375,9 +379,6 @@ class EquatInput extends HTMLElement {
         </div>`;
         this.container = this.shadowRoot.querySelector('#containerDiv');
         this.input = this.shadowRoot.querySelector("#dynamicEquation");
-        this.input.addEventListener("mouseup", () => {
-            console.log(this.shadowRoot.getSelection());
-        })
     }
     get() {
         return this.shadowRoot.querySelector("#dynamicEquation").innerHTML;
@@ -2457,6 +2458,16 @@ class Keypad extends inputMethod {
         } else if (this.getAttribute("mode") == "full") {
             //this mode has the full capabilities of the keypad
             this.shadowRoot.querySelector("#modeStyle").innerHTML = "";
+        } else if (this.getAttribute("mode") == "half") {
+            this.shadowRoot.querySelector("#modeStyle").innerHTML = `
+             #arrowIcon{
+                visibility: hidden;
+                z-index: -1;
+             }
+            `;
+        }
+        if (this.ogMode == undefined && this.hasAttribute('mode')) {
+            this.ogMode = this.getAttribute('mode');
         }
     }
     enterPressed(input) {
@@ -2636,9 +2647,9 @@ class Keypad extends inputMethod {
         this.shadowRoot.querySelector('#styleInjector').innerHTML = styling;
     }
     reset() {
-        let display = display.input;
         this.shadowRoot.querySelector('#styleInjector').innerHTML = "";
-        display = this.firstTargets.input
+        this.setAttribute('mode', this.ogMode);
+        this.keyTargets.input = this.firstTargets.input
         this.keyTargets.scroll = this.firstTargets.scroll;
     }
     setVisibility(vis) {
@@ -3458,6 +3469,9 @@ class colorTextInput extends HTMLElement {
         this.attachShadow({ mode: "open" });
         this.shadowRoot.innerHTML = `
         <style>
+        .primary {
+            fill: var(--functionsColor);
+        }
         #colorInput{
             height: 100%;
             width: 100%;
@@ -3482,22 +3496,25 @@ class colorTextInput extends HTMLElement {
         }
         </style>
         <div id="colorInput">
-            <div id="colorIndicator"></div>
+            <svg id="colorIndicator" style="isolation:isolate" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <circle class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
+            <path id="lineIndicator" d="m652.2 486.59 297.83-297.83c-18.065-21.064-37.724-40.723-58.788-58.788l-297.83 297.83c-16.184-7.725-34.296-12.051-53.411-12.051-68.575 0-124.25 55.675-124.25 124.25 0 19.115 4.326 37.227 12.051 53.411l-297.83 297.83c18.065 21.064 37.724 40.723 58.788 58.788l297.83-297.83c16.184 7.725 34.296 12.051 53.411 12.051 68.575 0 124.25-55.675 124.25-124.25 0-19.115-4.326-37.227-12.051-53.411z" fill="#fff"/>
+            </svg>
             <rich-input id="dynamicEquation"></rich-input>
         </div>
         `
         this.style.backgroundColor = "var(--numbersColor)"
         this.style.borderRadius = "15px"
-        this.colorInd = this.shadowRoot.querySelector("#colorIndicator")
+        this.colorInd = this.shadowRoot.querySelector("#lineIndicator")
         this.richInput = this.shadowRoot.querySelector("#dynamicEquation")
         this.input = this.richInput.input
         console.log(this.input)
         this.alert = this.richInput.alert
         this.color = getRandomColor();
-        this.colorInd.style.backgroundColor = this.color;
+        this.colorInd.style.fill = this.color;
     }
     setColor(color) {
-        this.colorInd.style.backgroundColor = color
+        this.colorInd.style.fill = color
         this.color = color
     }
     static get observedAttributes() {
@@ -3650,6 +3667,7 @@ class templateMode extends HTMLElement {
       }
         </style>
         <style id="orientationStyle"></style>
+        <style id="keypadStyling"></style>
         <div id="modeContainer" class="modeContainerClass">
                     <div id="contentPane" style="grid-area: content;">
                         <div id="contentContainer" class="dynamicContent">
@@ -3690,9 +3708,7 @@ class templateMode extends HTMLElement {
             element.setAttribute('placeholder', 'Equation')
             element.setAttribute('style', 'width: 100%; height: calc(100% - 10px);font-size: 60px;')
             element.classList.add('dynamicEquation');
-            element.input.addEventListener('input', (e) => {
-                this.inputMethod();
-            });
+            this.equationFocusHandler(element)
             gEContainer.insertBefore(element, this.shadowRoot.querySelector('#addEquation'))
         })
         this.shadowRoot.querySelector('#fullContent').addEventListener('click', () => {
@@ -3715,10 +3731,9 @@ class templateMode extends HTMLElement {
         })
     }
     setStyling() {
-        let orientation = "";
         let styling = "";
         if (this.modeContainer.offsetWidth / this.modeContainer.offsetHeight > 3 / 4) {
-            orientation = "horizontal";
+            this.orientation = "horizontal";
             styling = `
              .modeContainerClass{
                 grid-template-areas:
@@ -3736,9 +3751,19 @@ class templateMode extends HTMLElement {
               }
              .
             `
+            if (this.inputOpen) {
+                keypad.style = "width: calc(33.3333% - 10px); height: calc(100% - 60px) top: 60px; margin-left: 0px; left: 66.6666%;";
+                this.shadowRoot.querySelector('#keypadStyling').innerHTML = `
+                    .modeContainerClass {
+                        grid-template-columns: 33.3333% 33.3333% 33.3333%;
+                        grid-template-rows: 100%;
+                    }
+                    `
+            }
+
         } else {
-            orientation = "vertical";
-            styling= `
+            this.orientation = "vertical";
+            styling = `
             .modeContainerClass {
                 grid-template-areas:
                   "content"
@@ -3750,15 +3775,55 @@ class templateMode extends HTMLElement {
                 grid-template-rows: 100%;
               }
             `
+            if (this.inputOpen) {
+                keypad.style = "height: calc(33.3333% - 26.6666px); top: calc(66.6666% + 16.6666px); left: 10px;";
+                this.shadowRoot.querySelector('#keypadStyling').innerHTML = `
+                .modeContainerClass {
+                    grid-template-rows: 33.3333% 33.3333% 33.3333%;
+                    grid-template-columns: 100%;
+                }
+                `
+            }
         }
-
         this.shadowRoot.querySelector("#orientationStyle").innerHTML = styling;
+    }
+    equationFocusHandler(elem) {
+        elem.addEventListener('focusin', (e) => {
+            console.log("fucking work")
+            this.inputOpen = true;
+            let styling = "";
+            if (this.orientation == "vertical") {
+                styling = `
+                    .modeContainerClass {
+                        grid-template-rows: 33.3333% 33.3333% 33.3333%;
+                    }
+                `
+                keypad.style = 'height: calc(33.3333% - 26.6666px); top: calc(66.6666% + 16.6666px); left: 10px;';
+            } else if (this.orientation == "horizontal") {
+                styling = `
+                    .modeContainerClass {
+                        grid-template-columns: 33.3333% 33.3333% 33.3333%;
+                    }
+                `
+                keypad.style = 'width: calc(33.3333% - 10px); height: calc(100% - 60px) top: 60px; margin-left: 0px; left: 66.6666%;';
+            }
+            console.log(this.shadowRoot.querySelector('#keypadStyling'))
+            console.log(this.orientation)
+            this.shadowRoot.querySelector('#keypadStyling').innerHTML = styling;
+        });
+        elem.addEventListener('focusout', (e) => {
+            console.log("focus lost")
+            this.inputOpen = false;
+            this.shadowRoot.querySelector('#keypadStyling').innerHTML = "";
+            keypad.reset();
+            hideElements([keypad]);
+        });
+        elem.addEventListener('input', (e) => {
+            this.inputMethod();
+        });
     }
     connectedInit() {
         if (!this.connectedOnce) {
-            this.shadowRoot.querySelector('#initEquation').input.addEventListener('input', (e) => {
-                this.inputMethod();
-            });
             this.connectedOnce = true
             this.setStyling();
             appendMethod('mobileLandscape', () => {
@@ -3767,13 +3832,11 @@ class templateMode extends HTMLElement {
             appendMethod('mobilePortrait', () => {
                 this.setStyling();
             });
+            this.equationFocusHandler(this.shadowRoot.querySelector('#initEquation'));
         }
     }
     contentMethod() {
         console.log("contentMethod")
-    }
-    inputMethod() {
-        console.log("default")
     }
     getEquations() {
         let equations = []
