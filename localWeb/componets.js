@@ -4553,7 +4553,53 @@ class quickSettings extends HTMLElement {
 customElements.define('quick-settings', quickSettings);
 class tabPage extends HTMLElement {
     constructor() {
-
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+                #pageContainer {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                }
+            </style>
+            <div id="pageContainer">
+            </div>
+        `;
+        this.pageContainer = this.shadowRoot.querySelector("#pageContainer")
+    }
+    static get observedAttributes() {
+        return ['type'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('type')) {
+            if(this.getAttribute('type') == 'main'){
+                this.type = 'main'
+            }else if (this.getAttribute('type') == 'template'){
+                this.type = 'template'
+            }else{
+                this.type = 'template'
+            }
+        }
+        if(this.hasAttribute('name')){
+            this.name = this.getAttribute('name')
+        }else{
+            this.name = this.id
+        }
+    }
+    connectedCallback(){
+        setTimeout(() => {
+            
+            if(this.definedInd == undefined){
+                this.pageContainer.append(...this.childNodes)
+                console.log(this.parentElement)
+                this.definedInd = this.parentElement.addMethod(this)
+            }
+        });
+    }
+    setTabName(name) {
+        this.name = name
+        this.definedInd.querySelector('#newTabName').innerHTML = name
     }
 }
 customElements.define('tab-page', tabPage);
@@ -4563,79 +4609,231 @@ class tabMenu extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
         <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--textColor);
-                -webkit-tap-highlight-color: transparent;
-            }
-            .svgText {
-                fill: var(--textColor);
-            }
-            #tabMenu{
-                display: grid;
-                flex-wrap: wrap;
-                width: 100%;
-                height: 100%;
-                grid-template-areas:
-                    "selector"
-                    "content";
-                grid-template-rows: 50px calc(100% - 50px);
-            }
-            #tabContainer{
-                height: 100%;
-                width: 100%;
-                grid-area: content;
-            }
-            #tabSelector{
-                grid-area: selector;
-                position: absolute;
-                overflow: hidden;
-                border: 0px;
-                height: 50px;
-                width: 100%;
-                display: inline-flex;
-                z-index: 2;
-                background-color: var(--functionsColor);
-            }
-            #mobileContainer {
-                visibility: visible;
-                left: 0;
-                aspect-ratio: 1/1;
-                height: 50px;
-                z-index: 3;
-                position: absolute;
-                background-color: transparent;
-                border: none;
-                display: grid;
-                place-items: center;
-            }
-            #tabNum{
-                position: absolute;
-            }
-            #tabSelectorContainer {
-                position: absolute;
-                left: 0;
-                height: 40px;
-                right: 40px;
-                visibility: hidden;
-            }
-            #settingsCogIcon {
-                top: 0;
-                right: 0;
-                width: 50px;
-                height: 50px;
-                position: absolute;
-            }
-            .tabPage{
-                visibility : hidden;
-            }
+        @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Regular.ttf);
+          }
+          
+          @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Bold.ttf);
+            font-weight: bold;
+          }
+          
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          .imgDivClass {
+            aspect-ratio: 1 / 1;
+          }
+          
+          .svgText {
+            fill: var(--textColor);
+          }
+          
+          .primary {
+            fill: var(--functionsColor);
+          }
+          
+          .secondary {
+            fill: var(--displayColor);
+          }
+          
+          .accent {
+            fill: var(--numbersColor);
+          }
+          
+          /*********************************Injected css from mode***********************************/
+          
+          /*end*/
+          #mainPage{
+            width: 100%;
+            height: 100%;
+          }
+          
+          #mobileTabs {
+            visibility: inherit;
+            z-index: 3;
+            left: 0px;
+            aspect-ratio: 1 / 1;
+            height: 50px;
+            position: absolute;
+            background-color: transparent;
+            border: none;
+            display: grid;
+            place-items: center;
+          }
+          
+          #mobileTabs h3 {
+            margin: 0;
+          }
+          
+          #tabNum {
+            margin: 0px;
+          }
+
+          #tabPageContainer{
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 50px;
+            bottom: 0;
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            background-color: var(--displayColor);
+          }
+          
+          #tabContainer {
+            visibility: hidden;
+            left: 0;
+            top: 50px;
+            height: calc(100% - 50px);
+            width: 100%;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, 175px); 
+            padding-top: 20px; 
+            position: absolute;
+            background-color: var(--translucent); 
+            border-radius: 20px 20px 0 0; 
+            justify-content: space-evenly;
+            justify-items: center; 
+            overflow-y: auto;
+          }
+          
+          .tablinks {
+            visibility: inherit;
+            position: relative;
+            background-color: var(--displayColor);
+            color: var(--textColor);
+            border: none;
+            padding: 0px 15px 0 15px;
+            font-size: 17px;
+            display: inline-flex;
+            -webkit-tap-highlight-color: transparent;
+            width: 175px; 
+            height: 280px; 
+            top: unset; 
+            border-radius: 20px; 
+            text-align: center;
+          }
+          
+          button:focus {
+            outline: none;
+          }
+          
+          #tabContainer button h3 {
+            font-size: 17px;
+            font-weight: normal;
+            margin-top: 6.5px;
+          }
+          
+          .tablinks.active{
+            background-color: var(--numbersColor);
+          }
+          
+          #settingsCogIcon {
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            aspect-ratio: 1 / 1;
+          }
+          
+          ::-webkit-scrollbar {
+            width: 10px;
+          }
+          
+          ::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          
+          ::-webkit-scrollbar-thumb {
+            width: 5px;
+            background: #00000080;
+            border-radius: 10px;
+          }
+          
+          ::-webkit-scrollbar-button:end:increment {
+            height: 7px;
+            display: block;
+            background: transparent;
+          }
+          
+          ::-webkit-scrollbar-button:start:increment {
+            height: 7px;
+            display: block;
+            background: transparent;
+          }
+          
+          .tabcontent {
+            
+          }
+          
+          #mainPage {
+            background-color: var(--functionsColor);
+          }
+          
+          #tabNum {
+            position: absolute;
+          }
+          
+          .tabIcons {
+            aspect-ratio: 1 / 1.45;
+            bottom: 5px;
+            left: 5px;
+            height: 240.1575px;
+            border: none;
+            width: unset;
+            filter: drop-shadow(-5px 5px 5px var(--translucent));
+            position: absolute;
+          }
+          #tabRemove {
+            right: 0;
+          }
+          #newTabName {
+            width: calc(100% - 31.5px);
+            text-align: start;
+          }
+          .svgText {
+            fill: var(--textColor);
+          }
+          
+          .settingCircle {
+            fill: var(--textColor)
+          }
+          
+          .primary {
+            fill: var(--functionsColor);
+          }
+          
+          .secondary {
+            fill: var(--displayColor);
+          }
+          
+          .accent {
+            fill: var(--numbersColor);
+          }
+          
+          .text {
+            fill: var(--textColor)
+          }
+          .tabPage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+          }
+
         </style>
-        <div id="tabMenu">
-            <div id="tabSelector">
-            <button id="mobileContainer">
+        <style id="typeStyle"></style>
+        <div class="page" id="mainPage">
+            <button id="mobileTabs">
                 <svg id="mobileTabIcon" class="imgDivClass" width="50px" style="isolation:isolate"
                     viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
@@ -4645,12 +4843,179 @@ class tabMenu extends HTMLElement {
                 </svg>
                 <h3 id="tabNum">1</h3>
             </button>
-            <div id="tabSelectorContainer">
-                <button class="tablinks active " id="mainTab" data-tabMap="mainTab" name="Main Tab">
-                    <h3>Main</h3>
-                    <svg class="displayBase tabIcons" id="displayMain" preserveAspectRatio="none"
-                        style="isolation:isolate" viewBox="0 0 1080 1572" xmlns="http://www.w3.org/2000/svg">
-                        <path class="secondary"
+            <div id="tabContainer">
+                
+            </div>
+            <svg id="settingsCogIcon" name="Open Settings" style="isolation:isolate" viewBox="0 0 1080 1080"
+                width="100%" height="100%">
+                <circle vector-effect="non-scaling-stroke" cx="540" cy="540" r="500" fill="rgb(0,0,0)"
+                    fill-opacity="0.2" />
+                <path class="svgText"
+                    d=" M 244.674 697.548 C 232.822 675.449 223.384 651.865 216.714 627.15 L 184.02 627.15 C 157.205 627.15 135.435 605.38 135.435 578.565 L 135.435 504.283 C 135.435 477.468 157.205 455.698 184.02 455.698 L 215.958 455.698 L 215.958 455.698 C 224.818 421.674 238.911 389.752 257.327 360.847 L 235.667 337.347 C 217.494 317.63 218.748 286.868 238.465 268.695 L 293.086 218.352 C 312.803 200.179 343.565 201.433 361.738 221.15 L 383.307 244.551 L 383.307 244.551 C 405.378 232.865 428.913 223.58 453.562 217.045 L 453.562 184.732 C 453.562 157.917 475.332 136.147 502.147 136.147 L 576.429 136.147 C 603.244 136.147 625.014 157.917 625.014 184.732 L 625.014 217.045 C 658.734 225.985 690.369 240.072 719.025 258.412 L 719.025 258.412 L 743.659 235.708 C 763.376 217.535 794.138 218.789 812.311 238.506 L 862.654 293.127 C 880.827 312.844 879.574 343.606 859.856 361.779 L 835.061 384.633 C 846.595 406.527 855.769 429.853 862.243 454.274 L 862.243 454.274 L 895.98 454.274 C 922.795 454.274 944.565 476.044 944.565 502.859 L 944.565 577.141 C 944.565 603.956 922.795 625.726 895.98 625.726 L 862.243 625.726 C 853.33 659.346 839.3 690.893 821.04 719.481 L 821.04 719.481 L 843.286 743.618 C 861.459 763.335 860.205 794.097 840.488 812.27 L 785.867 862.613 C 766.149 880.786 735.387 879.533 717.214 859.815 L 694.924 835.631 C 672.953 847.232 649.535 856.454 625.014 862.955 L 625.014 895.268 C 625.014 922.083 603.244 943.853 576.429 943.853 L 502.147 943.853 C 475.332 943.853 453.562 922.083 453.562 895.268 L 453.562 862.955 C 420.658 854.232 389.74 840.607 361.638 822.913 L 337.306 845.339 C 317.589 863.512 286.827 862.258 268.654 842.541 L 218.311 787.92 C 200.138 768.203 201.392 737.441 221.109 719.268 L 244.674 697.548 Z  M 397.96 670.915 C 325.972 592.81 330.939 470.954 409.044 398.966 C 487.149 326.979 609.005 331.945 680.993 410.05 C 752.98 488.155 748.014 610.011 669.909 681.999 C 591.804 753.987 469.948 749.02 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 Z "
+                    fill-rule="evenodd" fill="rgb(255,255,255)" />
+            </svg>
+
+        <div id="tabPageContainer" class="tabcontent" style="display:flex" data-tab="mainTab">
+            
+        </div>
+        
+    </div>
+        `;
+        this.container =  this.shadowRoot.querySelector('#mainPage');
+        this.tabsContainer = this.shadowRoot.querySelector('#tabPageContainer');
+        this.tabIndicatorContainer = this.shadowRoot.querySelector('#tabContainer');
+        this.tabCount = this.shadowRoot.querySelector('#tabNum');
+        this.mobileTabButton = this.shadowRoot.querySelector('#mobileTabs');
+        this.tabsContainer.addMethod = (page) => {return this.addTab(page)};
+        appendMethod('mobileLandscape', () => {
+            this.setStyling();
+        })
+        appendMethod('mobilePortrait', () => {
+            this.setStyling();
+        });
+        this.shadowRoot.querySelector('#settingsCogIcon').addEventListener('click', () => {});
+        this.mobileTabButton.addEventListener('click', () => {
+            this.indVisible = !this.indVisible;
+            if(this.indVisible){
+                this.tabIndController(true)
+            }else{
+                this.tabIndController(false)
+            }
+        });
+    }
+    
+    setStyling(){
+        let type = this.type
+        let orientation = "";
+        let styling = "";
+        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
+            orientation = "horizontal";
+        } else {
+            orientation = "vertical";
+        }
+        if(orientation == "horizontal"){
+            styling = `
+                #mobileTabs {
+                    visibility: hidden;
+                    z-index: -1;
+                }
+  
+                #tabContainer {
+                    position: absolute;
+                    left: 0;
+                    height: 40px;
+                    right: 40px;
+                    display: inline-flex;
+                    top: 0;
+                    padding: 0px;
+                    overflow-y: hidden;
+                    border-radius: 0;
+                    justify-content: unset;
+                    width: calc(100% - 40px);
+                    background-color: unset;
+                    visibility: inherit;
+                }
+  
+                .tablinks {
+                    position: relative;
+                    background-color: var(--functionsColor);
+                    color: var(--textColor);
+                    height: 90%;
+                    top: 10%;
+                    width: fit-content;
+                    visibility: inherit;
+                    padding: 0px 15px 0 15px;
+                    font-size: 17px;
+                    border-radius: 15px 15px 0 0;
+                    display: inline-flex;
+                    -webkit-tap-highlight-color: transparent;
+                }
+  
+                #tabContainer button h3 {
+                    font-size: 17px;
+                    font-weight: normal;
+                    margin-top: 6.5px;
+                }
+  
+                #settingsCogIcon {
+                    top: 0;
+                    right: 0;
+                    position: absolute;
+                    height : 40px;
+                    width: 40px;
+                    aspect-ratio: 1 / 1;
+                }
+  
+                #tabPageContainer {
+                    top: 40px;
+                    border-radius: 0;
+                }
+                .tabIcons{
+                    visibility: hidden;
+                }
+  
+            `;
+            if(this.indVisible == undefined){
+                this.indVisible = false;
+            }
+        }
+        this.shadowRoot.querySelector('#typeStyle').innerHTML = styling;
+        this.orientation = orientation
+    }
+    setTabCount() {
+        let elems = this.shadowRoot.querySelectorAll('tab-page')
+        this.tabCount.innerHTML = elems.length;
+    }
+    createTabIndicator(name, page, type) {
+        let tabButton = document.createElement('button');
+        tabButton.classList.add('tablinks');
+        tabButton.innerHTML = `
+        <h3 id="newTabName"></h3>
+        <svg div id="tabRemove" class="imgDivClass" height="31.5px" style="isolation:isolate"
+            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                fill-opacity=".2" />
+            <path class="svgText"
+                d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+        </svg>
+
+        <svg class="displayBase tabIcons" id="displayFunc" preserveAspectRatio="none"
+            style="isolation:isolate" viewBox="0 0 1080 1572" xmlns="http://www.w3.org/2000/svg">
+            
+        </svg>
+        `;
+        tabButton.querySelector('#newTabName').innerHTML = name;
+        if(type == 'template'){
+            tabButton.querySelector('#displayFunc').innerHTML = `
+            <path class="secondary"
+            d="m115.13-1.93h849.75c63.54 0 115.13 51.587 115.13 115.13v1342.7c0 63.54-51.587 115.13-115.13 115.13h-849.75c-63.54 0-115.13-51.587-115.13-115.13v-1342.7c0-63.54 51.587-115.13 115.13-115.13z"
+            fill="#fff" />
+            <path class="primary"
+                d="m122.69 353.18h834.62c46.058 0 83.451 37.393 83.451 83.45v233.92c0 46.057-37.393 83.45-83.451 83.45h-834.62c-46.058 0-83.451-37.393-83.451-83.45v-233.92c0-46.057 37.393-83.45 83.451-83.45z"
+                fill="#C1C1C1" />
+            <path class="primary"
+                d="m125.74 784.52h828.52c47.741 0 86.5 38.759 86.5 86.499v579.74c0 47.74-38.759 86.499-86.5 86.499h-828.52c-47.741 0-86.5-38.759-86.5-86.499v-579.74c0-47.74 38.759-86.499 86.5-86.499z"
+                fill="#C1C1C1" />
+            <path class="secondary"
+                d="m130.26 822h70.486c26.634 0 48.257 21.508 48.257 48s-21.623 48-48.257 48h-70.486c-26.634 0-48.257-21.508-48.257-48s21.623-48 48.257-48z"
+                fill="#fff" />
+            <path class="accent"
+                d="m115.11 948.3h88.776c18.275 0 33.112 14.837 33.112 33.113v69.474c0 18.276-14.837 33.113-33.112 33.113h-88.776c-18.275 0-33.112-14.837-33.112-33.113v-69.474c0-18.276 14.837-33.113 33.112-33.113z"
+                fill="#D9D9D9" />
+            <path class="accent"
+                d="m123.37 386.3h833.26c30.974 0 56.122 25.148 56.122 56.123v23.454c0 30.975-25.148 56.123-56.122 56.123h-833.26c-30.974 0-56.122-25.148-56.122-56.123v-23.454c0-30.975 25.148-56.123 56.122-56.123z"
+                fill="#D9D9D9" />
+            <path class="secondary"
+                d="m116.31 545h138.28c23.5 0 42.579 18.147 42.579 40.5s-19.079 40.5-42.579 40.5h-138.28c-23.5 0-42.579-18.147-42.579-40.5s19.079-40.5 42.579-40.5z"
+                fill="#fff" />
+            <circle class="accent" cx="113.37" cy="585.5" r="40.5" fill="#d9d9d9"
+                vector-effect="non-scaling-stroke" />
+            <circle class="text" cx="888.75" cy="176" r="124" vector-effect="non-scaling-stroke" />
+            `;
+        }else if (type == "main"){
+            tabButton.querySelector('#displayFunc').innerHTML = `
+            <path class="secondary"
                             d="m115.13-1.93h849.75c63.54 0 115.13 51.587 115.13 115.13v1342.7c0 63.54-51.587 115.13-115.13 115.13h-849.75c-63.54 0-115.13-51.587-115.13-115.13v-1342.7c0-63.54 51.587-115.13 115.13-115.13z"
                             fill="#fff" />
                         <path class="primary"
@@ -4674,83 +5039,69 @@ class tabMenu extends HTMLElement {
                         <path class="accent"
                             d="m123.37 198.26h288.99c22.595 0 40.94 18.343 40.94 40.937v4.816c0 22.594-18.345 40.937-40.94 40.937h-288.99c-22.595 0-40.94-18.343-40.94-40.937v-4.816c0-22.594 18.345-40.937 40.94-40.937z"
                             fill="#D9D9D9" />
-                    </svg>
-                </button>
-                <template class="newTab">
-                    <button id="tabButton" class="tablinks" data-tabMap="custFunc">
-                        <h3 id="newTabName"></h3>
-                        <svg div id="tabRemove" class="imgDivClass" height="31.5px" style="isolation:isolate"
-                            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                                fill-opacity=".2" />
-                            <path class="svgText"
-                                d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-                        </svg>
-
-                        <svg class="displayBase tabIcons" id="displayFunc" preserveAspectRatio="none"
-                            style="isolation:isolate" viewBox="0 0 1080 1572" xmlns="http://www.w3.org/2000/svg">
-                            <path class="secondary"
-                                d="m115.13-1.93h849.75c63.54 0 115.13 51.587 115.13 115.13v1342.7c0 63.54-51.587 115.13-115.13 115.13h-849.75c-63.54 0-115.13-51.587-115.13-115.13v-1342.7c0-63.54 51.587-115.13 115.13-115.13z"
-                                fill="#fff" />
-                            <path class="primary"
-                                d="m122.69 353.18h834.62c46.058 0 83.451 37.393 83.451 83.45v233.92c0 46.057-37.393 83.45-83.451 83.45h-834.62c-46.058 0-83.451-37.393-83.451-83.45v-233.92c0-46.057 37.393-83.45 83.451-83.45z"
-                                fill="#C1C1C1" />
-                            <path class="primary"
-                                d="m125.74 784.52h828.52c47.741 0 86.5 38.759 86.5 86.499v579.74c0 47.74-38.759 86.499-86.5 86.499h-828.52c-47.741 0-86.5-38.759-86.5-86.499v-579.74c0-47.74 38.759-86.499 86.5-86.499z"
-                                fill="#C1C1C1" />
-                            <path class="secondary"
-                                d="m130.26 822h70.486c26.634 0 48.257 21.508 48.257 48s-21.623 48-48.257 48h-70.486c-26.634 0-48.257-21.508-48.257-48s21.623-48 48.257-48z"
-                                fill="#fff" />
-                            <path class="accent"
-                                d="m115.11 948.3h88.776c18.275 0 33.112 14.837 33.112 33.113v69.474c0 18.276-14.837 33.113-33.112 33.113h-88.776c-18.275 0-33.112-14.837-33.112-33.113v-69.474c0-18.276 14.837-33.113 33.112-33.113z"
-                                fill="#D9D9D9" />
-                            <path class="accent"
-                                d="m123.37 386.3h833.26c30.974 0 56.122 25.148 56.122 56.123v23.454c0 30.975-25.148 56.123-56.122 56.123h-833.26c-30.974 0-56.122-25.148-56.122-56.123v-23.454c0-30.975 25.148-56.123 56.122-56.123z"
-                                fill="#D9D9D9" />
-                            <path class="secondary"
-                                d="m116.31 545h138.28c23.5 0 42.579 18.147 42.579 40.5s-19.079 40.5-42.579 40.5h-138.28c-23.5 0-42.579-18.147-42.579-40.5s19.079-40.5 42.579-40.5z"
-                                fill="#fff" />
-                            <circle class="accent" cx="113.37" cy="585.5" r="40.5" fill="#d9d9d9"
-                                vector-effect="non-scaling-stroke" />
-                            <circle class="text" cx="888.75" cy="176" r="124" vector-effect="non-scaling-stroke" />
-                        </svg>
-
-
-                    </button>
-                </template>
-            </div>
-            <svg id="settingsCogIcon" name="Open Settings" style="isolation:isolate" viewBox="0 0 1080 1080"
-                width="100%" height="100%">
-                <circle vector-effect="non-scaling-stroke" cx="540" cy="540" r="500" fill="rgb(0,0,0)"
-                    fill-opacity="0.2" />
-                <path class="svgText"
-                    d=" M 244.674 697.548 C 232.822 675.449 223.384 651.865 216.714 627.15 L 184.02 627.15 C 157.205 627.15 135.435 605.38 135.435 578.565 L 135.435 504.283 C 135.435 477.468 157.205 455.698 184.02 455.698 L 215.958 455.698 L 215.958 455.698 C 224.818 421.674 238.911 389.752 257.327 360.847 L 235.667 337.347 C 217.494 317.63 218.748 286.868 238.465 268.695 L 293.086 218.352 C 312.803 200.179 343.565 201.433 361.738 221.15 L 383.307 244.551 L 383.307 244.551 C 405.378 232.865 428.913 223.58 453.562 217.045 L 453.562 184.732 C 453.562 157.917 475.332 136.147 502.147 136.147 L 576.429 136.147 C 603.244 136.147 625.014 157.917 625.014 184.732 L 625.014 217.045 C 658.734 225.985 690.369 240.072 719.025 258.412 L 719.025 258.412 L 743.659 235.708 C 763.376 217.535 794.138 218.789 812.311 238.506 L 862.654 293.127 C 880.827 312.844 879.574 343.606 859.856 361.779 L 835.061 384.633 C 846.595 406.527 855.769 429.853 862.243 454.274 L 862.243 454.274 L 895.98 454.274 C 922.795 454.274 944.565 476.044 944.565 502.859 L 944.565 577.141 C 944.565 603.956 922.795 625.726 895.98 625.726 L 862.243 625.726 C 853.33 659.346 839.3 690.893 821.04 719.481 L 821.04 719.481 L 843.286 743.618 C 861.459 763.335 860.205 794.097 840.488 812.27 L 785.867 862.613 C 766.149 880.786 735.387 879.533 717.214 859.815 L 694.924 835.631 C 672.953 847.232 649.535 856.454 625.014 862.955 L 625.014 895.268 C 625.014 922.083 603.244 943.853 576.429 943.853 L 502.147 943.853 C 475.332 943.853 453.562 922.083 453.562 895.268 L 453.562 862.955 C 420.658 854.232 389.74 840.607 361.638 822.913 L 337.306 845.339 C 317.589 863.512 286.827 862.258 268.654 842.541 L 218.311 787.92 C 200.138 768.203 201.392 737.441 221.109 719.268 L 244.674 697.548 Z  M 397.96 670.915 C 325.972 592.81 330.939 470.954 409.044 398.966 C 487.149 326.979 609.005 331.945 680.993 410.05 C 752.98 488.155 748.014 610.011 669.909 681.999 C 591.804 753.987 469.948 749.02 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 L 397.96 670.915 Z "
-                    fill-rule="evenodd" fill="rgb(255,255,255)" />
-            </svg>
-            </div>
-            <div id="tabContainer">
-            </div>
-        </div>
-        `;
-        this.tabsContainer = this.shadowRoot.getElementById('tabSelectorContainer');
-        this.tabCount = this.shadowRoot.getElementById('tabNum');
-    }
-    setTabCount() {
-        let elems = this.shadowRoot.querySelectorAll('tab-page')
-        this.tabCount.innerHTML = elems.length;
-    }
-    createTabIndicator() {
-
+            `
+            tabButton.classList.add('active');
+            tabButton.querySelector('#tabRemove').remove();
+            this.mainPage = page;
+        }
+        if(type != "main"){
+            tabButton.querySelector('#tabRemove').addEventListener('click', () => {
+                tabButton.remove();
+                if(!isHidden(page)){
+                    this.openTab(this.mainPage);
+                }
+                page.remove();
+                this.setTabCount();
+            });
+            page.style.visibility = 'hidden';
+        }
+        tabButton.addEventListener('click', (e) => {
+            if(tabButton.querySelector('#tabRemove') == undefined || e.target != tabButton.querySelector('#tabRemove') && !tabButton.querySelector('#tabRemove').contains(e.target)){
+                this.shadowRoot.querySelectorAll('.tablinks.active').forEach((tab) => {
+                    tab.classList.remove('active');
+                });
+                tabButton.classList.add('active');
+                this.tabIndController(false);
+                this.indVisible = false;
+                this.openTab(page);
+            }
+            
+        });
+        this.tabIndicatorContainer.append(tabButton);
+        return tabButton;
     }
     addTab(page) {
         page.classList.add('tabPage');
-
-        this.tabsContainer.appendChild(page);
+        console.log(this.tabsContainer)
+        this.tabsContainer.append(page);
+        let retable = this.createTabIndicator(page.name, page, page.type);
         this.setTabCount();
+        return retable;
+    }
+    openTab(page) {
+        let tabPages = [...this.shadowRoot.querySelectorAll('tab-page')].filter((tab) => {
+            return tab != page;
+        });
+        hideElements(tabPages);
+        pullUpElements([page]);
+    }
+    tabIndController(visibility){
+        if(this.orientation == 'vertical'){
+            if(visibility){
+                this.tabIndicatorContainer.style.zIndex = '5';
+                pullUpElements([this.tabIndicatorContainer]);
+                console.log('pulling up')
+            }else{
+                this.tabIndicatorContainer.style.zIndex = '-1';
+                hideElements([this.tabIndicatorContainer]);
+                console.log('hiding')
+            }
+        }
     }
     connectedCallback() {
         setTimeout(() => {
+            
+            this.tabsContainer.append(...this.childNodes)
             this.setTabCount();
         });
     }

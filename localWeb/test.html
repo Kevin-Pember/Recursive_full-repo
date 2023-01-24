@@ -11,18 +11,70 @@
 </head>
 
 <body>
-    
+    <script>
+        let stylers = [
+
+        ]
+        let formats = [
+            {
+                "name": "mobilePortrait",
+                "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
+                "methods": []
+            },
+            {
+                "name": "mobileLandscape",
+                "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
+                "methods": []
+            }
+        ]
+        let appendMethod = (format, method) => {
+            formats.find((elem) => {
+                if (elem.name == format) {
+                    elem.methods.push(method)
+                }
+            })
+        }
+        let array = []
+    </script>
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <style>
         body{
             height: 100%;
             width: 100%;
+            background-color: var(--functionsColor);
         }
     </style>
     <script src="./packages/chart.js"></script>
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
     <!--<tab-menu></tab-menu>-->
-    <func-keypad style="height: 33.3333%; width: 100%; position: absolute;" mode="limited"></func-keypad>
+    <tab-menu>
+        <tab-page name="main" type="main">
+            <h1>Hello World from the main</h1>
+        </tab-page>
+        <tab-page name="thing" type="template">
+            <h1>from the thing</h1>
+        </tab-page>
+    </tab-menu>
+    <script>
+        for (let qElem of formats) {
+            let format = () => {
+                console.log("Format styling method")
+                console.log(qElem.methods)
+                for (let method of qElem.methods) {
+                    method();
+                }
+            }
+            qElem.query.addEventListener('change', () => {
+                if (qElem.query.matches) {
+                    format()
+                }
+            })
+            if (qElem.query.matches == true) {
+                console.log("is true Value")
+                format()
+            }
+        }
+    </script>
 </body>
 </html>

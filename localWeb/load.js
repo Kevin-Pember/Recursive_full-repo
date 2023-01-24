@@ -92,7 +92,7 @@ if (document.getElementById("mainBody") != null) {
   //Tab handling code *************************************************************************************
   document.getElementById('mainTab').addEventListener("click", function (e) {
     if (window.innerWidth / window.innerHeight < 3 / 4) {
-      changeTabAs(false, 'openElement("mainPage")');
+      changeTabAs(false, () => openElement("mainPage"));
     }
 
   });
@@ -101,11 +101,14 @@ if (document.getElementById("mainBody") != null) {
       console.log("toggled")
       hideAllTabs();
       keypad.setVisibility(false)
-      changeTabAs(true, "");
+      changeTabAs(true, () => {});
     } else {
       console.log("toggled other")
 
-      changeTabAs(false, "openElement('mainPage');document.getElementById('keypad').style = undefined;");
+      changeTabAs(false,() => {
+        openElement('mainPage');
+        document.getElementById('keypad').style = undefined;
+      });
 
     }
   });
@@ -999,7 +1002,7 @@ function changeTabAs(change, func) {
     }
     animate(document.getElementById('tabContainer'), "0.20s ease-in 0s 1 normal none running fadeEffect2").then(() => {
       document.getElementById('tabContainer').style.animation = undefined;
-      eval(func)
+      func();
     });
   } else {
     visibility = "hidden";
@@ -1012,9 +1015,7 @@ function changeTabAs(change, func) {
         bases[i].style.visibility = visibility;
         tablinks[i].style = tabstyle;
       }
-      console.log('eval reached')
-      func = "console.log('HelloO?');" + func
-      eval(func)
+      func();
     })
 
   }
@@ -1287,7 +1288,9 @@ function newTabButton(config, tabPage) {
     if (!highlight.querySelector('#tabRemove').contains(e.target)) {
       if (window.innerWidth / window.innerHeight < 3 / 4) {
         sessionStorage.setItem('facing', 'custFunc');
-        let code = "(openElement('" + nameElem.innerHTML + "'))";
+        let code = () => {
+          openElement(nameElem.innerHTML)
+        };
         changeTabAs(false, code);
       } else {
         openElement(nameElem.innerHTML);
