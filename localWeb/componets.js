@@ -339,8 +339,9 @@ class EquatInput extends HTMLElement {
             fill: var(--textColor);
         }
         #containerDiv{
-            height: inherit;
-            width: inherit;
+            height: 100%;
+            width: 100%;
+            display: block;
             overflow: hidden;
             flex-wrap: nowrap;
             margin: 0;
@@ -348,11 +349,12 @@ class EquatInput extends HTMLElement {
         #dynamicEquation{
             width: 100%;
             height: 100%;
-            padding-left: 10px;
             font-size: inherit;
             font-weight: inherit;
             text-indent: inherit;
             direction: inherit;
+            display: grid;
+            align-content: center;
         }
         [placeholder]:empty:before {
             content: attr(placeholder);
@@ -409,17 +411,22 @@ class EquatInput extends HTMLElement {
         }, { once: true });
     }
     static get observedAttributes() {
-        return ['innerStyle', 'placeholder', "id"];
+        return ['innerStyle', 'placeholder', "id", "enabled"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if (this.getAttribute("innerStyle") != undefined) {
+        if (this.hasAttribute("innerStyle")) {
             this.shadowRoot.querySelector("#containerDiv").setAttribute("style", this.getAttribute("innerStyle"));
         }
-        if (this.getAttribute("placeholder") != undefined) {
+        if (this.hasAttribute("placeholder")) {
             this.shadowRoot.querySelector("#dynamicEquation").setAttribute("placeholder", this.getAttribute("placeholder"));
         }
-        if (this.getAttribute('id') != undefined) {
+        if (this.hasAttribute('id')) {
             inputs.push(this);
+        }
+        if (this.hasAttribute('enabled')) {
+            if(this.getAttribute('enabled') === "false"){
+                this.shadowRoot.querySelector("#dynamicEquation").setAttribute("contenteditable", "false");
+            }
         }
     }
     connectedCallback() {
@@ -743,7 +750,7 @@ class historyDisplay extends HTMLElement {
                                 <h4 id='previousEquation'></h4>
                                 <br>
                             </template>
-                            <rich-input id="mainEntry" style="height: 47px; font-size: 40px;"></rich-input>
+                            <rich-input id="mainEntry" style="height: 47px; font-size: 40px; display: block; padding-left:10px;"></rich-input>
                         </div>
                         <div id="overlayContainer">
                             <div id="overlayDiv">
@@ -1109,43 +1116,44 @@ class advTable extends HTMLElement {
     }
     addData(tableEntry) {
         console.log("data added")
-        if (this.shadowRoot.querySelectorAll(".filler")) {
-            this.shadowRoot.querySelectorAll(".filler").forEach((elem) => {
-                elem.remove();
+        if (tableEntry != undefined) {
+            if (this.shadowRoot.querySelectorAll(".filler")) {
+                this.shadowRoot.querySelectorAll(".filler").forEach((elem) => {
+                    elem.remove();
+                });
+            }
+            let columnCount = this.shadowRoot.querySelectorAll(".tableHeader").length;
+            let rowCount = this.shadowRoot.querySelectorAll(".tableRow").length;
+            let entryHeader = document.createElement("th");
+            entryHeader.classList.add("tableHeader");
+            entryHeader.innerHTML = `y<sup>${columnCount}</sup>`;
+            entryHeader.style.backgroundColor = arguments[1] ? arguments[1] : "";
+            this.headerRow.appendChild(entryHeader);
+            if (rowCount != tableEntry) {
+                let removeElems = this.shadowRoot.querySelectorAll(".tableRow");
+                for (let elem of removeElems) {
+                    elem.remove();
+                }
+                if (!this.shadowRoot.querySelector("#xHeader")) {
+                    let xHeader = document.createElement("th");
+                    xHeader.id = "xHeader";
+                    xHeader.innerHTML = "x";
+                    this.headerRow.prepend(xHeader);
+
+                }
+                for (let i = 0; i < tableEntry.length; i++) {
+                    let row = document.createElement("tr");
+                    row.id = "row" + i;
+                    row.classList.add("tableRow");
+                    row.innerHTML = `<td>${tableEntry[i].x}</td>`
+                    this.table.appendChild(row);
+                }
+            }
+            tableEntry.forEach((entry, index) => {
+                let targetRow = this.shadowRoot.querySelector("#row" + index);
+                targetRow.innerHTML += `<td>${entry.y}</td>`;
             });
         }
-        let columnCount = this.shadowRoot.querySelectorAll(".tableHeader").length;
-        let rowCount = this.shadowRoot.querySelectorAll(".tableRow").length;
-        let entryHeader = document.createElement("th");
-        entryHeader.classList.add("tableHeader");
-        entryHeader.innerHTML = `y<sup>${columnCount}</sup>`;
-        entryHeader.style.backgroundColor = arguments[1] ? arguments[1] : "unset";
-        this.headerRow.appendChild(entryHeader);
-        if (rowCount != tableEntry) {
-            let removeElems = this.shadowRoot.querySelectorAll(".tableRow");
-            for (let elem of removeElems) {
-                elem.remove();
-            }
-            if (!this.shadowRoot.querySelector("#xHeader")) {
-                let xHeader = document.createElement("th");
-                xHeader.id = "xHeader";
-                xHeader.innerHTML = "x";
-                this.headerRow.prepend(xHeader);
-
-            }
-            for (let i = 0; i < tableEntry.length; i++) {
-                let row = document.createElement("tr");
-                row.id = "row" + i;
-                row.classList.add("tableRow");
-                row.innerHTML = `<td>${tableEntry[i].x}</td>`
-                this.table.appendChild(row);
-            }
-        }
-        tableEntry.forEach((entry, index) => {
-            let targetRow = this.shadowRoot.querySelector("#row" + index);
-            targetRow.innerHTML += `<td>${entry.y}</td>`;
-        });
-
     }
     clearTable() {
         this.table.innerHTML = `<tr id="headerRow">
@@ -3001,202 +3009,6 @@ class extendedKeypad extends inputMethod {
 }
 customElements.define('keypad-ex', extendedKeypad);
 class menuPane extends HTMLElement {
-    pageSelector(tPage) {
-        let selectorType = "";
-        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
-            if (this.type != "mode" && this.type == "simpleMenu") {
-                selectorType = "full";
-            } else {
-                selectorType = "full";
-            }
-        } else {
-            selectorType = "full";
-        }
-        console.log(selectorType)
-        if (selectorType == "full") {
-            this.container.style.zIndex = 1;
-            hideElements([this.switcher])
-            //this.switcher.style.visibility = "hidden";
-        }
-        let hiddenPages = [...this.pages].filter((page) => {
-            return page != tPage;
-        })
-        if (tPage.hasKeypad) {
-            console.log("has keypad")
-            if (typeof keypad !== 'undefined') {
-                console.log(keypad)
-                keypad.setVisibility(true);
-            }
-        }
-        hideElements(hiddenPages);
-        pullUpElements([tPage, this.shadowRoot.querySelector("#modeButton")]);
-    }
-    pageReturn() {
-        this.container.style.zIndex = -1;
-        console.log(this.pages)
-        hideElements([...this.pages, this.shadowRoot.querySelector("#modeButton")]);
-        if (keypad != undefined) {
-            keypad.setVisibility(false);
-        }
-        pullUpElements([this.switcher]);
-    }
-    setStyling() {
-        let type = this.type
-        let orientation = "";
-        let styling = "";
-        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
-            orientation = "horizontal";
-        } else {
-            orientation = "vertical";
-        }
-        if (type == "mode") {
-            styling += `
-            button{
-                color: unset;
-            }
-            .modeButton{
-                overflow: hidden;
-                padding: 0px;
-                border:none; 
-                border-radius: 25px;
-                align-content: space-evenly;
-                align-items: center; 
-                text-indent: 5px;
-                font-size: large;
-            }
-            #modeButton{
-                animation: fadeEffect 0.50s ease-in 1 none;
-                z-index: 2;
-                height: fit-content;
-                position: absolute;
-                border: none;
-                background-color: var(--displayColor);
-                font-size: 20px;
-                padding: 10px;
-                border-radius: 50px;
-            }
-            #paneContainer{
-                background-color: transparent;
-            }
-            `
-            if (orientation == "vertical") {
-                styling += `
-                #modeSwitcher{
-                    display: grid; 
-                    grid-auto-rows: 1fr;
-                    grid-auto-flow: row;
-                }
-                .modeButton{
-                    display: flex;
-                    height: calc(100% - 20px);
-                    margin-top: 10px;
-                    margin-left: 10px;
-                    width: calc(100% - 20px);
-                }
-                #modeButton{
-                    right: 20px;
-                    top: 20px;
-                }
-                `
-            } else if (orientation == "horizontal") {
-                styling += `
-                #modeSwitcher{
-                    display: grid; 
-                    grid-auto-columns: 1fr;
-                    grid-auto-flow: column;
-                }
-                .modeButton{
-                    display: grid;
-                    width: calc(100% - 20px);
-                    margin-left: 10px;
-                    margin-top: 10px;
-                    height: calc(100% - 20px);
-                    align-content: center;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .imgDivClass{
-                    width: 100%;
-                }
-                .text{
-                    width: 100%;
-                }
-                #modeButton{
-                    left: 20px;
-                    top: 20px;
-                }
-                `;
-
-            }
-        } else {
-            styling += `
-            .modeButton{
-                width: calc(100% - 20px); 
-                height: 175px; 
-                margin-top:10px; 
-                margin-left:10px;
-            }
-            .backIcon{
-                transform: rotate(180deg);
-                background-color: transparent;
-                height: 45px;
-                z-index: 1;
-            }
-            
-            `
-            if (orientation == "vertical") {
-                styling += `
-                
-                `
-            } else if (orientation == "horizontal") {
-                styling += `
-                    #paneContainer{
-                        background-color: transparent;
-                        width: 100%;
-                        height: 100%;
-                        left: 0;
-                        top: 0;
-                        display: grid;
-                        grid-template-columns: 1fr 3fr;
-                        border-radius: 0px;
-                        grid-template-areas:
-                        "switcher container";
-                    }
-                    #title{
-                        margin: 0px;
-                    }
-                    #modeSwitcher{
-                        width: calc(100% - 10px);
-                        height: calc(100% - 20px);
-                        border-radius: 25px;
-                        margin-left: 10px;
-                        margin-top: 10px;
-                        position: initial;
-                        background-color: var(--functionsColor);
-                        grid-area: switcher;
-                    }
-                    #modeContainer{
-                        width: calc(100% - 20px);
-                        height: calc(100% - 20px);
-                        border-radius: 25px;
-                        margin-left: 10px;
-                        margin-top: 10px;
-                        background-color: var(--functionsColor);
-                        grid-area: container;
-                    }
-                    #pageBack{
-                        visibility: hidden;
-                    }
-                    .modeButton{
-                        height: 50px;
-                    }
-
-                `;
-
-            }
-        }
-        this.shadowRoot.querySelector("#typeStyle").innerHTML = styling;
-    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -3367,10 +3179,11 @@ class menuPane extends HTMLElement {
             this.setStyling();
             console.log(this.childNodes)
             //this.shadowRoot.querySelector("#modeContainer").append(...this.childNodes)
-            this.pages = []
+
             this.switcher = this.shadowRoot.querySelector("#modeSwitcher")
             this.container = this.shadowRoot.querySelector("#modeContainer")
             if (this.shadowRoot.querySelector("#modeContainer").createButton == undefined) {
+                this.pages = []
                 this.shadowRoot.querySelector("#modeContainer").createButton = (name, icon, page) => {
                     let button = document.createElement("button")
                     button.classList.add("modeButton");
@@ -3410,6 +3223,200 @@ class menuPane extends HTMLElement {
                 };
             }
         });
+    }
+    pageSelector(tPage) {
+        let selectorType = "";
+        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
+            if (this.type != "mode" && this.type == "simpleMenu") {
+                selectorType = "full";
+            } else {
+                selectorType = "full";
+            }
+        } else {
+            selectorType = "full";
+        }
+        console.log(selectorType)
+        if (selectorType == "full") {
+            this.container.style.zIndex = 1;
+            hideElements([this.switcher])
+            //this.switcher.style.visibility = "hidden";
+        }
+        let hiddenPages = [...this.pages].filter(page => page != tPage)
+        if (tPage.hasKeypad) {
+            console.log("has keypad")
+            if (typeof keypad !== 'undefined') {
+                console.log(keypad)
+                keypad.setVisibility(true);
+            }
+        }
+        hideElements(hiddenPages);
+        pullUpElements([tPage, this.shadowRoot.querySelector("#modeButton")]);
+    }
+    pageReturn() {
+        this.container.style.zIndex = -1;
+
+        hideElements([...this.pages, this.shadowRoot.querySelector("#modeButton")]);
+        if (keypad != undefined) {
+            keypad.setVisibility(false);
+        }
+        pullUpElements([this.switcher]);
+    }
+    setStyling() {
+        let type = this.type
+        let orientation = "";
+        let styling = "";
+        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
+            orientation = "horizontal";
+        } else {
+            orientation = "vertical";
+        }
+        if (type == "mode") {
+            styling += `
+            button{
+                color: unset;
+            }
+            .modeButton{
+                overflow: hidden;
+                padding: 0px;
+                border:none; 
+                border-radius: 25px;
+                align-content: space-evenly;
+                align-items: center; 
+                text-indent: 5px;
+                font-size: large;
+            }
+            #modeButton{
+                animation: fadeEffect 0.50s ease-in 1 none;
+                z-index: 2;
+                height: fit-content;
+                position: absolute;
+                border: none;
+                background-color: var(--displayColor);
+                font-size: 20px;
+                padding: 10px;
+                border-radius: 50px;
+            }
+            #paneContainer{
+                background-color: transparent;
+            }
+            `
+            if (orientation == "vertical") {
+                styling += `
+                #modeSwitcher{
+                    display: grid; 
+                    grid-auto-rows: 1fr;
+                    grid-auto-flow: row;
+                }
+                .modeButton{
+                    display: flex;
+                    height: calc(100% - 20px);
+                    margin-top: 10px;
+                    margin-left: 10px;
+                    width: calc(100% - 20px);
+                }
+                #modeButton{
+                    right: 20px;
+                    top: 20px;
+                }
+                `
+            } else if (orientation == "horizontal") {
+                styling += `
+                #modeSwitcher{
+                    display: grid; 
+                    grid-auto-columns: 1fr;
+                    grid-auto-flow: column;
+                }
+                .modeButton{
+                    display: grid;
+                    width: calc(100% - 20px);
+                    margin-left: 10px;
+                    margin-top: 10px;
+                    height: calc(100% - 20px);
+                    align-content: center;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .imgDivClass{
+                    width: 100%;
+                }
+                .text{
+                    width: 100%;
+                }
+                #modeButton{
+                    left: 20px;
+                    top: 20px;
+                }
+                `;
+
+            }
+        } else {
+            styling += `
+            .modeButton{
+                width: calc(100% - 20px); 
+                height: 175px; 
+                margin-top:10px; 
+                margin-left:10px;
+            }
+            .backIcon{
+                transform: rotate(180deg);
+                background-color: transparent;
+                height: 45px;
+                z-index: 1;
+            }
+            
+            `
+            if (orientation == "vertical") {
+                styling += `
+                
+                `
+            } else if (orientation == "horizontal") {
+                styling += `
+                    #paneContainer{
+                        background-color: transparent;
+                        width: 100%;
+                        height: 100%;
+                        left: 0;
+                        top: 0;
+                        display: grid;
+                        grid-template-columns: 1fr 3fr;
+                        border-radius: 0px;
+                        grid-template-areas:
+                        "switcher container";
+                    }
+                    #title{
+                        margin: 0px;
+                    }
+                    #modeSwitcher{
+                        width: calc(100% - 10px);
+                        height: calc(100% - 20px);
+                        border-radius: 25px;
+                        margin-left: 10px;
+                        margin-top: 10px;
+                        position: initial;
+                        background-color: var(--functionsColor);
+                        grid-area: switcher;
+                    }
+                    #modeContainer{
+                        width: calc(100% - 20px);
+                        height: calc(100% - 20px);
+                        border-radius: 25px;
+                        margin-left: 10px;
+                        margin-top: 10px;
+                        background-color: var(--functionsColor);
+                        grid-area: container;
+                    }
+                    #pageBack{
+                        visibility: hidden;
+                    }
+                    .modeButton{
+                        height: 50px;
+                    }
+
+                `;
+
+            }
+        }
+        this.shadowRoot.querySelector("#typeStyle").innerHTML = styling;
     }
 }
 customElements.define("menu-pane", menuPane);
@@ -4573,26 +4580,25 @@ class tabPage extends HTMLElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.hasAttribute('type')) {
-            if(this.getAttribute('type') == 'main'){
+            if (this.getAttribute('type') == 'main') {
                 this.type = 'main'
-            }else if (this.getAttribute('type') == 'template'){
+            } else if (this.getAttribute('type') == 'template') {
                 this.type = 'template'
-            }else{
+            } else {
                 this.type = 'template'
             }
         }
-        if(this.hasAttribute('name')){
+        if (this.hasAttribute('name')) {
             this.name = this.getAttribute('name')
-        }else{
+        } else {
             this.name = this.id
         }
     }
-    connectedCallback(){
+    connectedCallback() {
         setTimeout(() => {
-            
-            if(this.definedInd == undefined){
+
+            if (this.definedInd == undefined) {
                 this.pageContainer.append(...this.childNodes)
-                console.log(this.parentElement)
                 this.definedInd = this.parentElement.addMethod(this)
             }
         });
@@ -4861,30 +4867,30 @@ class tabMenu extends HTMLElement {
         
     </div>
         `;
-        this.container =  this.shadowRoot.querySelector('#mainPage');
+        this.container = this.shadowRoot.querySelector('#mainPage');
         this.tabsContainer = this.shadowRoot.querySelector('#tabPageContainer');
         this.tabIndicatorContainer = this.shadowRoot.querySelector('#tabContainer');
         this.tabCount = this.shadowRoot.querySelector('#tabNum');
         this.mobileTabButton = this.shadowRoot.querySelector('#mobileTabs');
-        this.tabsContainer.addMethod = (page) => {return this.addTab(page)};
+        this.tabsContainer.addMethod = (page) => { return this.addTab(page) };
         appendMethod('mobileLandscape', () => {
             this.setStyling();
         })
         appendMethod('mobilePortrait', () => {
             this.setStyling();
         });
-        this.shadowRoot.querySelector('#settingsCogIcon').addEventListener('click', () => {});
+        this.shadowRoot.querySelector('#settingsCogIcon').addEventListener('click', () => { });
         this.mobileTabButton.addEventListener('click', () => {
             this.indVisible = !this.indVisible;
-            if(this.indVisible){
+            if (this.indVisible) {
                 this.tabIndController(true)
-            }else{
+            } else {
                 this.tabIndController(false)
             }
         });
     }
-    
-    setStyling(){
+
+    setStyling() {
         let type = this.type
         let orientation = "";
         let styling = "";
@@ -4893,7 +4899,7 @@ class tabMenu extends HTMLElement {
         } else {
             orientation = "vertical";
         }
-        if(orientation == "horizontal"){
+        if (orientation == "horizontal") {
             styling = `
                 #mobileTabs {
                     visibility: hidden;
@@ -4955,7 +4961,7 @@ class tabMenu extends HTMLElement {
                 }
   
             `;
-            if(this.indVisible == undefined){
+            if (this.indVisible == undefined) {
                 this.indVisible = false;
             }
         }
@@ -4986,7 +4992,7 @@ class tabMenu extends HTMLElement {
         </svg>
         `;
         tabButton.querySelector('#newTabName').innerHTML = name;
-        if(type == 'template'){
+        if (type == 'template') {
             tabButton.querySelector('#displayFunc').innerHTML = `
             <path class="secondary"
             d="m115.13-1.93h849.75c63.54 0 115.13 51.587 115.13 115.13v1342.7c0 63.54-51.587 115.13-115.13 115.13h-849.75c-63.54 0-115.13-51.587-115.13-115.13v-1342.7c0-63.54 51.587-115.13 115.13-115.13z"
@@ -5013,7 +5019,7 @@ class tabMenu extends HTMLElement {
                 vector-effect="non-scaling-stroke" />
             <circle class="text" cx="888.75" cy="176" r="124" vector-effect="non-scaling-stroke" />
             `;
-        }else if (type == "main"){
+        } else if (type == "main") {
             tabButton.querySelector('#displayFunc').innerHTML = `
             <path class="secondary"
                             d="m115.13-1.93h849.75c63.54 0 115.13 51.587 115.13 115.13v1342.7c0 63.54-51.587 115.13-115.13 115.13h-849.75c-63.54 0-115.13-51.587-115.13-115.13v-1342.7c0-63.54 51.587-115.13 115.13-115.13z"
@@ -5044,10 +5050,10 @@ class tabMenu extends HTMLElement {
             tabButton.querySelector('#tabRemove').remove();
             this.mainPage = page;
         }
-        if(type != "main"){
+        if (type != "main") {
             tabButton.querySelector('#tabRemove').addEventListener('click', () => {
                 tabButton.remove();
-                if(!isHidden(page)){
+                if (!isHidden(page)) {
                     this.openTab(this.mainPage);
                 }
                 page.remove();
@@ -5056,7 +5062,7 @@ class tabMenu extends HTMLElement {
             page.style.visibility = 'hidden';
         }
         tabButton.addEventListener('click', (e) => {
-            if(tabButton.querySelector('#tabRemove') == undefined || e.target != tabButton.querySelector('#tabRemove') && !tabButton.querySelector('#tabRemove').contains(e.target)){
+            if (tabButton.querySelector('#tabRemove') == undefined || e.target != tabButton.querySelector('#tabRemove') && !tabButton.querySelector('#tabRemove').contains(e.target)) {
                 this.shadowRoot.querySelectorAll('.tablinks.active').forEach((tab) => {
                     tab.classList.remove('active');
                 });
@@ -5065,7 +5071,7 @@ class tabMenu extends HTMLElement {
                 this.indVisible = false;
                 this.openTab(page);
             }
-            
+
         });
         this.tabIndicatorContainer.append(tabButton);
         return tabButton;
@@ -5085,13 +5091,13 @@ class tabMenu extends HTMLElement {
         hideElements(tabPages);
         pullUpElements([page]);
     }
-    tabIndController(visibility){
-        if(this.orientation == 'vertical'){
-            if(visibility){
+    tabIndController(visibility) {
+        if (this.orientation == 'vertical') {
+            if (visibility) {
                 this.tabIndicatorContainer.style.zIndex = '5';
                 pullUpElements([this.tabIndicatorContainer]);
                 console.log('pulling up')
-            }else{
+            } else {
                 this.tabIndicatorContainer.style.zIndex = '-1';
                 hideElements([this.tabIndicatorContainer]);
                 console.log('hiding')
@@ -5100,10 +5106,855 @@ class tabMenu extends HTMLElement {
     }
     connectedCallback() {
         setTimeout(() => {
-            
+
             this.tabsContainer.append(...this.childNodes)
             this.setTabCount();
         });
     }
 }
 customElements.define('tab-menu', tabMenu);
+class equationMap extends HTMLElement {
+    constructor() {
+        super();
+        this.shadow = this.attachShadow({ mode: 'open' });
+        this.shadow.innerHTML = `
+        <style>
+        @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Regular.ttf);
+          }
+          
+          @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Bold.ttf);
+            font-weight: bold;
+          }
+          
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          .imgDivClass {
+            aspect-ratio: 1 / 1;
+          }
+          
+          .svgText {
+            fill: var(--textColor);
+          }
+          #varEquationContainer {
+            background-color: var(--functionsColor);
+            display: block;
+            flex-wrap: wrap;
+            border-radius: 25px;
+            top: 15%;
+            height: fit-content;
+            width: 100%;
+            padding: 10px;
+            overflow-y: auto;
+            filter: drop-shadow(-5px 5px 5px var(--translucent));
+          }
+          
+          #varGrid {
+            width: 100%;
+            height: auto;
+            position: relative;
+            display: grid;
+            grid-template-columns: 33.3333% 33.3333% 33.3333%;
+            grid-auto-rows: 35px;
+            overflow-y: auto;
+          }
+          
+          .variableContainer {
+            background-color: var(--displayColor);
+            height: 25px;
+            width: 95%;
+            margin-left: 2.5%;
+            border-radius: 25px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+            flex-wrap: nowrap;
+          }
+          
+          #varLabel {
+            display: inline-flex;
+            width: 100%;
+          }
+          
+          #variableName {
+            border-radius: 25px;
+            height: 25px;
+            padding-left: 7.5px;
+            padding-right: 7.5px;
+            flex-shrink: 0;
+            text-align: center;
+            background-color: var(--numbersColor);
+          
+          }
+          
+          #variableEntry {
+            border: none;
+            background-color: transparent;
+            left: 25px;
+            width: 100%;
+            bottom: 0;
+            margin-right: 2.5px;
+            height: 25px;
+            text-align: center;
+          }
+          
+          #EquationFunc {
+            border-radius: 20px;
+            height: 75px;
+            display: block;
+            color: var(--textColor);
+            background-color: var(--numbersColor);
+            z-index: 0;
+            overflow-y: auto;
+            font-size: 60px;
+            position: relative;
+          }
+        </style>
+        <div id="varEquationContainer" value="">
+            <rich-input id="EquationFunc" placeholder="Equation" style="padding-left: 10px;"></rich-input>
+            <div id="varGrid">
+            </div>
+        </div>
+        `;
+        this.vars = [];
+        this.richInput = this.shadowRoot.querySelector('#EquationFunc');
+        this.varGrid = this.shadowRoot.querySelector('#varGrid');
+        this.ogEquation = '';
+    }
+    static get observedAttributes() {
+        return ['type', 'name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('type')) {
+            if (this.getAttribute('type') == 'func') {
+                this.type = 'func'
+            } else {
+                this.type = 'equation'
+            }
+        } else {
+            this.type = 'equation'
+        }
+        if (this.hasAttribute('name')) {
+            this.name = this.getAttribute('name');
+
+        }
+    }
+    connectedCallback() {
+        setTimeout(() => {
+            if (this.input == undefined) {
+                this.input = this.richInput.input;
+                this.input.addEventListener('input', () => {
+                    this.ogEquation = this.input.innerHTML;
+                    this.checkVar();
+                });
+                this.input.addEventListener('focus', (e) => {
+                    this.input.innerHTML = this.ogEquation
+                });
+            }
+        });
+    }
+    checkVar() {
+        let callMethod;
+        console.log(this.vars)
+        if (this.type == 'func') {
+            callMethod = callCalc({ "callType": "get", 'method': 'vars', "existing": true, "funcName": this.name })
+        } else {
+            callMethod = callCalc({ "callType": "get", 'method': 'vars', "existing": false, "text": this.input.innerHTML })
+        }
+        console.log(callMethod)
+        callMethod.then(value => {
+            let checkList = value;
+            console.log(checkList)
+            let varExisting = [...this.vars];
+            let newVars = [];
+            for (let eVar of checkList) {
+                let matching = false;
+                for (let cVar of varExisting) {
+                    console.log(`${eVar.letter} == ${cVar.letter}}`)
+                    if (eVar.letter == cVar.letter) {
+                        let indexOfVar = varExisting.indexOf(cVar);
+                        varExisting.splice(indexOfVar, 1);
+                        matching = true;
+                        break;
+                    }
+                }
+                if (!matching) {
+                    newVars.push(eVar.letter);
+                }
+            }
+            for (let oldVar of varExisting) {
+                oldVar.element.remove();
+            }
+            for (let newVar of newVars) {
+                this.createVar(newVar);
+            }
+            console.log(JSON.stringify(this.vars));
+        })
+    }
+    createVar(name) {
+        let varContainer = document.createElement('div');
+        varContainer.classList.add('variableContainer');
+        varContainer.innerHTML = `
+            <label id="varLabel">
+                <h3 id="variableName"></h3>
+                <rich-input id="variableEntry" placeholder="value"></rich-input>
+            </label>
+        `;
+        varContainer.querySelector('#variableName').innerHTML = name;
+        varContainer.querySelector('#variableEntry').input.addEventListener('input', (e) => {
+            console.log("input")
+            this.parseEquation();
+        });
+        this.varGrid.appendChild(varContainer);
+        this.vars.push({
+            'letter': name,
+            get value() {
+                console.log("querying value")
+                return varContainer.querySelector('#variableEntry').input.innerHTML
+            },
+            "element": varContainer
+        });
+        return varContainer;
+    }
+    setEquation(equation) {
+        this.input.innerHTML = equation;
+        this.ogEquation = equation;
+        this.checkVar();
+    }
+    parseEquation() {
+        let promiseEquation;
+        if (this.type == "func") {
+            promiseEquation = callCalc({ callType: "get", method: "parseEquation", existing: true, funcName: this.name })
+        } else {
+            let parsedVars = JSON.parse(JSON.stringify(this.vars));
+            promiseEquation = callCalc({ callType: "get", method: "parseEquation", text: this.ogEquation, vars: parsedVars })
+        }
+        promiseEquation.then(value => {
+            this.input.innerHTML = value;
+        });
+    }
+}
+customElements.define('equation-map', equationMap);
+class dataViewer extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
+        <style>
+        @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Regular.ttf);
+          }
+          
+          @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Bold.ttf);
+            font-weight: bold;
+          }
+          
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          #resultPane {
+            background-color: var(--functionsColor);
+            width: 100%;
+            height: 100%;
+            border-radius: 25px;
+            filter: drop-shadow(-5px 5px 5px var(--translucent));
+            display: grid;
+            grid-template-areas: "switcher" "data";
+            grid-template-rows: 50px calc(100% - 50px);
+            padding: 10px;
+          }
+          
+          .funcModes {
+            overflow-y: scroll;
+          }
+          
+          #modeSwitcher {
+            top: 10px;
+            left: 10px;
+            height: 40px;
+            display: inline-block;
+            width: fit-content;
+            grid-area: switcher;
+          }
+          
+          .modeButton {
+            height: 100%;
+            width: 70px;
+            background-color: transparent;
+            border: none;
+            border-radius: 25px;
+            z-index: 2;
+          }
+          
+          #selectorSlider {
+            top: 10px;
+            height: 40px;
+            width: 70px;
+            z-index: -1;
+            position: absolute;
+            background-color: var(--displayColor);
+            border-radius: 25px;
+            transition: all 0.2s;
+          }
+          #modeContainer{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            grid-area: data;
+          }
+          #buttonContainer{
+            display: grid;
+            grid-auto-columns: 70px;
+            grid-auto-flow: column;
+            height: 100%;
+          }
+        </style>
+        <div id="resultPane">
+            <div id=modeSwitcher>
+                <div id="selectorSlider"></div>
+                <div id="buttonContainer">
+                </div>
+            </div>
+            <div id="modeContainer">
+
+            </div>
+        </div>
+        `;
+        this.modeContainer = this.shadowRoot.querySelector('#modeContainer');
+        this.modeSwitcher = this.shadowRoot.querySelector('#buttonContainer');
+        this.selector = this.shadowRoot.querySelector('#selectorSlider');
+        this.inputData = {};
+        this.nameList = [];
+        this.pages = [];
+        this.addDataPage = (name, page) => {
+            console.log("triggers")
+            if (!this.nameList.includes(name)) {
+                let button = document.createElement('button');
+                button.classList.add('modeButton');
+                button.innerHTML = name;
+                button.containerIndex = this.modeSwitcher.querySelectorAll('.modeButton').length;
+                button.addEventListener('click', () => {
+                    this.moveSlider(button.containerIndex);
+                    this.pageSelector(page)
+                });
+                this.modeSwitcher.appendChild(button);
+                this.inputData[page.name] = page.parseMethod
+                page.onUpdate = this.upstreamRequest
+                if(this.nameList.length > 0){
+                    page.style.visibility = "hidden";
+                }
+                this.nameList.push(name);
+                this.pages.push(page);
+                this.modeContainer.appendChild(page);
+                return button;
+            }
+        }
+    }
+    moveSlider(index) {
+        this.selector.style.marginLeft = `${index * 70}px`;
+    }
+    pageSelector(tPage) {
+        let hiddenPages = [...this.pages].filter(page => page != tPage)
+        hideElements(hiddenPages);
+        pullUpElements([tPage]);
+    }
+    connectedCallback() {
+        setTimeout(() => {
+        });
+    }
+}
+customElements.define('data-viewer', dataViewer);
+class dataPage extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+            * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                 -webkit-tap-highlight-color: transparent;
+            }
+            #dataContainer{
+                height: 100%;
+                width: 100%;
+                max-height: 100%;
+                display: block;
+            }
+            .svgText {
+                fill: var(--textColor);
+              }
+        </style>
+        <div id="dataContainer">
+            
+        </div>
+        `;
+        this.container = this.shadowRoot.querySelector('#dataContainer');
+
+    }
+    static get observedAttributes() {
+        return ['name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('name')) {
+            this.name = this.getAttribute('name');
+
+        }
+    }
+    dataQuery() {
+        //can either be a single data point or a range of data points
+    }
+    parseMethod(data) {
+        //parses the data for display on the page
+    }
+    connectedCallback() {
+        if (this.once == undefined) {
+            this.parent = this.parentElement;
+            this.parent.addDataPage(this.pageName, this);
+            this.once = true;
+        }
+    }
+}
+class singleData extends dataPage {
+    constructor() {
+        super();
+        this.container.innerHTML = `
+        <style>
+        @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Regular.ttf);
+          }
+          
+          @font-face {
+            font-family: ubuntu;
+            src: url(../fontAssets/Roboto-Bold.ttf);
+            font-weight: bold;
+          }
+          
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          button:focus {
+            outline: none;
+          }
+          
+          #funcModify {
+            align-content: center;
+            display: inline-block;
+            left: 1.5px;
+            padding-top: 10px;
+          }
+          
+          #funcModify:hover .drop-cont {
+            display: block;
+          }
+          
+          .drop-cont {
+            display: none;
+            background-color: var(--numbersColor);
+            min-width: 50px;
+            z-index: 1;
+            border-radius: 0px 0 15px 15px;
+          }
+          
+          .drop-cont a {
+            color: var(--textColor);
+            padding: 5px 5px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+          }
+          
+          #funcModify:hover #modBtn {
+            border-radius: 15px 15px 0px 0px;
+          }
+          
+          #modBtn {
+            background-color: var(--numbersColor);
+            color: var(--textColor);
+            border-radius: 25px;
+            width: 50px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            align-self: center;
+            height: 35px;
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          #equalsHeader {
+            margin-top: 10px;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 25px;
+            background-color: var(--numbersColor);
+            width: fit-content;
+            max-width: 100%;
+            font-size: 45px;
+            overflow: auto;
+          }
+          
+        </style>
+        <div id="funcModify">
+            <button id="modBtn">deg</button>
+            <div class="drop-cont">
+                <a id="selectorRad">rad</a>
+                <a id="selectorDeg">deg</a>
+            </div>
+        </div>
+        <h2 id="equalsHeader">=</h2>
+        `;
+        this.target = "singleData";
+        this.pageName = "Function";
+        this.modBtn = this.shadowRoot.querySelector('#modBtn');
+        this.selectorRad = this.shadowRoot.querySelector('#selectorRad');
+        this.selectorDeg = this.shadowRoot.querySelector('#selectorDeg');
+        this.equalsHeader = this.shadowRoot.querySelector('#equalsHeader');
+        this.selectorDeg.addEventListener("click", () => {
+            this.modBtn.innerHTML = "deg";
+            setSetting("degRad", true)
+        })
+        this.selectorRad.addEventListener('click', () => {
+            this.modBtn.innerHTML = "rad";
+            setSetting("degRad", false)
+        })
+    }
+    get dataQuery() {
+        return {
+            type: "single",
+            name: "singleData"
+        }
+    }
+    parseMethod(data) {
+        if(data != undefined){
+            this.equalsHeader.innerHTML = "=" + data;
+        }
+    }
+}
+customElements.define('single-data', singleData);
+class graphData extends dataPage {
+    constructor() {
+        super();
+        this.container.innerHTML = `
+            <style>
+              * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                -webkit-tap-highlight-color: transparent;
+              }
+              
+              input:focus {
+                outline: none;
+              }
+              
+              #graphContainer {
+                height: 100%;
+                padding: 5px;
+                width: 100%;
+                background-color: var(--displayColor);
+                border-radius: 20px;
+              }
+              
+              #funcChart {
+                height: 100%;
+                width: 100%;
+              }
+              
+              .selectorDiv {
+                background-color: var(--numbersColor);
+                padding: 5px;
+                border-radius: 0 0 25px 25px;
+                width: 140px;
+              }
+              
+              .secondaryFuncHeaders {
+                color: var(--textColor);
+                text-align: left;
+                position: relative;
+                font-weight: bold;
+                font-size: 25px;
+                background-color: var(--numbersColor);
+                padding: 5px 10px;
+                border-radius: 25px 25px 25px 25px;
+                margin-top: 10px;
+                width: 140px;
+              }
+              
+              .funcHeaders {
+                margin: 5px;
+                padding-left: 10px;
+                padding-right: 5px;
+                padding-bottom: 5px;
+                padding-top: 5px;
+                border-radius: 25px;
+                width: fit-content;
+                background-color: var(--functionsColor);
+              }
+              
+              .funcInputs {
+                margin-left: 5px;
+                height: 25px;
+                width: 60px;
+                padding-left: 14px;
+                border-radius: 25px;
+                border: none;
+                background-color: var(--displayColor);
+                text-align: center;
+              }
+              #settingsCog {
+                aspect-ratio: 1/1;
+                height: 50px;
+                width: 50px;
+                position: absolute;
+                bottom: 0;
+                right: 0;
+              }
+            </style>
+            <div id="graphContainer"><canvas id="funcChart"></canvas></div>
+            <svg id="settingsCog" class="imgDivClass" style="height: 50px;isolation:isolate"
+                viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
+                        fill-rule="evenodd" />
+            </svg>
+        `;
+        let graphCanvas = this.shadowRoot.querySelector('#funcChart')
+        this.ctx = graphCanvas.getContext('2d')
+        this.target = "graphData"
+        this.pageName = "Graph"
+        this.settingsButton = this.shadowRoot.querySelector('#settingsCog')
+        this.settingsButton.addEventListener("click", () => {
+            console.log(quickSettingsPane)
+            quickSettingsPane.open("Graph", [
+                {
+                    "title": "Range",
+                    "type": "dRange",
+                    "setMethod": (value1, value2) => {
+                        setSetting('graphMin', value1);
+                        setSetting('graphMax', value2);
+                        this.graph.options.x.min = value1;
+                        this.graph.options.x.max = value2;
+                        this.graphInMode()
+                    },
+                    "range": [settings.gMin, settings.gMax],
+                    "initMethod": () => {
+
+                    }
+                },
+                {
+                    "title": "Resolution",
+                    "type": "range",
+                    "setMethod": (value) => {
+                        setSetting('graphRes', value);
+                        this.graphInMode()
+                    },
+                    "value": settings.gR,
+                    "initMethod": () => {
+                    }
+                },
+            ], () => { this.graphInMode() });
+        })
+    }
+    parseMethod(packet) {
+        if(packet != undefined){
+            this.graph.data.datasets[0].data = packet.points;
+            this.graph.data.datasets[1].data = packet.extrema;
+        }
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        if (this.graph == undefined) {
+            this.graph = createGraph(this.ctx)
+            this.graph.options.plugins.zoom.zoom.onZoomComplete = () => {
+                this.graphInMode()
+            }
+            this.graph.options.plugins.zoom.pan.onPanComplete = () => {
+                setTimeout(() => {
+                    let vars = getGraphVars(this.graph)
+                    console.log("garph vars")
+                    console.log(vars)
+                    callCalc({ "callType": "env", "targetEnv": this.key, "method": "setGraphVar", "newVars": vars }).then(() => {
+                        this.graphInMode()
+                    });
+
+                })
+
+            }
+        }
+    }
+
+}
+customElements.define('graph-data', graphData);
+class tableData extends dataPage {
+    constructor() {
+        super()
+        this.container.innerHTML = `
+            <style>
+            #dataTable {
+                width: 100%;
+                height: 100%;
+                border-spacing: 5px;
+            }
+              
+            #dataTable td {
+                background-color: var(--displayColor);
+            }
+            td {
+                border-radius: 20px;
+                text-indent: 10px;
+                padding: 5px;
+                background-color: var(--functionsColor);
+            }
+              
+            th {
+                width: 100px;
+                margin: 5px;
+                background-color: var(--numbersColor);
+                border-radius: 20px;
+            }
+            #settingsCog {
+                aspect-ratio: 1/1;
+                height: 50px;
+                width: 50px;
+                position: absolute;
+                bottom: 0;
+                right: 0;
+              }
+            </style>
+            <adv-table id="dataTable"></adv-table>
+            <svg id="settingsCog" class="imgDivClass" style="height: 50px;isolation:isolate"
+                viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
+                        fill-rule="evenodd" />
+            </svg>
+        `
+        this.target = "tableData"
+        this.pageName = "Table"
+        this.table = this.shadowRoot.querySelector('#dataTable')
+        this.settingsButton = this.shadowRoot.querySelector('#settingsCog')
+        this.settingsButton.addEventListener("click", () => {
+            quickSettingsPane.open("Table", [
+                {
+                    "title": "Range",
+                    "type": "dRange",
+                    "setMethod": (value1, value2) => {
+                        setSetting('tableMin', value1);
+                        setSetting('tableMax', value2);
+                        this.tableInMode()
+                    },
+                    "range": [settings.tMin, settings.tMax],
+                    "initMethod": () => {
+
+                    }
+                },
+                {
+                    "title": "Cells",
+                    "type": "range",
+                    "setMethod": (value) => {
+                        setSetting('tableCells', value);
+                        this.tableInMode()
+                    },
+                    "value": settings.tC,
+                    "initMethod": () => {
+                    }
+                },
+            ], () => { this.tableInMode() });
+        })
+        this.container.appendChild(this.table)
+    }
+    parseMethod(packet) {
+        this.table.clearTable();
+        this.table.addData(packet)
+    }
+}
+customElements.define('table-data', tableData);
+class templateFuncPage extends HTMLElement{
+    constructor(){
+        super();
+        this.attachShadow({mode: 'open'});
+        this.shadowRoot.innerHTML = `
+            <style>
+                #pageContainer {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    display: flex;
+                    flex-flow: column;
+                }
+                #nameInput {
+                    font-size: 100px; 
+                    height: 100px; 
+                    direction: rtl; 
+                    padding: 0 10px 0 10px;
+                }
+                #equationMap{
+                    width: calc(100% - 20px);
+                    margin-left: 10px;
+                }
+                #dataViewer{
+                    width: calc(100% - 20px); 
+                    margin: 10px; 
+                    flex-grow: 1; 
+                }
+            </style>
+            <div id="pageContainer">
+                <rich-input id="nameInput"></rich-input>
+                <equation-map id="equationMap"></equation-map>
+                <data-viewer id="dataViewer">
+                    <single-data style="position: absolute; height: 100%; width: 100%;"></single-data>
+                    <graph-data style="position: absolute; height: 100%; width: 100%;"></graph-data>
+                    <table-data style="position: absolute; height: 100%; width: 100%;"></table-data>
+                </data-viewer>
+            </div>
+        `; 
+        this.nameInput = this.shadowRoot.querySelector('#nameInput');
+        this.equationMap = this.shadowRoot.querySelector('#equationMap');
+        this.dataViewer = this.shadowRoot.querySelector('#dataViewer');
+    }
+    thisInitMethod(){
+        callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
+            this.funcDef = value;
+            this.vars = this.funcDef.vars;
+            let varNames = []
+            this.vars.forEach(val => { varNames.push(val.letter) })
+            callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` })
+          });
+    }
+}
+customElements.define('template-func', templateFuncPage);

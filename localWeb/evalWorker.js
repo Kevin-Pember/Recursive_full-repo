@@ -463,11 +463,26 @@ class solveEnv {
     return fullSolve(solvableEquat, this.vars)
   }
   calcPoints(type, equation) {
-    let solvableEquat = setVarEquat(equation, this.vars);
-    if (type == "graph") {
-      return { "points": calculatePoints(solvableEquat, this.envVars.gMin, this.envVars.gMax, settings.gR, settings), "extrema": calculateExtrema(setVarEquat(equation, this.vars)) }
-    } else {
-      return calculatePoints(solvableEquat, settings.tMin, settings.tMax, settings.tC, settings)
+    if (type == "graph" || type == "table") {
+      let solvableEquat = setVarEquat(equation, this.vars);
+      if (type == "graph") {
+        return { "points": calculatePoints(solvableEquat, this.envVars.gMin, this.envVars.gMax, settings.gR, settings), "extrema": calculateExtrema(setVarEquat(equation, this.vars)) }
+      } else {
+        return calculatePoints(solvableEquat, settings.tMin, settings.tMax, settings.tC, settings)
+      }
+    }else if (type = "array"){
+      let retArray = [];
+      for(let equat of equation){
+        let solvableEquat = setVarEquat(equat, this.vars);
+        let single;
+        try{
+          single = this.calcSingle(solvableEquat, this.vars)
+        }catch(e){
+          single = "error"
+        }
+        retArray.push(single)
+      }
+      return retArray;
     }
   }
   setEnvVar(object) {
@@ -615,10 +630,10 @@ class DynamicEnv extends solveEnv {
     let undefVars = equatVars.filter(elem => !defVars.find(elem2 => elem.letter == elem2.letter))
     let hasEqual = equation.includes('=');
     if (undefVars.length == 1) {
-      if(!hasEqual){
-        if(this.target == "graph" || this.target == "table"){
+      if (!hasEqual) {
+        if (this.target == "graph" || this.target == "table") {
           return "r"
-        }else{
+        } else {
           return `cant`
         }
       }
@@ -657,10 +672,10 @@ class DynamicEnv extends solveEnv {
       let retArry = [];
       for (let equation of arry) {
         let isCalc = this.isCalculable(equation);
-        if(isCalc != "cant" && isCalc != "dS"){
+        if (isCalc != "cant" && isCalc != "dS") {
           let result = this.calcPoints(this.target, equation);
           retArry.push(result)
-        }else{
+        } else {
           retArry.push(undefined)
         }
       }
@@ -722,17 +737,18 @@ onmessage = function (e) {
     } else if (object.method == "envVar") {
       let env = runners.find(elem => elem.id == object.targetEnv);
       env.setEnvVar(object.newVars)
-      if(env.type == "static"){
+      if (env.type == "static") {
         env.checkCalculable();
       }
-      
+
     }
   } else if (object.callType == "get") {
     if (object.method == 'list') {
       port.postMessage({ result: getNameList() })
     } else if (object.method == 'vars') {
       //{callType: "get", method: "vars", text : blank for brevity}
-      if (object.existing == undefined) {
+      if (object.existing == undefined || object.existing == false) {
+        console.log("parsing vars")
         port.postMessage({ result: varInEquat(object.text) })
       } else if (object.existing == true) {
         let thing = funcList.find(elem => {
@@ -749,13 +765,71 @@ onmessage = function (e) {
         })
       }
 
+    } else if (object.method == 'parseEquation') {
+      console.log("parsedEquation")
+      if (object.existing == false || object.existing == undefined) {
+        port.postMessage({
+          result: setVarEquat(object.text, object.vars, false)
+        });
+      } else {
+        let env = runners.find(elem => elem.id == object.funcName)
+        port.postMessage({
+          result: env.getParsedEquation()
+        });
+      }
+
     } else if (object.method == 'func') {
       //{callType: "get", method: "func", name : blank for brevity}
       port.postMessage({ result: getMethod(object.name) })
     } else if (object.method == 'parsedMeth') {
       //{callType: "get", method: "parsedMeth", text : blank for brevity}
       port.postMessage({ result: parseFunction(object.text) })
-    }
+    } /*else if (object.method == "dataQuery"){
+      let calcLocation;
+      let queries = Array.isArray(object.queries) ? object.queries : [object.queries]
+      let retQueries = [];
+      if(object.targetEnv != undefined){
+        calcLocation = runners.find(elem => elem.id == object.targetEnv)
+      }else{
+        calcLocation = "global"
+      }
+      for(let query of queries){
+        let retValue;
+        if(query.type == "single"){
+          if(calcLocation == "global"){
+            retValue = fullSolve(query.equation);
+          }else{
+            retValue =calcLocation.calcSingle(query.equation)
+          }
+        }else if (query.type == "points"){
+          if(query.pointType == "table"){
+            if(calcLocation == "global"){
+              retValue = calculatePoints(query.equation, settings.tMin, settings.tMax, settings.tC)
+            }else{
+              retValue = calcLocation.calcPoints("table", query.equation)
+            }
+          }else if (query.pointType == "graph"){
+            if(calcLocation == "global"){
+              retValue = calculatePoints(query.equation, query.start, query.end, settings.gR)
+            }else{
+              retValue = calcLocation.calcPoints("graph", query.equation)
+            }
+          }else if(query.pointType == "array") {
+            if(calcLocation == "global"){
+              let array = []
+              for(let equat of query.array){
+                array.push(fullSolve(equat))
+              }
+              retValue = array
+            }else{
+              retValue = calcLocation.calcPoints("graph", query.array)
+            }
+          }
+        }
+        retQueries.push({"name": query.name, "value": retValue})
+      }
+      port.postMessage({result: retQueries})
+    }*/
 
   } else if (object.callType == "func") {
     if (object.method == 'add') {
@@ -801,7 +875,7 @@ onmessage = function (e) {
       case 'solve':
         let targetEnv = runners.find(elem => elem.id == object.targetEnv)
         console.log(targetEnv)
-        if(targetEnv.type == "dynamic"){
+        if (targetEnv.type == "dynamic") {
           if (targetEnv.target == "single") {
             port.postMessage({
               result: targetEnv.solveEquation(object.equation)
@@ -811,10 +885,10 @@ onmessage = function (e) {
               result: targetEnv.solvePointArray(object.array)
             })
           }
-        }else if (targetEnv.type == "static"){
+        } else if (targetEnv.type == "static") {
 
         }
-        
+
         break;
       case 'clear':
         runners.find(elem => elem.id == object.targetEnv).clearVars()
@@ -2167,20 +2241,20 @@ function varInList(list, varLetter) {
   }
   return null;
 }
-function createParseEquat(equation){
+function createParseEquat(equation) {
   let vars = varInEquat(equation);
   let solveArry = [];
-  if(vars.length == 1){
+  if (vars.length == 1) {
     let pos = vars[0].positions.reverse();
-    for(let i = 0; i < pos.length; i++){
+    for (let i = 0; i < pos.length; i++) {
       let sec = equation.substring(pos[i] + 1)
       solveArry.unshift(sec)
       equation = equation.substring(0, pos[i])
-      if(pos[i] == pos.length -1 || pos.length == 1){
+      if (pos[i] == pos.length - 1 || pos.length == 1) {
         solveArry.unshift(equation)
       }
     }
-  }else{
+  } else {
     solveArry = [equation]
   }
   console.log(solveArry)
@@ -2194,17 +2268,17 @@ function calculatePoints(equation, start, end, res) {
 
   start = Math.floor(start)
   end = Math.ceil(end)
-  
+
   for (let i = start; i <= end; i += step) {
     let newPoint = {};
     newPoint.x = i;
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    let proper = parseEquation.length > 0 ? parseEquation.join(newPoint.x) : ""+newPoint.x;
+    let proper = parseEquation.length > 0 ? parseEquation.join(newPoint.x) : "" + newPoint.x;
     newPoint.y = fullSolve(proper);
     pointArray.push(newPoint);
-    
+
   }
   return pointArray;
 }
@@ -2283,12 +2357,11 @@ function getParsedMethod(text) {
   return parseFunction(text)
 }
 function setVarEquat(equation, varList) {
-  console.log(varList)
   for (let data of varList) {
     for (let i = 0; i < equation.length; i++) {
-      console.log(equation.substring(i, i + data.letter.length))
-      if (funcMatch(equation.substring(i), true) != "") {
-        i += funcMatch(equation.substring(i), true).func.length - 1;
+      let funcMatchVar = funcMatch(equation.substring(i), true);
+      if (funcMatchVar != "") {
+        i += funcMatchVar.func.length - 1;
         console.log()
       } else if (equation.substring(i, i + data.letter.length) == data.letter) {
         if (data.value != "" && data.value != undefined) {

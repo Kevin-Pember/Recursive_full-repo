@@ -88,7 +88,7 @@ if (document.getElementById("mainBody") != null) {
   }
   //*********************************************************************************************************
   
-
+  /*
   //Tab handling code *************************************************************************************
   document.getElementById('mainTab').addEventListener("click", function (e) {
     if (window.innerWidth / window.innerHeight < 3 / 4) {
@@ -114,7 +114,7 @@ if (document.getElementById("mainBody") != null) {
   });
   document.getElementById('settingsCogIcon').addEventListener("click", function () { sessionStorage.setItem("facing", "settingsOut"); openPage("settingsPage") });
   //********************************************************************************************************
-
+  */
 
 
   //Media query for resizing the calculator***********************************
@@ -1227,7 +1227,6 @@ function custButton(funcConfig, target) {
   for (let i = 0; i < target.length; i++) {
     let targetElem = document.getElementById(target[i]);
     targetElem.addCard(name,equation);
-    setNumOfTabs();
   }
 
 }
@@ -1698,13 +1697,12 @@ function checkVar(name, def) {
     }
     //Ext var removal
     for (let oldVar of varExisting) {
-      varGrid.removeChild(oldVar.element);
+      oldVar.element.remove();
     }
     //Var Creatation part
     for (let newVar of newVars) {
       def.generateVar(newVar);
     }
-    let currentVars = varListAssbely(varGrid);
 
   })
 }
@@ -2964,15 +2962,6 @@ class TemplatePage extends FuncPage {
       }
       callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": thisElem.id, "newVars": varArray });
     }
-
-    let updateElements = [
-      "minGraph",
-      "maxGraph",
-      'resolutionGraph',
-      'minTable',
-      'maxTable',
-      "cellTable",
-    ];
   }
   generateVar(name) {
     let tempvar = document.getElementsByClassName("variableTemplate")[0];
@@ -2984,7 +2973,6 @@ class TemplatePage extends FuncPage {
     });
     this.varGrid.appendChild(varClon);
     this.vars.push({ "name": name, 'elem': varClon })
-    //this.serioShit.thing = "test";
   }
   packageHandler(packet) {
     this.tabPage.querySelector("#EquationFunc").innerHTML = packet.result;
@@ -3068,14 +3056,12 @@ class HybridPage extends TemplatePage {
 class EquatPage extends TemplatePage {
   constructor(config) {
     super(config)
-    console.log("%c Page Def:", "color: yellow", this)
     let thisElem = this;
     let clon = this.clone;
     let tabCopy = this.tabPage;
     let equation = config.equation;
     this.equationDIV = clon.getElementById("EquationFunc");
-    this.type = "function"
-    console.log(this.def)
+    this.type = "function";
 
     this.equationDIV.innerHTML = equation;
     this.equationDIV.dataset.baseE = equation;

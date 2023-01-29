@@ -36,26 +36,20 @@
         }
         let array = []
     </script>
+    <script src="startup.js"></script>
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <style>
         body{
             height: 100%;
             width: 100%;
-            background-color: var(--functionsColor);
+            background-color: var(--displayColor);
         }
     </style>
     <script src="./packages/chart.js"></script>
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
     <!--<tab-menu></tab-menu>-->
-    <tab-menu>
-        <tab-page name="main" type="main">
-            <h1>Hello World from the main</h1>
-        </tab-page>
-        <tab-page name="thing" type="template">
-            <h1>from the thing</h1>
-        </tab-page>
-    </tab-menu>
+    <template-func></template-func>
     <script>
         for (let qElem of formats) {
             let format = () => {
