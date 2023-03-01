@@ -16,6 +16,7 @@
 
     <link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico" />
     <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./styling/animations.css">
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <meta name="theme-color" content="#31d53d" />
     <script src="startup.js"></script>
@@ -44,21 +45,6 @@
                 "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
                 "methods": []
             },
-            /*{
-                "name": "tabletPortrait",
-                "query": window.matchMedia("(orientation: portrait) and (min-width: 600px) and (max-width: 1000px)"),
-                "methods": []
-            },
-            {
-                "name": "tabletLandscape",
-                "query": window.matchMedia("(orientation: landscape) and (min-width: 600px) and (max-width: 1000px)"),
-                "methods": []
-            },
-            {
-                "name": "desktop",
-                "query": window.matchMedia("(min-width: 1000px)"),
-                "methods": []
-            }*/
         ]
         let appendMethod = (format, method) => {
             formats.find((elem) => {
@@ -73,8 +59,11 @@
     <script>stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
     
     <div class="page" id="mainPage">
-        <tab-menu>
-            <tab-page name="main" type="main">
+        <tab-menu id="mainTabs">
+            <script>
+                let mainTab = document.getElementById('mainTabs')
+            </script>
+            <tab-page name="main" type="main" hasKeypad="true">
                 <div id="MainContent" class="tabcontent" style="display:flex" data-tab="mainTab">
                     <menu-pane type="mode">
                         <menu-page name="Scientific" isFirst="true" hasKeypad="true">
@@ -115,6 +104,15 @@
                                 let extendedMainKeypad = document.getElementById("extendedMainKeypad");
                                 let mainScroll = document.getElementById("mainScroll");
                                 let styler = document.getElementById("formatStyle");
+                                let mainPageContainer = document.getElementById("mainPageContainer");
+                                let observer = new MutationObserver(() =>{
+                                    if(isHidden(mainPageContainer)){
+                                        keypad.style.visibility = "hidden";
+                                    }else{
+                                        keypad.style.visibility = "visible";
+                                    }
+                                });
+                                observer.observe(mainPageContainer, {attributes: true});
                                 appendMethod('mobileLandscape', () => {
                                     console.log(styler)
                                     styler.innerHTML = `
@@ -409,6 +407,9 @@
                 </div>
             </tab-page>
         </tab-menu>
+        <script>
+            envObject.mainTabMenu = document.getElementById("mainTabs");
+        </script>
     </div>
     <div id="nameEntry">
         <div id="entryDiv">
@@ -779,7 +780,11 @@
         </div>
     </div>
     <quick-settings id="quickSettings" style="visibility: hidden;"></quick-settings>
-    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry"></func-keypad>
+    <edit-page id="mainEditor" mode="method" class="page" style="bottom: 100%; position: absolute; background-color: var(--semi-transparent)"></edit-page>
+    <script>
+        envObject.mainEdit = document.getElementById("mainEditor");
+    </script>
+    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
     <script>
         let keypad = document.getElementById("mainKeypad");
         for (let qElem of formats) {

@@ -24,7 +24,6 @@ let defStyle = `
     color: var(--textColor);
   }
 `;
-let inputs = [];
 let colorArray = [];
 
 function setFocus(node, index) {
@@ -48,6 +47,9 @@ var repeater;
 function buttonMapper(elemArray) {
     for (let elem of elemArray) {
         let elemDef = elem.def
+        if (elemDef == undefined) {
+            console.log(elem)
+        }
         elemDef.addEventListener('click', (e) => {
             elem.function(e);
         });
@@ -303,6 +305,23 @@ function getRandomColor() {
     }
     return color;
 }
+function createTab(name, buttonList) {
+    let newTab = document.createElement('tab-page');
+    newTab.setAttribute('name', name);
+    newTab.setAttribute('type', 'template');
+    let newTemplate = document.createElement('template-func');
+    newTemplate.setAttribute('name', name);
+    newTemplate.buttonList = buttonList;
+    newTab.appendChild(newTemplate);
+    envObject.mainTabMenu.appendChild(newTab);
+}
+function changeButtons(name, defObject){
+    let target = envObject.funcButtons.find(value => value.name == name);
+    for(let button of target.defs){
+        button.nameLabel.innerHTML = defObject.name;
+        button.equationLabel.innerHTML = defObject.text;
+    }
+}
 //Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
 function hideElements(elements) {
     for (let element of elements) {
@@ -339,22 +358,37 @@ class EquatInput extends HTMLElement {
             fill: var(--textColor);
         }
         #containerDiv{
-            height: 100%;
+            height: inherit;
             width: 100%;
-            display: block;
-            overflow: hidden;
-            flex-wrap: nowrap;
+            overflow: inherit;
             margin: 0;
+            display: grid;
+            grid-template-columns: 100%;
+            grid-template-areas: "content errIcon";
+            position: relative;
+            justify-content: space-evenly;
+            justify-items: center;
+            align-content: space-evenly;
+            align-items: center;
         }
         #dynamicEquation{
             width: 100%;
-            height: 100%;
+            height: inherit;
             font-size: inherit;
             font-weight: inherit;
             text-indent: inherit;
             direction: inherit;
             display: grid;
             align-content: center;
+            grid-area: content;
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+        #errorIcon{
+            height: 50px; 
+            aspect-ratio: 1/1;
+            grid-area: errIcon;
+            visibility: hidden;
         }
         [placeholder]:empty:before {
             content: attr(placeholder);
@@ -373,7 +407,7 @@ class EquatInput extends HTMLElement {
         <div id="containerDiv">
             <div id="dynamicEquation" class="editDiv"
                 contenteditable="true" value="" autofocus>‎</div>
-            <svg style="isolation:isolate; height: 100%;" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">    
+            <svg id="errorIcon" style="isolation:isolate;" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">    
                 <path d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z" fill-opacity=".2"/>
                 <rect x="477" y="172.3" width="126" height="548.83" class="svgText"/>
                 <rect x="477" y="781.7" width="126" height="126" class="svgText"/>
@@ -381,6 +415,8 @@ class EquatInput extends HTMLElement {
         </div>`;
         this.container = this.shadowRoot.querySelector('#containerDiv');
         this.input = this.shadowRoot.querySelector("#dynamicEquation");
+        this.errIcon = this.shadowRoot.querySelector("#errorIcon");
+        this.styler = this.shadowRoot.querySelector("#styler");
     }
     get() {
         return this.shadowRoot.querySelector("#dynamicEquation").innerHTML;
@@ -403,15 +439,26 @@ class EquatInput extends HTMLElement {
         return selection;
     }
     alert() {
-        this.container.style.overflow = "visible";
-        this.container.style.display = "flex";
+        this.container.style = `
+            grid-template-columns: calc(100% - 50px) 50px;
+        `;
+        this.errIcon.style = `
+            visibility: inherit;
+        `;
         this.input.addEventListener("input", () => {
-            this.container.style.overflow = "hidden";
-            this.container.style.display = "block";
+            this.container.style = "";
+            this.container.style = "";
         }, { once: true });
     }
+    disable(type) {
+        if (type) {
+            this.input.setAttribute("contenteditable", "false");
+        } else {
+            this.input.setAttribute("contenteditable", "true");
+        }
+    }
     static get observedAttributes() {
-        return ['innerStyle', 'placeholder', "id", "enabled"];
+        return ['innerStyle', 'placeholder', "id", "enabled", "mode"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.hasAttribute("innerStyle")) {
@@ -421,11 +468,18 @@ class EquatInput extends HTMLElement {
             this.shadowRoot.querySelector("#dynamicEquation").setAttribute("placeholder", this.getAttribute("placeholder"));
         }
         if (this.hasAttribute('id')) {
-            inputs.push(this);
+            envObject.inputs.push(this);
         }
         if (this.hasAttribute('enabled')) {
-            if(this.getAttribute('enabled') === "false"){
+            if (this.getAttribute('enabled') === "false") {
                 this.shadowRoot.querySelector("#dynamicEquation").setAttribute("contenteditable", "false");
+            } else {
+                this.shadowRoot.querySelector("#dynamicEquation").setAttribute("contenteditable", "true");
+            }
+        }
+        if (this.hasAttribute('mode')) {
+            if (this.hasAttribute('mode') === "flex") {
+
             }
         }
     }
@@ -437,6 +491,9 @@ class EquatInput extends HTMLElement {
                 this.mapped = true;
             }
         });
+    }
+    get value() {
+        return this.input.innerHTML.replaceAll('‎', '');
     }
 }
 customElements.define("rich-input", EquatInput);
@@ -648,6 +705,7 @@ class historyDisplay extends HTMLElement {
               #displayClip {
                 width: 100%;
                 height: 100%;
+                overflow: hidden;
                 filter: drop-shadow(-5px 5px 5px var(--translucent));
               }
               
@@ -898,7 +956,7 @@ class historyDisplay extends HTMLElement {
                 this.scrollBottom();
             })
         }
-        inputs.push(this);
+        envObject.inputs.push(this);
         this.calcBody = calcBody;
         this.historyHeader = historyHeader;
         this.enterContainer = enterContainer;
@@ -1010,6 +1068,7 @@ class FuncButton extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
         <style>
           
           * {
@@ -1029,11 +1088,22 @@ class FuncButton extends HTMLElement {
           .svgText {
             fill: var(--textColor);
           }
+          #nameLabel {
+            transition: 0.5s;
+          }
+            #removeFunc {
+                height: 75px;
+                width: 75px;
+                position: absolute;
+                top: 0;
+                right: calc(50% - 37.5px);
+                visibility: hidden;
+            }
         </style>
         <button id="customFuncButton">
             <h2 id="equationLabel"></h2>
-            <h5 id="nameLabel" style="margin-bottom: -40px;"></h5>
-            <svg id="removeFunc" style="height: 40px; isolation:isolate; aspect-ratio: 1 / 1; margin-right: -75%;" viewBox="0 0 1080 1080"
+            <h5 id="nameLabel"></h5>
+            <svg id="removeFunc" viewBox="0 0 1080 1080"
                 xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
@@ -1043,29 +1113,42 @@ class FuncButton extends HTMLElement {
             </svg>
         </button>
         `;
-        let buttonNode = this.shadowRoot.querySelector("#customFuncButton");
-        let removeSVG = this.shadowRoot.querySelector("#removeFunc");
+        this.buttonNode = this.shadowRoot.querySelector("#customFuncButton");
+        this.removeSVG = this.shadowRoot.querySelector("#removeFunc");
+        this.nameLabel = this.shadowRoot.querySelector("#nameLabel");
+        this.equationLabel = this.shadowRoot.querySelector("#equationLabel");
+        this.removeActive = false;
 
-        removeSVG.addEventListener('click', (e) => {
-            openConfirm("Are you sure you want to delete this Function?", () => {
-                funcRemove(buttonNode);
-            });
-
-        });
-        buttonNode.addEventListener('click', (e) => {
-            if (!removeSVG.contains(e.target)) {
-                let elem = buttonNode;
-                console.log(elem.id)
-                let funcName = elem.querySelector("#nameLabel").innerHTML;
-                let funcParse = findFuncConfig(funcName);
-                if (matchPage(funcName) == null) {
-                    createTab(funcParse)
-                } else {
-                    openElement(funcName);
+        this.buttonNode.addEventListener('click', (e) => {
+            if (this.removeActive == false) {
+                let funcName = this.nameLabel.innerHTML;
+                if (!envObject.mainTabMenu.hasTab(funcName)) {
+                    createTab(this.name, this.copies)
+                }else{
+                    envObject.mainTabMenu.openTabByName(this.name);
                 }
+            } else {
+                openConfirm("Are you sure you want to delete this Function?", () => {
+                    funcRemove(buttonNode);
+                });
             }
         });
 
+    }
+    setRemove() {
+        if (!this.removeActive) {
+            console.log('setting remove')
+            pullUpElements([this.removeSVG])
+            hideElements([this.equationLabel])
+            this.nameLabel.style = "bottom: 0; position: absolute; font-size: 20px; width: 100%;";
+            this.removeActive = true;
+        } else {
+            console.log('setting remove')
+            pullUpElements([this.equationLabel])
+            hideElements([this.removeSVG])
+            this.nameLabel.style = "";
+            this.removeActive = false;
+        }
     }
     static get observedAttributes() {
         return ['name', 'equation'];
@@ -1171,6 +1254,7 @@ class inputMethod extends HTMLElement {
         this.firstTargets = {};
         this.keyTargets = {}
         this.linkedElems = [];
+        envObject.keypads.push(this);
     }
     frontButtonPressed(input) {
         let display = this.keyTargets.input.input;
@@ -1204,8 +1288,8 @@ class inputMethod extends HTMLElement {
         this.keyTargets.scroll.scrollTop = this.keyTargets.scroll.scrollHeight;
     }
     attributesMethod() {
-        this.keyTargets.scroll = inputs.find((elem) => elem.id === this.getAttribute("history"));
-        this.keyTargets.input = inputs.find((elem) => elem.id === this.getAttribute("input"));
+        this.keyTargets.scroll = envObject.inputs.find((elem) => elem.id === this.getAttribute("history"));
+        this.keyTargets.input = envObject.inputs.find((elem) => elem.id === this.getAttribute("input"));
         if (this.firstTargets.scroll == undefined) {
             this.firstTargets.scroll = document.getElementById(this.getAttribute("history"));
         }
@@ -1213,14 +1297,19 @@ class inputMethod extends HTMLElement {
             this.firstTargets.input = document.getElementById(this.getAttribute("input"))
         }
         if (this.hasAttribute('linked')) {
-            let linkedString = document.querySelectorAll(this.getAttribute("linked"));
-            if (linkedString.contains(',')) {
+            let linkedString = this.getAttribute("linked");
+            if (linkedString.includes(',')) {
                 let linkedArry = linkedString.split(',');
                 this.linkedElems = linkedArry;
             } else {
                 this.linkedElems = [];
                 this.linkedElems.push(linkedString);
             }
+            this.linkedElems.forEach((elem) => {
+                let target = envObject.keypads.find((element) => element.id == elem);
+                target.setAttribute("input", this.getAttribute("input"));
+                target.setAttribute("history", this.getAttribute("history"));
+            });
         }
     }
     clearMain() {
@@ -1364,6 +1453,10 @@ class inputMethod extends HTMLElement {
         }
 
     }
+    getInputSel() {
+        console.log(this.keyTargets.input)
+        return this.keyTargets.input.getSel();
+    }
 }
 class Keypad extends inputMethod {
 
@@ -1479,16 +1572,18 @@ class Keypad extends inputMethod {
       width: 100%;
       top: 40px;
       bottom: 10px;
-      display: inline-flex;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 50%;
       overflow-x: auto;
+      overflow-y: hidden;
     }
     .customButton {
-        margin-left: 3.3333%;
-        bottom: 5px;
+        margin-left: 5px;
         position: relative;
         background-color: var(--displayColor);
         color: var(--textColor);
-        width: 45%;
+        width: calc(100% - 10px);
         z-index: 2;
         flex-shrink: 0;
         border: none;
@@ -1898,14 +1993,7 @@ class Keypad extends inputMethod {
                         <path class="svgText"
                             d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
                     </svg>
-                    <svg id="minusIconPopup" class="minusIcon imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                            fill-opacity=".2" />
-                        <rect class="svgText" transform="matrix(-1,0,0,-1,1080,1080)" x="287.12" y="481.64" width="505.75"
-                            height="116.71" />
-                    </svg>
+                    <remove-icon id="minusIconPopup" class="minusIcon imgDivClass"></remove-icon>
                     <div id="custFuncGridPopup">
         
                     </div>
@@ -2001,7 +2089,7 @@ class Keypad extends inputMethod {
                 "name": "Functions Page",
                 "function": () => {
                     sessionStorage.setItem("facing", "moreFunctionsPage");
-                    openPage("moreFunctionsPage");
+                    openPage(document.getElementById("moreFunctionsPage"));
                 },
                 "repeatable": false,
             },
@@ -2229,7 +2317,7 @@ class Keypad extends inputMethod {
                         openPopup();
                     } else {
                         sessionStorage.setItem("facing", "creatorPage")
-                        openPage("custCreatorPage")
+                        openPage(document.getElementById("custCreatorPage"))
                     }
                 },
                 "repeatable": false,
@@ -2419,6 +2507,11 @@ class Keypad extends inputMethod {
                 "repeatable": true,
             },
         ];
+        this.shadowRoot.querySelector('#minusIconPopup').addEventListener('click', () => {
+            this.shadowRoot.querySelectorAll('func-button').forEach((button) => {
+                button.setRemove(true);
+            });
+        });
         buttonMapper(keypadButtons);
 
     }
@@ -2649,7 +2742,15 @@ class Keypad extends inputMethod {
         card.setAttribute('name', name)
         card.setAttribute('equation', content)
         card.classList.add('customButton')
-        selfGrid.appendChild(card)
+        let linkedButtons = [card];
+        for (let elem of this.linkedElems) {
+            let target = envObject.keypads.find(keypad => keypad.id == elem)
+            let cardClone = card.cloneNode()
+            target.funcGrid.appendChild(cardClone)
+            linkedButtons.push(cardClone)
+        }
+        envObject.funcButtons.push({"name": name, "defs":linkedButtons})
+        selfGrid.appendChild(card);
     }
     setStyle(styling) {
         this.shadowRoot.querySelector('#styleInjector').innerHTML = styling;
@@ -2671,166 +2772,261 @@ class Keypad extends inputMethod {
             hideElements([this])
         }
     }
-    getInputSel() {
-        console.log(this.keyTargets.input)
-        return this.keyTargets.input.getSel();
-    }
+
 }
 customElements.define("func-keypad", Keypad);
+class removeIcon extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+                #minusIcon{
+                    width: 100%;
+                    height: 100%;
+                }
+                .svgText{
+                    fill: var(--textColor);
+                }
+                .minusBoxes{
+                    transition: 0.5s;
+                }
+            </style>
+            <svg id="minusIcon" class="imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                        fill-opacity=".2" />
+                    <rect id="firstTile" transform="" class="svgText minusBoxes"  x="287.12" y="481.64" width="505.75"
+                        height="116.71" />
+                    <rect id="secondaryTile" transform="" class="svgText minusBoxes" x="287.12" y="481.64" width="505.75"
+                        height="116.71" />
+            </svg>
+        `;
+        this.toggle = false;
+        this.addEventListener('click', () => {
+            if (!this.toggle) {
+                this.shadowRoot.querySelector('#firstTile').setAttribute('transform', "rotate(135 540 540)")
+                this.shadowRoot.querySelector('#secondaryTile').setAttribute('transform', "rotate(45 540 540)")
+                this.toggle = true;
+            } else {
+                this.shadowRoot.querySelector('#firstTile').setAttribute('transform', "")
+                this.shadowRoot.querySelector('#secondaryTile').setAttribute('transform', "")
+                this.toggle = false;
+            }
+        });
+    }
+}
+customElements.define("remove-icon", removeIcon);
 class extendedKeypad extends inputMethod {
     constructor() {
         super();
         this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
         <style>
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--textColor);
-            -webkit-tap-highlight-color: transparent;
-          }
-          
-          .imgDivClass{
-            aspect-ratio: 1 / 1;
-          }
-          .svgText{
-            fill: var(--textColor);
-          }
-          
-          .pane{
-            border-radius: 25px;
-            background-color: var(--functionsColor);
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
-          }
-          
-          button:focus {
-            outline: none;
-          }
-          
-          #extendedKeypad{
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-          }
-          #extendedFuncGrid {
-            height: 100%;
-            top: 33.3333%;
-            width: 100%;
-            left: 400px;
-            right: 0;
-            display: grid;
-            grid-gap: 0px 0px;
-            grid-template-columns: 50% 50%;
-            grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
-            background-color: #00000000;
-            z-index: 1;
-            grid-template-areas:
-              "help func"
-              "vars ac"
-              "mod abs"
-              "sin deg"
-              "cos arc"
-              "tan inv"
-              "d-f fact"
-              "ln log"
-              "log10 e";
-          }
-          .fI {
-            background-color: var(--displayColor);
-          }
-          
-          .funcbutton {
-            height: 100%;
-            width: 100%;
-            font-size: 20px;
-            color: var(--textColor);
-            background-color: var(--functionsColor);
-            text-align: center;
-            border-style: none;
-          }
-          
-          .funcbutton:focus {
-            outline: none;
-            box-shadow: none;
-          }
-          
-          .trigButton {
-            height: 100%;
-            width: 100%;
-            font-size: 20px;
-            color: var(--textColor);
-            background-color: var(--functionsColor);
-            text-align: center;
-            border-style: none;
-          }
-        </style>
-        <style id="modeStyle"></style>
-        <div id="extendedKeypad" class="pane">
-                        <div id="extendedFuncGrid">
-                            <div class="button-item fI" style="grid-area: help;"><button class="funcbutton" id="helpEx">
-                                    <svg class="helpIcon imgDivClass" style="height: 40px;isolation:isolate"
-                                        viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg">\
-                                        <path class="svgText"
-                                            d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
-                                            fill-rule="evenodd" />
-                                    </svg>
-                                </button></div>
-                            <div class="button-item fI" style="grid-area: func;"><button class="funcbutton"
-                                    id="functionEx">Func</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: ac;"><button class="funcbutton"
-                                    id="acEx">ac</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: vars;"><button class="funcbutton"
-                                    id="varEx">xyz</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: arc;"><button class="funcbutton"
-                                    id="arcEx">arc</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: inv;"><button class="funcbutton"
-                                    id="invEx">inv</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: sin;"><button class="trigButton"
-                                    id="sinEx">sin</button>
-                            </div>
-                            <div class="button-itemfI" style="grid-area: deg;"><button class="funcbutton"
-                                    id="degEx">deg</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: cos;"><button class="trigButton"
-                                    id="cosEx">cos</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton"
-                                    id="modEx">mod</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: tan;"><button class="trigButton"
-                                    id="tanEx">tan</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
-                                    |</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: d-f;"><button class="funcbutton"
-                                    id="deciToFracEx">d→f</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: fact;"><button class="funcbutton"
-                                    id="factorialEx">n!</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: ln;"><button class="funcbutton"
-                                    id="lnEx">ln</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: log;"><button class="funcbutton"
-                                    id="log10Ex">log</button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: log10;"><button
-                                    class="funcbutton">log<sub>10</sub></button>
-                            </div>
-                            <div class="button-item fI" style="grid-area: e;"><button class="funcbutton"
-                                    id="eEx">e</button>
-                            </div>
-                        </div>
-                    </div>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: ubuntu;
+        color: var(--textColor);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .imgDivClass {
+        aspect-ratio: 1 / 1;
+    }
+
+    .svgText {
+        fill: var(--textColor);
+    }
+
+    .pane {
+        border-radius: 25px;
+        background-color: var(--functionsColor);
+        filter: drop-shadow(-5px 5px 5px var(--translucent));
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+    #extendedKeypad {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    #extendedFuncGrid {
+        height: 100%;
+        top: 33.3333%;
+        width: 100%;
+        left: 400px;
+        right: 0;
+        display: grid;
+        grid-gap: 0px 0px;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
+        background-color: #00000000;
+        z-index: 1;
+        grid-template-areas:
+            "help func"
+            "vars ac"
+            "mod abs"
+            "sin deg"
+            "cos arc"
+            "tan inv"
+            "d-f fact"
+            "ln log"
+            "log10 e";
+    }
+
+    .fI {
+        background-color: var(--displayColor);
+    }
+
+    .funcbutton {
+        height: 100%;
+        width: 100%;
+        font-size: 20px;
+        color: var(--textColor);
+        background-color: var(--functionsColor);
+        text-align: center;
+        border-style: none;
+    }
+
+    .funcbutton:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .trigButton {
+        height: 100%;
+        width: 100%;
+        font-size: 20px;
+        color: var(--textColor);
+        background-color: var(--functionsColor);
+        text-align: center;
+        border-style: none;
+    }
+    #funcDisplay{
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #funcGrid{
+        visibility: hidden;
+        width: 100%;
+        height: calc(100% - 50px);
+        display: grid;
+        grid-gap: 0px 0px;
+        grid-template-columns: 100%;
+        grid-auto-rows: 100px;
+    }
+    #backIcon{
+        height: 50px;
+        transform: rotate(180deg);
+    }
+    #addIcon{
+        height: 50px;
+    }
+    #minusIcon{
+        height: 50px;
+    }
+    .customButton {
+        margin-left: 5px;
+        position: relative;
+        background-color: var(--numbersColor);
+        color: var(--textColor);
+        width: calc(100% - 10px);
+        z-index: 2;
+        border: none;
+        border-radius: 25px;
+        top: 2.5%;
+        height: 95%
+      }
+    
+</style>
+<style id="modeStyle"></style>
+<div id="extendedKeypad" class="pane">
+    <div id="extendedFuncGrid">
+        <div class="button-item fI" style="grid-area: help;"><button class="funcbutton" id="helpEx">
+                <svg class="helpIcon imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 45 45"
+                    xmlns="http://www.w3.org/2000/svg">\
+                    <path class="svgText"
+                        d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
+                        fill-rule="evenodd" />
+                </svg>
+            </button></div>
+        <div class="button-item fI" style="grid-area: func;"><button class="funcbutton" id="functionEx">Func</button>
+        </div>
+        <div class="button-item fI" style="grid-area: ac;"><button class="funcbutton" id="acEx">ac</button>
+        </div>
+        <div class="button-item fI" style="grid-area: vars;"><button class="funcbutton" id="varEx">xyz</button>
+        </div>
+        <div class="button-item fI" style="grid-area: arc;"><button class="funcbutton" id="arcEx">arc</button>
+        </div>
+        <div class="button-item fI" style="grid-area: inv;"><button class="funcbutton" id="invEx">inv</button>
+        </div>
+        <div class="button-item fI" style="grid-area: sin;"><button class="trigButton" id="sinEx">sin</button>
+        </div>
+        <div class="button-itemfI" style="grid-area: deg;"><button class="funcbutton" id="degEx">deg</button>
+        </div>
+        <div class="button-item fI" style="grid-area: cos;"><button class="trigButton" id="cosEx">cos</button>
+        </div>
+        <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton" id="modEx">mod</button>
+        </div>
+        <div class="button-item fI" style="grid-area: tan;"><button class="trigButton" id="tanEx">tan</button>
+        </div>
+        <div class="button-item fI" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
+                |</button>
+        </div>
+        <div class="button-item fI" style="grid-area: d-f;"><button class="funcbutton" id="deciToFracEx">d→f</button>
+        </div>
+        <div class="button-item fI" style="grid-area: fact;"><button class="funcbutton" id="factorialEx">n!</button>
+        </div>
+        <div class="button-item fI" style="grid-area: ln;"><button class="funcbutton" id="lnEx">ln</button>
+        </div>
+        <div class="button-item fI" style="grid-area: log;"><button class="funcbutton" id="log10Ex">log</button>
+        </div>
+        <div class="button-item fI" style="grid-area: log10;"><button class="funcbutton">log<sub>10</sub></button>
+        </div>
+        <div class="button-item fI" style="grid-area: e;"><button class="funcbutton" id="eEx">e</button>
+        </div>
+    </div>
+    <div id="funcDisplay">
+    <svg id="backIcon" style="height: 50px;isolation:isolate" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="1080" height="1080" fill-opacity="0" />
+                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                </svg>
+    <svg id="addIcon" class="imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
+        xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                fill-opacity=".2" />
+            <path class="svgText"
+                d="m481.64 598.36v194.52h116.71v-194.52h194.52v-116.71h-194.52v-194.52h-116.71v194.52h-194.52v116.71h194.52z" />
+    </svg>
+    <remove-icon id="minusIcon"></remove-icon>
+    <div id="funcGrid">
+
+    </div>
+    </div>
+</div>
         `
         let keypadButtons = [
+            {
+                "def": this.shadowRoot.querySelector('#functionEx'),
+                "id": 'functionEx',
+                "name": "Open Function Menu",
+                "function": () => {
+                    this.openFuncMenu();
+                },
+            },
             {
                 "def": this.shadowRoot.querySelector('#acEx'),
                 "id": 'acEx',
@@ -2841,7 +3037,7 @@ class extendedKeypad extends inputMethod {
                 "repeatable": false,
             },
             {
-                "def": this.shadowRoot.querySelector('#keyboardPopup'),
+                "def": this.shadowRoot.querySelector('#varEx'),
                 "id": 'varEx',
                 "name": "Open Keyboard",
                 "function": () => {
@@ -2973,9 +3169,38 @@ class extendedKeypad extends inputMethod {
                 "repeatable": false,
             },
         ];
+        buttonMapper(keypadButtons)
+        this.shadowRoot.querySelector('#backIcon').addEventListener('click', () => {
+            this.closeFuncMenu();
+        });
+        this.shadowRoot.querySelector('#minusIcon').addEventListener('click', () => {
+            this.shadowRoot.querySelectorAll('func-button').forEach((button) => {
+
+                button.setRemove(true);
+            });
+        });
+        this.buttonGrid = this.shadowRoot.querySelector('#extendedFuncGrid')
+        this.funcGrid = this.shadowRoot.querySelector('#funcGrid')
     }
+
     static get observedAttributes() {
         return ['mode', "input", "history"];
+    }
+    addCard(name, content) {
+        let selfGrid = this.shadowRoot.querySelector('#funcGrid')
+        let card = document.createElement('func-button')
+        card.setAttribute('name', name)
+        card.setAttribute('equation', content)
+        card.classList.add('customButton')
+        selfGrid.appendChild(card)
+    }
+    openFuncMenu() {
+        pullUpElements([this.funcGrid])
+        hideElements([this.buttonGrid])
+    }
+    closeFuncMenu() {
+        hideElements([this.funcGrid])
+        pullUpElements([this.buttonGrid])
     }
     attributeChangedCallback(name, oldValue, newValue) {
         this.attributesMethod();
@@ -3000,6 +3225,9 @@ class extendedKeypad extends inputMethod {
                   "mod log10 fact"
                   "log ln e";
               }
+              #funcGrid{
+                grid-template-columns: 50% 50%;
+            }
               `;
         } else if (this.getAttribute("mode") == "double") {
             //this mode has the full capabilities of the keypad
@@ -4596,10 +4824,9 @@ class tabPage extends HTMLElement {
     }
     connectedCallback() {
         setTimeout(() => {
-
-            if (this.definedInd == undefined) {
+            if (this.tabInd == undefined) {
                 this.pageContainer.append(...this.childNodes)
-                this.definedInd = this.parentElement.addMethod(this)
+                this.parentElement.addMethod(this)
             }
         });
     }
@@ -4614,6 +4841,7 @@ class tabMenu extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
         <style>
         @font-face {
             font-family: ubuntu;
@@ -4705,7 +4933,7 @@ class tabMenu extends HTMLElement {
             grid-template-columns: repeat(auto-fill, 175px); 
             padding-top: 20px; 
             position: absolute;
-            background-color: var(--translucent); 
+            background-color: var(--semi-transparent); 
             border-radius: 20px 20px 0 0; 
             justify-content: space-evenly;
             justify-items: center; 
@@ -4871,8 +5099,16 @@ class tabMenu extends HTMLElement {
         this.tabsContainer = this.shadowRoot.querySelector('#tabPageContainer');
         this.tabIndicatorContainer = this.shadowRoot.querySelector('#tabContainer');
         this.tabCount = this.shadowRoot.querySelector('#tabNum');
+        this.tabList = [];
+        this.tabLinks = [];
         this.mobileTabButton = this.shadowRoot.querySelector('#mobileTabs');
-        this.tabsContainer.addMethod = (page) => { return this.addTab(page) };
+        this.addMethod = (page) => { this.addTab(page) };
+        this.tabsContainer.addMethod = this.addMethod;
+
+        this.tabIndicatorContainer.addEventListener('click', (e) => {
+            this.tabIndController();
+        });
+
         appendMethod('mobileLandscape', () => {
             this.setStyling();
         })
@@ -4881,8 +5117,7 @@ class tabMenu extends HTMLElement {
         });
         this.shadowRoot.querySelector('#settingsCogIcon').addEventListener('click', () => { });
         this.mobileTabButton.addEventListener('click', () => {
-            this.indVisible = !this.indVisible;
-            if (this.indVisible) {
+            if (!isHidden(this.tabIndicatorContainer)) {
                 this.tabIndController(true)
             } else {
                 this.tabIndController(false)
@@ -4959,7 +5194,9 @@ class tabMenu extends HTMLElement {
                 .tabIcons{
                     visibility: hidden;
                 }
-  
+                .tablinks.active{
+                    background-color: var(--displayColor);
+                  }
             `;
             if (this.indVisible == undefined) {
                 this.indVisible = false;
@@ -4975,6 +5212,7 @@ class tabMenu extends HTMLElement {
     createTabIndicator(name, page, type) {
         let tabButton = document.createElement('button');
         tabButton.classList.add('tablinks');
+        tabButton.name = name;
         tabButton.innerHTML = `
         <h3 id="newTabName"></h3>
         <svg div id="tabRemove" class="imgDivClass" height="31.5px" style="isolation:isolate"
@@ -5063,35 +5301,70 @@ class tabMenu extends HTMLElement {
         }
         tabButton.addEventListener('click', (e) => {
             if (tabButton.querySelector('#tabRemove') == undefined || e.target != tabButton.querySelector('#tabRemove') && !tabButton.querySelector('#tabRemove').contains(e.target)) {
-                this.shadowRoot.querySelectorAll('.tablinks.active').forEach((tab) => {
-                    tab.classList.remove('active');
-                });
-                tabButton.classList.add('active');
-                this.tabIndController(false);
+                //this.tabIndController(false);
                 this.indVisible = false;
                 this.openTab(page);
             }
 
         });
         this.tabIndicatorContainer.append(tabButton);
+        this.tabLinks.push(tabButton)
         return tabButton;
     }
     addTab(page) {
         page.classList.add('tabPage');
-        console.log(this.tabsContainer)
         this.tabsContainer.append(page);
-        let retable = this.createTabIndicator(page.name, page, page.type);
+        this.tabList.push(page);
+        page.tabInd = this.createTabIndicator(page.name, page, page.type);
         this.setTabCount();
-        return retable;
+        this.openTab(page);
+    }
+    openTabByName(name){
+        console.log(this.tabList)
+        let page = this.tabList.find((tab) => {
+            console.log(tab.name + " vs. " + name)
+            return tab.name == name;
+        })
+        console.log(name)
+        console.log(page)
+
+        this.openTab(page);
     }
     openTab(page) {
-        let tabPages = [...this.shadowRoot.querySelectorAll('tab-page')].filter((tab) => {
+        let tabPages = this.tabList.filter((tab) => {
             return tab != page;
         });
+        this.tabLinks.forEach((elem) => {
+            if(elem.classList.contains('active')){
+                elem.classList.remove('active');
+            }
+        })
+        page.tabInd.classList.add('active');
+        for (let tabPage of tabPages) {
+            if (!isHidden(tabPage) && tabPage.hasAttribute('hasKeypad') && !isHidden(keypad)) {
+                tabPage.returnKepad = true;
+                hideElements([keypad]);
+            }
+        }
+        if (page.returnKepad != undefined && page.returnKepad) {
+            pullUpElements([keypad]);
+        }
         hideElements(tabPages);
         pullUpElements([page]);
     }
+    hasTab(name){
+        return this.tabList.find((tab) => {
+            return tab.name == name;
+        }) != undefined;
+    }
     tabIndController(visibility) {
+        if(arguments[0] == undefined){
+            if(isHidden(this.tabIndicatorContainer)){
+                visibility = true;
+            }else{
+                visibility = false;
+            }
+        }
         if (this.orientation == 'vertical') {
             if (visibility) {
                 this.tabIndicatorContainer.style.zIndex = '5';
@@ -5152,10 +5425,12 @@ class equationMap extends HTMLElement {
             flex-wrap: wrap;
             border-radius: 25px;
             top: 15%;
-            height: fit-content;
+            height: inherit;
+            max-height: inherit;
+            overflow-y: auto;
+            overflow-x: hidden;
             width: 100%;
             padding: 10px;
-            overflow-y: auto;
             filter: drop-shadow(-5px 5px 5px var(--translucent));
           }
           
@@ -5166,17 +5441,15 @@ class equationMap extends HTMLElement {
             display: grid;
             grid-template-columns: 33.3333% 33.3333% 33.3333%;
             grid-auto-rows: 35px;
-            overflow-y: auto;
+            justify-items: center;
+            align-items: center;
           }
           
           .variableContainer {
             background-color: var(--displayColor);
             height: 25px;
             width: 95%;
-            margin-left: 2.5%;
             border-radius: 25px;
-            margin-top: 5px;
-            margin-bottom: 5px;
             display: inline-block;
             flex-wrap: nowrap;
           }
@@ -5189,12 +5462,12 @@ class equationMap extends HTMLElement {
           #variableName {
             border-radius: 25px;
             height: 25px;
+            min-width: 25px;
             padding-left: 7.5px;
             padding-right: 7.5px;
             flex-shrink: 0;
             text-align: center;
             background-color: var(--numbersColor);
-          
           }
           
           #variableEntry {
@@ -5211,23 +5484,24 @@ class equationMap extends HTMLElement {
           #EquationFunc {
             border-radius: 20px;
             height: 75px;
+            width: 100%;
             display: block;
+            overflow-x: hidden;
             color: var(--textColor);
             background-color: var(--numbersColor);
             z-index: 0;
-            overflow-y: auto;
             font-size: 60px;
             position: relative;
           }
         </style>
         <div id="varEquationContainer" value="">
             <rich-input id="EquationFunc" placeholder="Equation" style="padding-left: 10px;"></rich-input>
-            <div id="varGrid">
-            </div>
+            <div id="varGrid"></div>
         </div>
         `;
         this.vars = [];
         this.richInput = this.shadowRoot.querySelector('#EquationFunc');
+        this.input = this.richInput.input;
         this.varGrid = this.shadowRoot.querySelector('#varGrid');
         this.ogEquation = '';
     }
@@ -5310,9 +5584,16 @@ class equationMap extends HTMLElement {
                 <rich-input id="variableEntry" placeholder="value"></rich-input>
             </label>
         `;
+        let variableEntry = varContainer.querySelector('#variableEntry');
         varContainer.querySelector('#variableName').innerHTML = name;
-        varContainer.querySelector('#variableEntry').input.addEventListener('input', (e) => {
+        variableEntry.input.addEventListener('input', (e) => {
             console.log("input")
+            if (this.type == 'func') {
+                callCalc({ callType: "set", method: "var", targetEnv: this.name, target: name, value: variableEntry.value }).then((value) => {
+                    this.parentVarCallBack(value);
+                });
+
+            }
             this.parseEquation();
         });
         this.varGrid.appendChild(varContainer);
@@ -5342,6 +5623,14 @@ class equationMap extends HTMLElement {
         promiseEquation.then(value => {
             this.input.innerHTML = value;
         });
+    }
+    /**
+     * @param {string} equation
+     */
+    set equat(equation) {
+        this.ogEquation = equation;
+        this.input.innerHTML = equation;
+        this.checkVar();
     }
 }
 customElements.define('equation-map', equationMap);
@@ -5458,9 +5747,10 @@ class dataViewer extends HTMLElement {
                     this.pageSelector(page)
                 });
                 this.modeSwitcher.appendChild(button);
-                this.inputData[page.name] = page.parseMethod
-                page.onUpdate = this.upstreamRequest
-                if(this.nameList.length > 0){
+                this.inputData[page.pageName] = (entry) => page.parseMethod(entry);
+                page.onUpdate = (value) => { this.upstreamRequest(value) }
+                page.key = this.name;
+                if (this.nameList.length > 0) {
                     page.style.visibility = "hidden";
                 }
                 this.nameList.push(name);
@@ -5468,7 +5758,10 @@ class dataViewer extends HTMLElement {
                 this.modeContainer.appendChild(page);
                 return button;
             }
+            console.log(`here is the data`)
+            console.log(this.inputData)
         }
+        this.modeContainer.addDataPage = this.addDataPage;
     }
     moveSlider(index) {
         this.selector.style.marginLeft = `${index * 70}px`;
@@ -5481,6 +5774,14 @@ class dataViewer extends HTMLElement {
     connectedCallback() {
         setTimeout(() => {
         });
+    }
+    static get observedAttributes() {
+        return ['name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('name')) {
+            this.name = this.getAttribute('name');
+        }
     }
 }
 customElements.define('data-viewer', dataViewer);
@@ -5656,7 +5957,7 @@ class singleData extends dataPage {
         }
     }
     parseMethod(data) {
-        if(data != undefined){
+        if (data != undefined) {
             this.equalsHeader.innerHTML = "=" + data;
         }
     }
@@ -5683,6 +5984,8 @@ class graphData extends dataPage {
               #graphContainer {
                 height: 100%;
                 padding: 5px;
+                position: absolute;
+                display: block;
                 width: 100%;
                 background-color: var(--displayColor);
                 border-radius: 20px;
@@ -5790,31 +6093,38 @@ class graphData extends dataPage {
         })
     }
     parseMethod(packet) {
-        if(packet != undefined){
+        console.log(this.graph.data)
+        if (packet != undefined) {
             this.graph.data.datasets[0].data = packet.points;
             this.graph.data.datasets[1].data = packet.extrema;
+            this.graph.update();
         }
+    }
+    get graphVars() {
+        return {
+            "gMin": this.graph.scales.x == undefined ? settings.gMin : Number(this.graph.scales.x.min),
+            "gMax": this.graph.scales.x == undefined ? settings.gMax : Number(this.graph.scales.x.max)
+        }
+    }
+    graphChangeMethod() {
+        let changeFunc = () => {
+            console.log(this.key)
+            callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": this.key, "newVars": this.graphVars }).then( (value) => {
+                console.log(value)
+                this.parseMethod(value)
+            });
+        }
+        this.graph.options.plugins.zoom.zoom.onZoomComplete = changeFunc;
+        this.graph.options.plugins.zoom.pan.onPanComplete = changeFunc;
     }
     connectedCallback() {
         super.connectedCallback();
-        if (this.graph == undefined) {
-            this.graph = createGraph(this.ctx)
-            this.graph.options.plugins.zoom.zoom.onZoomComplete = () => {
-                this.graphInMode()
+        setTimeout(() => {
+            if (this.graph == undefined) {
+                this.graph = createGraph(this.ctx)
+                this.graphChangeMethod();
             }
-            this.graph.options.plugins.zoom.pan.onPanComplete = () => {
-                setTimeout(() => {
-                    let vars = getGraphVars(this.graph)
-                    console.log("garph vars")
-                    console.log(vars)
-                    callCalc({ "callType": "env", "targetEnv": this.key, "method": "setGraphVar", "newVars": vars }).then(() => {
-                        this.graphInMode()
-                    });
-
-                })
-
-            }
-        }
+        });
     }
 
 }
@@ -5904,11 +6214,12 @@ class tableData extends dataPage {
     }
 }
 customElements.define('table-data', tableData);
-class templateFuncPage extends HTMLElement{
-    constructor(){
+class templateFuncPage extends HTMLElement {
+    constructor() {
         super();
-        this.attachShadow({mode: 'open'});
+        this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="./styling/animations.css">
             <style>
                 #pageContainer {
                     width: 100%;
@@ -5925,6 +6236,8 @@ class templateFuncPage extends HTMLElement{
                 }
                 #equationMap{
                     width: calc(100% - 20px);
+                    height: fit-content;
+                    max-height: 230px;
                     margin-left: 10px;
                 }
                 #dataViewer{
@@ -5932,29 +6245,449 @@ class templateFuncPage extends HTMLElement{
                     margin: 10px; 
                     flex-grow: 1; 
                 }
+                #editIcon {
+                    position: absolute;
+                    visibility: inherit;
+                }
+                .svgText {
+                    fill: var(--textColor);
+                  }
             </style>
             <div id="pageContainer">
                 <rich-input id="nameInput"></rich-input>
                 <equation-map id="equationMap"></equation-map>
+                <svg id="editIcon" class="imgDivClass" height="60px"
+                    style="isolation:isolate;" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m247.3 834.71c-1.536 0.421-3.181-0.014-4.306-1.14-1.125-1.124-1.561-2.77-1.14-4.306 5.585-20.371 20.976-76.536 26.513-96.733 0.418-1.522 1.615-2.706 3.139-3.113 1.528-0.403 3.153 0.035 4.27 1.153 14.725 14.724 55.497 55.497 70.222 70.222 1.116 1.116 1.554 2.744 1.153 4.27-0.404 1.528-1.591 2.721-3.113 3.139-20.199 5.535-76.364 20.93-96.736 26.509l-2e-3 -1e-3zm460.36-540.66 80.36 80.359 41.077-41.077c15.355-15.355 11.029-44.618-9.658-65.305l-2.698-2.698c-22.175-22.175-53.545-26.815-70.006-10.353l-39.075 39.074zm-415.45 413.74 393.69-393.69c3.919-3.919 10.283-3.919 14.202 0l66.29 66.29c3.919 3.919 3.919 10.283 0 14.202l-393.69 393.69c-3.919 3.919-10.283 3.919-14.202 0l-66.29-66.29c-3.919-3.919-3.919-10.283 0-14.202z"
+                            fill-rule="evenodd" />
+                </svg>
                 <data-viewer id="dataViewer">
                     <single-data style="position: absolute; height: 100%; width: 100%;"></single-data>
                     <graph-data style="position: absolute; height: 100%; width: 100%;"></graph-data>
                     <table-data style="position: absolute; height: 100%; width: 100%;"></table-data>
                 </data-viewer>
             </div>
-        `; 
+            `;
         this.nameInput = this.shadowRoot.querySelector('#nameInput');
         this.equationMap = this.shadowRoot.querySelector('#equationMap');
         this.dataViewer = this.shadowRoot.querySelector('#dataViewer');
+        this.editButton = this.shadowRoot.querySelector('#editIcon');
+        console.log(this.dataViewer)
     }
-    thisInitMethod(){
+    thisInitMethod() {
+        this.nameInput.input.innerHTML = this.name;
+        this.dataViewer.upstreamRequest = (type) => {
+            callCalc({ callType: 'get', method: 'envData', targetEnv: this.name, target: type }).then(value => {
+                if (type == "equation") {
+                    parseObject.Function(value);
+                } else if (type == "graph") {
+                    parseObject.Graph(value);
+                } else if (type == "table") {
+                    parseObject.Table(value);
+                }
+            });
+        }
+        this.dataViewer.setAttribute("name", this.name)
+        this.equationMap.setAttribute("type", "func")
+        this.equationMap.setAttribute("name", this.name)
+        this.equationMap.parentVarCallBack = (value) => this.parseMethod(value);
+        this.equationMap.input.addEventListener("input", () => {
+            this.changeMethod(this.funcDef.func, this.equationMap.input.innerHTML)
+        });
+        this.nameInput.input.addEventListener("input", () => {
+            this.changeMethod(this.nameInput.input.innerHTML, this.funcDef.ogFunc)
+        });
+        
         callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
             this.funcDef = value;
             this.vars = this.funcDef.vars;
             let varNames = []
             this.vars.forEach(val => { varNames.push(val.letter) })
-            callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` })
-          });
+            if (this.funcDef.type == "function") {
+                this.type = "function";
+                this.equationMap.equat = this.funcDef.ogFunc;
+                this.editButton.addEventListener("click", () => {
+                    envObject.mainEdit.setAttribute("mode","function");
+                    openPage(document.getElementById("mainEditor"))
+                    let editorObject = {
+                        confirmMethod : () => {
+                            this.changeMethod(envObject.mainEdit.nameEditor.input.innerHTML, envObject.mainEdit.equationEditor.input.innerHTML)
+                        },
+                        name : this.funcDef.func,
+                        equation : this.funcDef.ogFunc,
+                    }
+                    envObject.mainEdit.openEdit(editorObject);
+                })
+            } else {
+                this.editButton.addEventListener("click", () => {
+                    envObject.mainEdit.setAttribute("mode","method");
+                    openPage(document.getElementById("mainEditor"))
+                    let editorObject = {
+                        confirmMethod : () => {
+                            this.changeMethod("", envObject.mainEdit.textEditorEdit.textEditor.innerHTML)
+                        },
+                        code : this.funcDef.full,
+                    }
+                    envObject.mainEdit.openEdit(editorObject);
+                })
+                this.type = "method";
+                this.equationMap.equat = `${this.name}(${varNames.join(',')})`
+            }
+            callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` }).then(() => {
+                callCalc({ callType: 'get', method: 'envPacket', targetEnv: this.name }).then( value => {
+                    this.parseMethod(value)
+                })
+            })
+
+        });
+    }
+    parseMethod(packet) {
+        console.log(this.dataViewer)
+        let parseObject = this.dataViewer.inputData
+        parseObject.Function(packet.point)
+        parseObject.Graph(packet.graph)
+        parseObject.Table(packet.table)
+    }
+    changeMethod(name, value){
+        let parseObject = { callType: "func", method: "change", name: this.funcDef.func, changes: {} };
+        if(this.funcDef.type == "function"){
+            parseObject.changes = { "type": "Function", "name": name, "equation": value };
+        }else{
+            parseObject.changes = { "type": "Hybrid", "code": value };
+        }
+        callCalc(parseObject).then(value => {
+            console.log(value)
+            this.nameInput.input.innerHTML = value.func;
+            if(value.type == "method"){
+                this.equationMap.equat = `${value.func}(${value.vars.join(',')})`
+                changeButtons(this.funcDef.func, { name: value.func, text: "Hybrid"});
+                changeImplemented(this.funcDef.func, { "type": "Hybrid", "name": value.func, "code": value.full });
+                this.funcDef = value;
+            }else{
+                this.equationMap.equat = value.ogFunc;
+                changeButtons(this.funcDef.func, { name: value.func, text: value.ogFunc});
+                changeImplemented(this.funcDef.func, parseObject.changes);
+                this.funcDef = value;
+            }
+        });
+    }
+    static get observedAttributes() {
+        return ['name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('name')) {
+            this.name = this.getAttribute('name');
+            this.thisInitMethod();
+        }
     }
 }
 customElements.define('template-func', templateFuncPage);
+class codeTerminal extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+              * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                -webkit-tap-highlight-color: transparent;
+              }
+              
+              textarea {
+                border: none;
+                overflow: auto;
+                outline: none;
+              
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+              
+                resize: none;
+              }
+              
+              #lineLabel {
+                width: fit-content;
+                overflow: visible;
+              }
+              
+              #creatorEditor {
+                display: grid;
+                display: flex;
+                overflow: auto;
+              }
+              
+              #creatorEditor::-webkit-scrollbar {
+                width: 10px;
+              }
+              
+              #creatorEditor::-webkit-scrollbar-track {
+                background: transparent;
+              }
+              
+              #creatorEditor::-webkit-scrollbar-thumb {
+                width: 5px;
+                background: #00000080;
+                border-radius: 10px;
+              }
+              
+              #creatorEditor::-webkit-scrollbar-button:end:increment {
+                height: 0px;
+                background: transparent;
+              }
+              
+              #creatorEditor::-webkit-scrollbar-button:start:increment {
+                height: 0px;
+                background: transparent;
+              
+              }
+              .numberedHeader {
+                font-size: 25px;
+              }
+              
+              #creatorEditor::-webkit-scrollbar-corner {
+                background-color: transparent;
+              }
+              
+              .codeEditor {
+                font-size: 25px;
+                background-color: transparent;
+                border: none;
+                overflow-wrap: none;
+                padding-left: 5px;
+              }
+            </style>
+            <div id="creatorEditor">
+                <div id="lineLabel"></div>
+                <textarea class="codeEditor" id="codeEditor" spellcheck="false"></textarea>
+            </div>
+
+        `;
+        this.container = this.shadowRoot.querySelector('#creatorEditor');
+        this.codeEditor = this.shadowRoot.querySelector('#codeEditor');
+        this.numberIndex = this.shadowRoot.querySelector('#lineLabel');
+
+        this.codeEditor.addEventListener("input", (e) => {
+            this.codeEditor.height = "";
+            this.codeEditor.height = this.scrollHeight + "px"
+            this.recaculateNums()
+        })
+
+        this.createNumHeader(1);
+    }
+    //Responsible for handling the numbering on the terminal 
+    recaculateNums() {
+        let parentElem = this.numberIndex;
+        let text = this.codeEditor.value;
+
+        let numOfO = (text.match(/\n/g) || []).length;
+
+        numOfO++;
+        let childern = parentElem.querySelectorAll('.numberedHeader');
+        if (childern.length > numOfO) {
+            for (let i = childern.length - 1; i > numOfO - 1; i--) {
+                childern[i].remove();
+            }
+        } else {
+            for (let i = 0; i < numOfO - childern.length; i++) {
+                this.createNumHeader(numOfO)
+            }
+        }
+    }
+    //Responsible for the individual numbering headers in the code terminal
+    createNumHeader(num) {
+        let parentElem = this.numberIndex;
+        let initial = document.createElement('h3');
+        initial.className = "numberedHeader";
+        initial.innerHTML = num;
+        parentElem.appendChild(initial)
+    }
+    get text() {
+        return this.codeEditor.value;
+    }
+    set text(value) {
+        this.codeEditor.value = value;
+        this.recaculateNums();
+    }
+}
+customElements.define('code-terminal', codeTerminal);
+class editPage extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+              * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                -webkit-tap-highlight-color: transparent;
+              }
+              
+              .imgDivClass {
+                aspect-ratio: 1 / 1;
+              }
+              
+              .svgText {
+                fill: var(--textColor);
+              }
+              
+              #editDiv {
+                width: 100%;
+                height: 100%;
+                background-color: var(--semi-transparent);
+              }
+              
+              #custFuncEditHeader {
+                padding: 6.5px 15px 6.5px 15px;
+                width: fit-content;
+                left: calc(50% - 62.22px);
+                top: 10px;
+                font-size: 50px;
+              }
+              
+              #editExit {
+                left: 10px;
+                top: 10px;
+              }
+              
+              #textEditor {
+                position: absolute;
+                top: 80px;
+                background: var(--functionsColor);
+                bottom: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+                border-radius: 25px;
+                padding: 10px;
+                overflow: hidden;
+                filter: drop-shadow(-5px 5px 5px var(--translucent));
+              }
+              
+              #confirmEdit {
+                z-index: 1;
+                right: 10px;
+                top: 10px;
+              }
+              #topController{
+                width: 100%;
+                height: 80px;
+                display:grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                justify-content: space-evenly;
+                justify-items: center;
+                align-content: space-evenly;
+                align-items: center;
+              }
+              #funcEditor{
+                width: calc(100% - 20px);
+                margin-left: 10px;
+                background: var(--functionsColor);
+                border-radius: 25px;
+                padding: 10px;
+                display:flex;
+                flex-direction: column;
+              }
+              #nameEditor{
+                margin-bottom: 10px;
+                height: 80px;
+                overflow: hidden;
+              }
+              #equationEditor{
+                background-color: var(--displayColor);
+                min-height: 80px;
+                overflow: visible;
+                height: fit-content;
+                max-height: 100%;
+              }
+              .funcEditors{
+                width: 100%;
+                display:grid;
+                background: var(--numbersColor);
+                border-radius: 20px;
+                padding: 0 10px 0 10px;
+                font-size: 65px;
+              }
+            </style>
+            <div id="editDiv">
+                <div id=topController>
+                    <svg id="editExit" class="imgDivClass" style="height: 55px;isolation:isolate"
+                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                            d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+                    </svg>
+                    <h1 id="custFuncEditHeader">Edit</h1>
+                    <svg id="confirmEdit" class="imgDivClass" style="height: 55px;isolation:isolate"
+                       viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
+                            fill-opacity=".2" />
+                        <path class="svgText"
+                           d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+                    </svg>
+                </div>
+                  <code-terminal id="textEditor"></code-terminal>
+                  <div id="funcEditor">
+                        <rich-input id="nameEditor" class="funcEditors"></rich-input>
+                        <rich-input id="equationEditor" class="funcEditors"></rich-input>
+                  </div>
+              </div>
+        `;
+        this.editDiv = this.shadowRoot.getElementById('editDiv');
+        this.editExit = this.shadowRoot.getElementById('editExit');
+        this.confirmEdit = this.shadowRoot.getElementById('confirmEdit');
+        this.funcEditor = this.shadowRoot.getElementById('funcEditor');
+        this.nameEditor = this.shadowRoot.getElementById('nameEditor');
+        this.equationEditor = this.shadowRoot.getElementById('equationEditor');
+        this.textEditorEdit = this.shadowRoot.getElementById('textEditor');
+        this.editExit.addEventListener('click',() => {
+            this.close();
+        });
+    }
+    openEdit(editObject){
+        this.confirmEdit.addEventListener('click',() => {
+            this.close();
+            editObject.confirmMethod();
+        }, {once: true});
+        
+        if(this.mode == "function"){
+            this.nameEditor.input.innerHTML = editObject.name;
+            this.equationEditor.input.innerHTML = editObject.equation;
+        }else{
+            this.textEditorEdit.textEditor.innerHTML = editObject.code;
+        }
+    }
+    close(){
+        closePage(this);
+    }
+    static get observedAttributes() {
+        return ['mode'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('mode')) {
+            if (this.getAttribute("mode") == 'function') {
+                this.mode = 'function';
+                this.textEditorEdit.style.visibility = 'hidden';
+                this.funcEditor.style.visibility = 'inherit';
+            } else if (this.getAttribute("mode") == 'method') {
+                this.mode = 'method';
+                this.textEditorEdit.style.visibility = 'inherit';
+                this.funcEditor.style.visibility = 'hidden';
+            }
+        }
+    }
+}
+customElements.define('edit-page', editPage);

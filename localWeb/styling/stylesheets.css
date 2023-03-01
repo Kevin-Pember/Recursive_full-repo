@@ -2547,20 +2547,6 @@ th {
   right: 0;
 }
 
-
-
-/*@media only screen and (max-aspect-ratio: 3/4) {
-  
-}*/
-
-/*@media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 2/1) {
-  
-}*/
-
-/*@media only screen and (max-height: 450px) {
-  
-}*/
-
 @media only screen and (min-aspect-ratio: 5/3) and (min-height: 451px) {}
 
 @media only screen and (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/3) {}

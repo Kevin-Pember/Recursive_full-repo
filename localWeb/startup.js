@@ -1,5 +1,10 @@
 var settings;
 let calcWorker = new Worker('evalWorker.js');
+let envObject = {
+  funcButtons: [],
+  inputs: [],
+  keypads: [],
+}
 const callCalc = (arry) => new Promise((res, rej) => {
     const channel = new MessageChannel();
     channel.port1.onmessage = ({ data }) => {

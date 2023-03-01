@@ -12,9 +12,10 @@ let definedPages = [
   }
 ];
 //let keypad = document.getElementById('mainKeypad');
-let mainHistory = inputs.filter((elem) => elem.id == "mainHistory")[0];
-let mainEntry = inputs.filter((input) => input.id == "mainEntry")[0];
+let mainHistory = envObject.inputs.filter((elem) => elem.id == "mainHistory")[0];
+let mainEntry = envObject.inputs.filter((input) => input.id == "mainEntry")[0];
 let quickSettingsPane = document.getElementById('quickSettings');
+let mainTabs = document.getElementById('mainTabs');
 //console.log(inputs[0].alert())
 console.log(mainEntry)
 var settings;
@@ -67,10 +68,9 @@ window.onmessage = function (e) {
 setSettings();
 //let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
 if (document.getElementById("mainBody") != null) {
-
-  
   //Responsible for creating and implementing the custom functions at runtime ********************************
   var funcs = getFuncList();
+  console.log(funcs)
   for (let funcObject of funcs) {
     console.log(funcObject);
     addImplemented(funcObject);
@@ -87,7 +87,7 @@ if (document.getElementById("mainBody") != null) {
     }
   }
   //*********************************************************************************************************
-  
+
   /*
   //Tab handling code *************************************************************************************
   document.getElementById('mainTab').addEventListener("click", function (e) {
@@ -721,51 +721,51 @@ if (document.getElementById("mainBody") != null) {
   //********************************************************************
   */
 
-/*
-  //Extend Keypad mappings*****************************************************
-  document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
-  document.getElementById('functionEx').addEventListener("click", function () {
-    if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
-      document.getElementById('extendedFuncGrid').style.animation = "0.15s ease-in 0s 1 reverse none running fadeEffect";
-      setTimeout(function () { document.getElementById('extendedFuncGrid').style.visibility = "hidden"; document.getElementById('extendedFuncGrid').style.animation = null; }, 150);
-      document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal none running slideFromSide";
-      sessionStorage.setItem("facing", "mainFlip")
-    }
-  });
-  document.getElementById('deleteHistory').addEventListener("click", function () { deleteHistory(); });
-  document.getElementById('deciToFracEx').addEventListener("click", function () { frontButtonPressed('d→f('); });
-  document.getElementById('absEx').addEventListener("click", function () { frontButtonPressed('|'); });
-  document.getElementById('acEx').addEventListener('click', () => {
-    clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
-  })
-  document.getElementById('modEx').addEventListener("click", function () { frontButtonPressed('mod('); });
-  document.getElementById('degEx').addEventListener("click", function (e) {
-    setDegMode();
-  });
-  document.getElementById('arcEx').addEventListener("click", function () { setArc(); });
-  document.getElementById('invEx').addEventListener("click", function () { setInverse(); });
-  document.getElementById('sinEx').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('cosEx').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('tanEx').addEventListener("click", function (e) { trigPressed(e); });
-  document.getElementById('factorialEx').addEventListener("click", function () { frontButtonPressed('!'); });
-  document.getElementById('log10Ex').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
-  document.getElementById('lnEx').addEventListener("click", function () { frontButtonPressed('ln('); });
-  document.getElementById('backExMini').addEventListener("click", function () {
-    document.getElementById('customFuncDisplay').style.animation = null;
-    document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
-    setTimeout(function () {
-      document.getElementById('customFuncDisplay').style = undefined;
-      document.getElementById('extendedFuncGrid').style = undefined;
-
-    }, 150);
-    document.getElementById('extendedFuncGrid').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
-  });
-  document.getElementById('addFunctionEx').addEventListener("click", function () {
-    openPopup();
-  });
-  document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
-  //***************************************************************************************************
-*/
+  /*
+    //Extend Keypad mappings*****************************************************
+    document.getElementById('helpEx').addEventListener("click", function () { document.location = 'help.html'; setState(); sessionStorage.setItem("facing", "helpOut"); });
+    document.getElementById('functionEx').addEventListener("click", function () {
+      if (window.innerWidth / window.innerHeight > 3 / 4 && window.innerWidth / window.innerHeight < 2 / 1) {
+        document.getElementById('extendedFuncGrid').style.animation = "0.15s ease-in 0s 1 reverse none running fadeEffect";
+        setTimeout(function () { document.getElementById('extendedFuncGrid').style.visibility = "hidden"; document.getElementById('extendedFuncGrid').style.animation = null; }, 150);
+        document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal none running slideFromSide";
+        sessionStorage.setItem("facing", "mainFlip")
+      }
+    });
+    document.getElementById('deleteHistory').addEventListener("click", function () { deleteHistory(); });
+    document.getElementById('deciToFracEx').addEventListener("click", function () { frontButtonPressed('d→f('); });
+    document.getElementById('absEx').addEventListener("click", function () { frontButtonPressed('|'); });
+    document.getElementById('acEx').addEventListener('click', () => {
+      clearMain(); keyTargets.scroll.scrollTop = keyTargets.scroll.scrollHeight;
+    })
+    document.getElementById('modEx').addEventListener("click", function () { frontButtonPressed('mod('); });
+    document.getElementById('degEx').addEventListener("click", function (e) {
+      setDegMode();
+    });
+    document.getElementById('arcEx').addEventListener("click", function () { setArc(); });
+    document.getElementById('invEx').addEventListener("click", function () { setInverse(); });
+    document.getElementById('sinEx').addEventListener("click", function (e) { trigPressed(e); });
+    document.getElementById('cosEx').addEventListener("click", function (e) { trigPressed(e); });
+    document.getElementById('tanEx').addEventListener("click", function (e) { trigPressed(e); });
+    document.getElementById('factorialEx').addEventListener("click", function () { frontButtonPressed('!'); });
+    document.getElementById('log10Ex').addEventListener("click", function () { frontButtonPressed('log₁₀('); });
+    document.getElementById('lnEx').addEventListener("click", function () { frontButtonPressed('ln('); });
+    document.getElementById('backExMini').addEventListener("click", function () {
+      document.getElementById('customFuncDisplay').style.animation = null;
+      document.getElementById('customFuncDisplay').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
+      setTimeout(function () {
+        document.getElementById('customFuncDisplay').style = undefined;
+        document.getElementById('extendedFuncGrid').style = undefined;
+  
+      }, 150);
+      document.getElementById('extendedFuncGrid').style.animation = "0.15s ease-in 0s 1 normal reverse running slideFromSide";
+    });
+    document.getElementById('addFunctionEx').addEventListener("click", function () {
+      openPopup();
+    });
+    document.getElementById('minusFunctionEx').addEventListener("click", function () { console.log("Things" + document.getElementById("enterHeader").value); });
+    //***************************************************************************************************
+  */
 
 
   //Name entry handler*********************************************************************************
@@ -834,7 +834,7 @@ if (document.getElementById("mainBody") != null) {
 
 
   //Theme Handling*************************************************************************************
-  
+
   let accents = getAccents();
   let defaultThemes = getThemes();
   let catalog = getCatalog();
@@ -913,7 +913,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('radModeBut').className = "settingsButton active";
   }
   //***************************************************************************************************
-  
+
 
 
   //Buy Page*******************************************************************************************
@@ -932,11 +932,11 @@ if (document.getElementById("mainBody") != null) {
   });
   //***************************************************************************************************
 
-  
+
   //Custom Functions Page******************************************************************************
   document.getElementById('addIcon').addEventListener('click', function () {
     console.log('clicked')
-    openPage("custCreatorPage")
+    openPage(document.getElementById("custCreatorPage"))
     document.getElementById('moreFunctionsPage').style.zIndex = 3;
     sessionStorage.setItem('facing', 'creatorMorePage')
   })
@@ -958,17 +958,16 @@ if (document.getElementById("mainBody") != null) {
 }
 /**********************************************|Main Page UI|*********************************************************/
 //Responsible for animating pages on top of the main calculator (currently only used for creator page)
-function openPage(id) {
-  let element = document.getElementById(id);
+function openPage(element) {
   element.style.zIndex = 5;
   animate(element, "0.15s ease 0s 1 normal none running pageup").then(() => {
+    console.log("Never Ran")
     element.style.animation = undefined;
     element.style.bottom = "0px";
   });
 }
 //Responsible for hiding pages that where placed on top of the main calculator
-function closePage(id) {
-  let element = document.getElementById(id);
+function closePage(element) {
   animate(element, "0.15s ease 0s 1 reverse none running pageup").then(() => {
     element.style.animation = undefined;
     element.style.bottom = "100%";
@@ -1082,7 +1081,6 @@ function switchMode(modeId) {
 /*******************************************|Main Page Custom Func Editing|*******************************************/
 //Responsible for the naming page for when a new func is typed in the enter header but needs a name
 function openPopup() {
-  console.log("open popup ran")
   sessionStorage.setItem("facing", "createNaming");
   document.getElementById('nameEntry').style.visibility = "visible";
 }
@@ -1226,7 +1224,7 @@ function custButton(funcConfig, target) {
   }
   for (let i = 0; i < target.length; i++) {
     let targetElem = document.getElementById(target[i]);
-    targetElem.addCard(name,equation);
+    targetElem.addCard(name, equation);
   }
 
 }
@@ -1246,7 +1244,7 @@ function funcRemove(e) {
   //document.getElementById('custFuncGridPopup').removeChild(link);
 }
 //Responsible for the creation of tab and tab page of the given config
-function createTab(config) {
+/*function createTab(config) {
 
   let tabs = document.getElementsByClassName('tabcontent');
   keypad.setVisibility(false)
@@ -1263,7 +1261,7 @@ function createTab(config) {
     let def = (new CustomPage(config));
     definedPages.push(def)
   }
-}
+}*/
 //Responsible for the creation of a tab button that links to the tab
 function newTabButton(config, tabPage) {
   let name = config.name;
@@ -1422,7 +1420,7 @@ function matchPage(name) {
 //END
 /*********************************************|Custom Func Updating|************************************************/
 //Responsible for handing the changing of a cust func on the default tab page
-function changeFunc(og, newString, def) {
+/*function changeFunc(og, newString, def) {
   let tab = def.tab;
   let page = def.tabPage;
   console.log(og)
@@ -1447,7 +1445,7 @@ function changeFunc(og, newString, def) {
   }
 
   updateCustomButtons(og, newString);
-}
+}*/
 //Responsible for changing the name and equation value on the a cust func link 
 function updateCustomButtons(oldVal, newValue) {
   console.log('Old Val is ' + oldVal + " New Value is " + newValue);
@@ -1478,10 +1476,10 @@ function updateCustomButtons(oldVal, newValue) {
 }
 //Responsible for changing a cust func entry in the interpreter 
 function changeImplemented(name, newObject) {
-  let object = {};
+  console.log(newObject)
   let funcList = getFuncList()
-  let target = funcList.find((func, idx) => {
-    if(func.name == name){
+  let target = funcList.find((func) => {
+    if (func.name == name) {
       return true
     }
   })
@@ -1859,7 +1857,7 @@ function settingExit() {
   settings = JSON.parse(localStorage.getItem("settings"));
   setSettings();
 
-  closePage('settingsPage')
+  //closePage('settingsPage')
 }
 //Responsible for handling if purchases have been completed by the user
 function queryPurchase(item) {
@@ -2017,7 +2015,7 @@ let facingBack = [
     "backElm": 'mainPopup',
     "prtCont": 'main',
     "mth": function () {
-      closePage('custCreatorPage');
+      closePage(document.getElementById('custCreatorPage'));
     },
   },
   {
@@ -2025,7 +2023,7 @@ let facingBack = [
     "backElm": '',
     "prtCont": 'main',
     "mth": function () {
-      closePage('moreFunctionsPage');
+      closePage(document.getElementById('moreFunctionsPage'));
     }
   },
   {
@@ -2033,7 +2031,7 @@ let facingBack = [
     "backElm": '',
     'prtCont': 'main',
     "mth": function () {
-      closePage("custCreatorPage")
+      closePage(document.getElementById("custCreatorPage"))
     }
   },
   {
@@ -2041,7 +2039,7 @@ let facingBack = [
     "backElm": 'moreFunctionsPage',
     'prtCont': 'main',
     "mth": function () {
-      closePage("custCreatorPage")
+      closePage(document.getElementById("custCreatorPage"))
     }
   }
 ];
@@ -2093,9 +2091,6 @@ function setSettings() {
   rootCss.style.setProperty('--functionsColor', colorArray[0]);
   rootCss.style.setProperty('--textColor', colorArray[3]);
   TextColorGlobal = colorArray[3];
-  if (!settings.degRad) {
-    setDegMode();
-  }
   document.getElementById('graphDStep').value = settings.gR;
   document.getElementById('domainBottomG').value = settings.gMin;
   document.getElementById('domainTopG').value = settings.gMax;
@@ -2143,28 +2138,7 @@ function inputSolver(equation, errorStatement) {
 }
 //Responsible for assebiling the code terminal throughout the program
 function createCodeTerminal(element, name) {
-  let container = document.createElement("div")
-  container.id = "creatorEditor";
-  container.className = "creatorDiv";
 
-  let numberIndex = document.createElement("div")
-  numberIndex.id = "lineLabel";
-  container.appendChild(numberIndex)
-
-  let textarea = document.createElement('textarea')
-  textarea.className = "codeEditor";
-  textarea.id = name;
-  textarea.spellcheck = false;
-  textarea.addEventListener("input", function (e) {
-    this.style.height = "";
-    this.style.height = this.scrollHeight + "px"
-    recaculateNums(numberIndex, textarea.value)
-  })
-  container.appendChild(textarea)
-
-  createNumHeader(numberIndex, 1);
-
-  element.appendChild(container);
 }
 //Responsible for handling the numbering on the terminal 
 function recaculateNums(parentElem, text) {
@@ -2727,16 +2701,12 @@ function codeFilter(code) {
   }
   return true
 }
-function onAnimationComplete(elem, resolve) {
-  elem.removeEventListener('animationend', onAnimationComplete);
-  resolve();
-}
 
 function animate(elem, animation) {
   return new Promise((resolve, reject) => {
-    elem.addEventListener('animationend',
-      (e) => onAnimationComplete(elem, resolve),
-      false);
+    elem.addEventListener('animationend', (e) => {
+      resolve();
+    },{ once: true });
 
     elem.style.animation = animation;
   });
@@ -2965,7 +2935,7 @@ class TemplatePage extends FuncPage {
   }
   generateVar(name) {
     let tempvar = document.getElementsByClassName("variableTemplate")[0];
-    let varClon = tempvar.content.cloneNode(true);8
+    let varClon = tempvar.content.cloneNode(true); 8
     let thisElem = this;
     varClon.getElementById('variableName').innerHTML = name;
     varClon.getElementById('variableEntry').addEventListener('input', function (e) {
@@ -3036,19 +3006,19 @@ class HybridPage extends TemplatePage {
     hideElements([this.tabPage.querySelector('#editDiv')]);
     pullUpElements([this.tabPage.querySelector('#varEquationContainer'), this.tabPage.querySelector('#resultPane'), this.tabPage.querySelector('#nameFunc')]);
   }
-  changed(type){
+  changed(type) {
     let name = this.tabPage.querySelector("#nameFunc").innerHTML
     var code;
-    if(type == "method"){
+    if (type == "method") {
       code = tabCopy.querySelector('#custEdit').value
-    }else if(type == "name"){
+    } else if (type == "name") {
       let tempCode = tabCopy.querySelector('#custEdit').value
       tempCode = tempCode.substring(tempCode.indexOf("("))
       code = `function ${name}${tempCode}`
       tabCopy.querySelector('#custEdit').value = code;
     }
     callCalc({ callType: "func", method: "change", name: this.id, changes: { "type": "method", "name": name, "code": code } }).then(value => {
-      changeImplemented(this.id, {"type": "Hybrid", 'name': name, "code": code})
+      changeImplemented(this.id, { "type": "Hybrid", 'name': name, "code": code })
       this.id = value;
     })
   }
@@ -3108,7 +3078,7 @@ class EquatPage extends TemplatePage {
     let equation = this.tabPage.querySelector("#EquationFunc").innerHTML
     this.equationDIV.dataset.baseE = equation;
     callCalc({ callType: "func", method: "change", name: this.id, changes: { "type": "function", "name": name, "equation": equation } }).then(value => {
-      changeImplemented(this.id, {"type": "Function", 'name': name, "equation": equation})
+      changeImplemented(this.id, { "type": "Function", 'name': name, "equation": equation })
       this.id = name;
       checkVar(this.id, this)
     })

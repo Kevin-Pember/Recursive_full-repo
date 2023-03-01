@@ -1,44 +1,135 @@
-<div id='functionDiv' class="funcModes">
-    <div id="funcModify">
-        <button id="modBtn">deg</button>
-        <div class="drop-cont">
-            <a id="selectorRad">rad</a>
-            <a id="selectorDeg">deg</a>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: ubuntu;
+        color: var(--textColor);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .imgDivClass {
+        aspect-ratio: 1 / 1;
+    }
+
+    .svgText {
+        fill: var(--textColor);
+    }
+
+    .pane {
+        border-radius: 25px;
+        background-color: var(--functionsColor);
+        filter: drop-shadow(-5px 5px 5px var(--translucent));
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+    #extendedKeypad {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    #extendedFuncGrid {
+        height: 100%;
+        top: 33.3333%;
+        width: 100%;
+        left: 400px;
+        right: 0;
+        display: grid;
+        grid-gap: 0px 0px;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 11.1111% 11.1111% 11.1111% 11.1111% 11.1111% 11.1111%;
+        background-color: #00000000;
+        z-index: 1;
+        grid-template-areas:
+            "help func"
+            "vars ac"
+            "mod abs"
+            "sin deg"
+            "cos arc"
+            "tan inv"
+            "d-f fact"
+            "ln log"
+            "log10 e";
+    }
+
+    .fI {
+        background-color: var(--displayColor);
+    }
+
+    .funcbutton {
+        height: 100%;
+        width: 100%;
+        font-size: 20px;
+        color: var(--textColor);
+        background-color: var(--functionsColor);
+        text-align: center;
+        border-style: none;
+    }
+
+    .funcbutton:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .trigButton {
+        height: 100%;
+        width: 100%;
+        font-size: 20px;
+        color: var(--textColor);
+        background-color: var(--functionsColor);
+        text-align: center;
+        border-style: none;
+    }
+</style>
+<style id="modeStyle"></style>
+<div id="extendedKeypad" class="pane">
+    <div id="extendedFuncGrid">
+        <div class="button-item fI" style="grid-area: help;"><button class="funcbutton" id="helpEx">
+                <svg class="helpIcon imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 45 45"
+                    xmlns="http://www.w3.org/2000/svg">\
+                    <path class="svgText"
+                        d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
+                        fill-rule="evenodd" />
+                </svg>
+            </button></div>
+        <div class="button-item fI" style="grid-area: func;"><button class="funcbutton" id="functionEx">Func</button>
+        </div>
+        <div class="button-item fI" style="grid-area: ac;"><button class="funcbutton" id="acEx">ac</button>
+        </div>
+        <div class="button-item fI" style="grid-area: vars;"><button class="funcbutton" id="varEx">xyz</button>
+        </div>
+        <div class="button-item fI" style="grid-area: arc;"><button class="funcbutton" id="arcEx">arc</button>
+        </div>
+        <div class="button-item fI" style="grid-area: inv;"><button class="funcbutton" id="invEx">inv</button>
+        </div>
+        <div class="button-item fI" style="grid-area: sin;"><button class="trigButton" id="sinEx">sin</button>
+        </div>
+        <div class="button-itemfI" style="grid-area: deg;"><button class="funcbutton" id="degEx">deg</button>
+        </div>
+        <div class="button-item fI" style="grid-area: cos;"><button class="trigButton" id="cosEx">cos</button>
+        </div>
+        <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton" id="modEx">mod</button>
+        </div>
+        <div class="button-item fI" style="grid-area: tan;"><button class="trigButton" id="tanEx">tan</button>
+        </div>
+        <div class="button-item fI" style="grid-area: abs;"><button class="funcbutton" id="absEx">|
+                |</button>
+        </div>
+        <div class="button-item fI" style="grid-area: d-f;"><button class="funcbutton" id="deciToFracEx">d→f</button>
+        </div>
+        <div class="button-item fI" style="grid-area: fact;"><button class="funcbutton" id="factorialEx">n!</button>
+        </div>
+        <div class="button-item fI" style="grid-area: ln;"><button class="funcbutton" id="lnEx">ln</button>
+        </div>
+        <div class="button-item fI" style="grid-area: log;"><button class="funcbutton" id="log10Ex">log</button>
+        </div>
+        <div class="button-item fI" style="grid-area: log10;"><button class="funcbutton">log<sub>10</sub></button>
+        </div>
+        <div class="button-item fI" style="grid-area: e;"><button class="funcbutton" id="eEx">e</button>
         </div>
     </div>
-    <h2 id="equalsHeader">=</h2>
-</div>
-<div id="graphDiv" class="funcModes">
-    <div id="graphContainer"><canvas id="funcChart"></canvas></div>
-    <div id="rangingValues">
-        <details class="funcDetails">
-            <summary class="secondaryFuncHeaders">Settings</summary>
-            <div class="selectorDiv">
-                <h3 class="funcHeaders">Min<input class="funcInputs" id="minGraph" type="text"></h3>
-                <h3 class="funcHeaders">Max<input class="funcInputs" id="maxGraph" type="text"></h3>
-                <h3 class="funcHeaders">Res<input class="funcInputs" id="resolutionGraph" type="text"></h3>
-            </div>
-        </details>
-    </div>
-</div>
-<div id="tableDiv" class="funcModes">
-    <div id="tableContainer">
-        <table id="funcTable" class="templateTable">
-            <tr>
-                <th>x</th>
-                <th>y</th>
-            </tr>
-        </table>
-    </div>
-    <div id="rangingValues">
-        <details class="funcDetails">
-            <summary class="secondaryFuncHeaders">Settings</summary>
-            <div class="selectorDiv">
-                <h3 class="funcHeaders">Min<input class="funcInputs" id="minTable" type="text"></h3>
-                <h3 class="funcHeaders">Max<input class="funcInputs" id="maxTable" type="text"></h3>
-                <h3 class="funcHeaders">Cells<input class="stepInputs" id="cellTable" type="text"></h3>
-            </div>
-        </details>
-    </div>
-
 </div>
