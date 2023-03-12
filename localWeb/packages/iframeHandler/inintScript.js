@@ -26,13 +26,9 @@ const callCalc = (arry) => new Promise((res, rej) => {
   calcWorker.postMessage(arry, [channel.port2]);
 });
 window.onmessage = function (e) {
-  console.log(e)
   let valArry = e.data;
   let object = valArry
   if (object.call == 'init') {
-    console.log('init called')
-    let html;
     eval(object.code)
-    console.log(object.code)
   }
 }

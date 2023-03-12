@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <meta name="theme-color" content="#31d53d" />
     <script src="startup.js"></script>
+    <script src="./packages/qr-creator.js"></script>
+    <script type="text/javascript" src="./packages/html5-qrcode.min.js"></script>
     <script src="packages/js-solver.js"></script>
     <script src="packages/chart.js"></script>
     <script src="packages/hammer.js"></script>
@@ -53,7 +55,6 @@
                 }
             })
         }
-        let array = []
     </script>
     <style id="bodyStyle"></style>
     <script>stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
@@ -105,14 +106,6 @@
                                 let mainScroll = document.getElementById("mainScroll");
                                 let styler = document.getElementById("formatStyle");
                                 let mainPageContainer = document.getElementById("mainPageContainer");
-                                let observer = new MutationObserver(() =>{
-                                    if(isHidden(mainPageContainer)){
-                                        keypad.style.visibility = "hidden";
-                                    }else{
-                                        keypad.style.visibility = "visible";
-                                    }
-                                });
-                                observer.observe(mainPageContainer, {attributes: true});
                                 appendMethod('mobileLandscape', () => {
                                     console.log(styler)
                                     styler.innerHTML = `
@@ -176,6 +169,7 @@
                                     }
                                     `
                                     let bodyStyler = stylers.find((elem) => elem.id == "mainBody" ).styler;
+                                    keypad.setAttribute("mode", "full");
                                     bodyStyler.innerHTML = `
                                         #mainKeypad{
                                             animation: fadeEffect 0.50s linear 1 none;
@@ -784,9 +778,39 @@
     <script>
         envObject.mainEdit = document.getElementById("mainEditor");
     </script>
+    <popup-background id="mainPopup"style="width: 100%; height: 100%; position: absolute; visibility: hidden; left:0px; top: 0px;"></popup-background>
+    <share-page id="sharePopup"copy="true"></share-page>
+    <qr-scan-page id="scanPopup"></qr-scan-page>
+    <script>
+        let shareElem = document.getElementById("sharePopup");
+        let scanPopup = document.getElementById("scanPopup");
+        let basicStyle = "position: absolute; transition: 0.0s ease-in-out; display:block;";
+
+        appendMethod('mobileLandscape', () => {
+            shareElem.style = basicStyle + "width: 33.3333%; height: calc(100% - 20px);top: 10px; right: -100%;";
+            shareElem.setAttribute("mode", "landscape");
+
+            scanPopup.style = basicStyle + "width: unset; height: calc(100% - 20px);top: 10px; right: -100%;";
+            scanPopup.setAttribute("mode", "landscape");
+        })
+        appendMethod('mobilePortrait', () => {
+            shareElem.style = basicStyle + "width: calc(100% - 20px); height: 45%;left: 10px; bottom: -100%;";
+            shareElem.setAttribute("mode", "portrait");
+
+            scanPopup.style = basicStyle + "width: calc(100% - 20px); left: 10px; top: 100%;";
+            scanPopup.setAttribute("mode", "portrait");
+        });
+        envObject.sharePopup = shareElem;
+        envObject.qrScanPage = scanPopup;
+        envObject.mainPopup = document.getElementById("mainPopup");
+        envObject.qrScanPage.qrReader.onMessage = (message) => {
+            document.getElementById("scanText").innerHTML = message;
+        }
+    </script>
     <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
     <script>
         let keypad = document.getElementById("mainKeypad");
+        envObject.cardContainers.push(keypad);
         for (let qElem of formats) {
             let format = () => {
                 console.log("Format styling method")
@@ -801,7 +825,6 @@
                 }
             })
             if (qElem.query.matches == true) {
-                console.log("is true Value")
                 format()
             }
         }

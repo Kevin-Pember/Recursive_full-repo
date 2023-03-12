@@ -315,9 +315,10 @@ function createTab(name, buttonList) {
     newTab.appendChild(newTemplate);
     envObject.mainTabMenu.appendChild(newTab);
 }
-function changeButtons(name, defObject){
+function changeButtons(name, defObject) {
     let target = envObject.funcButtons.find(value => value.name == name);
-    for(let button of target.defs){
+    target.name = name
+    for (let button of target.defs) {
         button.nameLabel.innerHTML = defObject.name;
         button.equationLabel.innerHTML = defObject.text;
     }
@@ -428,7 +429,8 @@ class EquatInput extends HTMLElement {
         return this.shadowRoot.querySelector("#dynamicEquation");
     }
     focus() {
-        this.input.focus();
+        let lastChild = this.input.lastChild;
+        setFocus(lastChild, lastChild.length, this.shadowRoot);
     }
     clear() {
         this.input.innerHTML = '‎';
@@ -519,6 +521,9 @@ class historyDisplay extends HTMLElement {
               
               .svgText {
                 fill: var(--textColor);
+              }
+              .secondary {
+                fill: var(--displayColor);
               }
               
               .pane {
@@ -785,16 +790,11 @@ class historyDisplay extends HTMLElement {
             </style>
             <div id="displayClip" class="pane">
                         <svg id="deleteHistory" class="imgDivClass" height='42.5px' style="isolation:isolate"
-                            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                                fill-opacity=".2" />
-                            <path class="svgText"
-                                d="m263.96 352.97h-0.328c-0.021-0.638-0.032-1.277-0.032-1.917 0-68.745 123.85-124.56 276.4-124.56s276.4 55.812 276.4 124.56c0 0.64-0.011 1.279-0.032 1.917h-0.36c0.236 1.255 0.36 2.551 0.36 3.874v5.777c0 11.521-9.354 20.875-20.875 20.875h-511.01c-11.521 0-20.875-9.354-20.875-20.875v-5.777c0-1.323 0.124-2.619 0.36-3.874z" />
-                            <path class="svgText"
-                                d="m764.84 415.5v376.64c0 33.863-23.915 61.356-53.371 61.356h-342.94c-29.456 0-53.371-27.493-53.371-61.356v-376.64h449.68zm-199.45 81.188c69.081 12.044 121.67 72.365 121.67 144.87 0 81.164-65.895 147.06-147.06 147.06s-147.06-65.895-147.06-147.06h38.264c0 60.037 48.742 108.78 108.78 108.78s108.78-48.742 108.78-108.78c0-51.29-35.573-94.336-83.371-105.79v26.732l-83.392-47.514 83.392-47.514v29.216z"
-                                fill-rule="evenodd" />
+                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="secondary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+                            <path class="svgText" d="m220.71 323.67h-0.379c-0.025-0.738-0.037-1.476-0.037-2.217 0-79.517 143.26-144.08 319.7-144.08s319.7 64.558 319.7 144.08c0 0.741-0.012 1.479-0.037 2.217h-0.416c0.273 1.452 0.416 2.951 0.416 4.482v6.682c0 13.326-10.819 24.146-24.145 24.146h-591.08c-13.326 0-24.145-10.82-24.145-24.146v-6.682c0-1.531 0.142-3.03 0.416-4.482zm348.66 166.23c79.906 13.932 140.73 83.705 140.73 167.57 0 93.882-76.221 170.1-170.1 170.1s-170.1-76.221-170.1-170.1h44.259c0 69.445 56.381 125.82 125.82 125.82 69.445 0 125.82-56.38 125.82-125.82 0-59.326-41.147-109.12-96.436-122.37v30.921l-96.458-54.959 96.458-54.96v33.794zm230.7-93.91v435.66c0 39.169-27.662 70.97-61.734 70.97h-396.67c-34.072 0-61.734-31.801-61.734-70.97v-435.66h520.14z" fill="#fff" fill-rule="evenodd"/>
                         </svg>
+
                         <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                             autocorrect="off">
                             <h3 contenteditable="false" id="historyHeader">
@@ -1124,7 +1124,7 @@ class FuncButton extends HTMLElement {
                 let funcName = this.nameLabel.innerHTML;
                 if (!envObject.mainTabMenu.hasTab(funcName)) {
                     createTab(this.name, this.copies)
-                }else{
+                } else {
                     envObject.mainTabMenu.openTabByName(this.name);
                 }
             } else {
@@ -1260,7 +1260,6 @@ class inputMethod extends HTMLElement {
         let display = this.keyTargets.input.input;
         let inputShadow = this.keyTargets.input.shadowRoot;
         let sel = this.getInputSel();
-        console.log(sel)
         let index = 0;
         let targetChild = undefined;
         let higher = 0;
@@ -1272,9 +1271,7 @@ class inputMethod extends HTMLElement {
             higher = sel.focusOffset;
             lower = sel.anchorOffset;
         }
-        console.log(lower)
         if (display.contains(sel.focusNode) && sel.focusNode != null) {
-            console.log(lower)
             let appendString = sel.focusNode.nodeValue.substring(0, lower) + input;
             sel.focusNode.nodeValue = appendString + sel.focusNode.nodeValue.substring(higher);
             targetChild = sel.focusNode;
@@ -1314,6 +1311,7 @@ class inputMethod extends HTMLElement {
     }
     clearMain() {
         this.keyTargets.input.clear();
+        console.log(this.keyTargets.input)
     }
     //Responsible for handling trig button presses
     trigPressed(event) {
@@ -1458,7 +1456,7 @@ class inputMethod extends HTMLElement {
         return this.keyTargets.input.getSel();
     }
 }
-class Keypad extends inputMethod {
+class Keypad extends inputMethod { //Keypad class
 
     constructor() {
         super();
@@ -2596,9 +2594,9 @@ class Keypad extends inputMethod {
             }
         }
         if (lazyAfterthought >= 1 && this.keyTargets.input.innerHTML.charAt(badIdea - 1) != '(') {
-            frontButtonPressed(')');
+           this.frontButtonPressed(')');
         } else {
-            frontButtonPressed('(');
+           this.frontButtonPressed('(');
         }
     }
     //Responsible (I Think) for handling all power of event for main calc buttons
@@ -2749,7 +2747,7 @@ class Keypad extends inputMethod {
             target.funcGrid.appendChild(cardClone)
             linkedButtons.push(cardClone)
         }
-        envObject.funcButtons.push({"name": name, "defs":linkedButtons})
+        envObject.funcButtons.push({ "name": name, "defs": linkedButtons })
         selfGrid.appendChild(card);
     }
     setStyle(styling) {
@@ -4930,7 +4928,8 @@ class tabMenu extends HTMLElement {
             height: calc(100% - 50px);
             width: 100%;
             display: grid; 
-            grid-template-columns: repeat(auto-fill, 175px); 
+            grid-template-columns: repeat(auto-fill, 175px);
+            grid-auto-rows: 290px;
             padding-top: 20px; 
             position: absolute;
             background-color: var(--semi-transparent); 
@@ -5319,7 +5318,7 @@ class tabMenu extends HTMLElement {
         this.setTabCount();
         this.openTab(page);
     }
-    openTabByName(name){
+    openTabByName(name) {
         console.log(this.tabList)
         let page = this.tabList.find((tab) => {
             console.log(tab.name + " vs. " + name)
@@ -5335,7 +5334,7 @@ class tabMenu extends HTMLElement {
             return tab != page;
         });
         this.tabLinks.forEach((elem) => {
-            if(elem.classList.contains('active')){
+            if (elem.classList.contains('active')) {
                 elem.classList.remove('active');
             }
         })
@@ -5352,16 +5351,16 @@ class tabMenu extends HTMLElement {
         hideElements(tabPages);
         pullUpElements([page]);
     }
-    hasTab(name){
+    hasTab(name) {
         return this.tabList.find((tab) => {
             return tab.name == name;
         }) != undefined;
     }
     tabIndController(visibility) {
-        if(arguments[0] == undefined){
-            if(isHidden(this.tabIndicatorContainer)){
+        if (arguments[0] == undefined) {
+            if (isHidden(this.tabIndicatorContainer)) {
                 visibility = true;
-            }else{
+            } else {
                 visibility = false;
             }
         }
@@ -6109,7 +6108,7 @@ class graphData extends dataPage {
     graphChangeMethod() {
         let changeFunc = () => {
             console.log(this.key)
-            callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": this.key, "newVars": this.graphVars }).then( (value) => {
+            callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": this.key, "newVars": this.graphVars }).then((value) => {
                 console.log(value)
                 this.parseMethod(value)
             });
@@ -6214,10 +6213,43 @@ class tableData extends dataPage {
     }
 }
 customElements.define('table-data', tableData);
-class templateFuncPage extends HTMLElement {
+class funcPage extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+    }
+    static get observedAttributes() {
+        return ['name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('name')) {
+            this.name = this.getAttribute('name');
+            this.initMethod();
+        }
+    }
+}
+class customFuncPage extends funcPage {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
+        <style>
+            #pageContainer {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+            }
+        </style>
+        <iframe
+        `;
+    }
+    initMethod() {
+        funcList
+    }
+}
+class templateFuncPage extends funcPage {
+    constructor() {
+        super();
         this.shadowRoot.innerHTML = `
             <link rel="stylesheet" href="./styling/animations.css">
             <style>
@@ -6245,27 +6277,35 @@ class templateFuncPage extends HTMLElement {
                     margin: 10px; 
                     flex-grow: 1; 
                 }
-                #editIcon {
+                .imgDivClass {
                     position: absolute;
                     visibility: inherit;
+                    margin-left: 5px;
+                    margin-top: 5px;
                 }
                 .svgText {
                     fill: var(--textColor);
-                  }
+                }
+                .primary {
+                    fill: var(--functionsColor);
+                }
             </style>
             <div id="pageContainer">
                 <rich-input id="nameInput"></rich-input>
                 <equation-map id="equationMap"></equation-map>
-                <svg id="editIcon" class="imgDivClass" height="60px"
-                    style="isolation:isolate;" viewBox="0 0 1080 1080"
-                    xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                            fill-opacity=".2" />
-                        <path class="svgText"
-                            d="m247.3 834.71c-1.536 0.421-3.181-0.014-4.306-1.14-1.125-1.124-1.561-2.77-1.14-4.306 5.585-20.371 20.976-76.536 26.513-96.733 0.418-1.522 1.615-2.706 3.139-3.113 1.528-0.403 3.153 0.035 4.27 1.153 14.725 14.724 55.497 55.497 70.222 70.222 1.116 1.116 1.554 2.744 1.153 4.27-0.404 1.528-1.591 2.721-3.113 3.139-20.199 5.535-76.364 20.93-96.736 26.509l-2e-3 -1e-3zm460.36-540.66 80.36 80.359 41.077-41.077c15.355-15.355 11.029-44.618-9.658-65.305l-2.698-2.698c-22.175-22.175-53.545-26.815-70.006-10.353l-39.075 39.074zm-415.45 413.74 393.69-393.69c3.919-3.919 10.283-3.919 14.202 0l66.29 66.29c3.919 3.919 3.919 10.283 0 14.202l-393.69 393.69c-3.919 3.919-10.283 3.919-14.202 0l-66.29-66.29c-3.919-3.919-3.919-10.283 0-14.202z"
-                            fill-rule="evenodd" />
+                <svg id="editIcon" class="imgDivClass" height="42.5px"
+                style="isolation:isolate;" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                    <circle class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
+                    <path class="svgText" d="m253.93 811.84c-1.505 0.419-3.119-2e-3 -4.227-1.102-1.107-1.098-1.541-2.711-1.133-4.219 5.403-19.997 20.293-75.131 25.649-94.957 0.405-1.495 1.574-2.66 3.067-3.064 1.497-0.401 3.092 0.022 4.192 1.114 14.493 14.387 54.625 54.223 69.118 68.61 1.098 1.09 1.534 2.685 1.146 4.183-0.391 1.5-1.55 2.674-3.042 3.09-19.788 5.501-74.811 20.801-94.768 26.346l-2e-3 -1e-3zm449.5-531.86 79.095 78.514 40.135-40.432c15.001-15.113 10.654-43.794-9.708-64.006l-2.656-2.636c-21.826-21.667-52.606-26.103-68.689-9.9l-38.177 38.46zm-405.91 407.24 384.64-387.5c3.829-3.857 10.07-3.881 13.928-0.051l65.247 64.767c3.857 3.829 3.88 10.07 0.051 13.927l-384.64 387.5c-3.829 3.858-10.07 3.881-13.928 0.051l-65.247-64.767c-3.857-3.829-3.88-10.07-0.051-13.927z" fill-rule="evenodd"/>
                 </svg>
+                <svg id="shareIcon" class="imgDivClass" style="left:47.5px;" height="42.5px"
+                style="isolation:isolate;" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                    <circle class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
+                    <path class="svgText"  d="m343 829.4c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm288.47-288.42c0-52.025 42.237-94.263 94.263-94.263 52.025 0 94.263 42.238 94.263 94.263s-42.238 94.263-94.263 94.263c-52.026 0-94.263-42.238-94.263-94.263zm-288.47-290.39c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm145.82 102.92 135.93 135.93c10.857-21.215 28.204-38.568 49.414-49.433l-135.92-135.92c-10.862 21.213-28.212 38.563-49.424 49.424zm135.93 239-135.91 135.91c21.21 10.865 38.557 28.218 49.414 49.433l135.91-135.91c-21.21-10.865-38.557-28.218-49.414-49.433z" fill-rule="evenodd"/>
+                </svg>
+
                 <data-viewer id="dataViewer">
                     <single-data style="position: absolute; height: 100%; width: 100%;"></single-data>
                     <graph-data style="position: absolute; height: 100%; width: 100%;"></graph-data>
@@ -6277,10 +6317,11 @@ class templateFuncPage extends HTMLElement {
         this.equationMap = this.shadowRoot.querySelector('#equationMap');
         this.dataViewer = this.shadowRoot.querySelector('#dataViewer');
         this.editButton = this.shadowRoot.querySelector('#editIcon');
-        console.log(this.dataViewer)
+        this.shareButton = this.shadowRoot.querySelector('#shareIcon');
     }
-    thisInitMethod() {
+    initMethod() {
         this.nameInput.input.innerHTML = this.name;
+        this.funcListDef = findFuncConfig(this.name).def;
         this.dataViewer.upstreamRequest = (type) => {
             callCalc({ callType: 'get', method: 'envData', targetEnv: this.name, target: type }).then(value => {
                 if (type == "equation") {
@@ -6302,7 +6343,7 @@ class templateFuncPage extends HTMLElement {
         this.nameInput.input.addEventListener("input", () => {
             this.changeMethod(this.nameInput.input.innerHTML, this.funcDef.ogFunc)
         });
-        
+
         callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
             this.funcDef = value;
             this.vars = this.funcDef.vars;
@@ -6312,26 +6353,29 @@ class templateFuncPage extends HTMLElement {
                 this.type = "function";
                 this.equationMap.equat = this.funcDef.ogFunc;
                 this.editButton.addEventListener("click", () => {
-                    envObject.mainEdit.setAttribute("mode","function");
+                    envObject.mainEdit.setAttribute("mode", "function");
                     openPage(document.getElementById("mainEditor"))
                     let editorObject = {
-                        confirmMethod : () => {
+                        confirmMethod: () => {
                             this.changeMethod(envObject.mainEdit.nameEditor.input.innerHTML, envObject.mainEdit.equationEditor.input.innerHTML)
                         },
-                        name : this.funcDef.func,
-                        equation : this.funcDef.ogFunc,
+                        name: this.funcDef.func,
+                        equation: this.funcDef.ogFunc,
                     }
                     envObject.mainEdit.openEdit(editorObject);
                 })
+                this.shareButton.addEventListener("click", () => {
+                    envObject.sharePopup.open(this.funcListDef.compressed);
+                });
             } else {
                 this.editButton.addEventListener("click", () => {
-                    envObject.mainEdit.setAttribute("mode","method");
+                    envObject.mainEdit.setAttribute("mode", "method");
                     openPage(document.getElementById("mainEditor"))
                     let editorObject = {
-                        confirmMethod : () => {
+                        confirmMethod: () => {
                             this.changeMethod("", envObject.mainEdit.textEditorEdit.textEditor.innerHTML)
                         },
-                        code : this.funcDef.full,
+                        code: this.funcDef.full,
                     }
                     envObject.mainEdit.openEdit(editorObject);
                 })
@@ -6339,7 +6383,7 @@ class templateFuncPage extends HTMLElement {
                 this.equationMap.equat = `${this.name}(${varNames.join(',')})`
             }
             callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` }).then(() => {
-                callCalc({ callType: 'get', method: 'envPacket', targetEnv: this.name }).then( value => {
+                callCalc({ callType: 'get', method: 'envPacket', targetEnv: this.name }).then(value => {
                     this.parseMethod(value)
                 })
             })
@@ -6353,36 +6397,47 @@ class templateFuncPage extends HTMLElement {
         parseObject.Graph(packet.graph)
         parseObject.Table(packet.table)
     }
-    changeMethod(name, value){
-        let parseObject = { callType: "func", method: "change", name: this.funcDef.func, changes: {} };
-        if(this.funcDef.type == "function"){
-            parseObject.changes = { "type": "Function", "name": name, "equation": value };
-        }else{
-            parseObject.changes = { "type": "Hybrid", "code": value };
-        }
-        callCalc(parseObject).then(value => {
-            console.log(value)
-            this.nameInput.input.innerHTML = value.func;
-            if(value.type == "method"){
-                this.equationMap.equat = `${value.func}(${value.vars.join(',')})`
-                changeButtons(this.funcDef.func, { name: value.func, text: "Hybrid"});
-                changeImplemented(this.funcDef.func, { "type": "Hybrid", "name": value.func, "code": value.full });
-                this.funcDef = value;
-            }else{
-                this.equationMap.equat = value.ogFunc;
-                changeButtons(this.funcDef.func, { name: value.func, text: value.ogFunc});
-                changeImplemented(this.funcDef.func, parseObject.changes);
-                this.funcDef = value;
+    changeMethod(name, value) {
+        let testQuery = findFuncConfig(name);
+        if (testQuery === false || testQuery.def == this.funcListDef) {
+            let parseObject = { callType: "func", method: "change", name: this.funcDef.func, changes: {} };
+            if (this.funcDef.type == "function") {
+                parseObject.changes = { "type": "Function", "name": name, "equation": value };
+            } else {
+                parseObject.changes = { "type": "Hybrid", "code": value };
             }
-        });
-    }
-    static get observedAttributes() {
-        return ['name'];
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (this.hasAttribute('name')) {
-            this.name = this.getAttribute('name');
-            this.thisInitMethod();
+            callCalc(parseObject).then(value => {
+                console.log(value)
+                let equationValue;
+                if (value.type == "method") {
+                    equationValue = `${value.func}(${value.vars.join(',')})`
+                    changeButtons(this.funcDef.func, { name: value.func, text: "Hybrid" });
+                    //changeImplemented(this.funcDef.func, { "type": "Hybrid", "name": value.func, "code": value.full });
+                    this.funcListDef.name = value.func;
+                    this.funcListDef.text = value.full;
+                    console.log(Object.getPrototypeOf(funcListProxy));
+                    this.funcDef = value;
+                } else {
+                    equationValue = value.ogFunc;
+                    changeButtons(this.funcDef.func, { name: value.func, text: value.ogFunc });
+                    //changeImplemented(this.funcDef.func, parseObject.changes);
+                    this.funcListDef.name = value.func;
+                    this.funcListDef.text = value.ogFunc;
+                    console.log(Object.getPrototypeOf(funcListProxy));
+                    this.funcDef = value;
+                }
+                if (arguments[2] != undefined) {
+                    let array = arguments[2];
+                    if (array.includes("name")) {
+                        this.nameInput.input.innerHTML = value.func;
+                    }
+                    if (array.includes("equation")) {
+                        this.equationMap.equat = equationValue;
+                    }
+                }
+            });
+        } else {
+            report(`Can't have function with same name`, false)
         }
     }
 }
@@ -6653,24 +6708,24 @@ class editPage extends HTMLElement {
         this.nameEditor = this.shadowRoot.getElementById('nameEditor');
         this.equationEditor = this.shadowRoot.getElementById('equationEditor');
         this.textEditorEdit = this.shadowRoot.getElementById('textEditor');
-        this.editExit.addEventListener('click',() => {
+        this.editExit.addEventListener('click', () => {
             this.close();
         });
     }
-    openEdit(editObject){
-        this.confirmEdit.addEventListener('click',() => {
+    openEdit(editObject) {
+        this.confirmEdit.addEventListener('click', () => {
             this.close();
             editObject.confirmMethod();
-        }, {once: true});
-        
-        if(this.mode == "function"){
+        }, { once: true });
+
+        if (this.mode == "function") {
             this.nameEditor.input.innerHTML = editObject.name;
             this.equationEditor.input.innerHTML = editObject.equation;
-        }else{
+        } else {
             this.textEditorEdit.textEditor.innerHTML = editObject.code;
         }
     }
-    close(){
+    close() {
         closePage(this);
     }
     static get observedAttributes() {
@@ -6691,3 +6746,458 @@ class editPage extends HTMLElement {
     }
 }
 customElements.define('edit-page', editPage);
+class popupBackground extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+           <div id="backgroundDiv" style="background:var(--semi-transparent); width: 100%;
+           height: 100%; transition: all 0.5s ease; opacity: 0;"></div> 
+        `;
+        this.backgroundDiv = this.shadowRoot.getElementById('backgroundDiv');
+
+    }
+    open(closeMethod) {
+        this.backgroundDiv.style.visibility = 'visible';
+        this.backgroundDiv.style.opacity = '1';
+        this.backgroundDiv.addEventListener('click', () => {
+            closeMethod();
+            this.close()
+        }, { once: true });
+    }
+    close() {
+        this.backgroundDiv.style.opacity = '0';
+        this.backgroundDiv.style.visibility = 'hidden';
+
+    }
+}
+customElements.define('popup-background', popupBackground);
+class qrCode extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <canvas id="qrCanvas" width="100%" height="100%">
+        `;
+        this.qrCanvas = this.shadowRoot.getElementById('qrCanvas');
+
+    }
+    render(text) {
+        QrCreator.render({
+            text: text,
+            radius: "0.5",
+            ecLevel: "H",
+            fill: getCSS("--textColor"),
+            size: "200",
+        }, this.qrCanvas);
+    }
+    static get observedAttributes() {
+        return ['text'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('text')) {
+            this.text = this.getAttribute('text');
+            this.render(this.text);
+        }
+    }
+}
+customElements.define('qr-code', qrCode);
+class sharePage extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+                * {
+                    box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
+                    font-family: ubuntu;
+                    color: var(--textColor);
+                    -webkit-tap-highlight-color: transparent;
+                }
+                .svgText {
+                    fill: var(--textColor)
+                }
+                .accent {
+                    fill: var(--numbersColor);
+                }
+                #shareDiv{
+                    background-color: var(--functionsColor);
+                    border-radius: 25px;
+                    position: absolute;
+                    display: flex;
+                    flex-flow: column;
+                    height: 100%;
+                    width: 100%;
+                    filter: drop-shadow(-5px 5px 5px var(--translucent));
+                }
+                #qrCenter{
+                    display: grid;
+                    justify-content: space-evenly;
+                    justify-items: center;
+                    align-content: space-evenly;
+                    align-items: center;
+                }
+                #shareActions{
+                    display: grid;
+                    height: calc(100% - 20px);
+                    border-radius: 15px;
+                    margin: 10px;
+                    width: calc(100% - 20px);
+                    background-color: var(--displayColor);
+                    grid-flow: row;
+                }
+                #backIcon{
+                    height: 50px; 
+                    width:50px; 
+                    aspect-ratio: 1/1; 
+                    isolation:isolate; 
+                    transform: rotate(180deg);
+                    flex-shrink: 0;
+                }
+                .shareGroup{
+                    grid-template-areas: 
+                    "icon"
+                    "title";
+                    width: fit-content;
+                    justify-content: space-evenly;
+                    justify-items: center;
+                    align-content: space-evenly;
+                    align-items: center;
+                    text-align: center;
+                    margin: 10px;
+                }
+            </style>
+            <div id="shareDiv">
+                <svg id="backIcon" style="" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="1080" height="1080" fill-opacity="0" />
+                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                </svg>
+                <div id="qrCenter">
+                    <qr-code id="qrCode" text="nothing to see here"></qr-code>
+                </div>
+                <div id="shareActions">
+
+                </div>
+            </div>
+        `;
+        this.shareGrid = this.shadowRoot.getElementById('shareActions');
+        this.backIcon = this.shadowRoot.getElementById('backIcon');
+        this.qrCode = this.shadowRoot.getElementById('qrCode');
+        this.text = "null";
+        this.qrCode.setAttribute('text', this.text);
+        this.isOpen = false;
+
+        let copyIcon = new DOMParser().parseFromString(`
+            <svg width="50px" height="50px" style="isolation:isolate" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+            <clipPath id="a">
+            <rect width="1080" height="1080"/>
+            </clipPath>
+            </defs>
+            <g clip-path="url(#a)">
+            <circle class="accent" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path d="m700.11 286v-10.116c0-29.392-23.863-53.255-53.255-53.255h-299.31c-29.392 0-53.255 23.863-53.255 53.255v443.08c0 29.392 23.863 53.255 53.255 53.255h16.269v-57.521c-9.499-5.544-15.887-15.846-15.887-27.628v-379.3c0-17.643 14.324-31.967 31.967-31.967h234.61c9.232 0 17.555 3.922 23.393 10.189h62.211zm29.841 482.85m-264.45-407.89h234.61c17.643 0 31.967 14.324 31.967 31.967v379.3c0 17.643-14.324 31.967-31.967 31.967h-234.61c-17.643 0-31.967-14.324-31.967-31.967v-379.3c0-17.643 14.324-31.967 31.967-31.967zm-32.349-53.182h299.31c29.392 0 53.255 23.863 53.255 53.255v443.08c0 29.392-23.863 53.255-53.255 53.255h-299.31c-29.392 0-53.255-23.863-53.255-53.255v-443.08c0-29.392 23.863-53.255 53.255-53.255z" class="svgText" fill-rule="evenodd"/>
+            </g>
+            </svg>
+            
+            `, "text/xml").firstChild;;
+        console.log(copyIcon.firstChild);
+        this.createShareGroup('Copy', copyIcon, () => {
+            navigator.clipboard.writeText(this.text);
+        });
+
+    }
+    open() {
+        this.style.transitionDuration = "0.0s";
+        if (arguments[0] != undefined) {
+            this.setAttribute('text', arguments[0]);
+        }
+        this.isOpen = true;
+        this.backMethod = this.close;
+        this.setStyle();
+        if (envObject.mainPopup != undefined) {
+            envObject.mainPopup.open(() => {
+                this.close();
+            });
+            this.backMethod = () => {
+                this.close();
+                envObject.mainPopup.close();
+            }
+        }
+        this.backIcon.addEventListener('click', () => { this.backMethod(); }, { once: true });
+        this.style.transitionDuration = "0.5s";
+    }
+    close(){
+        this.style.transitionDuration = "0.0s";
+        this.isOpen = false;
+        this.setStyle();
+        this.removeAttribute('text');
+        this.style.transitionDuration = "0.5s";
+    }
+    setStyle(){
+        console.log(this.isOpen);
+        if(this.mode == "portrait"){
+            if(this.isOpen){
+                console.log("open portrait");
+                this.style.top = "unset";
+                this.style.bottom = "10px";
+            }else{
+                console.log("close portrait");
+                this.style.bottom = '-100%';
+            }
+        }else if(this.mode == "landscape"){
+            
+            if(this.isOpen){
+                console.log("open landscape");
+                this.style.top = "10px";
+                this.style.right = "10px";
+            }else{
+                console.log("open landscape");
+                this.style.right = '-100%';
+            }
+        }
+    }
+    createShareGroup(name, icon, action) {
+        let shareGroup = document.createElement('div');
+        shareGroup.addEventListener('click', () => { action() });
+        shareGroup.classList.add('shareGroup');
+        icon.style.gridArea = 'icon';
+        shareGroup.appendChild(icon);
+        let title = document.createElement('h5');
+        title.innerHTML = name;
+        title.style.gridArea = 'title';
+        shareGroup.appendChild(title);
+
+        this.shareGrid.appendChild(shareGroup);
+    }
+    static get observedAttributes() {
+        return ["text", "mode"];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('text')) {
+            this.text = this.getAttribute('text');
+            this.qrCode.setAttribute('text', this.text);
+        }
+        if(this.hasAttribute('mode')){
+            this.mode = this.getAttribute('mode');
+            this.setStyle();
+        }
+    }
+}
+customElements.define('share-page', sharePage);
+class QrCodeReader extends HTMLElement {
+    constructor() {
+        super();
+        this.qrCodeReader = null;
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+          .svgText {
+            fill: var(--textColor);
+          }
+          .primary {
+            fill: var(--functionsColor);
+          }
+          #swtichIcon{
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+          }
+          #reader{
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
+            }
+        </style>
+        <div id="reader">
+        
+        </div>
+        <svg id="swtichIcon" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path class="svgText" d="m677.38 225.1c-46.86-25.01-100.36-39.19-157.14-39.19-184.6 0-334.47 149.87-334.47 334.47 0 56.783 14.18 110.28 39.19 157.14l66.733-66.733c-11.093-27.988-17.19-58.491-17.19-90.407 0-135.63 110.11-245.74 245.74-245.74 31.916 0 62.419 6.097 90.407 17.19l66.733-66.733zm-285.35 552.38c0.804 2.927-0.025 6.063-2.171 8.209-2.143 2.143-5.281 2.974-8.209 2.171-38.829-10.645-145.89-39.983-184.39-50.536-2.903-0.797-5.159-3.079-5.934-5.984-0.769-2.912 0.066-6.01 2.196-8.14 28.068-28.068 105.79-105.79 133.86-133.85 2.127-2.127 5.231-2.962 8.139-2.197 2.912 0.769 5.187 3.032 5.985 5.934 10.55 38.502 39.894 145.56 50.529 184.39l-3e-3 3e-3zm10.583 77.414c46.86 25.01 100.36 39.19 157.14 39.19 184.6 0 334.47-149.87 334.47-334.47 0-56.783-14.18-110.28-39.19-157.14l-66.733 66.733c11.093 27.988 17.19 58.491 17.19 90.407 0 135.63-110.11 245.74-245.74 245.74-31.916 0-62.419-6.097-90.407-17.19l-66.733 66.733zm285.35-552.38c-0.804-2.927 0.025-6.063 2.171-8.209 2.143-2.143 5.281-2.974 8.209-2.171 38.829 10.645 145.89 39.983 184.39 50.536 2.903 0.798 5.159 3.079 5.934 5.984 0.769 2.912-0.066 6.01-2.196 8.14-28.068 28.068-105.79 105.79-133.86 133.85-2.127 2.127-5.231 2.962-8.139 2.197-2.912-0.769-5.187-3.032-5.985-5.934-10.55-38.502-39.894-145.56-50.529-184.39l3e-3 -3e-3z" fill="#ebebeb" fill-rule="evenodd"/>
+        </svg>
+
+      `;
+        this.reader = this.shadowRoot.querySelector('#reader');
+        this.qrCodeReader = new Html5Qrcode(this.reader);
+        this.switchIcon = this.shadowRoot.querySelector('#swtichIcon');
+        this.facing = 'environment';
+        this.switchIcon.addEventListener('click', () => {
+            this.facing = this.facing === 'environment' ? 'user' : 'environment';
+            this.qrCodeReader.stop().then(() => {
+                this.start();
+            });
+        });
+    }
+    stop() {
+        this.qrCodeReader.stop();
+        if(this.onQRStop != undefined){
+            this.onQRStop();
+        }
+    }
+    start() {
+        let thing = (thing) => {
+            this.qrCodeMessageHandler(thing)
+        };
+        this.qrCodeReader.start(
+            { facingMode: this.facing },
+            { fps: 10, aspectRatio: 1, qrbox: { width: 250, height: 250 } },
+            thing,
+            this.errorHandler,
+        )
+        console.log(this.qrCodeReader)
+    }
+
+    qrCodeMessageHandler(qrCodeMessage) {
+        console.log(`QR code detected: ${qrCodeMessage}`);
+        if(this.onMessage != undefined){
+            this.onMessage(qrCodeMessage);
+        }
+        this.qrCodeReader.stop();
+    }
+    errorHandler(errorMessage) {
+        if (errorMessage != "QR code parse error, error = No barcode or QR code detected." && errorMessage != "QR code parse error, error = D: No MultiFormat Readers were able to detect the code.") {
+            console.log(`Error: ${errorMessage}`);
+        }
+    }
+}
+customElements.define('qr-reader', QrCodeReader);
+class qrScanPage extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+            .svgText {
+                fill: var(--textColor)
+            }
+            #qrScanPage{
+                width: 100%;
+                height: inherit;
+                background-color: var(--functionsColor);
+                border-radius: 25px;
+                filter: drop-shadow(-5px 5px 5px var(--translucent));
+            }
+            #qrReader{
+                position: relative;
+                aspect-ratio: 1;
+                width: calc(100% - 20px);
+                background-color: var(--displayColor);
+                display: block;
+                border-radius: 25px;
+                overflow: hidden;
+                margin: 10px;
+            }
+            #backIcon{
+                height: 50px; 
+                width:50px; 
+                aspect-ratio: 1/1; 
+                isolation:isolate; 
+                transform: rotate(180deg);
+                flex-shrink: 0;
+            }
+            #title{
+                text-align: center;
+                margin: 0;
+            }
+        </style>
+        <style id="modeStyle"></style>
+        <div id="qrScanPage">
+            <svg id="backIcon" style="" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="1080" height="1080" fill-opacity="0" />
+                <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                <path class="svgText"
+                    d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+            </svg>
+            <h2 id="title">Scan QR Code</h2>
+            <qr-reader id="qrReader"></qr-reader>
+        </div>
+        `
+        this.qrReader = this.shadowRoot.querySelector('#qrReader');
+        this.backIcon = this.shadowRoot.querySelector('#backIcon');
+    }
+    open(){
+        this.style.transitionDuration = "0.0s";
+        this.qrReader.start();
+        this.backMethod = this.close;
+        this.isOpen = true;
+        this.setStyle();
+        
+        if (envObject.mainPopup != undefined) {
+            envObject.mainPopup.open(() => {
+                this.close();
+            });
+            this.backMethod = () => {
+                this.close();
+                envObject.mainPopup.close();
+            }
+        }
+        this.backIcon.addEventListener('click', () => {
+            this.backMethod();
+        });
+        this.style.transitionDuration = "0.5s";
+    }
+    close(){
+        this.style.transitionDuration = "0.0s";
+        this.qrReader.stop();
+        this.isOpen = false;
+        this.setStyle();
+        this.style.transitionDuration = "0.5s";
+        
+    }
+    setStyle(){
+        if(this.mode == "portrait"){
+            this.shadowRoot.querySelector('#modeStyle').innerHTML = `
+            #qrScanPage{
+                width: 100%;
+                height: inherit;
+            }
+            #qrReader{
+                width: calc(100% - 20px);
+            }
+            `;
+            if(this.isOpen){
+                this.style.top = "50%";
+                this.style.marginTop = "-50%";
+            }else{
+                this.style.top = "100%";
+                this.style.marginTop = "unset";
+            }
+        }else if(this.mode == "landscape"){
+            this.shadowRoot.querySelector('#modeStyle').innerHTML = `
+            #qrScanPage{
+                width: inherit;
+                height: 100%;
+            }
+            #qrReader{
+                height: calc(100% - 100px);
+            }
+            `;
+            if(this.isOpen){
+                this.style.right = "10px";
+            }else{
+                this.style.right = "-102%";
+                this.style.marginLeft = "unset";
+            }
+        }
+    }
+    static get observedAttributes() {
+        return ['mode'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if(this.hasAttribute('mode')){
+            this.mode = this.getAttribute('mode');
+            this.setStyle(true);
+        }
+    }
+}
+customElements.define('qr-scan-page', qrScanPage);

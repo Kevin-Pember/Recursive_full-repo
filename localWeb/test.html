@@ -34,25 +34,65 @@
                 }
             })
         }
-        let array = []
+        let array = [{"name": "jerry", "test": "test"}]
+        let objecty = {"instance": array[0]}
+        objecty.instance.test = "test2";
+        console.log(objecty);
+        console.log(array);
     </script>
     <script src="startup.js"></script>
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <style>
-        body{
+        body {
             height: 100%;
             width: 100%;
             background-color: var(--displayColor);
         }
     </style>
+    <script src="./packages/qr-creator.js"></script>
+    <script type="text/javascript" src="./packages/html5-qrcode.min.js"></script>
     <script src="./packages/chart.js"></script>
     <script src="packages/hammer.js"></script>
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
     <!--<tab-menu></tab-menu>-->
     <!--<edit-page></edit-page>-->
-    <template-func name="testor"></template-func>
+    <button onclick="document.getElementById('sharePopup').open()" style="background-color: var(--functionsColor);">Open
+        code</button>
+    <button onclick="document.getElementById('scanPopup').open()" style="background-color: var(--functionsColor);">Open
+        scan</button>
+    <h1 id="scanText"></h1>
+    <popup-background id="mainPopup"style="width: 100%; height: 100%; position: absolute; visibility: hidden; left:0px; top: 0px;"></popup-background>
+    <share-page id="sharePopup"copy="true"></share-page>
+    <qr-scan-page id="scanPopup"></qr-scan-page>
     <script>
+        let shareElem = document.getElementById("sharePopup");
+        let scanPopup = document.getElementById("scanPopup");
+        let basicStyle = "position: absolute; transition: 0.0s ease-in-out; display:block;";
+
+        appendMethod('mobileLandscape', () => {
+            shareElem.style = basicStyle + "width: 33.3333%; height: calc(100% - 20px);top: 10px; right: -100%;";
+            shareElem.setAttribute("mode", "landscape");
+
+            scanPopup.style = basicStyle + "width: unset; height: calc(100% - 20px);top: 10px; right: -100%;";
+            scanPopup.setAttribute("mode", "landscape");
+        })
+        appendMethod('mobilePortrait', () => {
+            shareElem.style = basicStyle + "width: calc(100% - 20px); height: 45%;left: 10px; bottom: -100%;";
+            shareElem.setAttribute("mode", "portrait");
+
+            scanPopup.style = basicStyle + "width: calc(100% - 20px); left: 10px; top: 100%;";
+            scanPopup.setAttribute("mode", "portrait");
+        });
+        envObject.sharePopup = shareElem;
+        envObject.qrScanPage = scanPopup;
+        envObject.mainPopup = document.getElementById("mainPopup");
+        envObject.qrScanPage.qrReader.onMessage = (message) => {
+            document.getElementById("scanText").innerHTML = message;
+        }
+    </script>
+    <script>
+        let keypad = document.getElementById("mainKeypad");
         for (let qElem of formats) {
             let format = () => {
                 console.log("Format styling method")
@@ -73,4 +113,5 @@
         }
     </script>
 </body>
+
 </html>

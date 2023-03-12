@@ -1,10 +1,150 @@
+class FuncDef {
+  constructor(){
+    if(arguments.length == 1){
+      if(typeof arguments[0] == "string"){
+        let func = arguments[0]
+        switch (func.substring(0, 1)) {
+          case "F":
+            this.typeDef = "Function";
+            break;
+          case "H":
+            this.typeDef = "Hybrid";
+            break;
+          case "C":
+            this.typeDef = "Code";
+            break;
+          default:
+            report("Non-parsable Func found", false);
+            break;
+        }
+        func = func.substring(func.indexOf('»') + 1);
+        this.nameDef = func.substring(0, func.indexOf('»'));
+        func = func.substring(func.indexOf('»') + 1);
+        this.textDef = func.substring(0, func.indexOf('»'));
+      }else if (typeof arguments[0] == "object"){
+        this.typeDef = arguments[0].type;
+        this.nameDef = arguments[0].name;
+        if(this.typeDef == "Function"){
+          this.textDef = arguments[0].equation;
+        }else{
+          this.textDef = arguments[0].code;
+        }
+      }
+    }else{
+      this.typeDef = arguments[0];
+      this.nameDef = arguments[1];
+      this.textDef = arguments[2];
+    }
+  }
+  /**
+   * @param {string} type
+   */
+  set type(type){
+    this.typeDef = type;
+    setFuncList(funcList);
+  }
+  get type(){
+    return this.typeDef;
+  }
+  /**
+   * @param {string} name
+   */
+  set name(name){
+    this.nameDef = name;
+    setFuncList(funcList);
+  }
+  get name(){
+    return this.nameDef;
+  }
+  /**
+   * @param {any} text
+   */
+  set text(text){
+    this.textDef = text;
+    setFuncList(funcList);
+  }
+  get text(){
+    return this.textDef;
+  }
+  get object(){
+    if(this.typeDef == "Function"){
+      return {
+        "type": this.typeDef,
+        "name": this.nameDef,
+        "equation": this.textDef
+      }
+    }else{
+      return {
+        "type": this.typeDef,
+        "name": this.nameDef,
+        "code": this.textDef
+      }
+    }
+  }
+  get compressed(){
+    let parsedString = "";
+    switch (this.type) {
+      case "Function":
+        parsedString = "F"
+        break;
+      case "Hybrid":
+        parsedString = "H"
+        break;
+      case "Code":
+        parsedString = "C"
+        break;
+    }
+    parsedString += "»" + this.name + "»" + this.text + "»";
+    return parsedString;
+  }
+}
 var settings;
 let calcWorker = new Worker('evalWorker.js');
 let envObject = {
   funcButtons: [],
   inputs: [],
   keypads: [],
+  cardContainers: [],
 }
+let funcList = getFuncList();
+const funcListProxy = new Proxy(funcList, {
+  set: (target, property, value) => {
+    console.log("triggered proxy")
+    if(property === "length"){
+      target[property] = value;
+    }else{
+      if(value instanceof FuncDef){
+        target[property] = value;
+      }else{
+        console.log(target)
+        console.log(property)
+        target[property] = new FuncDef(value);
+      }
+    }
+    setFuncList(target);
+    return true;
+  },
+  get: (target, property) => {
+    if (property === 'push') {
+      console.log("triggered proxy")
+      return (value) => {
+        target[property].apply(target, [new FuncDef(value)]);
+        setFuncList(target);
+        return true;
+      };
+    } else {
+      return target[property];
+    }
+  },
+  getPrototypeOf(target) {
+    return target.map((item) => {
+      let retObj = item.object;
+      retObj.def = item;
+      return retObj;
+    });
+  },
+  
+});
 const callCalc = (arry) => new Promise((res, rej) => {
     const channel = new MessageChannel();
     channel.port1.onmessage = ({ data }) => {
@@ -124,4 +264,34 @@ function setSettings() {
     /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       colorMessager.postMessage(colorArray[0]);
     }*/
+}
+function funcCompressor(){}
+//Responsible for getting the func list from local Storage
+function getFuncList() {
+  let parseString = localStorage.getItem("funcList");
+  let array = [];
+  let finalArray = [];
+  if (parseString == undefined) {
+    array = [];
+  } else {
+    while (parseString.includes('⥾')) {
+      array.push(parseString.substring(0, parseString.indexOf('⥾')));
+      parseString = parseString.substring(parseString.indexOf('⥾') + 1);
+    }
+  }
+  for (let func of array) {
+    finalArray.push(new FuncDef(func));
+  }
+  finalArray.forEach(element => {
+    console.log(element.compressed);
+  });;
+  return finalArray;
+}
+function setFuncList(array) {
+  let parseString = "";
+  for (let item of array) {
+    console.log(`name : ${item.name}, type : ${item.type}, text : ${item.text}`)
+    parseString += item.compressed + "⥾";
+  }
+  localStorage.setItem("funcList", parseString);
 }

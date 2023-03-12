@@ -69,20 +69,18 @@ setSettings();
 //let graphModeChart = createGraph(document.getElementById('graphModeCanvas'))
 if (document.getElementById("mainBody") != null) {
   //Responsible for creating and implementing the custom functions at runtime ********************************
-  var funcs = getFuncList();
-  console.log(funcs)
+  var funcs = Object.getPrototypeOf(funcListProxy);
+  callCalc({ "callType": 'func', "method": 'add', "newFuncs": funcs });
   for (let funcObject of funcs) {
-    console.log(funcObject);
-    addImplemented(funcObject);
     switch (funcObject.type) {
       case "Function":
-        custButton(funcObject, ['mainKeypad']);
+        custButton(funcObject);
         break;
       case "Code":
-        custButton(funcObject, ['mainKeypad']);
+        custButton(funcObject);
         break;
       case "Hybrid":
-        custButton(funcObject, ['mainKeypad']);
+        custButton(funcObject);
         break;
     }
   }
@@ -940,7 +938,7 @@ if (document.getElementById("mainBody") != null) {
     document.getElementById('moreFunctionsPage').style.zIndex = 3;
     sessionStorage.setItem('facing', 'creatorMorePage')
   })
-  document.getElementById('searchArea').addEventListener('input', function () {
+  /*document.getElementById('searchArea').addEventListener('input', function () {
     let list = getFuncList();
     let filtered = list.filter(function (value) {
       console.log(searchAlgo(value.name, document.getElementById('searchArea').value))
@@ -953,7 +951,7 @@ if (document.getElementById("mainBody") != null) {
     for (let item of filtered) {
       custButton(item, ['mainKeypad']);
     }
-  })
+  })*/
   //***************************************************************************************************
 }
 /**********************************************|Main Page UI|*********************************************************/
@@ -1124,77 +1122,29 @@ function setSelect(node, index) {
   sel.removeAllRanges();
   sel.addRange(range);
 }
-//Responsible for getting the func list from local Storage
-function getFuncList() {
-  let parseString = localStorage.getItem("funcList");
-  let array = [];
-  let finalArray = [];
-  if (parseString == undefined) {
-    array = [];
-  } else {
-    while (parseString.includes('⥾')) {
-      array.push(parseString.substring(0, parseString.indexOf('⥾')));
-      parseString = parseString.substring(parseString.indexOf('⥾') + 1);
-    }
-
-  }
-  for (let func of array) {
-    let funcJSON = {};
-    switch (func.substring(0, 1)) {
-      case "F":
-        funcJSON.type = "Function";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.equation = func.substring(0, func.indexOf('»'));
-        break;
-      case "H":
-        funcJSON.type = "Hybrid";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.code = func.substring(0, func.indexOf('»'));
-        break;
-      case "C":
-        funcJSON.type = "Code";
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.name = func.substring(0, func.indexOf('»'));
-        func = func.substring(func.indexOf('»') + 1);
-        funcJSON.code = func.substring(0, func.indexOf('»'));
-        break;
-      default:
-        report("Non-parsable Func found", false);
-        break;
-    }
-    finalArray.push(funcJSON);
-  }
-  return finalArray;
-}
 //END
 /************************************************|Custom Func UI|****************************************************/
 //Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
 function createFunc(type, name, text) {
-  var funcList = getFuncList();
   if (findFuncConfig(name) === false) {
-
-    let object = { "name": name, "type": type };
+    let object = new FuncDef(type, name, text);
+    console.log(object)
     switch (type) {
       case "Function":
         object.equation = text;
-        custButton(funcAssebly(type, name, text), ['mainKeypad']);
-        addImplemented(object)
+        custButton(object.object);
+        addImplemented(object.object)
         break;
       case "Code":
         object.code = text;
-        custButton(funcAssebly(type, name, "Code"), ['mainKeypad']);
+        custButton(object.object);
         break;
       case "Hybrid":
         object.code = text;
-        custButton(funcAssebly(type, name, "Hybrid"), ['mainKeypad']);
+        custButton(object.object);
         break;
     }
-    funcList.push(object);
-    setFuncList(funcList);
+    funcListProxy.push(object);
   }
 }
 
@@ -1207,7 +1157,7 @@ function compareTable(elems, points) {
   return false
 }
 //Responsible for creating the cust func buttons and adding them to the elements in target array
-function custButton(funcConfig, target) {
+function custButton(funcConfig) {
   let type = funcConfig.type;
   let name = funcConfig.name;
   let equation = "";
@@ -1222,9 +1172,8 @@ function custButton(funcConfig, target) {
       equation = "Hybrid";
       break;
   }
-  for (let i = 0; i < target.length; i++) {
-    let targetElem = document.getElementById(target[i]);
-    targetElem.addCard(name, equation);
+  for (let container of envObject.cardContainers) {
+    container.addCard(name, equation);
   }
 
 }
@@ -1476,58 +1425,30 @@ function updateCustomButtons(oldVal, newValue) {
 }
 //Responsible for changing a cust func entry in the interpreter 
 function changeImplemented(name, newObject) {
-  console.log(newObject)
-  let funcList = getFuncList()
-  let target = funcList.find((func) => {
+  let target = funcListProxy.find((func) => {
     if (func.name == name) {
       return true
     }
   })
-  funcList.splice(funcList.indexOf(target), 1, newObject);
-  setFuncList(funcList)
+  funcListProxy.splice(funcListProxy.indexOf(target), 1, newObject);
 }
 //Responsible for adding a cust func entry into interpreter
 function addImplemented(funcConfig) {
-  /*if (funcConfig.type == "Function") {
-    createNewFunction("function", funcConfig.name, funcConfig.equation);
-  } else if (funcConfig.type == "Hybrid") {
-    createNewFunction("method", funcConfig.code)
-  }*/
+  
   funcConfig.callType = "func"
   funcConfig.method =
     callCalc({ "callType": 'func', "method": 'add', "newFuncs": [funcConfig] });
 }
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
-function setFuncList(array) {
-  let parseString = "";
-  for (let i = 0; i < array.length; i++) {
-    let parsedString = "";
-    switch (array[i].type) {
-      case "Function":
-        parsedString = "F" + "»" + array[i].name + "»" + array[i].equation + "»";
-        break;
-      case "Hybrid":
-        parsedString = "H" + "»" + array[i].name + "»" + array[i].code + "»";
-        break;
-      case "Code":
-        parsedString = "C" + "»" + array[i].name + "»" + array[i].code + "»";
-        break;
-    }
-    parseString += parsedString + "⥾";
-  }
-  localStorage.setItem("funcList", parseString);
-}
 //Responsible for removing a value for the funcList (main backend)
 function removeFunc(funcName) {
   callCalc({ "callType": 'func', "method": 'remove', "name": funcName });
-  let array = getFuncList();
-  for (let item of array) {
+  for (let item of funcListProxy) {
     if (item.name == funcName) {
       //removeImplemented(item);
-      array.splice(array.indexOf(item), 1);
+      funcListProxy.splice(funcListProxy.indexOf(item), 1);
     }
   }
-  setFuncList(array);
 }
 //END
 /**********************************************|Custom Func backend|*************************************************/
@@ -1706,7 +1627,7 @@ function checkVar(name, def) {
 }
 //Matches a funcConfig from funclist with a name
 function findFuncConfig(name) {
-  let funcList = getFuncList();
+  let funcList = Object.getPrototypeOf(funcListProxy);
   for (let func of funcList) {
     if (func.name == name) {
       return func;
