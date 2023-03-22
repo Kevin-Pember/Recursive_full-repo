@@ -34,8 +34,8 @@
                 }
             })
         }
-        let array = [{"name": "jerry", "test": "test"}]
-        let objecty = {"instance": array[0]}
+        let array = [{ "name": "jerry", "test": "test" }]
+        let objecty = { "instance": array[0] }
         objecty.instance.test = "test2";
         console.log(objecty);
         console.log(array);
@@ -56,35 +56,87 @@
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
 
-    
+
     <button onclick="document.getElementById('sharePopup').open()" style="background-color: var(--functionsColor);">Open
         code</button>
-    <share-page id="sharePopup"copy="true" style="display: block;"></share-page>
+    <button onclick="document.getElementById('scanPopup').open()" style="background-color: var(--functionsColor);">Open
+        scan</button>
+    <button onclick="document.getElementById('editPopupPopup').open({
+        confirmMethod : () => {
+            console.log('gerrymanderEverything')
+        },
+        mode: 'function',
+        name: 'box',
+        text: 'shit',
+    })" style="background-color: var(--functionsColor);">Open
+        edit</button>
+    <button onclick="document.getElementById('confirmPopup').open('are you sure about that', () => {
+        console.log('gerrymanderEverything')
+    },)" style="background-color: var(--functionsColor);">Open
+        confirm</button>
+    <button onclick="document.getElementById('settingsPopup').open('Graph', [
+    {
+        title: 'Range',
+        type: 'dRange',
+        setMethod: (value1, value2) => {
+            setSetting('graphMin', value1);
+            setSetting('graphMax', value2);
+            this.graph.options.x.min = value1;
+            this.graph.options.x.max = value2;
+            this.graphInMode()
+        },
+        range: [settings.gMin, settings.gMax],
+        initMethod: () => {
+
+        }
+    },
+    {
+        title: 'Resolution',
+        type: 'range',
+        setMethod: (value) => {
+            setSetting('graphRes', value);
+            this.graphInMode()
+        },
+        value: settings.gR,
+        initMethod: () => {
+        }
+    },
+], () => { console.log('changing graph') })" style="background-color: var(--functionsColor);">Open
+        settings</button>
+    <share-page id="sharePopup" copy="true" style="display: block;"></share-page>
+    <qr-scan-page id="scanPopup"></qr-scan-page>
+    <edit-page id="editPopupPopup"></edit-page>
+    <confirm-page id="confirmPopup"></confirm-page>
+    <quick-settings id="settingsPopup"></quick-settings>
     <script>
         let shareElem = document.getElementById("sharePopup");
-        //let scanPopup = document.getElementById("scanPopup");
-        //let basicStyle = "position: absolute; display:block; visibility: hidden;";
-
+        let scanPopup = document.getElementById("scanPopup");
+        let editPopup = document.getElementById("editPopupPopup");
+        let confirmPopup = document.getElementById("confirmPopup");
+        let settingsPopup = document.getElementById("settingsPopup");
         appendMethod('mobileLandscape', () => {
-            //shareElem.style = basicStyle + "width: 33.3333%; height: calc(100% - 20px);top: 10px; transition: right 0.5s ease-in;right: -100%;";
             shareElem.setAttribute("mode", "landscape");
-
-            //scanPopup.style = basicStyle + "width: unset; height: calc(100% - 20px);top: 10px; transition: right 0.5s ease-in; right: -100%;";
-            //scanPopup.setAttribute("mode", "landscape");
+            scanPopup.setAttribute("mode", "landscape");
+            editPopup.setAttribute("mode", "landscape");
+            confirmPopup.setAttribute("mode", "landscape");
+            settingsPopup.setAttribute("mode", "landscape");
         })
         appendMethod('mobilePortrait', () => {
-            //shareElem.style = basicStyle + "width: calc(100% - 20px); height: 45%;left: 10px; transition: bottom 0.5s ease-in; bottom: -100%;";
             shareElem.setAttribute("mode", "portrait");
-
-            //scanPopup.style = basicStyle + "width: calc(100% - 20px); left: 10px;transition: 0.5s ease-in; transition-property: top, margin-top; top: 100%;";
-            //scanPopup.setAttribute("mode", "portrait");
+            scanPopup.setAttribute("mode", "portrait");
+            editPopup.setAttribute("mode", "portrait");
+            confirmPopup.setAttribute("mode", "portrait");
+            settingsPopup.setAttribute("mode", "portrait");
         });
+        envObject.editPopup = editPopup;
         envObject.sharePopup = shareElem;
-        //envObject.qrScanPage = scanPopup;
+        envObject.qrScanPage = scanPopup;
+        envObject.confirmPopup = confirmPopup;
+        envObject.settingsPopup = settingsPopup;
         envObject.mainPopup = document.getElementById("mainPopup");
-        /*envObject.qrScanPage.qrReader.onMessage = (message) => {
-            document.getElementById("scanText").innerHTML = message;
-        }*/
+        envObject.qrScanPage.qrReader.onMessage = (message) => {
+
+        }
     </script>
     <script>
         let keypad = document.getElementById("mainKeypad");

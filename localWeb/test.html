@@ -8,10 +8,19 @@
     <title>Document</title>
     <meta name="viewport"
         content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="startup.js"></script>
+    <link rel="stylesheet" href="./styling/stylesheets.css">
+    <script src="./packages/qr-creator.js"></script>
+    <script type="text/javascript" src="./packages/html5-qrcode.min.js"></script>
+    <script src="./packages/chart.js"></script>
+    <script src="packages/hammer.js"></script>
+    <script src="./packages/chartjs-plugin-zoom.js"></script>
+    <script src="componets.js"></script>
 </head>
 
 <body>
     <script>
+        console.log(document.createElement('button').nodeName);
         let stylers = [
 
         ]
@@ -40,8 +49,7 @@
         console.log(objecty);
         console.log(array);
     </script>
-    <script src="startup.js"></script>
-    <link rel="stylesheet" href="./styling/stylesheets.css">
+    
     <style>
         body {
             height: 100%;
@@ -49,69 +57,14 @@
             background-color: var(--displayColor);
         }
     </style>
-    <script src="./packages/qr-creator.js"></script>
-    <script type="text/javascript" src="./packages/html5-qrcode.min.js"></script>
-    <script src="./packages/chart.js"></script>
-    <script src="packages/hammer.js"></script>
-    <script src="./packages/chartjs-plugin-zoom.js"></script>
-    <script src="componets.js"></script>
-    <!--<tab-menu></tab-menu>-->
-    <!--<edit-page></edit-page>-->
-    <button onclick="document.getElementById('sharePopup').open()" style="background-color: var(--functionsColor);">Open
-        code</button>
-    <button onclick="document.getElementById('scanPopup').open()" style="background-color: var(--functionsColor);">Open
-        scan</button>
-    <h1 id="scanText"></h1>
-    <popup-background id="mainPopup"style="width: 100%; height: 100%; position: absolute; visibility: hidden; left:0px; top: 0px;"></popup-background>
-    <share-page id="sharePopup"copy="true"></share-page>
-    <qr-scan-page id="scanPopup"></qr-scan-page>
+    <slide-switcher id="switcher"></slide-switcher>
     <script>
-        let shareElem = document.getElementById("sharePopup");
-        let scanPopup = document.getElementById("scanPopup");
-        let basicStyle = "position: absolute; transition: 0.0s ease-in-out; display:block;";
-
-        appendMethod('mobileLandscape', () => {
-            shareElem.style = basicStyle + "width: 33.3333%; height: calc(100% - 20px);top: 10px; right: -100%;";
-            shareElem.setAttribute("mode", "landscape");
-
-            scanPopup.style = basicStyle + "width: unset; height: calc(100% - 20px);top: 10px; right: -100%;";
-            scanPopup.setAttribute("mode", "landscape");
-        })
-        appendMethod('mobilePortrait', () => {
-            shareElem.style = basicStyle + "width: calc(100% - 20px); height: 45%;left: 10px; bottom: -100%;";
-            shareElem.setAttribute("mode", "portrait");
-
-            scanPopup.style = basicStyle + "width: calc(100% - 20px); left: 10px; top: 100%;";
-            scanPopup.setAttribute("mode", "portrait");
-        });
-        envObject.sharePopup = shareElem;
-        envObject.qrScanPage = scanPopup;
-        envObject.mainPopup = document.getElementById("mainPopup");
-        envObject.qrScanPage.qrReader.onMessage = (message) => {
-            document.getElementById("scanText").innerHTML = message;
-        }
+        let switcher = document.getElementById('switcher');
+        switcher.addButton("Thing");
+        switcher.addButton("Thing2");
+        switcher.addButton("Thing3");
     </script>
-    <script>
-        let keypad = document.getElementById("mainKeypad");
-        for (let qElem of formats) {
-            let format = () => {
-                console.log("Format styling method")
-                console.log(qElem.methods)
-                for (let method of qElem.methods) {
-                    method();
-                }
-            }
-            qElem.query.addEventListener('change', () => {
-                if (qElem.query.matches) {
-                    format()
-                }
-            })
-            if (qElem.query.matches == true) {
-                console.log("is true Value")
-                format()
-            }
-        }
-    </script>
+    <!--<create-page></create-page>-->
 </body>
 
 </html>

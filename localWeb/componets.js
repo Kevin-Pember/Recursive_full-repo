@@ -1128,7 +1128,7 @@ class FuncButton extends HTMLElement {
                     envObject.mainTabMenu.openTabByName(this.name);
                 }
             } else {
-                openConfirm("Are you sure you want to delete this Function?", () => {
+                envObject.confirmPopup.open("Are you sure you want to delete this Function?", () => {
                     funcRemove(buttonNode);
                 });
             }
@@ -2532,7 +2532,7 @@ class Keypad extends inputMethod { //Keypad class
               left: calc(50% - 25px);
               height: 50px;
               width: 50px;
-              visibility: visible;
+              visibility: inherit;
             }
             #moreFunctionsButton{
               color: transparent;
@@ -2594,9 +2594,9 @@ class Keypad extends inputMethod { //Keypad class
             }
         }
         if (lazyAfterthought >= 1 && this.keyTargets.input.innerHTML.charAt(badIdea - 1) != '(') {
-           this.frontButtonPressed(')');
+            this.frontButtonPressed(')');
         } else {
-           this.frontButtonPressed('(');
+            this.frontButtonPressed('(');
         }
     }
     //Responsible (I Think) for handling all power of event for main calc buttons
@@ -4116,8 +4116,7 @@ class graphMode extends templateMode {
         this.ctx = graphCanvas.getContext('2d')
 
         this.settingsButton.addEventListener("click", () => {
-            console.log(quickSettingsPane)
-            quickSettingsPane.open("Graph", [
+            envObject.quickSettingsPane.open("Graph", [
                 {
                     "title": "Range",
                     "type": "dRange",
@@ -4258,7 +4257,7 @@ class tableMode extends templateMode {
         this.table = table
         tableContainer.appendChild(table)
         this.settingsButton.addEventListener("click", () => {
-            quickSettingsPane.open("Table", [
+            envObject.quickSettingsPane.open("Table", [
                 {
                     "title": "Range",
                     "type": "dRange",
@@ -4328,6 +4327,9 @@ class settingsSec extends HTMLElement {
             }
             input:focus, textarea:focus, select:focus{
                 outline: none;
+            }
+            #settingsSection{
+                min-width: 300px;
             }
             .svgText {
                 fill: var(--textColor);
@@ -4588,202 +4590,6 @@ class settingsSec extends HTMLElement {
 
 }
 customElements.define('settings-section', settingsSec);
-class quickSettings extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-        <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--textColor);
-                -webkit-tap-highlight-color: transparent;
-            }
-            input:focus, textarea:focus, select:focus{
-                outline: none;
-            }
-            .svgText {
-                fill: var(--textColor);
-              }
-            #exitButton{
-                position: absolute;
-                z-index: 2;
-                margin-right: 0;
-                right: 65px;
-                margin-top: 24.25px;
-            }
-            #baseContainer{
-                display: grid;
-                justify-items: center;
-                align-items: center;
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                left: 0;
-                top: 0;
-                background-color: var(--neutralColor);
-                z-index: inherit;
-            }
-            #settingsPane{
-                width: calc(100% - 100px);
-                height: auto;
-                border-radius: 25px;
-                padding-bottom: 10px;
-                background-color: var(--functionsColor);
-            }
-            #settingsTitle{
-                margin: 10px;
-                padding: 10px;
-                font-size: 50px;
-                padding-top: 5px;
-                padding-bottom: 5px;
-                border-radius: 25px;
-                color: var(--textColor);
-                background-color: var(--numbersColor);
-            }
-            #settingsContainer{
-                display: grid;
-                grid-auto-rows: 35px;
-                grid-template-columns: 100%;
-                grid-gap: 5px;
-                justify-items: center;
-                align-items: center;
-            }
-            .calculationsLabels {
-                display: flex;
-                position: relative;
-                align-self: center;
-                align-content: center;
-                width: calc(100% - 15px);
-                color: var(--textColor);
-                height: 35px;
-            }
-            .settingsTextInput {
-                background-color: var(--numbersColor);
-                border: none;
-                border-width: 1.5px;
-                height: 35px;
-                width: 60px;
-                text-align: center;
-                color: var(--textColor);
-                text-indent: 5px;
-                font-size: 15px;
-                border-radius: 8px;
-                margin-right: 10px;
-                right: 0;
-                position: absolute;
-              }
-              
-              .settingsButton {
-                color: var(--textColor);
-                background-color: var(--functionsColor);
-                width: fit-content;
-                padding-left: 10px;
-                padding-right: 10px;
-                font-size: 20px;
-                height: 35px;
-                right: 0px;
-                margin-right: 10px;
-                border-radius: 20px;
-                border: none;
-                position: absolute;
-              }
-              
-              .settingsButton.active {
-                background-color: var(--numbersColor);
-              }
-              .settingTitle {
-                padding: 7.5px 0 7.5px;
-                color: var(--textColor);
-                text-align: left;
-                text-overflow: ellipsis;
-                position: inherit;
-                align-self: center;
-                margin-right: 15px;
-                margin-left: 5px;
-                font-size: 20px;
-                height: 100%;
-                line-height: 100%;
-              }
-              .colorPicker {
-                align-self: center;
-                height: 25px;
-                position: relative;
-                border-style: solid;
-                border-color: var(--textColor);
-                border-radius: 15px;
-                outline: none;
-                right: 15px;
-                background-color: transparent;
-                position: absolute;
-              }
-              
-              .colorPicker::-webkit-color-swatch-wrapper {
-                padding: 0;
-              }
-              
-              .colorPicker::-webkit-color-swatch {
-                border: none;
-                border-radius: 15px;
-              }
-        </style>
-        <div id="baseContainer">
-            <div id="settingsPane">
-                <svg id="exitButton" style="height: 40px; isolation:isolate; aspect-ratio: 1 / 1;" viewBox="0 0 1080 1080"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                        fill-opacity=".2" />
-                    <path class="svgText"
-                        d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-                </svg>
-                <h1 id="settingsTitle"><h1>
-                <settings-section id="settingsDef"></settings-section>
-            </div>
-        </div>
-        `;
-        this.settingsTitle = this.shadowRoot.querySelector("#settingsTitle")
-        this.settingsDef = this.shadowRoot.querySelector("#settingsDef")
-        this.exitButton = this.shadowRoot.querySelector("#exitButton")
-        this.exitButton = this.addEventListener("click", () => {
-            this.exit();
-        });
-    }
-    static get observedAttributes() {
-        return ['id'];
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (this.hasAttribute('id')) {
-            this.shadowRoot.querySelector('#settingsTitle').innerHTML = this.getAttribute('id')
-        }
-    }
-    populateSettings(setArry) {
-        this.settingsDef.populateSettings(setArry)
-    }
-    clearSettings() {
-        this.settingsTitle.innerHTML = ""
-        this.settingsDef.clearSettings()
-    }
-    exit() {
-        this.defExit()
-        //this.style.visibility = "hidden";
-        hideElements([this.style])
-        this.style.zIndex = "0";
-        this.clearSettings()
-    }
-    open(title, setArry, exitMethod) {
-        this.settingsTitle.innerHTML = title;
-        this.populateSettings(setArry);
-        this.defExit = exitMethod;
-        //this.style.visibility = "visible";
-        pullUpElements([this.style])
-        this.style.zIndex = "10";
-    }
-}
-customElements.define('quick-settings', quickSettings);
 class tabPage extends HTMLElement {
     constructor() {
         super();
@@ -5633,6 +5439,95 @@ class equationMap extends HTMLElement {
     }
 }
 customElements.define('equation-map', equationMap);
+class slideSwitcher extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+            #modeSwitcher {
+                height: 40px;
+                display: block;
+                width: fit-content;
+            }
+            #modeSwitcher button{
+                height: 100%;
+                width: 70px;
+                background-color: transparent;
+                color: var(--textColor);
+                border: none;
+                border-radius: 25px;
+                z-index: 2;
+            }
+            #selectorSlider {
+                height: 40px;
+                width: 70px;
+                position: absolute;
+                background-color: var(--displayColor);
+                border-radius: 25px;
+                transition: all 0.2s;
+            }
+            #buttonContainer{
+                display: grid;
+                grid-auto-columns: 70px;
+                grid-auto-flow: column;
+                height: 100%;
+            }
+        </style>
+        <div id=modeSwitcher>
+            <div id="selectorSlider"></div>
+            <div id="buttonContainer">
+            </div>
+        </div>
+        `
+        this.buttonCount = 0;
+        this.buttonContainer = this.shadowRoot.querySelector('#buttonContainer');
+        this.selectorSlider = this.shadowRoot.querySelector('#selectorSlider');
+    }
+    addButton() {
+        let button;
+        if (arguments[0] != undefined && arguments[0].nodeName === 'BUTTON') {
+            button = arguments[0];
+            button.style = "unset";
+        } else if (arguments != undefined && typeof arguments[0] === typeof "") {
+            button = document.createElement('button');
+            button.innerHTML = arguments[0];
+        } else {
+            button = document.createElement('button');
+        }
+        let buttonIndex = this.buttonCount;
+        //button.containerIndex = buttonIndex;
+        console.log(button)
+        button.addEventListener('click', (e) => {
+            this.moveSlider(buttonIndex);
+            this.dispatchEvent(new CustomEvent('switch', { detail: buttonIndex }));
+        });
+        this.buttonContainer.appendChild(button);
+        this.buttonCount++;
+        return button;
+    }
+    moveSlider(index) {
+        this.selectorSlider.style.marginLeft = `${index * 70}px`;
+    }
+    static get observedAttributes() {
+        return ['selectColor'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('selectColor')) {
+            let selectColor = this.getAttribute('selectColor');
+            if(selectColor == "primary"){
+                this.selectorSlider.style.backgroundColor = "var(--functionsColor)";
+            }else if(selectColor == "secondary"){
+                this.selectorSlider.style.backgroundColor = "var(--displayColor)";
+            }else if(selectColor == "accent"){
+                this.selectorSlider.style.backgroundColor = "var(--numbersColor)";
+            }else{
+                this.selectorSlider.style.backgroundColor = selectColor;
+            }
+        }
+    }
+}
+customElements.define('slide-switcher', slideSwitcher);
 class dataViewer extends HTMLElement {
     constructor() {
         super();
@@ -5679,7 +5574,6 @@ class dataViewer extends HTMLElement {
           #modeSwitcher {
             top: 10px;
             left: 10px;
-            height: 40px;
             display: inline-block;
             width: fit-content;
             grid-area: switcher;
@@ -5693,43 +5587,22 @@ class dataViewer extends HTMLElement {
             border-radius: 25px;
             z-index: 2;
           }
-          
-          #selectorSlider {
-            top: 10px;
-            height: 40px;
-            width: 70px;
-            z-index: -1;
-            position: absolute;
-            background-color: var(--displayColor);
-            border-radius: 25px;
-            transition: all 0.2s;
-          }
           #modeContainer{
             width: 100%;
             height: 100%;
             position: absolute;
             grid-area: data;
           }
-          #buttonContainer{
-            display: grid;
-            grid-auto-columns: 70px;
-            grid-auto-flow: column;
-            height: 100%;
-          }
         </style>
         <div id="resultPane">
-            <div id=modeSwitcher>
-                <div id="selectorSlider"></div>
-                <div id="buttonContainer">
-                </div>
-            </div>
+            <slide-switcher id=modeSwitcher></slide-switcher>
             <div id="modeContainer">
 
             </div>
         </div>
         `;
         this.modeContainer = this.shadowRoot.querySelector('#modeContainer');
-        this.modeSwitcher = this.shadowRoot.querySelector('#buttonContainer');
+        this.modeSwitcher = this.shadowRoot.querySelector('#modeSwitcher');
         this.selector = this.shadowRoot.querySelector('#selectorSlider');
         this.inputData = {};
         this.nameList = [];
@@ -5738,14 +5611,11 @@ class dataViewer extends HTMLElement {
             console.log("triggers")
             if (!this.nameList.includes(name)) {
                 let button = document.createElement('button');
-                button.classList.add('modeButton');
                 button.innerHTML = name;
-                button.containerIndex = this.modeSwitcher.querySelectorAll('.modeButton').length;
                 button.addEventListener('click', () => {
-                    this.moveSlider(button.containerIndex);
                     this.pageSelector(page)
                 });
-                this.modeSwitcher.appendChild(button);
+                this.modeSwitcher.addButton(button);
                 this.inputData[page.pageName] = (entry) => page.parseMethod(entry);
                 page.onUpdate = (value) => { this.upstreamRequest(value) }
                 page.key = this.name;
@@ -5757,13 +5627,8 @@ class dataViewer extends HTMLElement {
                 this.modeContainer.appendChild(page);
                 return button;
             }
-            console.log(`here is the data`)
-            console.log(this.inputData)
         }
         this.modeContainer.addDataPage = this.addDataPage;
-    }
-    moveSlider(index) {
-        this.selector.style.marginLeft = `${index * 70}px`;
     }
     pageSelector(tPage) {
         let hiddenPages = [...this.pages].filter(page => page != tPage)
@@ -6060,8 +5925,7 @@ class graphData extends dataPage {
         this.pageName = "Graph"
         this.settingsButton = this.shadowRoot.querySelector('#settingsCog')
         this.settingsButton.addEventListener("click", () => {
-            console.log(quickSettingsPane)
-            quickSettingsPane.open("Graph", [
+            envObject.quickSettingsPane.open("Graph", [
                 {
                     "title": "Range",
                     "type": "dRange",
@@ -6178,7 +6042,7 @@ class tableData extends dataPage {
         this.table = this.shadowRoot.querySelector('#dataTable')
         this.settingsButton = this.shadowRoot.querySelector('#settingsCog')
         this.settingsButton.addEventListener("click", () => {
-            quickSettingsPane.open("Table", [
+            envObject.quickSettingsPane.open("Table", [
                 {
                     "title": "Range",
                     "type": "dRange",
@@ -6353,31 +6217,29 @@ class templateFuncPage extends funcPage {
                 this.type = "function";
                 this.equationMap.equat = this.funcDef.ogFunc;
                 this.editButton.addEventListener("click", () => {
-                    envObject.mainEdit.setAttribute("mode", "function");
-                    openPage(document.getElementById("mainEditor"))
                     let editorObject = {
+                        type: "function",
                         confirmMethod: () => {
-                            this.changeMethod(envObject.mainEdit.nameEditor.input.innerHTML, envObject.mainEdit.equationEditor.input.innerHTML)
+                            this.changeMethod(envObject.editPopup.nameEditor.input.innerHTML, envObject.editPopup.equationEditor.input.innerHTML)
                         },
                         name: this.funcDef.func,
                         equation: this.funcDef.ogFunc,
                     }
-                    envObject.mainEdit.openEdit(editorObject);
+                    envObject.editPopup.open(editorObject);
                 })
                 this.shareButton.addEventListener("click", () => {
                     envObject.sharePopup.open(this.funcListDef.compressed);
                 });
             } else {
                 this.editButton.addEventListener("click", () => {
-                    envObject.mainEdit.setAttribute("mode", "method");
-                    openPage(document.getElementById("mainEditor"))
                     let editorObject = {
+                        type: "method",
                         confirmMethod: () => {
-                            this.changeMethod("", envObject.mainEdit.textEditorEdit.textEditor.innerHTML)
+                            this.changeMethod("", envObject.editPopup.textEditorEdit.textEditor.innerHTML)
                         },
                         code: this.funcDef.full,
                     }
-                    envObject.mainEdit.openEdit(editorObject);
+                    envObject.editPopup.open(editorObject);
                 })
                 this.type = "method";
                 this.equationMap.equat = `${this.name}(${varNames.join(',')})`
@@ -6478,6 +6340,7 @@ class codeTerminal extends HTMLElement {
                 display: grid;
                 display: flex;
                 overflow: auto;
+                background-color: transparent;
               }
               
               #creatorEditor::-webkit-scrollbar {
@@ -6574,204 +6437,449 @@ class codeTerminal extends HTMLElement {
     }
 }
 customElements.define('code-terminal', codeTerminal);
-class editPage extends HTMLElement {
+class createPage extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
-            <style>
-              * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--textColor);
-                -webkit-tap-highlight-color: transparent;
-              }
-              
-              .imgDivClass {
-                aspect-ratio: 1 / 1;
-              }
-              
-              .svgText {
-                fill: var(--textColor);
-              }
-              
-              #editDiv {
-                width: 100%;
-                height: 100%;
-                background-color: var(--semi-transparent);
-              }
-              
-              #custFuncEditHeader {
-                padding: 6.5px 15px 6.5px 15px;
-                width: fit-content;
-                left: calc(50% - 62.22px);
-                top: 10px;
-                font-size: 50px;
-              }
-              
-              #editExit {
-                left: 10px;
-                top: 10px;
-              }
-              
-              #textEditor {
-                position: absolute;
-                top: 80px;
-                background: var(--functionsColor);
-                bottom: 10px;
-                left: 10px;
-                width: calc(100% - 20px);
-                border-radius: 25px;
-                padding: 10px;
-                overflow: hidden;
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
-              }
-              
-              #confirmEdit {
-                z-index: 1;
-                right: 10px;
-                top: 10px;
-              }
-              #topController{
-                width: 100%;
-                height: 80px;
-                display:grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                justify-content: space-evenly;
-                justify-items: center;
-                align-content: space-evenly;
-                align-items: center;
-              }
-              #funcEditor{
-                width: calc(100% - 20px);
-                margin-left: 10px;
-                background: var(--functionsColor);
-                border-radius: 25px;
-                padding: 10px;
-                display:flex;
-                flex-direction: column;
-              }
-              #nameEditor{
-                margin-bottom: 10px;
-                height: 80px;
-                overflow: hidden;
-              }
-              #equationEditor{
-                background-color: var(--displayColor);
-                min-height: 80px;
-                overflow: visible;
-                height: fit-content;
-                max-height: 100%;
-              }
-              .funcEditors{
-                width: 100%;
-                display:grid;
-                background: var(--numbersColor);
-                border-radius: 20px;
-                padding: 0 10px 0 10px;
-                font-size: 65px;
-              }
-            </style>
-            <div id="editDiv">
-                <div id=topController>
-                    <svg id="editExit" class="imgDivClass" style="height: 55px;isolation:isolate"
-                        viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                            fill-opacity=".2" />
-                        <path class="svgText"
-                            d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-                    </svg>
-                    <h1 id="custFuncEditHeader">Edit</h1>
-                    <svg id="confirmEdit" class="imgDivClass" style="height: 55px;isolation:isolate"
-                       viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                            fill-opacity=".2" />
-                        <path class="svgText"
-                           d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
-                    </svg>
+        <style>
+          
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          
+          .imgDivClass {
+            aspect-ratio: 1 / 1;
+          }
+          
+          .svgText {
+            fill: var(--textColor);
+          }
+          
+          input:focus {
+            outline: none;
+          }
+          
+          [contenteditable] {
+            outline: 0px solid transparent;
+          }
+          
+          button:focus {
+            outline: none;
+          }
+          
+          ::-webkit-scrollbar {
+            width: 10px;
+          }
+          
+          ::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          
+          ::-webkit-scrollbar-thumb {
+            width: 5px;
+            background: #00000080;
+            border-radius: 10px;
+          }
+          
+          ::-webkit-scrollbar-button:end:increment {
+            height: 7px;
+            display: block;
+            background: transparent;
+          }
+          
+          ::-webkit-scrollbar-button:start:increment {
+            height: 7px;
+            display: block;
+            background: transparent;
+          }
+          
+          #custCreatorPage {
+            background-color: var(--displayColor);
+            width: 100%;
+            height: 100%;
+          }
+          
+          #nameCreator {
+            background-color: var(--numbersColor);
+            border: none;
+            font-size: 50px;
+            width: calc(100% - 20px);
+            left: 10px;
+            padding: 5px;
+            border-radius: 15px;
+            top: 50px;
+            position: absolute;
+          }
+          
+          #mainCreator {
+            background-color: var(--functionsColor);
+            top: 135px;
+            bottom: 10px;
+            width: calc(100% - 20px);
+            left: 10px;
+            position: absolute;
+            border-radius: 20px;
+          }
+          
+          #saveCreator {
+            height: 40px;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            border: none;
+            background-color: var(--numbersColor);
+            position: absolute;
+            border-radius: 50px;
+          }
+          
+          .creatorPage {
+            width: 100%;
+            top: 60px;
+            bottom: 0px;
+            position: absolute;
+          }
+          
+          .creatorDiv {
+            width: calc(100% - 20px);
+            left: 10px;
+            height: calc(100% - 10px);
+            background-color: var(--displayColor);
+            padding: 10px;
+            font-size: 35px;
+            border-radius: 25px;
+            position: absolute;
+          }
+          
+          #creatorEditor {
+            display: grid;
+            display: flex;
+            overflow: auto;
+          }
+          
+          #creatorEditor::-webkit-scrollbar {
+            width: 10px;
+          }
+          
+          #creatorEditor::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          
+          #creatorEditor::-webkit-scrollbar-thumb {
+            width: 5px;
+            background: #00000080;
+            border-radius: 10px;
+          }
+          
+          #creatorEditor::-webkit-scrollbar-button:end:increment {
+            height: 0px;
+            background: transparent;
+          }
+          
+          #creatorEditor::-webkit-scrollbar-button:start:increment {
+            height: 0px;
+            background: transparent;
+          
+          }
+          
+          #creatorEditor::-webkit-scrollbar-corner {
+            background-color: transparent;
+          }
+          
+          #modeSwitcher {
+            top: 10px;
+            left: 10px;
+            height: 40px;
+            display: inline-block;
+            position: absolute;
+            width: 300px;
+          }
+          
+          .modeButton {
+            height: 100%;
+            width: 70px;
+            background-color: transparent;
+            border: none;
+            border-radius: 25px;
+            z-index: 2;
+            position: absolute;
+          }
+          
+          .selectorSlider {
+            top: 0px;
+            height: 40px;
+            width: 70px;
+            z-index: 1;
+            position: absolute;
+            background-color: var(--displayColor);
+            border-radius: 25px;
+          }
+        </style>
+        <div id="custCreatorPage">
+        <svg id="backCreator" class="imgDivClass" style="height: 45px; transform: rotate(180deg);isolation:isolate"
+            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1080" height="1080" fill-opacity="0" />
+            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+            <path class="svgText"
+                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+        </svg>
+        <input type="text" id="nameCreator" placeholder="Name">
+        <div id="mainCreator">
+            <div id=modeSwitcher>
+                <button class="modeButton" id="funcCreatorButton">Function</button>
+                <button class="modeButton" id="hybdCreatorButton" style="left: 75px">Hybrid</button>
+                <button class="modeButton" id="codeCreatorButton" style="left: 150px">Code</button>
+                <div id="custCreatorUnder" class="selectorSlider"></div>
+            </div>
+            <button id="saveCreator">Save</button>
+            <div class="creatorPage" id="funcTypePage">
+                <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value="">
                 </div>
-                  <code-terminal id="textEditor"></code-terminal>
-                  <div id="funcEditor">
-                        <rich-input id="nameEditor" class="funcEditors"></rich-input>
-                        <rich-input id="equationEditor" class="funcEditors"></rich-input>
-                  </div>
-              </div>
-        `;
-        this.editDiv = this.shadowRoot.getElementById('editDiv');
-        this.editExit = this.shadowRoot.getElementById('editExit');
-        this.confirmEdit = this.shadowRoot.getElementById('confirmEdit');
-        this.funcEditor = this.shadowRoot.getElementById('funcEditor');
-        this.nameEditor = this.shadowRoot.getElementById('nameEditor');
-        this.equationEditor = this.shadowRoot.getElementById('equationEditor');
-        this.textEditorEdit = this.shadowRoot.getElementById('textEditor');
-        this.editExit.addEventListener('click', () => {
-            this.close();
-        });
-    }
-    openEdit(editObject) {
-        this.confirmEdit.addEventListener('click', () => {
-            this.close();
-            editObject.confirmMethod();
-        }, { once: true });
+            </div>
+            <div class="creatorPage" id="hybridCodeTypePage" style="visibility: hidden;">
+                <div id="creatorEditor">
 
-        if (this.mode == "function") {
-            this.nameEditor.input.innerHTML = editObject.name;
-            this.equationEditor.input.innerHTML = editObject.equation;
-        } else {
-            this.textEditorEdit.textEditor.innerHTML = editObject.code;
-        }
+                </div>
+            </div>
+        </div>
+
+    </div>
+        `;
+    }
+}
+customElements.define('create-page', createPage);
+//Popup Section
+class popupBackground extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        //this.backgroundDiv = this.shadowRoot.getElementById('backgroundDiv');
+
+    }
+    open(closeMethod) {
+        console.log("open popup background")
+        this.style.zIndex = 0;
+        this.style.visibility = 'visible';
+        this.style.opacity = '1';
+        this.addEventListener('click', () => {
+            console.log('close popup');
+            closeMethod();
+            this.close()
+        }, { once: true });
     }
     close() {
-        closePage(this);
+        this.style.zIndex = -1;
+        this.style.opacity = '0';
+        this.style.visibility = 'hidden';
+
+    }
+    connectedCallback() {
+        this.style = `background:var(--semi-transparent); width: 100%;
+        height: 100%; transition: opacity 0.5s ease; opacity: 0; z-index: -1; left: 0px; top: 0px; position: absolute; visibility: hidden;`;
+    }
+}
+customElements.define('popup-background', popupBackground);
+class popup extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+            .svgText {
+                fill: var(--textColor);
+            }
+            #popupDiv {
+                background-color: var(--functionsColor);
+                border-radius: 25px;
+                transition: all 0.5s ease-in-out;
+                filter: drop-shadow(-5px 5px 5px var(--translucent));
+                display: flex;
+                flex-direction: column;
+            }
+            #backIcon {
+                height: 50px; 
+                width:50px; 
+                aspect-ratio: 1/1; 
+                isolation:isolate; 
+                transform: rotate(180deg);
+                flex-shrink: 0;
+            }
+            #contentDiv {
+                width: 100%;
+                height: 100%;
+            }
+            #popupContainer {
+                background-color: var(--semi-transparent);
+                width: 100%;
+                height: 100%;
+                transition: opacity 0.5s ease; 
+                opacity: 0; 
+                z-index: -1; 
+                left: 0px; 
+                top: 0px; 
+                position: absolute;
+            }
+            .uiButton{
+                border: none;
+                border-radius: 25px;
+                padding: 0px 20px 0px 20px;
+                height: fit-content;
+                position: absolute;
+              }
+              #confirmButton {
+                left: 10px;
+                bottom: 10px;
+              }
+              
+              #exitConfirmPage {
+                right: 10px;
+                bottom: 10px;
+              }
+        </style>
+        <style id="styler">
+        </style>
+        <div id="popupContainer" >
+            <div id="popupDiv" >
+                <svg id="backIcon" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <rect width="1080" height="1080" fill-opacity="0" />
+                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
+                    <path class="svgText"
+                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
+                </svg>
+                <div id="contentDiv"></div>
+            </div>
+        </div>
+        `;
+        this.popupDiv = this.shadowRoot.getElementById('popupDiv');
+        this.contentDiv = this.shadowRoot.getElementById('contentDiv');
+        this.backIcon = this.shadowRoot.getElementById('backIcon');
+        this.styler = this.shadowRoot.getElementById('styler');
+        this.popupContainer = this.shadowRoot.getElementById('popupContainer');
+        this.popupContainer.addEventListener('click', (e) => {
+            if(e.target == this.popupContainer){
+                this.close();
+            }
+        });
+        this.backIcon.addEventListener('click', () => { this.close(); });
+    }
+    open() {
+        this.isOpen = true;
+        this.backMethod = this.close;
+        this.setStyle();
+    }
+    close() {
+        this.isOpen = false;
+        this.setStyle();
+    }
+    setStyle() {
+        this.popupDiv.style = "";
+        this.popupContainer.style = "";
+        let style = (arguments[0] == undefined || typeof arguments[0] != typeof {}) ? {} : arguments[0]; ;
+
+        style.popupDiv = {
+            "position": "absolute"
+        };
+        style.popupDiv[this.mode == "portrait" ? "height": "width"] = "fit-content";
+        style.popupDiv[this.mode == "portrait" ? "width": "height"] = "calc(100% - 20px)";
+        style.popupDiv[this.mode == "portrait" ? "left": "top"] = "10px";
+        if(this.isOpen){
+            style.popupDiv[this.mode == "portrait" ? "bottom": "right"] = "10px";
+        }else{
+            style.popupDiv[this.mode == "portrait" ? "bottom": "right"] = "-100%";
+        }
+        style.popupContainer = {};
+        style.popupContainer["zIndex"] = this.isOpen ? "10": "-1";
+        style.popupContainer["opacity"] = this.isOpen ? "1": "0";
+        if(this.popupPos == "centered"){
+            style.popupContainer["display"] = "flex";
+            style.popupContainer["justify-content"] = "center";
+            style.popupContainer["align-items"] = "center";
+            style.popupDiv["position"] = "static";
+            style.popupDiv[this.mode == "portrait" ? "height": "width"] = this.mode == "portrait" ? "50": "width";
+            if(this.isOpen){
+                style.popupDiv[this.mode == "portrait" ? "marginTop": "marginLeft"] = "0px";
+            }else{
+                style.popupDiv[this.mode == "portrait" ? "marginTop": "marginLeft"] = "100%";
+            }
+        }
+        console.log(this.popupType);
+        Object.keys(style).forEach(key => {
+            let target = this[key];
+            let objectRef = style[key];
+            Object.keys(objectRef).forEach(key => {
+                target.style[key] = objectRef[key];
+            });
+        })
+        /*if (this.mode == "portrait") {
+            this.popupDiv.style = 'height: fit-content; width: calc(100% - 20px); transition: all 0.5s ease-in-out; left: 10px;'  
+            if (this.isOpen) {
+                this.popupDiv.style.bottom = "10px";
+            } else {
+                this.popupDiv.style.bottom = '-100%';
+            }
+        } else if (this.mode == "landscape") {
+            this.popupDiv.style = 'width: fit-content; height: calc(100% - 20px); transition: all 0.5s ease-in-out; top: 10px;'
+            if (this.isOpen) {
+                this.popupDiv.style.right = "10px";
+            } else {
+                this.popupDiv.style.right = '-100%';
+            }
+        }
+        if (this.isOpen) {
+            this.popupContainer.style.zIndex = "1";
+            this.popupContainer.style.opacity = "1";
+        } else {
+            this.popupContainer.style.zIndex = "-1";
+            this.popupContainer.style.opacity = "0";
+        }*/
+    }
+    set popupType (value) {
+        if(value == "boolean" && this.exitButton == undefined){
+            this._popupType = "boolean"
+            this.backIcon.remove();
+            this.popupDiv.innerHTML += `
+            <button id="confirmButton" class="uiButton" style="background-color: var(--numbersColor)">
+            <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
+            xmlns="http://www.w3.org/2000/svg">
+            <path class="svgText"
+                d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+            </svg>
+            </button>   
+            <button id="exitConfirmPage" class="uiButton" style="background-color: var(--displayColor)">
+            <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
+                xmlns="http://www.w3.org/2000/svg">
+                <path class="svgText"
+                    d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
+            </svg>
+            </button>
+            `;
+            this.exitButton = this.shadowRoot.getElementById('exitConfirmPage');
+            this.confirmButton = this.shadowRoot.getElementById('confirmButton');
+            this.exitButton.addEventListener('click', () => {
+                this.close();
+            });
+            this.confirmButton.addEventListener('click', () => {
+                this.confirmMethod();
+                this.close();
+            });
+        }
     }
     static get observedAttributes() {
         return ['mode'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.hasAttribute('mode')) {
-            if (this.getAttribute("mode") == 'function') {
-                this.mode = 'function';
-                this.textEditorEdit.style.visibility = 'hidden';
-                this.funcEditor.style.visibility = 'inherit';
-            } else if (this.getAttribute("mode") == 'method') {
-                this.mode = 'method';
-                this.textEditorEdit.style.visibility = 'inherit';
-                this.funcEditor.style.visibility = 'hidden';
-            }
+            this.mode = this.getAttribute('mode');
+            this.setStyle(true);
         }
     }
 }
-customElements.define('edit-page', editPage);
-class popupBackground extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-           <div id="backgroundDiv" style="background:var(--semi-transparent); width: 100%;
-           height: 100%; transition: all 0.5s ease; opacity: 0;"></div> 
-        `;
-        this.backgroundDiv = this.shadowRoot.getElementById('backgroundDiv');
-
-    }
-    open(closeMethod) {
-        this.backgroundDiv.style.visibility = 'visible';
-        this.backgroundDiv.style.opacity = '1';
-        this.backgroundDiv.addEventListener('click', () => {
-            closeMethod();
-            this.close()
-        }, { once: true });
-    }
-    close() {
-        this.backgroundDiv.style.opacity = '0';
-        this.backgroundDiv.style.visibility = 'hidden';
-
-    }
-}
-customElements.define('popup-background', popupBackground);
 class qrCode extends HTMLElement {
     constructor() {
         super();
@@ -6802,194 +6910,6 @@ class qrCode extends HTMLElement {
     }
 }
 customElements.define('qr-code', qrCode);
-class sharePage extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                * {
-                    box-sizing: border-box;
-                    padding: 0;
-                    margin: 0;
-                    font-family: ubuntu;
-                    color: var(--textColor);
-                    -webkit-tap-highlight-color: transparent;
-                }
-                .svgText {
-                    fill: var(--textColor)
-                }
-                .accent {
-                    fill: var(--numbersColor);
-                }
-                #shareDiv{
-                    background-color: var(--functionsColor);
-                    border-radius: 25px;
-                    position: absolute;
-                    display: flex;
-                    flex-flow: column;
-                    height: 100%;
-                    width: 100%;
-                    filter: drop-shadow(-5px 5px 5px var(--translucent));
-                }
-                #qrCenter{
-                    display: grid;
-                    justify-content: space-evenly;
-                    justify-items: center;
-                    align-content: space-evenly;
-                    align-items: center;
-                }
-                #shareActions{
-                    display: grid;
-                    height: calc(100% - 20px);
-                    border-radius: 15px;
-                    margin: 10px;
-                    width: calc(100% - 20px);
-                    background-color: var(--displayColor);
-                    grid-flow: row;
-                }
-                #backIcon{
-                    height: 50px; 
-                    width:50px; 
-                    aspect-ratio: 1/1; 
-                    isolation:isolate; 
-                    transform: rotate(180deg);
-                    flex-shrink: 0;
-                }
-                .shareGroup{
-                    grid-template-areas: 
-                    "icon"
-                    "title";
-                    width: fit-content;
-                    justify-content: space-evenly;
-                    justify-items: center;
-                    align-content: space-evenly;
-                    align-items: center;
-                    text-align: center;
-                    margin: 10px;
-                }
-            </style>
-            <div id="shareDiv">
-                <svg id="backIcon" style="" viewBox="0 0 1080 1080"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <rect width="1080" height="1080" fill-opacity="0" />
-                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                    <path class="svgText"
-                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-                </svg>
-                <div id="qrCenter">
-                    <qr-code id="qrCode" text="nothing to see here"></qr-code>
-                </div>
-                <div id="shareActions">
-
-                </div>
-            </div>
-        `;
-        this.shareGrid = this.shadowRoot.getElementById('shareActions');
-        this.backIcon = this.shadowRoot.getElementById('backIcon');
-        this.qrCode = this.shadowRoot.getElementById('qrCode');
-        this.text = "null";
-        this.qrCode.setAttribute('text', this.text);
-        this.isOpen = false;
-
-        let copyIcon = new DOMParser().parseFromString(`
-            <svg width="50px" height="50px" style="isolation:isolate" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-            <clipPath id="a">
-            <rect width="1080" height="1080"/>
-            </clipPath>
-            </defs>
-            <g clip-path="url(#a)">
-            <circle class="accent" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path d="m700.11 286v-10.116c0-29.392-23.863-53.255-53.255-53.255h-299.31c-29.392 0-53.255 23.863-53.255 53.255v443.08c0 29.392 23.863 53.255 53.255 53.255h16.269v-57.521c-9.499-5.544-15.887-15.846-15.887-27.628v-379.3c0-17.643 14.324-31.967 31.967-31.967h234.61c9.232 0 17.555 3.922 23.393 10.189h62.211zm29.841 482.85m-264.45-407.89h234.61c17.643 0 31.967 14.324 31.967 31.967v379.3c0 17.643-14.324 31.967-31.967 31.967h-234.61c-17.643 0-31.967-14.324-31.967-31.967v-379.3c0-17.643 14.324-31.967 31.967-31.967zm-32.349-53.182h299.31c29.392 0 53.255 23.863 53.255 53.255v443.08c0 29.392-23.863 53.255-53.255 53.255h-299.31c-29.392 0-53.255-23.863-53.255-53.255v-443.08c0-29.392 23.863-53.255 53.255-53.255z" class="svgText" fill-rule="evenodd"/>
-            </g>
-            </svg>
-            
-            `, "text/xml").firstChild;;
-        console.log(copyIcon.firstChild);
-        this.createShareGroup('Copy', copyIcon, () => {
-            navigator.clipboard.writeText(this.text);
-        });
-
-    }
-    open() {
-        this.style.transitionDuration = "0.0s";
-        if (arguments[0] != undefined) {
-            this.setAttribute('text', arguments[0]);
-        }
-        this.isOpen = true;
-        this.backMethod = this.close;
-        this.setStyle();
-        if (envObject.mainPopup != undefined) {
-            envObject.mainPopup.open(() => {
-                this.close();
-            });
-            this.backMethod = () => {
-                this.close();
-                envObject.mainPopup.close();
-            }
-        }
-        this.backIcon.addEventListener('click', () => { this.backMethod(); }, { once: true });
-        this.style.transitionDuration = "0.5s";
-    }
-    close(){
-        this.style.transitionDuration = "0.0s";
-        this.isOpen = false;
-        this.setStyle();
-        this.removeAttribute('text');
-        this.style.transitionDuration = "0.5s";
-    }
-    setStyle(){
-        console.log(this.isOpen);
-        if(this.mode == "portrait"){
-            if(this.isOpen){
-                console.log("open portrait");
-                this.style.top = "unset";
-                this.style.bottom = "10px";
-            }else{
-                console.log("close portrait");
-                this.style.bottom = '-100%';
-            }
-        }else if(this.mode == "landscape"){
-            
-            if(this.isOpen){
-                console.log("open landscape");
-                this.style.top = "10px";
-                this.style.right = "10px";
-            }else{
-                console.log("open landscape");
-                this.style.right = '-100%';
-            }
-        }
-    }
-    createShareGroup(name, icon, action) {
-        let shareGroup = document.createElement('div');
-        shareGroup.addEventListener('click', () => { action() });
-        shareGroup.classList.add('shareGroup');
-        icon.style.gridArea = 'icon';
-        shareGroup.appendChild(icon);
-        let title = document.createElement('h5');
-        title.innerHTML = name;
-        title.style.gridArea = 'title';
-        shareGroup.appendChild(title);
-
-        this.shareGrid.appendChild(shareGroup);
-    }
-    static get observedAttributes() {
-        return ["text", "mode"];
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (this.hasAttribute('text')) {
-            this.text = this.getAttribute('text');
-            this.qrCode.setAttribute('text', this.text);
-        }
-        if(this.hasAttribute('mode')){
-            this.mode = this.getAttribute('mode');
-            this.setStyle();
-        }
-    }
-}
-customElements.define('share-page', sharePage);
 class QrCodeReader extends HTMLElement {
     constructor() {
         super();
@@ -7039,7 +6959,7 @@ class QrCodeReader extends HTMLElement {
     }
     stop() {
         this.qrCodeReader.stop();
-        if(this.onQRStop != undefined){
+        if (this.onQRStop != undefined) {
             this.onQRStop();
         }
     }
@@ -7058,7 +6978,7 @@ class QrCodeReader extends HTMLElement {
 
     qrCodeMessageHandler(qrCodeMessage) {
         console.log(`QR code detected: ${qrCodeMessage}`);
-        if(this.onMessage != undefined){
+        if (this.onMessage != undefined) {
             this.onMessage(qrCodeMessage);
         }
         this.qrCodeReader.stop();
@@ -7070,11 +6990,128 @@ class QrCodeReader extends HTMLElement {
     }
 }
 customElements.define('qr-reader', QrCodeReader);
-class qrScanPage extends HTMLElement {
+class sharePage extends popup {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.contentDiv.innerHTML = `
+            <style>
+                * {
+                    box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
+                    font-family: ubuntu;
+                    color: var(--textColor);
+                    -webkit-tap-highlight-color: transparent;
+                }
+                .svgText {
+                    fill: var(--textColor)
+                }
+                .accent {
+                    fill: var(--numbersColor);
+                }
+                #qrCenter{
+                    display: grid;
+                    justify-content: space-evenly;
+                    justify-items: center;
+                    align-content: space-evenly;
+                    align-items: center;
+                }
+                #qrCode{
+                    margin: 0 20px 0 20px;
+                }
+                #shareActions{
+                    display: grid;
+                    height: calc(100% - 20px);
+                    border-radius: 15px;
+                    margin: 10px;
+                    width: calc(100% - 20px);
+                    background-color: var(--displayColor);
+                    grid-flow: row;
+                }
+                .shareGroup{
+                    grid-template-areas: 
+                    "icon"
+                    "title";
+                    width: fit-content;
+                    justify-content: space-evenly;
+                    justify-items: center;
+                    align-content: space-evenly;
+                    align-items: center;
+                    text-align: center;
+                    margin: 10px;
+                }
+            </style>
+                
+                <div id="qrCenter">
+                    <qr-code id="qrCode" text="nothing to see here"></qr-code>
+                </div>
+                <div id="shareActions">
+
+                </div>
+        `;
+        this.contentDiv.style.display = "flex";
+        this.contentDiv.style.flexFlow = "column";
+        this.shareGrid = this.shadowRoot.getElementById('shareActions');
+        this.backIcon = this.shadowRoot.getElementById('backIcon');
+        this.qrCode = this.shadowRoot.getElementById('qrCode');
+        this.text = "null";
+        this.qrCode.setAttribute('text', this.text);
+        this.isOpen = false;
+
+        let copyIcon = new DOMParser().parseFromString(`
+            <svg width="50px" height="50px" style="isolation:isolate" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+            <clipPath id="a">
+            <rect width="1080" height="1080"/>
+            </clipPath>
+            </defs>
+            <g clip-path="url(#a)">
+            <circle class="accent" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path d="m700.11 286v-10.116c0-29.392-23.863-53.255-53.255-53.255h-299.31c-29.392 0-53.255 23.863-53.255 53.255v443.08c0 29.392 23.863 53.255 53.255 53.255h16.269v-57.521c-9.499-5.544-15.887-15.846-15.887-27.628v-379.3c0-17.643 14.324-31.967 31.967-31.967h234.61c9.232 0 17.555 3.922 23.393 10.189h62.211zm29.841 482.85m-264.45-407.89h234.61c17.643 0 31.967 14.324 31.967 31.967v379.3c0 17.643-14.324 31.967-31.967 31.967h-234.61c-17.643 0-31.967-14.324-31.967-31.967v-379.3c0-17.643 14.324-31.967 31.967-31.967zm-32.349-53.182h299.31c29.392 0 53.255 23.863 53.255 53.255v443.08c0 29.392-23.863 53.255-53.255 53.255h-299.31c-29.392 0-53.255-23.863-53.255-53.255v-443.08c0-29.392 23.863-53.255 53.255-53.255z" class="svgText" fill-rule="evenodd"/>
+            </g>
+            </svg>
+            
+            `, "text/xml").firstChild;;
+        console.log(copyIcon.firstChild);
+        this.createShareGroup('Copy', copyIcon, () => {
+            navigator.clipboard.writeText(this.text);
+        });
+
+    }
+    open(text) {
+        this.text = text;
+        super.open();
+    }
+    close() {
+        super.close();
+        this.removeAttribute('text');
+    }
+    createShareGroup(name, icon, action) {
+        let shareGroup = document.createElement('div');
+        shareGroup.addEventListener('click', () => { action() });
+        shareGroup.classList.add('shareGroup');
+        icon.style.gridArea = 'icon';
+        shareGroup.appendChild(icon);
+        let title = document.createElement('h5');
+        title.innerHTML = name;
+        title.style.gridArea = 'title';
+        shareGroup.appendChild(title);
+
+        this.shareGrid.appendChild(shareGroup);
+    }
+    
+    /**
+     * @param {string} text
+     */
+    set text(text) {
+        this.qrCode.setAttribute('text', text);
+    }
+}
+customElements.define('share-page', sharePage);
+class qrScanPage extends popup {
+    constructor() {
+        super();
+        this.contentDiv.innerHTML = `
         <style>
             .svgText {
                 fill: var(--textColor)
@@ -7085,16 +7122,19 @@ class qrScanPage extends HTMLElement {
                 background-color: var(--functionsColor);
                 border-radius: 25px;
                 filter: drop-shadow(-5px 5px 5px var(--translucent));
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                flex-grow: 1;
             }
             #qrReader{
                 position: relative;
                 aspect-ratio: 1;
-                width: calc(100% - 20px);
                 background-color: var(--displayColor);
                 display: block;
                 border-radius: 25px;
                 overflow: hidden;
-                margin: 10px;
             }
             #backIcon{
                 height: 50px; 
@@ -7111,50 +7151,31 @@ class qrScanPage extends HTMLElement {
         </style>
         <style id="modeStyle"></style>
         <div id="qrScanPage">
-            <svg id="backIcon" style="" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                <rect width="1080" height="1080" fill-opacity="0" />
-                <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                <path class="svgText"
-                    d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-            </svg>
             <h2 id="title">Scan QR Code</h2>
             <qr-reader id="qrReader"></qr-reader>
         </div>
         `
+        this.popupDiv.style.position = "static";
+        this.popupPos = "centered";
         this.qrReader = this.shadowRoot.querySelector('#qrReader');
         this.backIcon = this.shadowRoot.querySelector('#backIcon');
-    }
-    open(){
-        this.style.transitionDuration = "0.0s";
-        this.qrReader.start();
-        this.backMethod = this.close;
-        this.isOpen = true;
-        this.setStyle();
-        
-        if (envObject.mainPopup != undefined) {
-            envObject.mainPopup.open(() => {
-                this.close();
-            });
-            this.backMethod = () => {
-                this.close();
-                envObject.mainPopup.close();
+        this.addEventListener('transitionend', () => {
+            if(this.style.top == "100%" || this.style.right == "-102%"){
+                this.style.visibility = "hidden";
             }
-        }
-        this.backIcon.addEventListener('click', () => {
-            this.backMethod();
         });
-        this.style.transitionDuration = "0.5s";
     }
-    close(){
-        this.style.transitionDuration = "0.0s";
+    open() {
+        this.qrReader.start();
+        super.open();
+    }
+    close() {
         this.qrReader.stop();
-        this.isOpen = false;
-        this.setStyle();
-        this.style.transitionDuration = "0.5s";
-        
+        super.close();
     }
     setStyle(){
+        super.setStyle();
+
         if(this.mode == "portrait"){
             this.shadowRoot.querySelector('#modeStyle').innerHTML = `
             #qrScanPage{
@@ -7163,15 +7184,9 @@ class qrScanPage extends HTMLElement {
             }
             #qrReader{
                 width: calc(100% - 20px);
+                margin-bottom: 10px;
             }
             `;
-            if(this.isOpen){
-                this.style.top = "50%";
-                this.style.marginTop = "-50%";
-            }else{
-                this.style.top = "100%";
-                this.style.marginTop = "unset";
-            }
         }else if(this.mode == "landscape"){
             this.shadowRoot.querySelector('#modeStyle').innerHTML = `
             #qrScanPage{
@@ -7179,25 +7194,398 @@ class qrScanPage extends HTMLElement {
                 height: 100%;
             }
             #qrReader{
-                height: calc(100% - 100px);
+                height: calc(100% - 80px);
             }
             `;
-            if(this.isOpen){
-                this.style.right = "10px";
-            }else{
-                this.style.right = "-102%";
-                this.style.marginLeft = "unset";
-            }
+        }
+    }
+}
+customElements.define('qr-scan-page', qrScanPage);
+class editPage extends popup {
+    constructor() {
+        super();
+        this.contentDiv.innerHTML = `
+            <style>
+              * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                -webkit-tap-highlight-color: transparent;
+              }
+              
+              .imgDivClass {
+                aspect-ratio: 1 / 1;
+              }
+              
+              .svgText {
+                fill: var(--textColor);
+              }
+              
+              #editDiv {
+                width: 100%;
+                height: fit-content;
+              }
+              
+              #custFuncEditHeader {
+                padding: 6.5px 15px 6.5px 15px;
+                width: fit-content;
+                left: calc(50% - 62.22px);
+                top: 10px;
+                font-size: 50px;
+              }
+              
+              #textEditor {
+                top: 80px;
+                background-color: var(--displayColor);
+                bottom: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+                border-radius: 25px;
+                padding: 10px;
+                margin: 0 0 10px 10px;
+                overflow: hidden;
+                filter: drop-shadow(-5px 5px 5px var(--translucent));
+              }
+              #funcEditor{
+                width: calc(100% - 20px);
+                margin-left: 10px;
+                border-radius: 25px;
+                margin-bottom: 10px;
+                display:flex;
+                flex-direction: column;
+                visibility: hidden;
+                position: absolute;
+              }
+              #nameEditor{
+                margin-bottom: 10px;
+                height: 80px;
+                overflow: hidden;
+              }
+              #equationEditor{
+                background-color: var(--displayColor);
+                min-height: 80px;
+                overflow: visible;
+                height: fit-content;
+                max-height: 100%;
+              }
+              .funcEditors{
+                width: 100%;
+                display:grid;
+                background: var(--numbersColor);
+                border-radius: 20px;
+                padding: 0 10px 0 10px;
+                font-size: 65px;
+              }
+                #confirm{
+                    position: absolute;
+                    bottom: 20px;
+                    right: 20px;
+                    border-radius: 25px;
+                    height: 40px;
+                    aspect-ratio: 1/1;
+                    border: none;
+                }
+            </style>
+            <div id="editDiv">
+                <h1 id="custFuncEditHeader">Edit</h1>
+                    <div id="textEditor">
+                        <code-terminal style="width: 100%; height: 100%;"></code-terminal>
+                    </div>
+                  <div id="funcEditor">
+                        <rich-input id="nameEditor" class="funcEditors"></rich-input>
+                        <rich-input id="equationEditor" class="funcEditors"></rich-input>
+                  </div>
+                  <button id="confirm" style="background-color: var(--numbersColor)">
+                            <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path class="svgText"
+                                    d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
+                            </svg>
+                    </button>   
+              </div>
+        `;
+        this.popupPos = "centered"
+        this.editDiv = this.shadowRoot.getElementById('editDiv');
+        this.funcEditor = this.shadowRoot.getElementById('funcEditor');
+        this.nameEditor = this.shadowRoot.getElementById('nameEditor');
+        this.equationEditor = this.shadowRoot.getElementById('equationEditor');
+        this.textEditorEdit = this.shadowRoot.getElementById('textEditor');
+        this.confirmEdit = this.shadowRoot.getElementById('confirm');
+    }
+    open(editObject) {
+        super.open();
+        this.confirmEdit.addEventListener('click', () => {
+            this.close();
+            editObject.confirmMethod();
+        }, { once: true });
+
+        if (editObject.mode == "function") {
+            this.nameEditor.input.innerHTML = editObject.name;
+            this.equationEditor.input.innerHTML = editObject.text;
+            this.funcType = "function";
+        } else {
+            this.textEditorEdit.textEditor.innerHTML = editObject.text;
+            this.funcType = "method";
+        }
+    }
+    /**
+     * @param {string} type
+     */
+    set funcType(type) {
+        if (type == "function") {
+            this.textEditorEdit.style.visibility = 'hidden';
+            this.textEditorEdit.style.position = 'absolute';
+            this.funcEditor.style.visibility = 'inherit';
+            this.funcEditor.style.position = 'relative';
+        } else {
+            this.textEditorEdit.style.visibility = 'inherit';
+            this.textEditorEdit.style.position = 'relative';
+            this.funcEditor.style.visibility = 'hidden';
+            this.funcEditor.style.position = 'absolute';
         }
     }
     static get observedAttributes() {
         return ['mode'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if(this.hasAttribute('mode')){
+        if (this.hasAttribute('mode')) {
             this.mode = this.getAttribute('mode');
             this.setStyle(true);
         }
     }
 }
-customElements.define('qr-scan-page', qrScanPage);
+customElements.define('edit-page', editPage);
+class confirmPage extends popup{
+    constructor(){
+        super();
+        this.contentDiv.innerHTML = `
+        <style>
+          * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            font-family: ubuntu;
+            color: var(--textColor);
+            -webkit-tap-highlight-color: transparent;
+          }
+          #confirmDiv {
+            width: 100%;
+            border-radius: 25px;
+            position: relative;
+            margin-bottom: 65.3px;
+          }
+          
+          #confirmHeader {
+            margin: 10px;
+            padding: 5px 10px 5px 10px;
+            width: fit-content;
+            border-radius: 25px;
+            background-color: var(--numbersColor);
+            margin-bottom: 10px;
+          }
+          
+          #confirmMessage {
+            height: 82px;
+            width: calc(100% - 20px);
+            margin-left: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            background-color: var(--displayColor);
+          }
+          
+        </style>
+        <div id="confirmDiv">
+            <h2 id="confirmHeader">Confirm</h2>
+            <h3 id="confirmMessage"></h3>
+            
+        </div>
+        `;
+        this.popupPos = "centered"
+        this.popupType = "boolean"
+    }
+    open(description, confirmMethod){
+        super.open();
+        this.shadowRoot.getElementById('confirmMessage').innerHTML = description;
+        this.confirmMethod = confirmMethod;
+    }
+    close(){
+        super.close();
+        this.confirmMethod = undefined;
+        this.shadowRoot.getElementById('confirmMessage').innerHTML = "";
+    }
+    setStyle(){
+        super.setStyle();
+        if(this.mode == "landscape"){
+            this.popupDiv.style.height = "fit-content";
+            this.popupDiv.style.width = "350px";
+        }
+    }
+    static get observedAttributes() {
+        return ['mode'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('mode')) {
+            this.mode = this.getAttribute('mode');
+            this.setStyle(true);
+        }
+    }
+}
+customElements.define('confirm-page', confirmPage);
+class quickSettings extends popup {
+    constructor() {
+        super();
+        this.contentDiv.innerHTML = `
+        <style>
+            * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--textColor);
+                -webkit-tap-highlight-color: transparent;
+            }
+            input:focus, textarea:focus, select:focus{
+                outline: none;
+            }
+            .svgText {
+                fill: var(--textColor);
+              }
+            #settingsPane{
+                width: 100%;
+                height: auto;
+                border-radius: 25px;
+                padding-bottom: 10px;
+                background-color: var(--functionsColor);
+            }
+            #settingsTitle{
+                margin: 10px;
+                padding: 10px;
+                font-size: 50px;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                border-radius: 25px;
+                color: var(--textColor);
+                background-color: var(--numbersColor);
+            }
+            #settingsContainer{
+                display: grid;
+                grid-auto-rows: 35px;
+                grid-template-columns: 100%;
+                grid-gap: 5px;
+                justify-items: center;
+                align-items: center;
+            }
+            .calculationsLabels {
+                display: flex;
+                position: relative;
+                align-self: center;
+                align-content: center;
+                width: calc(100% - 15px);
+                color: var(--textColor);
+                height: 35px;
+            }
+            .settingsTextInput {
+                background-color: var(--numbersColor);
+                border: none;
+                border-width: 1.5px;
+                height: 35px;
+                width: 60px;
+                text-align: center;
+                color: var(--textColor);
+                text-indent: 5px;
+                font-size: 15px;
+                border-radius: 8px;
+                margin-right: 10px;
+                right: 0;
+                position: absolute;
+              }
+              
+              .settingsButton {
+                color: var(--textColor);
+                background-color: var(--functionsColor);
+                width: fit-content;
+                padding-left: 10px;
+                padding-right: 10px;
+                font-size: 20px;
+                height: 35px;
+                right: 0px;
+                margin-right: 10px;
+                border-radius: 20px;
+                border: none;
+                position: absolute;
+              }
+              
+              .settingsButton.active {
+                background-color: var(--numbersColor);
+              }
+              .settingTitle {
+                padding: 7.5px 0 7.5px;
+                color: var(--textColor);
+                text-align: left;
+                text-overflow: ellipsis;
+                position: inherit;
+                align-self: center;
+                margin-right: 15px;
+                margin-left: 5px;
+                font-size: 20px;
+                height: 100%;
+                line-height: 100%;
+              }
+              .colorPicker {
+                align-self: center;
+                height: 25px;
+                position: relative;
+                border-style: solid;
+                border-color: var(--textColor);
+                border-radius: 15px;
+                outline: none;
+                right: 15px;
+                background-color: transparent;
+                position: absolute;
+              }
+              
+              .colorPicker::-webkit-color-swatch-wrapper {
+                padding: 0;
+              }
+              
+              .colorPicker::-webkit-color-swatch {
+                border: none;
+                border-radius: 15px;
+              }
+        </style>
+            <div id="settingsPane">
+                <h1 id="settingsTitle"><h1>
+                <settings-section id="settingsDef"></settings-section>
+            </div>
+        `;
+        this.settingsTitle = this.shadowRoot.querySelector("#settingsTitle")
+        this.settingsDef = this.shadowRoot.querySelector("#settingsDef")
+        this.exitButton = this.shadowRoot.querySelector("#exitButton")
+        this.popupPos = "centered"
+        this.exitButton = this.addEventListener("click", () => {
+            this.close();
+        });
+    }
+    populateSettings(setArry) {
+        this.settingsDef.populateSettings(setArry)
+    }
+    clearSettings() {
+        this.settingsTitle.innerHTML = ""
+        this.settingsDef.clearSettings()
+    }
+    close() {
+        super.close();
+        this.exitMethod();
+        this.clearSettings();
+    }
+    open(title, setArry, exitMethod) {
+        super.open();
+        this.settingsTitle.innerHTML = title;
+        this.populateSettings(setArry);
+        this.exitMethod = exitMethod;
+    }
+}
+customElements.define('quick-settings', quickSettings);

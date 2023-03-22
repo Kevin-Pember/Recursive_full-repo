@@ -773,38 +773,42 @@
             <button id="newFunction">+</button>
         </div>
     </div>
-    <quick-settings id="quickSettings" style="visibility: hidden;"></quick-settings>
     <edit-page id="mainEditor" mode="method" class="page" style="bottom: 100%; position: absolute; background-color: var(--semi-transparent)"></edit-page>
     <script>
         envObject.mainEdit = document.getElementById("mainEditor");
     </script>
-    <popup-background id="mainPopup"style="width: 100%; height: 100%; position: absolute; visibility: hidden; left:0px; top: 0px;"></popup-background>
-    <share-page id="sharePopup"copy="true"></share-page>
+    <share-page id="sharePopup" copy="true" style="display: block;"></share-page>
     <qr-scan-page id="scanPopup"></qr-scan-page>
+    <edit-page id="editPopup"></edit-page>
+    <confirm-page id="confirmPopup"></confirm-page>
+    <quick-settings id="settingsPopup"></quick-settings>
     <script>
         let shareElem = document.getElementById("sharePopup");
         let scanPopup = document.getElementById("scanPopup");
-        let basicStyle = "position: absolute; transition: 0.0s ease-in-out; display:block;";
-
+        let editPopup = document.getElementById("editPopup");
+        let confirmPopup = document.getElementById("confirmPopup");
+        let settingsPopup = document.getElementById("settingsPopup");
         appendMethod('mobileLandscape', () => {
-            shareElem.style = basicStyle + "width: 33.3333%; height: calc(100% - 20px);top: 10px; right: -100%;";
             shareElem.setAttribute("mode", "landscape");
-
-            scanPopup.style = basicStyle + "width: unset; height: calc(100% - 20px);top: 10px; right: -100%;";
             scanPopup.setAttribute("mode", "landscape");
+            editPopup.setAttribute("mode", "landscape");
+            confirmPopup.setAttribute("mode", "landscape");
+            settingsPopup.setAttribute("mode", "landscape");
         })
         appendMethod('mobilePortrait', () => {
-            shareElem.style = basicStyle + "width: calc(100% - 20px); height: 45%;left: 10px; bottom: -100%;";
             shareElem.setAttribute("mode", "portrait");
-
-            scanPopup.style = basicStyle + "width: calc(100% - 20px); left: 10px; top: 100%;";
             scanPopup.setAttribute("mode", "portrait");
+            editPopup.setAttribute("mode", "portrait");
+            confirmPopup.setAttribute("mode", "portrait");
+            settingsPopup.setAttribute("mode", "portrait");
         });
+        envObject.editPopup = editPopup;
         envObject.sharePopup = shareElem;
         envObject.qrScanPage = scanPopup;
-        envObject.mainPopup = document.getElementById("mainPopup");
+        envObject.confirmPopup = confirmPopup;
+        envObject.settingsPopup = settingsPopup;
         envObject.qrScanPage.qrReader.onMessage = (message) => {
-            document.getElementById("scanText").innerHTML = message;
+
         }
     </script>
     <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
