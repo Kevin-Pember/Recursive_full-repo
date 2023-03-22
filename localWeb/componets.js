@@ -1089,7 +1089,8 @@ class FuncButton extends HTMLElement {
             fill: var(--textColor);
           }
           #nameLabel {
-            transition: 0.5s;
+            transition:  0.5s;
+            transition-property: bottom, font-size;
           }
             #removeFunc {
                 height: 75px;
@@ -2787,7 +2788,7 @@ class removeIcon extends HTMLElement {
                     fill: var(--textColor);
                 }
                 .minusBoxes{
-                    transition: 0.5s;
+                    transition: transform 0.5s;
                 }
             </style>
             <svg id="minusIcon" class="imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
