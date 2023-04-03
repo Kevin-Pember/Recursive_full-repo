@@ -39,6 +39,7 @@ function setFocus(node, index) {
     if (arguments[2] != undefined) {
         console.log("Changing Selection")
         console.log(arguments[2])
+        console.log(arguments[2].getSelection())
         arguments[2].setSelection(range)
         console.log(arguments[2].getSelection())
     }
@@ -85,6 +86,9 @@ function buttonMapper(elemArray) {
 function getCSS(value) {
     return getComputedStyle(document.documentElement).getPropertyValue(value);
 }
+function hasNumber(myString) {
+    return /\d/.test(myString);
+  }
 function setSetting(name) {
     switch (name) {
         case ("degRad"):
@@ -305,15 +309,63 @@ function getRandomColor() {
     }
     return color;
 }
-function createTab(name, buttonList) {
-    let newTab = document.createElement('tab-page');
-    newTab.setAttribute('name', name);
-    newTab.setAttribute('type', 'template');
-    let newTemplate = document.createElement('template-func');
-    newTemplate.setAttribute('name', name);
-    newTemplate.buttonList = buttonList;
-    newTab.appendChild(newTemplate);
-    envObject.mainTabMenu.appendChild(newTab);
+function addImplemented(funcConfig) {
+
+    funcConfig.callType = "func"
+    funcConfig.method =
+        callCalc({ "callType": 'func', "method": 'add', "newFuncs": [funcConfig] });
+}
+function findFuncConfig(name) {
+    let funcList = Object.getPrototypeOf(funcListProxy);
+    for (let func of funcList) {
+        if (func.name == name) {
+            return func;
+        }
+    }
+    return false;
+}
+function createFunc(type, name, text) {
+    console.log("createFunc ran")
+    if (findFuncConfig(name) === false) {
+        let object = new FuncDef(type, name, text);
+        console.log(object)
+        switch (type) {
+            case "Function":
+                object.equation = text;
+                custButton(object.object);
+                addImplemented(object.object)
+                break;
+            case "Code":
+                object.code = text;
+                custButton(object.object);
+                break;
+            case "Hybrid":
+                object.code = text;
+                custButton(object.object);
+                break;
+        }
+        funcListProxy.push(object);
+    }
+}
+function custButton(funcConfig) {
+    let type = funcConfig.type;
+    let name = funcConfig.name;
+    let equation = "";
+    switch (funcConfig.type) {
+        case ("Function"):
+            equation = funcConfig.equation;
+            break;
+        case ("Code"):
+            equation = "Coded";
+            break;
+        case ("Hybrid"):
+            equation = "Hybrid";
+            break;
+    }
+    for (let container of envObject.cardContainers) {
+        container.addCard(name, equation);
+    }
+
 }
 function changeButtons(name, defObject) {
     let target = envObject.funcButtons.find(value => value.name == name);
@@ -325,6 +377,11 @@ function changeButtons(name, defObject) {
 }
 //Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
 function hideElements(elements) {
+    const endPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve("");
+        }, 150);
+      });
     for (let element of elements) {
         element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
         setTimeout(function () {
@@ -332,10 +389,15 @@ function hideElements(elements) {
             element.style.visibility = "hidden";
         }, 150);
     }
+    return endPromise;
 }
 //Intended for animating the enter of an element to the page but again im lazy and may not get implemented
 function pullUpElements(elements) {
-    console.log(elements)
+    const endPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve("");
+        }, 150);
+      });
     for (let element of elements) {
         console.log(element)
         element.style.visibility = "inherit";
@@ -344,11 +406,139 @@ function pullUpElements(elements) {
             element.style.animation = undefined;
         }, 150);
     }
+    return endPromise;
 }
+function openPage(element) {
+    element.style.zIndex = 5;
+    animate(element, "0.15s ease 0s 1 normal none running pageup").then(() => {
+      console.log("Never Ran")
+      element.style.animation = undefined;
+      element.style.bottom = "0px";
+    });
+  }
+  //Responsible for hiding pages that where placed on top of the main calculator
+  function closePage(element) {
+    animate(element, "0.15s ease 0s 1 reverse none running pageup").then(() => {
+      element.style.animation = undefined;
+      element.style.bottom = "100%";
+      element.style.zIndex = 1;
+    });
+  }
 function isHidden(el) {
     var style = window.getComputedStyle(el);
     return (style.display === 'none')
 }
+
+//Icons Start
+class svgIcon extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+        <style>
+        .svgText {
+            fill: var(--textColor);
+        }
+        .primary {
+            fill: var(--functionsColor);
+        }
+        .secondary {
+            fill: var(--displayColor);
+          }
+          
+        .accent {
+            fill: var(--numbersColor);
+        }
+        #svgAsset {
+            width: inherit;
+            height: inherit;
+            aspect-ratio: 1/1;
+            isolation: isolate;
+        }
+        </style>
+        
+        `
+    }
+}
+class ScanIcon extends svgIcon {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path class="svgText" d="m635.4 737.83c0-56.529 45.894-102.42 102.42-102.42s102.42 45.894 102.42 102.42-45.895 102.42-102.42 102.42-102.42-45.895-102.42-102.42zm0-498.08h150.72c29.876 0 54.132 24.256 54.132 54.132v150.72h-79.089v-103.54c0-12.264-9.957-22.221-22.221-22.221h-103.54v-79.089zm-190.81 0h-150.72c-29.876 0-54.132 24.256-54.132 54.132v150.72h79.089v-103.54c0-12.264 9.957-22.221 22.221-22.221h103.54v-79.089zm0 600.5h-150.72c-29.876 0-54.132-24.256-54.132-54.132v-150.72h79.089v103.54c0 12.264 9.957 22.221 22.221 22.221h103.54v79.089z" fill-rule="evenodd"/>
+        </svg>
+        `
+    }
+}
+customElements.define('scan-icon', ScanIcon);
+class pasteIcon extends svgIcon {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path class="svgText" d="m469.56 763.76h-158.49c-26.251 0-47.563-21.313-47.563-47.563v-452.44c0-26.251 21.312-47.563 47.563-47.563h71.829 165.53 71.828c26.251 0 47.564 21.312 47.564 47.563v130.17h-44.842v-109.75c0-12.779-10.375-23.154-23.154-23.154h-32.239v48.19c0 10.574-8.584 19.158-19.157 19.158h-165.53c-10.573 0-19.158-8.584-19.158-19.158v-48.19h-32.238c-12.779 0-23.154 10.375-23.154 23.154v411.59c0 12.779 10.375 23.154 23.154 23.154h138.06v44.831zm115.32-273.78h129.26c14.092 0 25.533 11.441 25.533 25.534 0 14.092-11.441 25.533-25.533 25.533h-129.26c-14.092 0-25.533-11.441-25.533-25.533 0-14.093 11.441-25.534 25.533-25.534zm-46.195-41.472h221.65c10.556 0 19.127 8.57 19.127 19.126v340c0 10.556-8.571 19.126-19.127 19.126h-221.65c-10.556 0-19.126-8.57-19.126-19.126v-340c0-10.556 8.57-19.126 19.126-19.126zm-16.878-37.034h255.41c21.685 0 39.29 17.606 39.29 39.291v373.74c0 21.685-17.605 39.29-39.29 39.29h-255.41c-21.685 0-39.29-17.605-39.29-39.29v-373.74c0-21.685 17.605-39.291 39.29-39.291z" fill="#fff" fill-rule="evenodd"/>
+        </svg>
+
+        `
+    }
+}
+customElements.define('paste-icon', pasteIcon);
+class arrowIcon extends svgIcon {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
+            <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
+            <path class="svgText" d="m452.13 393.06-251.84 251.84c-11.602 11.603-11.602 30.443 0 42.045l66.848 66.848c11.603 11.602 30.442 11.602 42.045 0l230.82-230.82 230.82 230.82c11.603 11.602 30.442 11.602 42.045 0l66.848-66.848c11.602-11.602 11.602-30.442 0-42.045l-318.69-318.69c-11.602-11.602-30.442-11.602-42.044 0l-66.848 66.848z"/>
+            </svg>
+
+        `
+        this.arrowIcon = this.shadowRoot.querySelector("#svgAsset");
+        this.circleBg = this.shadowRoot.querySelector("#circleBackground");
+    }
+    static get observedAttributes() {
+        return ['direction'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        console.log(name)
+        if(name == "direction"){
+            console.log(newValue)
+            if(newValue == "up"){
+                this.arrowIcon.style.transform = "";
+            }else if(newValue == "down"){
+                this.arrowIcon.style.transform = "rotate(180deg)";
+            }else if(newValue == "left"){
+                this.arrowIcon.style.transform = "rotate(270deg)";
+            }else if(newValue == "right"){
+                this.arrowIcon.style.transform = "rotate(90deg)";
+            }
+        }
+        if(this.hasAttribute("bgColor")){
+            console.log("setitngs the colors")
+            newValue = this.getAttribute("bgColor");
+            this.circleBg.classList.remove(...this.circleBg.classList);
+            if(newValue == "primary"){
+                this.circleBg.classList.add("primary");
+            }else if (newValue == "secondary"){
+                this.circleBg.classList.add("secondary");
+            }else if (newValue == "accent"){
+                this.circleBg.classList.add("accent");
+            }
+        }
+    }
+}
+customElements.define('arrow-icon', arrowIcon);
+class plusIcon extends svgIcon {
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        
+        `;
+    }
+}
+//Icons End
 class EquatInput extends HTMLElement {
     constructor() {
         super();
@@ -418,11 +608,15 @@ class EquatInput extends HTMLElement {
         this.input = this.shadowRoot.querySelector("#dynamicEquation");
         this.errIcon = this.shadowRoot.querySelector("#errorIcon");
         this.styler = this.shadowRoot.querySelector("#styler");
+        this.parentStylingMethod = () => {};
+
+        this.keypadPortrait = 'height: calc(33.3333% - 26.6666px); top: calc(66.6666% + 16.6666px);';
+        this.keypadLandscape = 'width: calc(33.3333% - 10px); height: calc(100% - 60px); top: 50px; margin-left: 0px; left: 66.6666%; position: absolute; ';
     }
-    get() {
+    get text() {
         return this.shadowRoot.querySelector("#dynamicEquation").innerHTML;
     }
-    set(val) {
+    set text(val) {
         this.shadowRoot.querySelector("#dynamicEquation").innerHTML = val;
     }
     def() {
@@ -460,12 +654,9 @@ class EquatInput extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ['innerStyle', 'placeholder', "id", "enabled", "mode"];
+        return ['placeholder', "id", "enabled", "mode", "popup"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if (this.hasAttribute("innerStyle")) {
-            this.shadowRoot.querySelector("#containerDiv").setAttribute("style", this.getAttribute("innerStyle"));
-        }
         if (this.hasAttribute("placeholder")) {
             this.shadowRoot.querySelector("#dynamicEquation").setAttribute("placeholder", this.getAttribute("placeholder"));
         }
@@ -482,6 +673,51 @@ class EquatInput extends HTMLElement {
         if (this.hasAttribute('mode')) {
             if (this.hasAttribute('mode') === "flex") {
 
+            }
+        }
+        if (this.hasAttribute('popup')) {
+            if (this.getAttribute('popup') == "true") {
+                if(envObject.mainKeypad != undefined){
+                    this.input.addEventListener('click', (e) => {
+                        this.inputOpen = true;
+                        if(!mediaTypeArray.queryHasMethod("portrait", "keyboardPopup") && !mediaTypeArray.queryHasMethod("landscape", "keyboardPopup")){
+                            mediaTypeArray.addMethodTo("portrait", {name :"keyboardPopup", func : (e) =>{
+                                envObject.mainKeypad.style = this.keypadPortrait;
+                                envObject.mainKeypad.setAttribute("mode", "limited");
+                            }});
+                            mediaTypeArray.addMethodTo("landscape", {name :"keyboardPopup", func :(e) => {
+                                envObject.mainKeypad.style = "";
+                                envObject.mainKeypad.style = this.keypadLandscape;
+                                envObject.mainKeypad.setAttribute("mode", "limited");
+                            }});
+                        }
+                        
+                        if(this.parentStylingMethod != undefined){
+                            this.parentStylingMethod(true);
+                        }
+                        envObject.mainKeypad.setAttribute("mode", "limited");
+                        pullUpElements([envObject.mainKeypad]);
+
+                        envObject.mainKeypad.setTarget({input: this, scroll: this});
+                        let removeMethod = (e) => {
+                            if(e.composedPath()[0].id != "dynamicEquation" && e.target.nodeName != "FUNC-KEYPAD" && e.target.id != envObject.mainKeypad.id){
+                                this.inputOpen = false;
+                                hideElements([envObject.mainKeypad]).then((e) => {
+                                    envObject.mainKeypad.style = '';
+                                    envObject.mainKeypad.reset();
+                                });
+                                
+                                if(this.parentStylingMethod != undefined){
+                                    this.parentStylingMethod(false);
+                                }
+                                document.body.removeEventListener('click', removeMethod);
+                                mediaTypeArray.remove("keyboardPopup");
+                            }
+                        }
+                        document.body.addEventListener('click', removeMethod);
+                    });
+                    
+                }
             }
         }
     }
@@ -1119,22 +1355,84 @@ class FuncButton extends HTMLElement {
         this.nameLabel = this.shadowRoot.querySelector("#nameLabel");
         this.equationLabel = this.shadowRoot.querySelector("#equationLabel");
         this.removeActive = false;
+        this.copies = [];
 
         this.buttonNode.addEventListener('click', (e) => {
             if (this.removeActive == false) {
                 let funcName = this.nameLabel.innerHTML;
                 if (!envObject.mainTabMenu.hasTab(funcName)) {
-                    createTab(this.name, this.copies)
+                    this.createTab(this.name, this.copies)
                 } else {
                     envObject.mainTabMenu.openTabByName(this.name);
                 }
             } else {
                 envObject.confirmPopup.open("Are you sure you want to delete this Function?", () => {
-                    funcRemove(buttonNode);
+                    this.removeCards()
+                    removeFunc(this.name)
                 });
             }
         });
 
+    }
+    init(name, text) {
+        this.name = name;
+        this.text = text;
+        for (let elem of envObject.funcPools) {
+            if (elem.getFuncButton(this) == false) {
+                let cardClone = this.cloneNode();
+                cardClone.name = this.name;
+                cardClone.text = this.text;
+                this.copies.push(cardClone);
+                cardClone.copies = this.copies;
+                elem.addFuncButton(cardClone);
+            }
+        }
+    }
+    /**
+     * @param {string} nameVal
+     */
+    set name(nameVal) {
+        this.nameLabel.innerHTML = nameVal;
+    }
+    get name() {
+        return this.nameLabel.innerHTML;
+    }
+    get text() {
+        return this.equationLabel.innerHTML;
+    }
+    /**
+     * @param {string} textVal
+     */
+    set text(textVal) {
+        this.equationLabel.innerHTML = textVal;
+    }
+    setAllNames(inputName) {
+        for (let elem of this.copies) {
+            elem.name = inputName;
+        }
+    }
+    setAllTexts(inputName) {
+        for (let elem of this.copies) {
+            elem.text = inputName;
+        }
+    }
+    createTab() {
+        let newTab = document.createElement('tab-page');
+        newTab.setAttribute('name', this.name);
+        newTab.setAttribute('type', 'template');
+        let newTemplate = document.createElement('template-func');
+        newTemplate.setAttribute('name', this.name);
+        newTemplate.buttonList = this.copies;
+        newTab.appendChild(newTemplate);
+        envObject.mainTabMenu.appendChild(newTab);
+    }
+    removeCards() {
+        for (let elem of this.copies) {
+            if (elem != this) {
+                elem.remove();
+            }
+        }
+        this.remove();
     }
     setRemove() {
         if (!this.removeActive) {
@@ -1256,6 +1554,7 @@ class inputMethod extends HTMLElement {
         this.keyTargets = {}
         this.linkedElems = [];
         envObject.keypads.push(this);
+        envObject.funcPools.push(this);
     }
     frontButtonPressed(input) {
         let display = this.keyTargets.input.input;
@@ -1283,17 +1582,25 @@ class inputMethod extends HTMLElement {
             index = input.length + 1;
         }
         setFocus(targetChild, index, inputShadow);
+        const inputEvent = new Event('input', { bubbles: true });
+        this.keyTargets.input.input.dispatchEvent(inputEvent);
         this.keyTargets.scroll.scrollTop = this.keyTargets.scroll.scrollHeight;
     }
+    setTarget(target){
+        if(target.input != undefined){
+            this.keyTargets.input = target.input;
+            if(this.firstTargets.input == undefined){
+                this.firstTargets.input = target.input;
+            }
+        }
+        if(target.scroll != undefined){
+            this.keyTargets.scroll = target.scroll;
+            if(this.firstTargets.scroll == undefined){
+                this.firstTargets.scroll = target.scroll;
+            }
+        }
+    }
     attributesMethod() {
-        this.keyTargets.scroll = envObject.inputs.find((elem) => elem.id === this.getAttribute("history"));
-        this.keyTargets.input = envObject.inputs.find((elem) => elem.id === this.getAttribute("input"));
-        if (this.firstTargets.scroll == undefined) {
-            this.firstTargets.scroll = document.getElementById(this.getAttribute("history"));
-        }
-        if (this.firstTargets.input == undefined) {
-            this.firstTargets.input = document.getElementById(this.getAttribute("input"))
-        }
         if (this.hasAttribute('linked')) {
             let linkedString = this.getAttribute("linked");
             if (linkedString.includes(',')) {
@@ -1305,8 +1612,6 @@ class inputMethod extends HTMLElement {
             }
             this.linkedElems.forEach((elem) => {
                 let target = envObject.keypads.find((element) => element.id == elem);
-                target.setAttribute("input", this.getAttribute("input"));
-                target.setAttribute("history", this.getAttribute("history"));
             });
         }
     }
@@ -1448,13 +1753,30 @@ class inputMethod extends HTMLElement {
         settings.degRad = !degRad;
         for (let elem of searchElems) {
             let tempTarget = elem.shadowRoot.querySelector('#keypad') ? trigElements[0] : trigElements[1];
-            tempTarget.shadowRoot.querySelector("#" + trigSwitches[0]) = text;
+            tempTarget.shadowRoot.querySelector("#" + trigSwitches[0]).innerHTML = text;
         }
 
     }
     getInputSel() {
         console.log(this.keyTargets.input)
         return this.keyTargets.input.getSel();
+    }
+    addCard(name, content) {
+        let card = document.createElement('func-button');
+        card.init(name, content);
+    }
+    addFuncButton(button) {
+        this.funcGrid.appendChild(button)
+    }
+    getFuncButton(testName) {
+        let elems = [... this.funcGrid.childNodes];
+        for (var i = 0; i < elems.length; i++) {
+            var child = elems[i];
+            if (child == testName) {
+                return button;
+            }
+        }
+        return false;
     }
 }
 class Keypad extends inputMethod { //Keypad class
@@ -1529,10 +1851,10 @@ class Keypad extends inputMethod { //Keypad class
         }
     
         #arrowIcon {
-            transform: rotate(270deg);
             visibility: inherit;
-            top: 5px;
-            right: 5px;
+            top: 10px;
+            transition: transform 0.125s;
+            right: 10px;
             font-size: 15px;
             text-align: center;
             stroke: transparent;
@@ -1540,7 +1862,7 @@ class Keypad extends inputMethod { //Keypad class
             background-color: #00000000;
             position: absolute;
             z-index: 2;
-            height: 40px;
+            height: 35px;
             pointer-events: all;
         }
     
@@ -1892,6 +2214,7 @@ class Keypad extends inputMethod { //Keypad class
         <style id="dynamicStyle"></style>
         <style id="styleInjector"></style>
         <div id="keypad" class="pane" style="visibility: inherit;">
+        <arrow-icon id="arrowIcon" class="arrows imgDivClass" bgColor="secondary" direction="up" ></arrow-icon>
             <div id="mainCacGrid">
                 <div id="specialElements button-item" name="1" class="button-item" style="grid-area: num1;">
                     <button class="numsbutton keypadButton" name="1" id="num1" focusable="false">1</button>
@@ -1903,14 +2226,7 @@ class Keypad extends inputMethod { //Keypad class
                     <button class="numsbutton keypadButton" id="num3">3</button>
                 </div>
                 <div class="button-item fI" style="grid-area: moreFuncBut;">
-                    <button id="moreFunctionsButton" class="keypadButton" tabindex="-1">More<br>Functions</button>
-                    <svg id="arrowIcon" class="arrows imgDivClass" style="isolation:isolate" viewBox="0 0 1080 1080"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect width="1080" height="1080" fill-opacity="0" />
-                        <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                        <path class="svgText"
-                            d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-                    </svg>
+                    <button id="moreFunctionsButton" class="keypadButton" tabindex="-1">𝑓</button>
                 </div>
                 <div class="button-item" style="grid-area: num4;">
                     <button class="numsbutton keypadButton" id="num4">4</button>
@@ -2056,6 +2372,8 @@ class Keypad extends inputMethod { //Keypad class
         
         </div>
         `;
+        this.arrowIcon = this.shadowRoot.querySelector('#arrowIcon');
+        this.styleInjector = this.shadowRoot.querySelector('#styleInjector');
         let keypadButtons = [
             {
                 "def": this.shadowRoot.querySelector('#num1'),
@@ -2312,11 +2630,10 @@ class Keypad extends inputMethod { //Keypad class
                 "name": "add Custom Function",
                 "function": () => {
                     let display = this.keyTargets.input.input;
+                    sessionStorage.setItem("facing", "creatorPage")
+                    pullUpElements([envObject.createPage]);
                     if (display.innerHTML != "‎" && display.innerHTML != "") {
-                        openPopup();
-                    } else {
-                        sessionStorage.setItem("facing", "creatorPage")
-                        openPage(document.getElementById("custCreatorPage"))
+                        envObject.createPage.creatorEquationFuncInput.text = display.innerHTML;
                     }
                 },
                 "repeatable": false,
@@ -2511,6 +2828,7 @@ class Keypad extends inputMethod { //Keypad class
                 button.setRemove(true);
             });
         });
+        this.funcGrid = this.shadowRoot.querySelector('#custFuncGridPopup');
         buttonMapper(keypadButtons);
 
     }
@@ -2528,10 +2846,6 @@ class Keypad extends inputMethod { //Keypad class
             //this mode is the keypads more limited mode removing the more functions tile and other func buttons
             this.shadowRoot.querySelector("#modeStyle").innerHTML = `
             #arrowIcon{
-              position: aboslute;
-              top: calc(50% - 25px);
-              left: calc(50% - 25px);
-              height: 50px;
               width: 50px;
               visibility: inherit;
             }
@@ -2714,42 +3028,32 @@ class Keypad extends inputMethod { //Keypad class
         }
     }
     popup() {
-        if (this.shadowRoot.querySelector('#arrowIcon').style.animation == "0.125s ease-in 0s 1 normal forwards running toUp") {
-            this.shadowRoot.querySelector('#arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toDown";
+        console.log(this.shadowRoot.querySelector('#arrowIcon').style.transform)
+        if (this.arrowIcon.style.transform == 'rotate(180deg)') {
+            this.arrowIcon.style.transform = '';
+            //this.shadowRoot.querySelector('#arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toDown";
             this.shadowRoot.querySelector('#extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 reverse forwards running extendFuncAnim";
             animate(this.shadowRoot.querySelector('#extraFuncPopUp'), "0.125s ease-in 0s 1 reverse none running extendFuncAnim").then(() => {
                 this.shadowRoot.querySelector('#extraFuncPopUp').style.animation = undefined;
                 this.shadowRoot.querySelector('#extraFuncPopUp').style.top = "100%";
+                this.shadowRoot.querySelector('#extraFuncPopUp').style.visibility = "hidden";
             });
             sessionStorage.setItem("facing", "");
-            this.shadowRoot.querySelector('#arrowIcon').style.transform = 'rotate(90deg);';
+            
         } else {
-            this.shadowRoot.querySelector('#arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toUp";
+            //this.shadowRoot.querySelector('#arrowIcon').style.animation = "0.125s ease-in 0s 1 normal forwards running toUp";
+            this.arrowIcon.style.transform = 'rotate(180deg)';
+            this.shadowRoot.querySelector('#extraFuncPopUp').style.visibility = "inherit";
             this.shadowRoot.querySelector('#extraFuncPopUp').style.animation = "0.125s ease-in 0s 1 normal forwards running extendFuncAnim";
             animate(this.shadowRoot.querySelector('#extraFuncPopUp'), "0.125s ease-in 0s 1 normal none running extendFuncAnim").then(() => {
                 this.shadowRoot.querySelector('#extraFuncPopUp').style.animation = undefined;
                 this.shadowRoot.querySelector('#extraFuncPopUp').style.top = "0%";
+                
             });
             sessionStorage.setItem("facing", "mainPopup");
-            this.shadowRoot.querySelector('#arrowIcon').style.transform = 'rotate(270deg);';
+            
         }
 
-    }
-    addCard(name, content) {
-        let selfGrid = this.shadowRoot.querySelector('#custFuncGridPopup')
-        let card = document.createElement('func-button')
-        card.setAttribute('name', name)
-        card.setAttribute('equation', content)
-        card.classList.add('customButton')
-        let linkedButtons = [card];
-        for (let elem of this.linkedElems) {
-            let target = envObject.keypads.find(keypad => keypad.id == elem)
-            let cardClone = card.cloneNode()
-            target.funcGrid.appendChild(cardClone)
-            linkedButtons.push(cardClone)
-        }
-        envObject.funcButtons.push({ "name": name, "defs": linkedButtons })
-        selfGrid.appendChild(card);
     }
     setStyle(styling) {
         this.shadowRoot.querySelector('#styleInjector').innerHTML = styling;
@@ -2758,8 +3062,11 @@ class Keypad extends inputMethod { //Keypad class
         this.shadowRoot.querySelector('#styleInjector').innerHTML = "";
         this.style = "";
         this.setAttribute('mode', this.ogMode);
-        this.keyTargets.input = this.firstTargets.input
+
+        this.keyTargets.input = this.firstTargets.input;
+        this.setAttribute('input', this.firstTargets.input.id);
         this.keyTargets.scroll = this.firstTargets.scroll;
+        this.setAttribute('scroll', this.firstTargets.scroll.id);
     }
     setVisibility(vis) {
         console.log("running vis")
@@ -2771,7 +3078,10 @@ class Keypad extends inputMethod { //Keypad class
             hideElements([this])
         }
     }
-
+    addFuncButton(button) {
+        super.addFuncButton(button);
+        button.classList.add('customButton');
+    }
 }
 customElements.define("func-keypad", Keypad);
 class removeIcon extends HTMLElement {
@@ -3185,14 +3495,6 @@ class extendedKeypad extends inputMethod {
     static get observedAttributes() {
         return ['mode', "input", "history"];
     }
-    addCard(name, content) {
-        let selfGrid = this.shadowRoot.querySelector('#funcGrid')
-        let card = document.createElement('func-button')
-        card.setAttribute('name', name)
-        card.setAttribute('equation', content)
-        card.classList.add('customButton')
-        selfGrid.appendChild(card)
-    }
     openFuncMenu() {
         pullUpElements([this.funcGrid])
         hideElements([this.buttonGrid])
@@ -3328,12 +3630,13 @@ class menuPane extends HTMLElement {
             this.pageReturn();
         });
         this.container = this.shadowRoot.querySelector("#paneContainer");
-        appendMethod('mobileLandscape', () => {
+        this.key = generateUniqueKey();
+        mediaTypeArray.addMethodTo('landscape', {name : this.key, func : () => {
             this.setStyling();
-        })
-        appendMethod('mobilePortrait', () => {
+        }});
+        mediaTypeArray.addMethodTo('portrait',{name : this.key, func : () => {
             this.setStyling();
-        });
+        }});
         this.container.addEventListener("change", () => {
             this.setStyling();
         })
@@ -3740,11 +4043,10 @@ class colorTextInput extends HTMLElement {
         `
         this.style.backgroundColor = "var(--numbersColor)"
         this.style.borderRadius = "15px"
-        this.colorInd = this.shadowRoot.querySelector("#lineIndicator")
-        this.richInput = this.shadowRoot.querySelector("#dynamicEquation")
-        this.input = this.richInput.input
-        console.log(this.input)
-        this.alert = this.richInput.alert
+        this.colorInd = this.shadowRoot.querySelector("#lineIndicator");
+        this.richInput = this.shadowRoot.querySelector("#dynamicEquation");
+        this.input = this.richInput.input;
+        this.alert = this.richInput.alert;
         this.color = getRandomColor();
         this.colorInd.style.fill = this.color;
     }
@@ -3753,11 +4055,14 @@ class colorTextInput extends HTMLElement {
         this.color = color
     }
     static get observedAttributes() {
-        return ['placeholder'];
+        return ['placeholder','popup'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.getAttribute("placeholder") != undefined) {
             this.richInput.setAttribute("placeholder", this.getAttribute("placeholder"));
+        }
+        if (this.getAttribute("popup") != undefined) {
+            this.richInput.setAttribute("popup", this.getAttribute("popup"));
         }
     }
     connectedCallback() {
@@ -3772,7 +4077,7 @@ class templateMode extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.shadowRoot.innerHTML = `
-        <style id="styler">
+        <style>
         * {
         box-sizing: border-box;
         padding: 0;
@@ -3901,6 +4206,7 @@ class templateMode extends HTMLElement {
         background: transparent;
       }
         </style>
+        <style id="styler"></style>
         <style id="orientationStyle"></style>
         <style id="keypadStyling"></style>
         <div id="modeContainer" class="modeContainerClass">
@@ -3920,7 +4226,7 @@ class templateMode extends HTMLElement {
                     </div>
                     <div id="contentControls" style="grid-area: controls;">
                         <div id="modeFuncGrid">
-                            <color-text id="initEquation" class="dynamicEquation" placeholder="Equation" style="width: 100%; height: calc(100% - 10px); font-size: 60px;"></color-text>
+                            <color-text id="initEquation" class="dynamicEquation" placeholder="Equation" popup="true" style="width: 100%; height: calc(100% - 10px); font-size: 60px;"></color-text>
                             <button id="addEquation">+</button>
                         </div>
                         <svg id="settingsCog" class="imgDivClass" style="height: 50px;isolation:isolate"
@@ -3936,6 +4242,7 @@ class templateMode extends HTMLElement {
         this.modeContainer = this.shadowRoot.getElementById("modeContainer")
         this.contentPane = this.shadowRoot.getElementById("contentPane")
         this.contentControls = this.shadowRoot.getElementById("contentControls")
+        this.styler = this.shadowRoot.getElementById("styler")
         this.settingsButton = this.shadowRoot.getElementById("settingsCog")
         this.shadowRoot.querySelector('#addEquation').addEventListener('click', () => {
             let gEContainer = this.shadowRoot.querySelector('#modeFuncGrid')
@@ -3943,7 +4250,13 @@ class templateMode extends HTMLElement {
             element.setAttribute('placeholder', 'Equation')
             element.setAttribute('style', 'width: 100%; height: calc(100% - 10px);font-size: 60px;')
             element.classList.add('dynamicEquation');
-            this.equationFocusHandler(element)
+            element.richInput.addEventListener('input', (e) => {
+                this.inputMethod();
+            });
+            element.richInput.parentStylingMethod = (input) => {
+                this.childStyleCallback(input);
+            }
+            element.richInput.setAttribute("popup", "true")
             gEContainer.insertBefore(element, this.shadowRoot.querySelector('#addEquation'))
         })
         this.shadowRoot.querySelector('#fullContent').addEventListener('click', () => {
@@ -3964,6 +4277,10 @@ class templateMode extends HTMLElement {
             }
 
         })
+    }
+    childStyleCallback(open) {
+        this.inputOpen = open;
+        this.setStyling();
     }
     setStyling() {
         let styling = "";
@@ -3987,13 +4304,14 @@ class templateMode extends HTMLElement {
              .
             `
             if (this.inputOpen) {
-                keypad.style = "width: calc(33.3333% - 10px); height: calc(100% - 60px) top: 60px; margin-left: 0px; left: 66.6666%;";
                 this.shadowRoot.querySelector('#keypadStyling').innerHTML = `
                     .modeContainerClass {
                         grid-template-columns: 33.3333% 33.3333% 33.3333%;
                         grid-template-rows: 100%;
                     }
                     `
+            }else{
+                this.shadowRoot.querySelector('#keypadStyling').innerHTML = ``;
             }
 
         } else {
@@ -4011,63 +4329,34 @@ class templateMode extends HTMLElement {
               }
             `
             if (this.inputOpen) {
-                keypad.style = "height: calc(33.3333% - 26.6666px); top: calc(66.6666% + 16.6666px); left: 10px;";
                 this.shadowRoot.querySelector('#keypadStyling').innerHTML = `
                 .modeContainerClass {
                     grid-template-rows: 33.3333% 33.3333% 33.3333%;
                     grid-template-columns: 100%;
                 }
                 `
+            }else{
+                this.shadowRoot.querySelector('#keypadStyling').innerHTML = ``;
             }
         }
         this.shadowRoot.querySelector("#orientationStyle").innerHTML = styling;
-    }
-    equationFocusHandler(elem) {
-        elem.addEventListener('focusin', (e) => {
-            console.log("fucking work")
-            this.inputOpen = true;
-            let styling = "";
-            if (this.orientation == "vertical") {
-                styling = `
-                    .modeContainerClass {
-                        grid-template-rows: 33.3333% 33.3333% 33.3333%;
-                    }
-                `
-                keypad.style = 'height: calc(33.3333% - 26.6666px); top: calc(66.6666% + 16.6666px); left: 10px;';
-            } else if (this.orientation == "horizontal") {
-                styling = `
-                    .modeContainerClass {
-                        grid-template-columns: 33.3333% 33.3333% 33.3333%;
-                    }
-                `
-                keypad.style = 'width: calc(33.3333% - 10px); height: calc(100% - 60px) top: 60px; margin-left: 0px; left: 66.6666%;';
-            }
-            console.log(this.shadowRoot.querySelector('#keypadStyling'))
-            console.log(this.orientation)
-            this.shadowRoot.querySelector('#keypadStyling').innerHTML = styling;
-        });
-        elem.addEventListener('focusout', (e) => {
-            console.log("focus lost")
-            this.inputOpen = false;
-            this.shadowRoot.querySelector('#keypadStyling').innerHTML = "";
-            keypad.reset();
-            hideElements([keypad]);
-        });
-        elem.addEventListener('input', (e) => {
-            this.inputMethod();
-        });
     }
     connectedInit() {
         if (!this.connectedOnce) {
             this.connectedOnce = true
             this.setStyling();
-            appendMethod('mobileLandscape', () => {
+            this.key = generateUniqueKey();
+            mediaTypeArray.addMethodTo('landscape',{name : this.key, func : () => {
                 this.setStyling();
-            })
-            appendMethod('mobilePortrait', () => {
+            }});
+            mediaTypeArray.addMethodTo('portrait',{name : this.key, func : () => {
                 this.setStyling();
+            }});
+            this.shadowRoot.querySelector('#initEquation').input.addEventListener('input', (e) => {
+                console.log("input to init")
+                this.inputMethod();
             });
-            this.equationFocusHandler(this.shadowRoot.querySelector('#initEquation'));
+            this.shadowRoot.querySelector('#initEquation').richInput.parentStylingMethod = (input) => {this.childStyleCallback(input);}
         }
     }
     contentMethod() {
@@ -4086,7 +4375,7 @@ class templateMode extends HTMLElement {
 class graphMode extends templateMode {
     constructor() {
         super();
-        this.shadowRoot.querySelector('#styler').innerHTML += `
+        this.styler.innerHTML += `
         #contentContainer{
             width: calc(100% - 20px);
             height: calc(100% - 20px);
@@ -4228,7 +4517,7 @@ customElements.define("graph-mode", graphMode);
 class tableMode extends templateMode {
     constructor() {
         super();
-        this.shadowRoot.querySelector('#styler').innerHTML += `
+        this.styler.innerHTML += `
         #modeTable {
             width: 100%;
             height: 100%;
@@ -4914,13 +5203,13 @@ class tabMenu extends HTMLElement {
         this.tabIndicatorContainer.addEventListener('click', (e) => {
             this.tabIndController();
         });
-
-        appendMethod('mobileLandscape', () => {
+        this.key = generateUniqueKey();
+        mediaTypeArray.addMethodTo('landscape',{ name: this.key, func : () => {
             this.setStyling();
-        })
-        appendMethod('mobilePortrait', () => {
+        }});
+        mediaTypeArray.addMethodTo('portrait',{ name: this.key, func : () => {
             this.setStyling();
-        });
+        }});
         this.shadowRoot.querySelector('#settingsCogIcon').addEventListener('click', () => { });
         this.mobileTabButton.addEventListener('click', () => {
             if (!isHidden(this.tabIndicatorContainer)) {
@@ -5231,7 +5520,7 @@ class equationMap extends HTMLElement {
             flex-wrap: wrap;
             border-radius: 25px;
             top: 15%;
-            height: inherit;
+            height: 100%;
             max-height: inherit;
             overflow-y: auto;
             overflow-x: hidden;
@@ -5300,6 +5589,7 @@ class equationMap extends HTMLElement {
             position: relative;
           }
         </style>
+        <style id="modeStyler"></style>
         <div id="varEquationContainer" value="">
             <rich-input id="EquationFunc" placeholder="Equation" style="padding-left: 10px;"></rich-input>
             <div id="varGrid"></div>
@@ -5309,10 +5599,11 @@ class equationMap extends HTMLElement {
         this.richInput = this.shadowRoot.querySelector('#EquationFunc');
         this.input = this.richInput.input;
         this.varGrid = this.shadowRoot.querySelector('#varGrid');
+        this.modeStyler = this.shadowRoot.querySelector('#modeStyler');
         this.ogEquation = '';
     }
     static get observedAttributes() {
-        return ['type', 'name'];
+        return ['type', 'name', 'mode'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.hasAttribute('type')) {
@@ -5328,6 +5619,15 @@ class equationMap extends HTMLElement {
             this.name = this.getAttribute('name');
 
         }
+        if(this.hasAttribute('mode')){
+            if(this.getAttribute('mode') == 'double'){
+                this.mode = 'double';
+                this.setStyle();
+            }else{
+                this.mode = 'triple';
+                this.setStyle();
+            }
+        }
     }
     connectedCallback() {
         setTimeout(() => {
@@ -5342,6 +5642,16 @@ class equationMap extends HTMLElement {
                 });
             }
         });
+    }
+    setStyle(){
+        if(this.mode == 'double'){
+            this.modeStyler.innerHTML = `
+            #varGrid{
+                grid-template-columns: 50% 50%;
+            }`;
+        }else{
+            this.modeStyler.innerHTML = ``;
+        }
     }
     checkVar() {
         let callMethod;
@@ -5396,12 +5706,18 @@ class equationMap extends HTMLElement {
             console.log("input")
             if (this.type == 'func') {
                 callCalc({ callType: "set", method: "var", targetEnv: this.name, target: name, value: variableEntry.value }).then((value) => {
-                    this.parentVarCallBack(value);
+                    if(this.parentVarCallBack != undefined){
+                        this.parentVarCallBack(value);
+                    }
                 });
-
             }
             this.parseEquation();
         });
+        if(this.varFocusCallBack != undefined){
+            variableEntry.parentStylingMethod = (type) => {this.varFocusCallBack(type)};
+            variableEntry.keypadPortrait += "height: calc(66.6666% - 120px); top: calc(33.3333% + 110px);";
+            variableEntry.setAttribute("popup", "true");
+        }
         this.varGrid.appendChild(varContainer);
         this.vars.push({
             'letter': name,
@@ -5447,7 +5763,7 @@ class slideSwitcher extends HTMLElement {
         this.shadowRoot.innerHTML = `
         <style>
             #modeSwitcher {
-                height: 40px;
+                height: 100%;
                 display: block;
                 width: fit-content;
             }
@@ -5461,12 +5777,12 @@ class slideSwitcher extends HTMLElement {
                 z-index: 2;
             }
             #selectorSlider {
-                height: 40px;
+                height: 100%;
                 width: 70px;
                 position: absolute;
                 background-color: var(--displayColor);
                 border-radius: 25px;
-                transition: all 0.2s;
+                transition: margin-left 0.2s;
             }
             #buttonContainer{
                 display: grid;
@@ -5516,13 +5832,13 @@ class slideSwitcher extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if (this.hasAttribute('selectColor')) {
             let selectColor = this.getAttribute('selectColor');
-            if(selectColor == "primary"){
+            if (selectColor == "primary") {
                 this.selectorSlider.style.backgroundColor = "var(--functionsColor)";
-            }else if(selectColor == "secondary"){
+            } else if (selectColor == "secondary") {
                 this.selectorSlider.style.backgroundColor = "var(--displayColor)";
-            }else if(selectColor == "accent"){
+            } else if (selectColor == "accent") {
                 this.selectorSlider.style.backgroundColor = "var(--numbersColor)";
-            }else{
+            } else {
                 this.selectorSlider.style.backgroundColor = selectColor;
             }
         }
@@ -5573,8 +5889,8 @@ class dataViewer extends HTMLElement {
           }
           
           #modeSwitcher {
-            top: 10px;
-            left: 10px;
+            position: relative;
+            height: 40px;
             display: inline-block;
             width: fit-content;
             grid-area: switcher;
@@ -6146,7 +6462,7 @@ class templateFuncPage extends funcPage {
                     position: absolute;
                     visibility: inherit;
                     margin-left: 5px;
-                    margin-top: 5px;
+                    top: 5px;
                 }
                 .svgText {
                     fill: var(--textColor);
@@ -6184,6 +6500,28 @@ class templateFuncPage extends funcPage {
         this.editButton = this.shadowRoot.querySelector('#editIcon');
         this.shareButton = this.shadowRoot.querySelector('#shareIcon');
     }
+    setStyle(){
+        if(this.dynamic == true){
+            let orientation = envObject.globalOrientation;
+            if(orientation == "landscape"){
+                this.nameInput.style = "width: 33.3333%; display: block;";
+                this.equationMap.style = "height: calc(100% - 110px); width: 33.3333%; max-height: unset;";
+                this.dataViewer.style = "width: calc(66.6666% - 30px) ; height: calc(100% - 20px); position: absolute; left: calc(33.3333% + 10px);";
+                this.equationMap.setAttribute("mode", "double")
+                if(this.keypadIsOpen){
+                    this.dataViewer.style = "width: calc(33.3333% - 30px); height: calc(100% - 20px); position: absolute; left: calc(33.3333% + 10px);";
+                }
+            }else{
+                this.nameInput.style = "";
+                this.equationMap.style = "";
+                this.dataViewer.style = "";
+                this.equationMap.setAttribute("mode", "triple")
+                if(this.keypadIsOpen){
+                    this.dataViewer.style = "";
+                }
+            }
+        }
+    }
     initMethod() {
         this.nameInput.input.innerHTML = this.name;
         this.funcListDef = findFuncConfig(this.name).def;
@@ -6201,7 +6539,18 @@ class templateFuncPage extends funcPage {
         this.dataViewer.setAttribute("name", this.name)
         this.equationMap.setAttribute("type", "func")
         this.equationMap.setAttribute("name", this.name)
+        this.dynamic = true;
+        mediaTypeArray.addMethodTo('landscape',{ name : `${this.name}PageStyling`, func : () => {
+            this.setStyle();
+        }});
+        mediaTypeArray.addMethodTo('portrait',{ name : `${this.name}PageStyling`, func : () => {
+            this.setStyle();
+        }});
         this.equationMap.parentVarCallBack = (value) => this.parseMethod(value);
+        this.equationMap.varFocusCallBack = (type) => {
+            this.keypadIsOpen = type;
+            this.setStyle();
+        }
         this.equationMap.input.addEventListener("input", () => {
             this.changeMethod(this.funcDef.func, this.equationMap.input.innerHTML)
         });
@@ -6270,7 +6619,6 @@ class templateFuncPage extends funcPage {
                 parseObject.changes = { "type": "Hybrid", "code": value };
             }
             callCalc(parseObject).then(value => {
-                console.log(value)
                 let equationValue;
                 if (value.type == "method") {
                     equationValue = `${value.func}(${value.vars.join(',')})`
@@ -6286,9 +6634,11 @@ class templateFuncPage extends funcPage {
                     //changeImplemented(this.funcDef.func, parseObject.changes);
                     this.funcListDef.name = value.func;
                     this.funcListDef.text = value.ogFunc;
+                    this.buttonList.setAllTexts(value.ogFunc);
                     console.log(Object.getPrototypeOf(funcListProxy));
                     this.funcDef = value;
                 }
+                this.buttonList[0].setAllNames(value.func);
                 if (arguments[2] != undefined) {
                     let array = arguments[2];
                     if (array.includes("name")) {
@@ -6443,6 +6793,7 @@ class createPage extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="./styling/animations.css">
         <style>
           
           * {
@@ -6456,10 +6807,22 @@ class createPage extends HTMLElement {
           
           .imgDivClass {
             aspect-ratio: 1 / 1;
+            postion: absolute;
+            height: 45px;
+            width: 45px;
+            isolation:isolate;
           }
-          
+          #backCreator{
+            display: block;
+            margin: 5px;
+            height: 45px;
+            width: 45px;
+          }
           .svgText {
             fill: var(--textColor);
+          }
+          .primary {
+            fill: var(--functionsColor);
           }
           
           input:focus {
@@ -6514,7 +6877,7 @@ class createPage extends HTMLElement {
             left: 10px;
             padding: 5px;
             border-radius: 15px;
-            top: 50px;
+            top: 55px;
             position: absolute;
           }
           
@@ -6551,6 +6914,8 @@ class createPage extends HTMLElement {
             left: 10px;
             height: calc(100% - 10px);
             background-color: var(--displayColor);
+            overflow-y: auto;
+            overflow-x: hidden;
             padding: 10px;
             font-size: 35px;
             border-radius: 25px;
@@ -6558,8 +6923,12 @@ class createPage extends HTMLElement {
           }
           
           #creatorEditor {
-            display: grid;
-            display: flex;
+            margin-left: 10px;
+            padding: 10px;
+            width: calc(100% - 20px);
+            max-height: calc(100% - 20px);
+            border-radius: 25px;
+            background-color: var(--displayColor);
             overflow: auto;
           }
           
@@ -6591,66 +6960,229 @@ class createPage extends HTMLElement {
           #creatorEditor::-webkit-scrollbar-corner {
             background-color: transparent;
           }
-          
-          #modeSwitcher {
-            top: 10px;
+          #slider{
+            position: absolute;
+            height: 40px;
             left: 10px;
-            height: 40px;
-            display: inline-block;
-            position: absolute;
-            width: 300px;
+            top: 10px;
           }
-          
-          .modeButton {
-            height: 100%;
-            width: 70px;
-            background-color: transparent;
-            border: none;
-            border-radius: 25px;
-            z-index: 2;
+          #scanCreator{
+            right: 5px;
+            top: 5px;
             position: absolute;
           }
-          
-          .selectorSlider {
-            top: 0px;
-            height: 40px;
-            width: 70px;
-            z-index: 1;
+          #pasteCreator{
+            right: 55px;
+            top: 5px;
             position: absolute;
-            background-color: var(--displayColor);
-            border-radius: 25px;
+          }
+          #creatorEquationFuncInput{
+            display: block;
+            height: fit-content;
           }
         </style>
+        <style id="modeStyler"></style>
         <div id="custCreatorPage">
-        <svg id="backCreator" class="imgDivClass" style="height: 45px; transform: rotate(180deg);isolation:isolate"
-            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <rect width="1080" height="1080" fill-opacity="0" />
-            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-            <path class="svgText"
-                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-        </svg>
+
+        <arrow-icon id="backCreator" direction="left"></arrow-icon>
+        <paste-icon id="pasteCreator" class="imgDivClass"></paste-icon>
+        <scan-icon id="scanCreator" class="imgDivClass"></scan-icon>
+        
         <input type="text" id="nameCreator" placeholder="Name">
         <div id="mainCreator">
-            <div id=modeSwitcher>
-                <button class="modeButton" id="funcCreatorButton">Function</button>
-                <button class="modeButton" id="hybdCreatorButton" style="left: 75px">Hybrid</button>
-                <button class="modeButton" id="codeCreatorButton" style="left: 150px">Code</button>
-                <div id="custCreatorUnder" class="selectorSlider"></div>
-            </div>
+            <slide-switcher id="slider"></slide-switcher>
             <button id="saveCreator">Save</button>
             <div class="creatorPage" id="funcTypePage">
-                <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value="">
+                <div class="creatorDiv" id="creatorEquationFunc" contenteditable="true" value="">
+                    <rich-input id="creatorEquationFuncInput" placeholder="Equation" value=""></rich-input>
                 </div>
             </div>
             <div class="creatorPage" id="hybridCodeTypePage" style="visibility: hidden;">
                 <div id="creatorEditor">
-
+                    <code-terminal id="terminal"></code-terminal>
                 </div>
             </div>
         </div>
 
     </div>
         `;
+        this.nameCreator = this.shadowRoot.getElementById('nameCreator');
+        this.slider = this.shadowRoot.getElementById('slider');
+        this.CodePage = this.shadowRoot.getElementById('hybridCodeTypePage');
+        this.terminal = this.shadowRoot.getElementById('terminal');
+        this.EquationPage = this.shadowRoot.getElementById('funcTypePage');
+        this.creatorEquationFunc = this.shadowRoot.getElementById('creatorEquationFunc');
+        this.creatorEquationFuncInput = this.shadowRoot.getElementById('creatorEquationFuncInput');
+
+        this.saveButton = this.shadowRoot.getElementById('saveCreator');
+        this.backButton = this.shadowRoot.getElementById('backCreator');
+        this.scanIcon = this.shadowRoot.getElementById('scanCreator');
+        this.pasteIcon = this.shadowRoot.getElementById('pasteCreator');
+        this.modeStyler = this.shadowRoot.getElementById('modeStyler');
+        
+        
+        this.createType = "Function";
+
+
+
+        this.saveButton.addEventListener('click', () => {
+            if(hasNumber(this.nameCreator)){
+                report("No numbers in name",false);
+            }else{
+                this.save();
+                hideElements([this]);
+            }
+            
+        });
+        this.backButton.addEventListener('click', () => {
+            hideElements([this]);
+        });
+
+
+        let equatPageButton = document.createElement('button');
+        equatPageButton.innerHTML = "Equation";
+        equatPageButton.addEventListener('click', () => {
+            this.createType = "Function";
+            this.switchPage();
+        });
+        this.slider.addButton(equatPageButton);
+
+
+
+        let hybridPageButton = document.createElement('button');
+        hybridPageButton.innerHTML = "Hybrid";
+        hybridPageButton.addEventListener('click', () => {
+            this.createType = "Hybrid";
+            this.switchPage();
+        });
+        this.slider.addButton(hybridPageButton);
+
+
+
+        let codePageButton = document.createElement('button');
+        codePageButton.innerHTML = "Code";
+        codePageButton.addEventListener('click', () => {
+            this.createType = "Code";
+            this.switchPage();
+        });
+        this.slider.addButton(codePageButton);
+
+
+
+        this.scanIcon.addEventListener('click', () => {
+            if (envObject.qrScanPage != undefined) {
+                envObject.qrScanPage.open();
+                envObject.qrScanPage.qrReader.onMessage = (message) => {
+                    if (message.includes("»")) {
+                        this.parseText();
+                    }else{
+                        report("Not a valid QR code",false);
+                    }
+
+                }
+            }
+        });
+        this.pasteIcon.addEventListener('click', () => {
+            navigator.clipboard
+            .readText()
+            .then((clipText) => {
+                if(clipText.includes("»")){
+                    this.parseText(clipText);
+                }else{
+                    report("Not a valid func code",false);
+                }
+            })
+        });
+
+        this.creatorEquationFunc.addEventListener('click', (e) => {
+            if (e.target == this.creatorEquationFunc) {
+                this.creatorEquationFuncInput.focus();
+            }
+
+        });
+    }
+    switchPage() {
+        let type = this.createType;
+        if (type == "Hybrid") {
+            this.CodePage.style.visibility = "inherit";
+            this.EquationPage.style.visibility = "hidden";
+            this.nameCreator.value = "Defined in Code"
+            this.nameCreator.disabled = true;
+        } else {
+            this.CodePage.style.visibility = type == "Code" ? "inherit" : "hidden";
+            this.EquationPage.style.visibility = type == "Code" ? "hidden" : "inherit";
+            this.nameCreator.value = this.nameCreator.value == "Defined in Code" ? "" : this.nameCreator.value;
+            this.nameCreator.disabled = false;
+        }
+    }
+    parseText(text) {
+        let tempParse = funcDecompressor(text);
+        if (tempParse.type == "Hybrid") {
+            this.terminal.text = tempParse.text;
+        } else {
+            this.nameCreator.value = tempParse.name;
+            if (tempParse.type == "Code") {
+                this.terminal.text = tempParse.text;
+            } else {
+                this.creatorEquationFuncInput.set(tempParse.text);
+            }
+        }
+    }
+    save() {
+        console.log("running save")
+        console.log(this.createType)
+
+        if (this.createType == "Function") {
+            createFunc("Function", this.nameCreator.value, this.creatorEquationFuncInput.text)
+        } else if (this.createType == "Hybrid") {
+            callCalc({ "callType": 'func', "method": 'add', 'newFuncs': [{ 'type': "Hybrid", 'code': document.getElementById('hybridEditor').value }] }).then((value) => {
+                createFunc("Hybrid", value, this.terminal.text)
+            });
+        } else if (this.createType == "Code") {
+            createFunc("Code", this.nameCreator.value, this.terminal.text)
+        }
+        console.log(funcList)
+
+    }
+    static get observedAttributes() {
+        return ['mode'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('mode')) {
+            this.mode = this.getAttribute('mode');
+            this.setStyle(true);
+        }
+    }
+    setStyle() {
+        if(this.mode == "landscape"){
+            this.modeStyler.innerHTML = `
+            #nameCreator{
+                width: calc(33.3333% - 20px);
+                z-index: 5;
+                left: 20px;
+                top: 65px;
+                height: 50px;
+                font-size: 35px;
+            }
+            #mainCreator{
+                top: 55px;
+            }
+            .creatorPage{
+                top: 70px;
+            }
+            #slider{
+                right: 90px;
+                left: unset;
+                height: 50px;
+            }
+            #saveCreator{
+                height: 50px;
+                width: 70px;
+            }
+            `
+        }else{
+            this.modeStyler.innerHTML = "";
+        }
     }
 }
 customElements.define('create-page', createPage);
@@ -6763,7 +7295,7 @@ class popup extends HTMLElement {
         this.styler = this.shadowRoot.getElementById('styler');
         this.popupContainer = this.shadowRoot.getElementById('popupContainer');
         this.popupContainer.addEventListener('click', (e) => {
-            if(e.target == this.popupContainer){
+            if (e.target == this.popupContainer) {
                 this.close();
             }
         });
@@ -6781,35 +7313,34 @@ class popup extends HTMLElement {
     setStyle() {
         this.popupDiv.style = "";
         this.popupContainer.style = "";
-        let style = (arguments[0] == undefined || typeof arguments[0] != typeof {}) ? {} : arguments[0]; ;
+        let style = (arguments[0] == undefined || typeof arguments[0] != typeof {}) ? {} : arguments[0];;
 
         style.popupDiv = {
             "position": "absolute"
         };
-        style.popupDiv[this.mode == "portrait" ? "height": "width"] = "fit-content";
-        style.popupDiv[this.mode == "portrait" ? "width": "height"] = "calc(100% - 20px)";
-        style.popupDiv[this.mode == "portrait" ? "left": "top"] = "10px";
-        if(this.isOpen){
-            style.popupDiv[this.mode == "portrait" ? "bottom": "right"] = "10px";
-        }else{
-            style.popupDiv[this.mode == "portrait" ? "bottom": "right"] = "-100%";
+        style.popupDiv[this.mode == "portrait" ? "height" : "width"] = "fit-content";
+        style.popupDiv[this.mode == "portrait" ? "width" : "height"] = "calc(100% - 20px)";
+        style.popupDiv[this.mode == "portrait" ? "left" : "top"] = "10px";
+        if (this.isOpen) {
+            style.popupDiv[this.mode == "portrait" ? "bottom" : "right"] = "10px";
+        } else {
+            style.popupDiv[this.mode == "portrait" ? "bottom" : "right"] = "-100%";
         }
         style.popupContainer = {};
-        style.popupContainer["zIndex"] = this.isOpen ? "10": "-1";
-        style.popupContainer["opacity"] = this.isOpen ? "1": "0";
-        if(this.popupPos == "centered"){
+        style.popupContainer["zIndex"] = this.isOpen ? "10" : "-1";
+        style.popupContainer["opacity"] = this.isOpen ? "1" : "0";
+        if (this.popupPos == "centered") {
             style.popupContainer["display"] = "flex";
             style.popupContainer["justify-content"] = "center";
             style.popupContainer["align-items"] = "center";
             style.popupDiv["position"] = "static";
-            style.popupDiv[this.mode == "portrait" ? "height": "width"] = this.mode == "portrait" ? "50": "width";
-            if(this.isOpen){
-                style.popupDiv[this.mode == "portrait" ? "marginTop": "marginLeft"] = "0px";
-            }else{
-                style.popupDiv[this.mode == "portrait" ? "marginTop": "marginLeft"] = "100%";
+            style.popupDiv[this.mode == "portrait" ? "height" : "width"] = this.mode == "portrait" ? "50" : "width";
+            if (this.isOpen) {
+                style.popupDiv[this.mode == "portrait" ? "marginTop" : "marginLeft"] = "0px";
+            } else {
+                style.popupDiv[this.mode == "portrait" ? "marginTop" : "marginLeft"] = "100%";
             }
         }
-        console.log(this.popupType);
         Object.keys(style).forEach(key => {
             let target = this[key];
             let objectRef = style[key];
@@ -6840,8 +7371,8 @@ class popup extends HTMLElement {
             this.popupContainer.style.opacity = "0";
         }*/
     }
-    set popupType (value) {
-        if(value == "boolean" && this.exitButton == undefined){
+    set popupType(value) {
+        if (value == "boolean" && this.exitButton == undefined) {
             this._popupType = "boolean"
             this.backIcon.remove();
             this.popupDiv.innerHTML += `
@@ -7100,7 +7631,7 @@ class sharePage extends popup {
 
         this.shareGrid.appendChild(shareGroup);
     }
-    
+
     /**
      * @param {string} text
      */
@@ -7161,7 +7692,7 @@ class qrScanPage extends popup {
         this.qrReader = this.shadowRoot.querySelector('#qrReader');
         this.backIcon = this.shadowRoot.querySelector('#backIcon');
         this.addEventListener('transitionend', () => {
-            if(this.style.top == "100%" || this.style.right == "-102%"){
+            if (this.style.top == "100%" || this.style.right == "-102%") {
                 this.style.visibility = "hidden";
             }
         });
@@ -7174,10 +7705,10 @@ class qrScanPage extends popup {
         this.qrReader.stop();
         super.close();
     }
-    setStyle(){
+    setStyle() {
         super.setStyle();
 
-        if(this.mode == "portrait"){
+        if (this.mode == "portrait") {
             this.shadowRoot.querySelector('#modeStyle').innerHTML = `
             #qrScanPage{
                 width: 100%;
@@ -7188,7 +7719,7 @@ class qrScanPage extends popup {
                 margin-bottom: 10px;
             }
             `;
-        }else if(this.mode == "landscape"){
+        } else if (this.mode == "landscape") {
             this.shadowRoot.querySelector('#modeStyle').innerHTML = `
             #qrScanPage{
                 width: inherit;
@@ -7358,8 +7889,8 @@ class editPage extends popup {
     }
 }
 customElements.define('edit-page', editPage);
-class confirmPage extends popup{
-    constructor(){
+class confirmPage extends popup {
+    constructor() {
         super();
         this.contentDiv.innerHTML = `
         <style>
@@ -7407,19 +7938,19 @@ class confirmPage extends popup{
         this.popupPos = "centered"
         this.popupType = "boolean"
     }
-    open(description, confirmMethod){
+    open(description, confirmMethod) {
         super.open();
         this.shadowRoot.getElementById('confirmMessage').innerHTML = description;
         this.confirmMethod = confirmMethod;
     }
-    close(){
+    close() {
         super.close();
         this.confirmMethod = undefined;
         this.shadowRoot.getElementById('confirmMessage').innerHTML = "";
     }
-    setStyle(){
+    setStyle() {
         super.setStyle();
-        if(this.mode == "landscape"){
+        if (this.mode == "landscape") {
             this.popupDiv.style.height = "fit-content";
             this.popupDiv.style.width = "350px";
         }

@@ -16,6 +16,7 @@
     <script src="packages/hammer.js"></script>
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
+    <script src="packages/safariSelectionPolyfill.js"></script>
 </head>
 
 <body>
@@ -28,12 +29,12 @@
             {
                 "name": "mobilePortrait",
                 "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
-                "methods": []
+                "methods": [()=>{envObject.globalOrientation = "portrait"}]
             },
             {
                 "name": "mobileLandscape",
                 "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
-                "methods": []
+                "methods": [()=>{envObject.globalOrientation = "landscape"}]
             }
         ]
         let appendMethod = (format, method) => {
@@ -49,7 +50,7 @@
         console.log(objecty);
         console.log(array);
     </script>
-    
+    <link rel="stylesheet" href="./styling/animations.css">
     <style>
         body {
             height: 100%;
@@ -57,12 +58,35 @@
             background-color: var(--displayColor);
         }
     </style>
-    <slide-switcher id="switcher"></slide-switcher>
+    <func-keypad id="mainKeypad" style="visibility: hidden;"></func-keypad>
     <script>
-        let switcher = document.getElementById('switcher');
-        switcher.addButton("Thing");
-        switcher.addButton("Thing2");
-        switcher.addButton("Thing3");
+        let keypad = document.getElementById("mainKeypad");
+        envObject.mainKeypad = keypad;
+    </script>
+    <rich-input popup="true" style="width: 300px; position: absolute; top: 0px; left: 0px;" id="thing"></rich-input>
+    
+    <script>
+        
+       document.body.addEventListener('click', (e) => {
+        console.log(e.target.nodeName);
+        console.log(e.composedPath()[0]);
+       })
+       for (let qElem of formats) {
+            let format = () => {
+                
+                for (let method of qElem.methods) {
+                    method();
+                }
+            }
+            qElem.query.addEventListener('change', () => {
+                if (qElem.query.matches) {
+                    format()
+                }
+            })
+            if (qElem.query.matches == true) {
+                format()
+            }
+        }
     </script>
     <!--<create-page></create-page>-->
 </body>

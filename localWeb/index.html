@@ -31,34 +31,25 @@
 </head>
 <script src="componets.js"></script>
 
-<body id="mainBody">
+<body id="mainBody" style="height: 100%; width: 100%; background-color: var(--displayColor);">
     <script>
-        let stylers = [
-
-        ]
-        let formats = [
-            {
-                "name": "mobilePortrait",
-                "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
-                "methods": []
-            },
-            {
-                "name": "mobileLandscape",
-                "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
-                "methods": []
-            },
-        ]
-        let appendMethod = (format, method) => {
-            formats.find((elem) => {
-                if (elem.name == format) {
-                    elem.methods.push(method)
-                }
-            })
-        }
+        mediaTypeArray.newQuery("portrait", "screen and (orientation: portrait) and (max-width: 450px)");
+        mediaTypeArray.addMethodTo('portrait',{ name : "globalOrientation", func : () => {
+            envObject.globalOrientation = "portrait";
+        }});
+        mediaTypeArray.newQuery("landscape", "screen and (orientation: landscape) and (max-height: 450px)");
+        mediaTypeArray.addMethodTo('landscape',{ name : "globalOrientation", func : () => {
+            envObject.globalOrientation = "landscape";
+        }});
     </script>
     <style id="bodyStyle"></style>
-    <script>stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
-    
+    <script>envObject.stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
+    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
+    <script>
+        let keypad = document.getElementById("mainKeypad");
+        envObject.mainKeypad = keypad;
+        envObject.cardContainers.push(keypad);
+    </script>
     <div class="page" id="mainPage">
         <tab-menu id="mainTabs">
             <script>
@@ -98,6 +89,8 @@
                             <div id="mainPageContainer">
                                 <history-display id="mainScroll" style="">
                                 </history-display>
+                                <script>
+                                </script>
                                 <keypad-ex id="extendedMainKeypad"></keypad-ex>
                             </div>
                             <style id="formatStyle"></style>
@@ -106,8 +99,9 @@
                                 let mainScroll = document.getElementById("mainScroll");
                                 let styler = document.getElementById("formatStyle");
                                 let mainPageContainer = document.getElementById("mainPageContainer");
-                                appendMethod('mobileLandscape', () => {
-                                    console.log(styler)
+
+                                envObject.mainKeypad.setTarget({ input: mainScroll.enterContainer, scroll: mainScroll})
+                                mediaTypeArray.addMethodTo('landscape',{ name : "keypadMainStyle", func : () => {
                                     styler.innerHTML = `
                                         #mainPageContainer{
                                             display: grid;
@@ -135,10 +129,8 @@
                                             top: 10px;
                                         }
                                     `;
-                                    console.log(styler.innerHTML)
                                     extendedMainKeypad.setAttribute("mode", 'triple');
-                                    let bodyStyler = stylers.find((elem) => elem.id == "mainBody" ).styler;
-                                    bodyStyler.innerHTML = `
+                                    envObject.stylers.find((elem) => elem.id == "mainBody" ).styler.innerHTML = `
                                         #mainKeypad{
                                             position: absolute;
                                             animation: 0.15s ease-in 0s 1 normal forwards running fadeEffect;
@@ -152,9 +144,8 @@
                                     `;
                                     keypad.setAttribute("mode", "half");
                                     keypad.ogMode = "half";
-                                    console.log(keypad)
-                                })
-                                appendMethod('mobilePortrait', () => {
+                                }})
+                                mediaTypeArray.addMethodTo('portrait',{ name : "keypadMainStyle", func : () => {
                                     styler.innerHTML = `
                                     #mainScroll {
                                         position: absolute;
@@ -168,9 +159,8 @@
                                         visibility: hidden;
                                     }
                                     `
-                                    let bodyStyler = stylers.find((elem) => elem.id == "mainBody" ).styler;
                                     keypad.setAttribute("mode", "full");
-                                    bodyStyler.innerHTML = `
+                                    envObject.stylers.find((elem) => elem.id == "mainBody" ).styler.innerHTML = `
                                         #mainKeypad{
                                             animation: fadeEffect 0.50s linear 1 none;
                                             width: calc(100% - 20px);
@@ -184,7 +174,8 @@
                                             filter: drop-shadow(-5px 5px 5px var(--translucent));
                                         }
                                     `;
-                                });
+                                
+                                }});
                             </script>
                         </menu-page>
                         <menu-page name="Graphing">
@@ -239,79 +230,6 @@
                             <table-mode id="mainModeTable"></table-mode>
                         </menu-page>
                     </menu-pane>
-                    <!--
-                    Start if main Mode
-                    
-                    <div id="graphMainMode" class="mode" style="visibility: hidden;">
-                        <div id="graphModeContainer" class="dynamicModeContainer">
-                            <div id="graphPane" class="dynamicModePane" grid-area="graph">
-                                <div id="graphContain" class="dynamicContent">
-                                    <canvas id="graphModeCanvas"></canvas>
-                                </div>
-                                <svg id="fullGraph" class="imgDivClass" style="height: 50px;isolation:isolate"
-                                    viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                                        fill-opacity=".2" />
-                                    <path class="svgText"
-                                        d="m352.08 274.47h-84.084v237h84.084v-152.92h152.92v-84.084h-152.92zm453.44 446.97v-152.92h-84.084v152.92h-152.92v84.084h152.92 84.084v-84.084z"
-                                        fill-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div id="graphControls" class="dynamicModeControls" grid-area="controls">
-                                <div id="graphFuncGrid" class="dynamicFuncGrid">
-                                    <div id="initGraphEquation" class="dynamicEquation" placeholder="Equation"
-                                        contenteditable="true" value=""></div>
-                                    <button id="addGraphEquation" class="addDynamicEquation">+</button>
-                                </div>
-                                <svg id="settingsCogGraph" class="imgDivClass" style="height: 50px;isolation:isolate"
-                                    viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                                    <path class="svgText"
-                                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
-                                        fill-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tableMainMode" class="mode" style="visibility: hidden;">
-                        <div id="tableModeContainer" class="dynamicModeContainer">
-                            <div id="tablePane" class="dynamicModePane" grid-area="graph">
-                                <div id="tableContain" class="dynamicContent">
-                                    <table id="modeTable">
-                                        <tr>
-                                            <th>x</th>
-                                            <th>y</th>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <svg id="fullGraph" class="imgDivClass" style="height: 50px;isolation:isolate"
-                                    viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                                        fill-opacity=".2" />
-                                    <path class="svgText"
-                                        d="m352.08 274.47h-84.084v237h84.084v-152.92h152.92v-84.084h-152.92zm453.44 446.97v-152.92h-84.084v152.92h-152.92v84.084h152.92 84.084v-84.084z"
-                                        fill-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div id="tableControls" class="dynamicModeControls" grid-area="controls">
-                                <div id="tableFuncGrid" class="dynamicFuncGrid">
-                                    <div id="initTableEquation" class="dynamicEquation" placeholder="Equation"
-                                        contenteditable="true" value=""></div>
-                                    <button id="addTableEquation" class="addDynamicEquation">+</button>
-                                </div>
-                                <svg id="settingsCogGraph" class="imgDivClass" style="height: 50px;isolation:isolate"
-                                    viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                                    <path class="svgText"
-                                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
-                                        fill-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    -->
                     <div id="selectorMode" class="mode" style="visibility: hidden;">
                         <button class="modeSelectButton" id="mainModeSelector">
                             <svg class="modeIcon" height="100%" style="isolation:isolate; aspect-ratio: 1/1;"
@@ -405,82 +323,9 @@
             envObject.mainTabMenu = document.getElementById("mainTabs");
         </script>
     </div>
-    <div id="nameEntry">
-        <div id="entryDiv">
-            <h2 id="entryNameHeader">Name</h2>
-            <svg id="confirmNameEntry" class="imgDivClass" style="height: 40px;isolation:isolate"
-                viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                    fill-opacity=".2" />
-                <path class="svgText"
-                    d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
-            </svg>
-            <svg id="exitNameEntry" class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                    fill-opacity=".2" />
-                <path class="svgText"
-                    d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-            </svg>
-
-            <textarea id="nameEntryArea" placeholder="Enter Name"></textarea>
-        </div>
-    </div>
-    <div id="confirmPage">
-        <div id="confirmDiv">
-            <h2 id="confirmHeader">Confirm</h2>
-            <h3 id="confirmMessage"></h3>
-            <svg id="confirmButton" class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                    fill-opacity=".2" />
-                <path class="svgText"
-                    d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
-            </svg>
-            <svg id="exitConfirmPage" class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                    fill-opacity=".2" />
-                <path class="svgText"
-                    d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-            </svg>
-        </div>
-    </div>
     <h1 id="popupConsole">
     </h1>
-    <div class="page" id="custCreatorPage">
-        <svg id="backCreator" class="imgDivClass" style="height: 45px; transform: rotate(180deg);isolation:isolate"
-            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <rect width="1080" height="1080" fill-opacity="0" />
-            <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-            <path class="svgText"
-                d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-        </svg>
-        <input type="text" id="nameCreator" placeholder="Name">
-        <div id="mainCreator">
-            <div id=modeSwitcher>
-                <button class="modeButton" id="funcCreatorButton">Function</button>
-                <button class="modeButton" id="hybdCreatorButton" style="left: 75px">Hybrid</button>
-                <button class="modeButton" id="codeCreatorButton" style="left: 150px">Code</button>
-                <div id="custCreatorUnder" class="selectorSlider"></div>
-            </div>
-            <button id="saveCreator">Save</button>
-            <div class="creatorPage" id="funcTypePage">
-                <div class="creatorDiv" id="creatorEquationFunc" placeholder="Equation" contenteditable="true" value="">
-                </div>
-            </div>
-            <div class="creatorPage" id="hybridCodeTypePage" style="visibility: hidden;">
-                <div id="creatorEditor">
-
-                </div>
-            </div>
-        </div>
-
-    </div>
+    <create-page id="creatorPage" class="page" style="z-index: 5; visibility: hidden;"></create-page>
     <div class="page" id="settingsPage">
         <div id="buyScreen" style="visibility: hidden;">
             <h1 class="settingsHeaders" id="buyTitle">Custom <br> Themes</h1>
@@ -788,50 +633,36 @@
         let editPopup = document.getElementById("editPopup");
         let confirmPopup = document.getElementById("confirmPopup");
         let settingsPopup = document.getElementById("settingsPopup");
-        appendMethod('mobileLandscape', () => {
+        let creatorPage = document.getElementById("creatorPage");
+        mediaTypeArray.addMethodTo('landscape', {name: "popupStyle", func : () => {
             shareElem.setAttribute("mode", "landscape");
             scanPopup.setAttribute("mode", "landscape");
             editPopup.setAttribute("mode", "landscape");
             confirmPopup.setAttribute("mode", "landscape");
             settingsPopup.setAttribute("mode", "landscape");
-        })
-        appendMethod('mobilePortrait', () => {
+            creatorPage.setAttribute("mode", "landscape");
+        }});
+        mediaTypeArray.addMethodTo('landscape', { name: "popupStyle", func: () => {
             shareElem.setAttribute("mode", "portrait");
             scanPopup.setAttribute("mode", "portrait");
             editPopup.setAttribute("mode", "portrait");
             confirmPopup.setAttribute("mode", "portrait");
             settingsPopup.setAttribute("mode", "portrait");
-        });
+            creatorPage.setAttribute("mode", "portrait");
+        }});
         envObject.editPopup = editPopup;
         envObject.sharePopup = shareElem;
         envObject.qrScanPage = scanPopup;
         envObject.confirmPopup = confirmPopup;
         envObject.settingsPopup = settingsPopup;
+        envObject.createPage = creatorPage;
         envObject.qrScanPage.qrReader.onMessage = (message) => {
 
         }
     </script>
-    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
+    
     <script>
-        let keypad = document.getElementById("mainKeypad");
-        envObject.cardContainers.push(keypad);
-        for (let qElem of formats) {
-            let format = () => {
-                console.log("Format styling method")
-                console.log(qElem.methods)
-                for (let method of qElem.methods) {
-                    method();
-                }
-            }
-            qElem.query.addEventListener('change', () => {
-                if (qElem.query.matches) {
-                    format()
-                }
-            })
-            if (qElem.query.matches == true) {
-                format()
-            }
-        }
+        
     </script>
     <script src="load.js"></script>
 </body>

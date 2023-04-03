@@ -98,26 +98,73 @@ class FuncDef {
     return parsedString;
   }
 }
+class MediaType {
+  #matchMedia;
+  #methodArray = [];
+  constructor(name, mediaString){
+    console.log(name);
+    console.log(mediaString);
+    this.name = name;
+    this.#matchMedia = window.matchMedia(mediaString);
+    this.changeMethod = (e) => {
+      if(e.matches){
+        this.#methodArray.forEach((element) => {
+          element.func();
+        });
+      }
+    };
+    
+    this.#matchMedia.onchange = this.changeMethod;
+    
+  }
+  getMedia(){
+    return this.#matchMedia;
+  }
+  addMethod(method){
+    this.#methodArray.push(method);
+    console.log("Added method: "+ method.name)
+    if(this.#matchMedia.matches){
+      method.func();
+    }
+    //this.changeMethod(this.#matchMedia);
+  }
+  hasMethod(name){
+    let has = this.#methodArray.find((element) => {
+      if(element.name == name){
+        return true;
+      }
+    });
+    return !!has;
+  }
+  removeMethod(methodName){
+    this.#methodArray.find((element, idx) => {
+      if(element.name = methodName){
+        this.#methodArray.splice(idx, 1);
+        return true;
+      };
+    })
+  }
+
+}
 var settings;
 let calcWorker = new Worker('evalWorker.js');
 let envObject = {
   funcButtons: [],
+  funcPools: [],
   inputs: [],
   keypads: [],
   cardContainers: [],
+  stylers: [],
 }
 let funcList = getFuncList();
 const funcListProxy = new Proxy(funcList, {
   set: (target, property, value) => {
-    console.log("triggered proxy")
     if(property === "length"){
       target[property] = value;
     }else{
       if(value instanceof FuncDef){
         target[property] = value;
       }else{
-        console.log(target)
-        console.log(property)
         target[property] = new FuncDef(value);
       }
     }
@@ -126,7 +173,6 @@ const funcListProxy = new Proxy(funcList, {
   },
   get: (target, property) => {
     if (property === 'push') {
-      console.log("triggered proxy")
       return (value) => {
         target[property].apply(target, [new FuncDef(value)]);
         setFuncList(target);
@@ -145,6 +191,42 @@ const funcListProxy = new Proxy(funcList, {
   },
   
 });
+let mediaTypeArray = {
+  "queries": [],
+  push : function (value){
+    if(value instanceof MediaType){
+      this.queries.push(value);
+    }
+  },
+  remove: function (name){
+    this.queries.forEach((element, idx) => {
+      element.removeMethod(name);
+    });
+  },
+  addMethodTo(queryName, method){
+    this.queries.find((element) => {
+      if(element.name == queryName){
+        element.addMethod(method);
+        return true;
+      }
+    })
+  },
+  newQuery: function (name, mediaString){
+    this.queries.push(new MediaType(name, mediaString));
+  },
+  queryHasMethod(queryName, methodName){
+    let query = this.queries.find((element) => {
+      if(element.name == queryName){
+        return true;
+      }
+    });
+    if(query != undefined){
+      return query.hasMethod(methodName);
+    }
+  }
+  
+};
+mediaTypeArray.push();
 const callCalc = (arry) => new Promise((res, rej) => {
     const channel = new MessageChannel();
     channel.port1.onmessage = ({ data }) => {
@@ -236,6 +318,15 @@ function getThemes() {
       }
     ];
 }
+function generateUniqueKey() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let key = '';
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    key += characters[randomIndex];
+  }
+  return key;
+}
 function setSettings() {
     let themes = getThemes();
   
@@ -266,6 +357,21 @@ function setSettings() {
     }*/
 }
 function funcCompressor(){}
+function funcDecompressor(func){
+  let funcObject = {};
+  if(func[0] == 'f'){
+    funcObject.type = "Function";
+  }else if (func[0] == 'c'){
+    funcObject.type = "Code";
+  }else{
+    funcObject.type = "Hybrid";
+  }
+  func = func.substring(func.indexOf('»') + 1);
+  funcObject.name = func.substring(0, func.indexOf('»'));
+  func = func.substring(func.indexOf('»') + 1);
+  funcObject.text = func.substring(0, func.indexOf('»'));
+  return funcObject;
+}
 //Responsible for getting the func list from local Storage
 function getFuncList() {
   let parseString = localStorage.getItem("funcList");
@@ -282,15 +388,11 @@ function getFuncList() {
   for (let func of array) {
     finalArray.push(new FuncDef(func));
   }
-  finalArray.forEach(element => {
-    console.log(element.compressed);
-  });;
   return finalArray;
 }
 function setFuncList(array) {
   let parseString = "";
   for (let item of array) {
-    console.log(`name : ${item.name}, type : ${item.type}, text : ${item.text}`)
     parseString += item.compressed + "⥾";
   }
   localStorage.setItem("funcList", parseString);

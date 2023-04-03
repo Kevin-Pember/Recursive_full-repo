@@ -766,72 +766,11 @@ if (document.getElementById("mainBody") != null) {
   */
 
 
-  //Name entry handler*********************************************************************************
-  document.getElementById('confirmNameEntry').addEventListener("click", function () {
-    createFunc('Function', document.getElementById('nameEntryArea').value, keyTargets.input.innerHTML);
-    universalBack();
-  });
-  document.getElementById('exitNameEntry').addEventListener("click", function () {
-    universalBack();
-  });
+  
   //***************************************************************************************************
 
 
 
-  //Confrim Page handler*******************************************************************************
-  document.getElementById('exitConfirmPage').addEventListener("click", function () {
-    closeConfirm();
-  });
-  //***************************************************************************************************
-
-
-
-  //Creator Handler************************************************************************************
-  document.getElementById('backCreator').addEventListener("click", function () {
-    universalBack();
-  });
-  let movable = document.getElementById("custCreatorUnder");
-  movable.dataset.pos = 0;
-  document.getElementById('funcCreatorButton').addEventListener("click", function () {
-    console.log("things")
-    animateModes(parseInt(movable.dataset.pos), 0, movable);
-    funcCreatorPages("funcTypePage")
-    document.getElementById('nameCreator').placeholder = "Name"
-    document.getElementById('nameCreator').readOnly = false;
-  });
-  document.getElementById('hybdCreatorButton').addEventListener("click", function () {
-    animateModes(parseInt(movable.dataset.pos), 75, movable);
-    funcCreatorPages("hybridCodeTypePage")
-    document.getElementById('nameCreator').placeholder = "defined by function"
-    document.getElementById('nameCreator').readOnly = true;
-  });
-  document.getElementById('codeCreatorButton').addEventListener("click", function () {
-    animateModes(parseInt(movable.dataset.pos), 150, movable);
-    funcCreatorPages("hybridCodeTypePage")
-    document.getElementById('nameCreator').placeholder = "Name"
-    document.getElementById('nameCreator').readOnly = false;
-  });
-  document.getElementById('saveCreator').addEventListener("click", function () {
-    if (movable.dataset.pos == 0) {
-      createFunc("Function", document.getElementById('nameCreator').value, document.getElementById('creatorEquationFunc').innerHTML)
-    } else if (movable.dataset.pos == 75) {
-      callCalc({ "callType": 'func', "method": 'add', 'newFuncs': [{ 'type': "Hybrid", 'code': document.getElementById('hybridEditor').value }] }).then((value) => {
-        createFunc("Hybrid", value, document.getElementById('hybridEditor').value)
-      });
-    } else if (movable.dataset.pos == 150) {
-      console.log('right thing happened')
-      createFunc("Code", document.getElementById('nameCreator').value, document.getElementById('hybridEditor').value)
-    }
-    universalBack();
-  });
-  createCodeTerminal(document.getElementById('creatorEditor'), "hybridEditor")
-  //***************************************************************************************************
-
-
-  //Settings Merge Start location 
-
-
-  //Theme Handling*************************************************************************************
 
   let accents = getAccents();
   let defaultThemes = getThemes();
@@ -1077,32 +1016,13 @@ function switchMode(modeId) {
 }
 //END
 /*******************************************|Main Page Custom Func Editing|*******************************************/
-//Responsible for the naming page for when a new func is typed in the enter header but needs a name
-function openPopup() {
-  sessionStorage.setItem("facing", "createNaming");
-  document.getElementById('nameEntry').style.visibility = "visible";
-}
+
 //Respinsible for the visible of pages on creator page. Takes the id and that is the page that becomes visible
 function funcCreatorPages(elemID) {
   for (let elem of document.getElementsByClassName('creatorPage')) {
     elem.style.visibility = "hidden";
   }
   document.getElementById(elemID).style.visibility = "visible";
-}
-function openConfirm(message, method) {
-  document.getElementById('confirmPage').style.visibility = "visible";
-  document.getElementById('confirmMessage').innerHTML = message;
-  document.getElementById('confirmButton').addEventListener('click', function () {
-    method();
-    closeConfirm();
-  });
-}
-function closeConfirm() {
-  let elem = document.getElementById('confirmButton')
-  let newElem = elem.cloneNode(true);
-  elem.parentNode.replaceChild(newElem, elem);
-  document.getElementById('confirmMessage').innerHTML = "";
-  document.getElementById('confirmPage').style.visibility = "hidden";
 }
 //END
 /***********************************************|Main Page Backend|*************************************************/
@@ -1124,29 +1044,7 @@ function setSelect(node, index) {
 }
 //END
 /************************************************|Custom Func UI|****************************************************/
-//Responsible for the orignal creatation of functions (probably doesn't need to be a method but it is)
-function createFunc(type, name, text) {
-  if (findFuncConfig(name) === false) {
-    let object = new FuncDef(type, name, text);
-    console.log(object)
-    switch (type) {
-      case "Function":
-        object.equation = text;
-        custButton(object.object);
-        addImplemented(object.object)
-        break;
-      case "Code":
-        object.code = text;
-        custButton(object.object);
-        break;
-      case "Hybrid":
-        object.code = text;
-        custButton(object.object);
-        break;
-    }
-    funcListProxy.push(object);
-  }
-}
+
 
 function compareTable(elems, points) {
   for (let i = 0; i < points.length; i++) {
@@ -1157,41 +1055,7 @@ function compareTable(elems, points) {
   return false
 }
 //Responsible for creating the cust func buttons and adding them to the elements in target array
-function custButton(funcConfig) {
-  let type = funcConfig.type;
-  let name = funcConfig.name;
-  let equation = "";
-  switch (funcConfig.type) {
-    case ("Function"):
-      equation = funcConfig.equation;
-      break;
-    case ("Code"):
-      equation = "Coded";
-      break;
-    case ("Hybrid"):
-      equation = "Hybrid";
-      break;
-  }
-  for (let container of envObject.cardContainers) {
-    container.addCard(name, equation);
-  }
 
-}
-//Responsible for removing the cust func button from page after remove func is pressed
-function funcRemove(e) {
-  let link = e;
-  let buttonName = link.querySelector("#nameLabel").innerHTML;
-  removeFunc(buttonName);
-  let names = document.getElementsByClassName("custFuncNames");
-  for (let i = 0; i < names.length; i++) {
-    if (names[i].innerHTML == buttonName) {
-      let parent = names[i].parentNode;
-      parent.remove();
-      i--;
-    }
-  }
-  //document.getElementById('custFuncGridPopup').removeChild(link);
-}
 //Responsible for the creation of tab and tab page of the given config
 /*function createTab(config) {
 
@@ -1432,13 +1296,6 @@ function changeImplemented(name, newObject) {
   })
   funcListProxy.splice(funcListProxy.indexOf(target), 1, newObject);
 }
-//Responsible for adding a cust func entry into interpreter
-function addImplemented(funcConfig) {
-  
-  funcConfig.callType = "func"
-  funcConfig.method =
-    callCalc({ "callType": 'func', "method": 'add', "newFuncs": [funcConfig] });
-}
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
 //Responsible for removing a value for the funcList (main backend)
 function removeFunc(funcName) {
@@ -1625,16 +1482,7 @@ function checkVar(name, def) {
 
   })
 }
-//Matches a funcConfig from funclist with a name
-function findFuncConfig(name) {
-  let funcList = Object.getPrototypeOf(funcListProxy);
-  for (let func of funcList) {
-    if (func.name == name) {
-      return func;
-    }
-  }
-  return false;
-}
+
 //Responsible for taking inputs and parsing them into the funclist
 function funcAssebly(type, name, text) {
   let object = {};
@@ -2110,28 +1958,6 @@ function getDate() {
   const d = new Date();
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
-}
-//Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
-function hideElements(elements) {
-  for (let element of elements) {
-    element.style.animation = "0.15s ease-in 0s 1 reverse forwards running fadeEffect"
-    setTimeout(function () {
-      element.style.animation = undefined;
-      element.style.visibility = "hidden";
-    }, 150);
-  }
-}
-//Intended for animating the enter of an element to the page but again im lazy and may not get implemented
-function pullUpElements(elements) {
-  console.log(elements)
-  for (let element of elements) {
-    console.log(element)
-    element.style.visibility = "inherit";
-    element.style.animation = "0.15s ease-in 0s 1 normal forwards running fadeEffect"
-    setTimeout(function () {
-      element.style.animation = undefined;
-    }, 150);
-  }
 }
 function queryVars(equat) {
   return callCalc({ "callType": "get", 'method': 'vars', 'text': equat })
