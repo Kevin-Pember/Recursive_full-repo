@@ -116,8 +116,7 @@ if (document.getElementById("mainBody") != null) {
 
 
   //Media query for resizing the calculator***********************************
-  const shit = window.matchMedia("(screen and max-height: 450px)");
-  var mobileLandscape = {
+/*  var mobileLandscape = {
     "q": window.matchMedia("screen and (max-height: 450px)"),
     "styling": `
     .tabcontent {
@@ -146,7 +145,7 @@ if (document.getElementById("mainBody") != null) {
     }
   
     #Container {
-      background-color: var(--functionsColor);
+      background-color: var(--primary);
     }
   
     #overlayDiv {
@@ -236,7 +235,7 @@ if (document.getElementById("mainBody") != null) {
     }
   
     #customFuncDisplay {
-      background-color: var(--functionsColor);
+      background-color: var(--primary);
       visibility: visible;
       width: 33.333%;
       left: 100%;
@@ -259,7 +258,7 @@ if (document.getElementById("mainBody") != null) {
       right: 2.5%;
       border-radius: 25px;
       border: none;
-      background-color: var(--numbersColor);
+      background-color: var(--accent);
     }
   
     #customFuncDisplayGrid {
@@ -516,7 +515,7 @@ if (document.getElementById("mainBody") != null) {
     }
   
     #customFuncDisplay {
-      background-color: var(--functionsColor);
+      background-color: var(--primary);
       visibility: visible;
       width: 33.333%;
       left: 100%;
@@ -539,7 +538,7 @@ if (document.getElementById("mainBody") != null) {
       right: 2.5%;
       border-radius: 25px;
       border: none;
-      background-color: var(--numbersColor);
+      background-color: var(--accent);
     }
   
     #customFuncDisplayGrid {
@@ -605,7 +604,7 @@ if (document.getElementById("mainBody") != null) {
       height: 100%;
       width: 40%;
       left: 60%;
-      background-color: var(--displayColor);
+      background-color: var(--secondary);
       position: absolute;
       z-index: 1;
       border-radius: 25px 0 0 0;
@@ -620,7 +619,7 @@ if (document.getElementById("mainBody") != null) {
     }
   
     #customFuncDisplayRecentText {
-      color: var(--textColor);
+      color: var(--text);
       text-align: center;
     }
   
@@ -678,7 +677,7 @@ if (document.getElementById("mainBody") != null) {
   })
   largeFormat.q.addEventListener("change", () => {
     queryMethod();
-  })
+  })*/
   //*****************************************************************
 
 
@@ -1855,10 +1854,10 @@ function setSettings() {
     }
   }
   let rootCss = document.querySelector(':root');
-  rootCss.style.setProperty('--displayColor', colorArray[2]);
-  rootCss.style.setProperty('--numbersColor', colorArray[1]);
-  rootCss.style.setProperty('--functionsColor', colorArray[0]);
-  rootCss.style.setProperty('--textColor', colorArray[3]);
+  rootCss.style.setProperty('--secondary', colorArray[2]);
+  rootCss.style.setProperty('--accent', colorArray[1]);
+  rootCss.style.setProperty('--primary', colorArray[0]);
+  rootCss.style.setProperty('--text', colorArray[3]);
   TextColorGlobal = colorArray[3];
   document.getElementById('graphDStep').value = settings.gR;
   document.getElementById('domainBottomG').value = settings.gMin;

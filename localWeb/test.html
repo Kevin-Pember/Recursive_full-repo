@@ -55,15 +55,10 @@
         body {
             height: 100%;
             width: 100%;
-            background-color: var(--displayColor);
+            background-color: var(--secondary);
         }
     </style>
-    <func-keypad id="mainKeypad" style="visibility: hidden;"></func-keypad>
-    <script>
-        let keypad = document.getElementById("mainKeypad");
-        envObject.mainKeypad = keypad;
-    </script>
-    <rich-input popup="true" style="width: 300px; position: absolute; top: 0px; left: 0px;" id="thing"></rich-input>
+    <func-grid-page></func-grid-page>
     
     <script>
         

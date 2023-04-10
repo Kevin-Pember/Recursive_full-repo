@@ -150,7 +150,6 @@ var settings;
 let calcWorker = new Worker('evalWorker.js');
 let envObject = {
   funcButtons: [],
-  funcPools: [],
   inputs: [],
   keypads: [],
   cardContainers: [],
@@ -201,6 +200,7 @@ let mediaTypeArray = {
   remove: function (name){
     this.queries.forEach((element, idx) => {
       element.removeMethod(name);
+      console.log(element)
     });
   },
   addMethodTo(queryName, method){
@@ -226,7 +226,6 @@ let mediaTypeArray = {
   }
   
 };
-mediaTypeArray.push();
 const callCalc = (arry) => new Promise((res, rej) => {
     const channel = new MessageChannel();
     channel.port1.onmessage = ({ data }) => {
@@ -337,10 +336,10 @@ function setSettings() {
       }
     }
     let rootCss = document.querySelector(':root');
-    rootCss.style.setProperty('--displayColor', colorArray[2]);
-    rootCss.style.setProperty('--numbersColor', colorArray[1]);
-    rootCss.style.setProperty('--functionsColor', colorArray[0]);
-    rootCss.style.setProperty('--textColor', colorArray[3]);
+    rootCss.style.setProperty('--secondary', colorArray[2]);
+    rootCss.style.setProperty('--accent', colorArray[1]);
+    rootCss.style.setProperty('--primary', colorArray[0]);
+    rootCss.style.setProperty('--text', colorArray[3]);
     TextColorGlobal = colorArray[3];
     if (!settings.degRad) {
       setDegMode();

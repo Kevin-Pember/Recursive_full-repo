@@ -31,7 +31,7 @@
 </head>
 <script src="componets.js"></script>
 
-<body id="mainBody" style="height: 100%; width: 100%; background-color: var(--displayColor);">
+<body id="mainBody" style="height: 100%; width: 100%; background-color: var(--secondary);">
     <script>
         mediaTypeArray.newQuery("portrait", "screen and (orientation: portrait) and (max-width: 450px)");
         mediaTypeArray.addMethodTo('portrait',{ name : "globalOrientation", func : () => {
@@ -48,7 +48,6 @@
     <script>
         let keypad = document.getElementById("mainKeypad");
         envObject.mainKeypad = keypad;
-        envObject.cardContainers.push(keypad);
     </script>
     <div class="page" id="mainPage">
         <tab-menu id="mainTabs">
@@ -326,6 +325,7 @@
     <h1 id="popupConsole">
     </h1>
     <create-page id="creatorPage" class="page" style="z-index: 5; visibility: hidden;"></create-page>
+    <func-grid-page id="funcGridPage" class="page" style="z-index: 5; visibility: hidden;"></func-grid-page>
     <div class="page" id="settingsPage">
         <div id="buyScreen" style="visibility: hidden;">
             <h1 class="settingsHeaders" id="buyTitle">Custom <br> Themes</h1>
@@ -634,6 +634,7 @@
         let confirmPopup = document.getElementById("confirmPopup");
         let settingsPopup = document.getElementById("settingsPopup");
         let creatorPage = document.getElementById("creatorPage");
+        let functionsPage = document.getElementById("funcGridPage");
         mediaTypeArray.addMethodTo('landscape', {name: "popupStyle", func : () => {
             shareElem.setAttribute("mode", "landscape");
             scanPopup.setAttribute("mode", "landscape");
@@ -656,6 +657,7 @@
         envObject.confirmPopup = confirmPopup;
         envObject.settingsPopup = settingsPopup;
         envObject.createPage = creatorPage;
+        envObject.funcPage = functionsPage;
         envObject.qrScanPage.qrReader.onMessage = (message) => {
 
         }
