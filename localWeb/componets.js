@@ -6071,15 +6071,6 @@ class dataViewer extends HTMLElement {
             font-weight: bold;
           }
           
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
-          
           #resultPane {
             background-color: var(--primary);
             width: 100%;
