@@ -29,12 +29,12 @@
             {
                 "name": "mobilePortrait",
                 "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
-                "methods": [()=>{envObject.globalOrientation = "portrait"}]
+                "methods": [() => { envObject.globalOrientation = "portrait" }]
             },
             {
                 "name": "mobileLandscape",
                 "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
-                "methods": [()=>{envObject.globalOrientation = "landscape"}]
+                "methods": [() => { envObject.globalOrientation = "landscape" }]
             }
         ]
         let appendMethod = (format, method) => {
@@ -44,8 +44,8 @@
                 }
             })
         }
-        let array = [{"name": "jerry", "test": "test"}]
-        let objecty = {"instance": array[0]}
+        let array = [{ "name": "jerry", "test": "test" }]
+        let objecty = { "instance": array[0] }
         objecty.instance.test = "test2";
         console.log(objecty);
         console.log(array);
@@ -58,17 +58,18 @@
             background-color: var(--secondary);
         }
     </style>
-    <func-grid-page></func-grid-page>
+    <title-card text="things"></title-card>
+    
+
     
     <script>
-        
-       document.body.addEventListener('click', (e) => {
-        console.log(e.target.nodeName);
-        console.log(e.composedPath()[0]);
-       })
-       for (let qElem of formats) {
+        document.body.addEventListener('click', (e) => {
+            console.log(e.target.nodeName);
+            console.log(e.composedPath()[0]);
+        })
+        for (let qElem of formats) {
             let format = () => {
-                
+
                 for (let method of qElem.methods) {
                     method();
                 }

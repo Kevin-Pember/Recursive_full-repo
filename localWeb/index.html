@@ -129,8 +129,7 @@
                                         }
                                     `;
                                     extendedMainKeypad.setAttribute("mode", 'triple');
-                                    envObject.stylers.find((elem) => elem.id == "mainBody" ).styler.innerHTML = `
-                                        #mainKeypad{
+                                    envObject.mainKeypad.style=`
                                             position: absolute;
                                             animation: 0.15s ease-in 0s 1 normal forwards running fadeEffect;
                                             width: calc(33.3333% - 15px);
@@ -139,7 +138,6 @@
                                             top: 50px;
                                             margin-left: 5px;
                                             z-index: 3;
-                                        }
                                     `;
                                     keypad.setAttribute("mode", "half");
                                     keypad.ogMode = "half";
@@ -159,8 +157,8 @@
                                     }
                                     `
                                     keypad.setAttribute("mode", "full");
-                                    envObject.stylers.find((elem) => elem.id == "mainBody" ).styler.innerHTML = `
-                                        #mainKeypad{
+                                    envObject.mainKeypad.style = `
+                                        
                                             animation: fadeEffect 0.50s linear 1 none;
                                             width: calc(100% - 20px);
                                             left: 10px;
@@ -171,7 +169,7 @@
                                             position: absolute;
                                             overflow: hidden;
                                             filter: drop-shadow(-5px 5px 5px var(--translucent));
-                                        }
+
                                     `;
                                 
                                 }});
@@ -636,6 +634,7 @@
         let creatorPage = document.getElementById("creatorPage");
         let functionsPage = document.getElementById("funcGridPage");
         mediaTypeArray.addMethodTo('landscape', {name: "popupStyle", func : () => {
+            console.log('triggered landscape');
             shareElem.setAttribute("mode", "landscape");
             scanPopup.setAttribute("mode", "landscape");
             editPopup.setAttribute("mode", "landscape");
@@ -643,7 +642,8 @@
             settingsPopup.setAttribute("mode", "landscape");
             creatorPage.setAttribute("mode", "landscape");
         }});
-        mediaTypeArray.addMethodTo('landscape', { name: "popupStyle", func: () => {
+        mediaTypeArray.addMethodTo('portrait', { name: "popupStyle", func: () => {
+            console.log('triggered landscape');
             shareElem.setAttribute("mode", "portrait");
             scanPopup.setAttribute("mode", "portrait");
             editPopup.setAttribute("mode", "portrait");
@@ -661,10 +661,6 @@
         envObject.qrScanPage.qrReader.onMessage = (message) => {
 
         }
-    </script>
-    
-    <script>
-        
     </script>
     <script src="load.js"></script>
 </body>

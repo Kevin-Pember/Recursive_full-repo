@@ -1,29 +1,3 @@
-let defStyle = `
-.svgText {
-    fill: var(--text);
-  }
-  
-  .settingCircle {
-    fill: var(--text)
-  }
-  
-  .primary {
-    fill: var(--primary);
-  }
-  
-  .secondary {
-    fill: var(--secondary);
-  }
-  
-  .accent {
-    fill: var(--accent);
-  }
-  
-  .text {
-    fill: var(--text);
-    color: var(--text);
-  }
-`;
 let colorArray = [];
 
 function setFocus(node, index) {
@@ -376,6 +350,7 @@ function changeButtons(name, defObject) {
 }
 //Intended for animating the hiding of elements. Implementation coming soon (IDK if it is coming soon because I lazy)
 function hideElements(elements) {
+    console.log(elements)
     const endPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve("");
@@ -437,26 +412,96 @@ function searchAlgo(string, checking) {
     }
     return true
 }
-//Icons Start
-class svgIcon extends HTMLElement {
+class recursiveComponent extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
         <style>
-        .svgText {
-            fill: var(--text);
-        }
-        .primary {
-            fill: var(--primary);
-        }
-        .secondary {
-            fill: var(--secondary);
-          }
-          
-        .accent {
-            fill: var(--accent);
-        }
+            * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0;
+                font-family: ubuntu;
+                color: var(--text);
+                -webkit-tap-highlight-color: transparent;
+            }
+            .primary {
+                fill: var(--primary);
+            }
+              
+            .secondary {
+                fill: var(--secondary);
+            }
+              
+            .accent {
+                fill: var(--accent);
+            }
+              
+            .text {
+                fill: var(--text)
+            }
+            .iconType{
+                border-radius: 50%;
+                aspect-ratio: 1/1;
+                background-color: var(--primary);
+                border: 1px solid var(--text);
+                display: grid;
+                place-items: center;
+                align-content: center;
+            }
+            .entryType{
+                border-radius: 15px;
+                border: 1px solid var(--text);
+            }
+            .titleType{
+                border-radius: 20px;
+                border: 1px solid var(--text);
+            }
+            .paneType{
+                border: 1px solid var(--text);
+                border-radius: 25px;
+                background-color: var(--primary);
+                filter: drop-shadow(-5px 5px 5px var(--translucent));
+            }
+            ::-webkit-scrollbar {
+                width: 2vh;
+              
+              }
+              
+            ::-webkit-scrollbar-track {
+                background: transparent;
+                margin-bottom: 40px;
+              }
+              
+            ::-webkit-scrollbar-thumb {
+                width: 5;
+                min-height: 30px;
+                background: var(--translucent);
+                border-radius: 10px;
+              }
+              
+            ::-webkit-scrollbar-button:end:increment {
+                height: 7px;
+                display: block;
+                background: transparent;
+              }
+              
+            ::-webkit-scrollbar-button:start:increment {
+                height: 7px;
+                display: block;
+                background: transparent;
+              }
+        </style>
+        `;
+    }
+}
+//Icons Start
+class svgIcon extends recursiveComponent {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
+        <style>
         #svgAsset {
             width: inherit;
             height: inherit;
@@ -468,21 +513,8 @@ class svgIcon extends HTMLElement {
         `
     }
     static get observedAttributes() {
-        return ["bgcolor"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if (this.hasAttribute("bgcolor")) {
-            newValue = this.getAttribute("bgcolor");
-            console.log("has bg attribute")
-            this.circleBg.classList.remove(...this.circleBg.classList);
-            if (newValue == "primary") {
-                this.circleBg.classList.add("primary");
-            } else if (newValue == "secondary") {
-                this.circleBg.classList.add("secondary");
-            } else if (newValue == "accent") {
-                this.circleBg.classList.add("accent");
-            }
-        }
     }
 }
 class ScanIcon extends svgIcon {
@@ -490,8 +522,7 @@ class ScanIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m635.4 737.83c0-56.529 45.894-102.42 102.42-102.42s102.42 45.894 102.42 102.42-45.895 102.42-102.42 102.42-102.42-45.895-102.42-102.42zm0-498.08h150.72c29.876 0 54.132 24.256 54.132 54.132v150.72h-79.089v-103.54c0-12.264-9.957-22.221-22.221-22.221h-103.54v-79.089zm-190.81 0h-150.72c-29.876 0-54.132 24.256-54.132 54.132v150.72h79.089v-103.54c0-12.264 9.957-22.221 22.221-22.221h103.54v-79.089zm0 600.5h-150.72c-29.876 0-54.132-24.256-54.132-54.132v-150.72h79.089v103.54c0 12.264 9.957 22.221 22.221 22.221h103.54v79.089z" fill-rule="evenodd"/>
+            <path class="text" d="m635.4 737.83c0-56.529 45.894-102.42 102.42-102.42s102.42 45.894 102.42 102.42-45.895 102.42-102.42 102.42-102.42-45.895-102.42-102.42zm0-498.08h150.72c29.876 0 54.132 24.256 54.132 54.132v150.72h-79.089v-103.54c0-12.264-9.957-22.221-22.221-22.221h-103.54v-79.089zm-190.81 0h-150.72c-29.876 0-54.132 24.256-54.132 54.132v150.72h79.089v-103.54c0-12.264 9.957-22.221 22.221-22.221h103.54v-79.089zm0 600.5h-150.72c-29.876 0-54.132-24.256-54.132-54.132v-150.72h79.089v103.54c0 12.264 9.957 22.221 22.221 22.221h103.54v79.089z" fill-rule="evenodd"/>
         </svg>
         `
     }
@@ -502,8 +533,7 @@ class pasteIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m469.56 763.76h-158.49c-26.251 0-47.563-21.313-47.563-47.563v-452.44c0-26.251 21.312-47.563 47.563-47.563h71.829 165.53 71.828c26.251 0 47.564 21.312 47.564 47.563v130.17h-44.842v-109.75c0-12.779-10.375-23.154-23.154-23.154h-32.239v48.19c0 10.574-8.584 19.158-19.157 19.158h-165.53c-10.573 0-19.158-8.584-19.158-19.158v-48.19h-32.238c-12.779 0-23.154 10.375-23.154 23.154v411.59c0 12.779 10.375 23.154 23.154 23.154h138.06v44.831zm115.32-273.78h129.26c14.092 0 25.533 11.441 25.533 25.534 0 14.092-11.441 25.533-25.533 25.533h-129.26c-14.092 0-25.533-11.441-25.533-25.533 0-14.093 11.441-25.534 25.533-25.534zm-46.195-41.472h221.65c10.556 0 19.127 8.57 19.127 19.126v340c0 10.556-8.571 19.126-19.127 19.126h-221.65c-10.556 0-19.126-8.57-19.126-19.126v-340c0-10.556 8.57-19.126 19.126-19.126zm-16.878-37.034h255.41c21.685 0 39.29 17.606 39.29 39.291v373.74c0 21.685-17.605 39.29-39.29 39.29h-255.41c-21.685 0-39.29-17.605-39.29-39.29v-373.74c0-21.685 17.605-39.291 39.29-39.291z" fill="#fff" fill-rule="evenodd"/>
+            <path class="text" d="m469.56 763.76h-158.49c-26.251 0-47.563-21.313-47.563-47.563v-452.44c0-26.251 21.312-47.563 47.563-47.563h71.829 165.53 71.828c26.251 0 47.564 21.312 47.564 47.563v130.17h-44.842v-109.75c0-12.779-10.375-23.154-23.154-23.154h-32.239v48.19c0 10.574-8.584 19.158-19.157 19.158h-165.53c-10.573 0-19.158-8.584-19.158-19.158v-48.19h-32.238c-12.779 0-23.154 10.375-23.154 23.154v411.59c0 12.779 10.375 23.154 23.154 23.154h138.06v44.831zm115.32-273.78h129.26c14.092 0 25.533 11.441 25.533 25.534 0 14.092-11.441 25.533-25.533 25.533h-129.26c-14.092 0-25.533-11.441-25.533-25.533 0-14.093 11.441-25.534 25.533-25.534zm-46.195-41.472h221.65c10.556 0 19.127 8.57 19.127 19.126v340c0 10.556-8.571 19.126-19.127 19.126h-221.65c-10.556 0-19.126-8.57-19.126-19.126v-340c0-10.556 8.57-19.126 19.126-19.126zm-16.878-37.034h255.41c21.685 0 39.29 17.606 39.29 39.291v373.74c0 21.685-17.605 39.29-39.29 39.29h-255.41c-21.685 0-39.29-17.605-39.29-39.29v-373.74c0-21.685 17.605-39.291 39.29-39.291z" fill="#fff" fill-rule="evenodd"/>
         </svg>
 
         `
@@ -515,18 +545,16 @@ class arrowIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
             <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m452.13 393.06-251.84 251.84c-11.602 11.603-11.602 30.443 0 42.045l66.848 66.848c11.603 11.602 30.442 11.602 42.045 0l230.82-230.82 230.82 230.82c11.603 11.602 30.442 11.602 42.045 0l66.848-66.848c11.602-11.602 11.602-30.442 0-42.045l-318.69-318.69c-11.602-11.602-30.442-11.602-42.044 0l-66.848 66.848z"/>
+            <path class="text" d="m452.13 393.06-251.84 251.84c-11.602 11.603-11.602 30.443 0 42.045l66.848 66.848c11.603 11.602 30.442 11.602 42.045 0l230.82-230.82 230.82 230.82c11.603 11.602 30.442 11.602 42.045 0l66.848-66.848c11.602-11.602 11.602-30.442 0-42.045l-318.69-318.69c-11.602-11.602-30.442-11.602-42.044 0l-66.848 66.848z"/>
             </svg>
         `
         this.arrowIcon = this.shadowRoot.querySelector("#svgAsset");
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
     }
     static get observedAttributes() {
-        return [...super.observedAttributes,'direction'];
+        return ['direction'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        super.attributeChangedCallback(name, oldValue, newValue);
         if (name == "direction") {
             if (newValue == "up") {
                 this.arrowIcon.style.transform = "";
@@ -548,8 +576,7 @@ class plusIcon extends svgIcon {
         this.shadowRoot.innerHTML += `
 
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m453.9 453.9h-261.36c-14.156 0-25.648 11.492-25.648 25.647v120.91c0 14.155 11.492 25.647 25.648 25.647h261.36v261.36c0 14.156 11.492 25.648 25.647 25.648h120.91c14.155 0 25.647-11.492 25.647-25.648v-261.36h261.36c14.156 0 25.648-11.492 25.648-25.647v-120.91c0-14.155-11.492-25.647-25.648-25.647h-261.36v-261.36c0-14.156-11.492-25.648-25.647-25.648h-120.91c-14.155 0-25.647 11.492-25.647 25.648v261.36z" fill="#ebebeb"/>
+            <path class="text" d="m453.9 453.9h-261.36c-14.156 0-25.648 11.492-25.648 25.647v120.91c0 14.155 11.492 25.647 25.648 25.647h261.36v261.36c0 14.156 11.492 25.648 25.647 25.648h120.91c14.155 0 25.647-11.492 25.647-25.648v-261.36h261.36c14.156 0 25.648-11.492 25.648-25.647v-120.91c0-14.155-11.492-25.647-25.648-25.647h-261.36v-261.36c0-14.156-11.492-25.648-25.647-25.648h-120.91c-14.155 0-25.647 11.492-25.647 25.648v261.36z" fill="#ebebeb"/>
         </svg>
         
         `
@@ -567,9 +594,8 @@ class minusIcon extends svgIcon {
                 }
             </style>
             <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-                <path id="firstTile" class="svgText minusBoxes" d="m192.54 453.9h694.92c14.156 0 25.648 11.492 25.648 25.647v120.91c0 14.155-11.492 25.647-25.648 25.647h-694.92c-14.156 0-25.648-11.492-25.648-25.647v-120.91c0-14.155 11.492-25.647 25.648-25.647z" fill="#ebebeb"/>
-                <path id="secondaryTile" class="svgText minusBoxes" d="m192.54 453.9h694.92c14.156 0 25.648 11.492 25.648 25.647v120.91c0 14.155-11.492 25.647-25.648 25.647h-694.92c-14.156 0-25.648-11.492-25.648-25.647v-120.91c0-14.155 11.492-25.647 25.648-25.647z" fill="#ebebeb"/>
+                <path id="firstTile" class="text minusBoxes" d="m192.54 453.9h694.92c14.156 0 25.648 11.492 25.648 25.647v120.91c0 14.155-11.492 25.647-25.648 25.647h-694.92c-14.156 0-25.648-11.492-25.648-25.647v-120.91c0-14.155 11.492-25.647 25.648-25.647z" fill="#ebebeb"/>
+                <path id="secondaryTile" class="text minusBoxes" d="m192.54 453.9h694.92c14.156 0 25.648 11.492 25.648 25.647v120.91c0 14.155-11.492 25.647-25.648 25.647h-694.92c-14.156 0-25.648-11.492-25.648-25.647v-120.91c0-14.155 11.492-25.647 25.648-25.647z" fill="#ebebeb"/>
             </svg>
         `;
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
@@ -577,10 +603,9 @@ class minusIcon extends svgIcon {
         this.secondaryTile = this.shadowRoot.querySelector("#secondaryTile");
     }
     static get observedAttributes() {
-        return [...super.observedAttributes,'animated'];
+        return ['animated'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        super.attributeChangedCallback(name, oldValue, newValue);
         if (this.hasAttribute('animated')) {
             if(this.getAttribute('animated') === "true" && this.toggle == undefined){
             this.toggle = false;
@@ -606,8 +631,8 @@ class errorIcon extends svgIcon {
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">    
             <path d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z" fill-opacity=".2"/>
-            <rect x="477" y="172.3" width="126" height="548.83" class="svgText"/>
-            <rect x="477" y="781.7" width="126" height="126" class="svgText"/>
+            <rect x="477" y="172.3" width="126" height="548.83" class="text"/>
+            <rect x="477" y="781.7" width="126" height="126" class="text"/>
         </svg>
         `;
     }
@@ -618,8 +643,7 @@ class historyIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m220.71 323.67h-0.379c-0.025-0.738-0.037-1.476-0.037-2.217 0-79.517 143.26-144.08 319.7-144.08s319.7 64.558 319.7 144.08c0 0.741-0.012 1.479-0.037 2.217h-0.416c0.273 1.452 0.416 2.951 0.416 4.482v6.682c0 13.326-10.819 24.146-24.145 24.146h-591.08c-13.326 0-24.145-10.82-24.145-24.146v-6.682c0-1.531 0.142-3.03 0.416-4.482zm348.66 166.23c79.906 13.932 140.73 83.705 140.73 167.57 0 93.882-76.221 170.1-170.1 170.1s-170.1-76.221-170.1-170.1h44.259c0 69.445 56.381 125.82 125.82 125.82 69.445 0 125.82-56.38 125.82-125.82 0-59.326-41.147-109.12-96.436-122.37v30.921l-96.458-54.959 96.458-54.96v33.794zm230.7-93.91v435.66c0 39.169-27.662 70.97-61.734 70.97h-396.67c-34.072 0-61.734-31.801-61.734-70.97v-435.66h520.14z" fill="#fff" fill-rule="evenodd"/>
+            <path class="text" d="m220.71 323.67h-0.379c-0.025-0.738-0.037-1.476-0.037-2.217 0-79.517 143.26-144.08 319.7-144.08s319.7 64.558 319.7 144.08c0 0.741-0.012 1.479-0.037 2.217h-0.416c0.273 1.452 0.416 2.951 0.416 4.482v6.682c0 13.326-10.819 24.146-24.145 24.146h-591.08c-13.326 0-24.145-10.82-24.145-24.146v-6.682c0-1.531 0.142-3.03 0.416-4.482zm348.66 166.23c79.906 13.932 140.73 83.705 140.73 167.57 0 93.882-76.221 170.1-170.1 170.1s-170.1-76.221-170.1-170.1h44.259c0 69.445 56.381 125.82 125.82 125.82 69.445 0 125.82-56.38 125.82-125.82 0-59.326-41.147-109.12-96.436-122.37v30.921l-96.458-54.959 96.458-54.96v33.794zm230.7-93.91v435.66c0 39.169-27.662 70.97-61.734 70.97h-396.67c-34.072 0-61.734-31.801-61.734-70.97v-435.66h520.14z" fill="#fff" fill-rule="evenodd"/>
         </svg>
         `
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
@@ -631,8 +655,7 @@ class removeIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m418.24 540-184.81 184.81c-10.009 10.01-10.009 26.262 0 36.271l85.495 85.495c10.009 10.009 26.261 10.009 36.271 0l184.81-184.81 184.81 184.81c10.01 10.009 26.262 10.009 36.271 0l85.495-85.495c10.009-10.009 10.009-26.261 0-36.271l-184.81-184.81 184.81-184.81c10.009-10.01 10.009-26.262 0-36.271l-85.495-85.495c-10.009-10.009-26.261-10.009-36.271 0l-184.81 184.81-184.81-184.81c-10.01-10.009-26.262-10.009-36.271 0l-85.495 85.495c-10.009 10.009-10.009 26.261 0 36.271l184.81 184.81z" fill="#ebebeb"/>
+            <path class="text" d="m418.24 540-184.81 184.81c-10.009 10.01-10.009 26.262 0 36.271l85.495 85.495c10.009 10.009 26.261 10.009 36.271 0l184.81-184.81 184.81 184.81c10.01 10.009 26.262 10.009 36.271 0l85.495-85.495c10.009-10.009 10.009-26.261 0-36.271l-184.81-184.81 184.81-184.81c10.009-10.01 10.009-26.262 0-36.271l-85.495-85.495c-10.009-10.009-26.261-10.009-36.271 0l-184.81 184.81-184.81-184.81c-10.01-10.009-26.262-10.009-36.271 0l-85.495 85.495c-10.009 10.009-10.009 26.261 0 36.271l184.81 184.81z" fill="#ebebeb"/>
         </svg>
         `
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
@@ -644,7 +667,6 @@ class colorIndIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
             <path id="lineIndicator" d="m652.2 486.59 297.83-297.83c-18.065-21.064-37.724-40.723-58.788-58.788l-297.83 297.83c-16.184-7.725-34.296-12.051-53.411-12.051-68.575 0-124.25 55.675-124.25 124.25 0 19.115 4.326 37.227 12.051 53.411l-297.83 297.83c18.065 21.064 37.724 40.723 58.788 58.788l297.83-297.83c16.184 7.725 34.296 12.051 53.411 12.051 68.575 0 124.25-55.675 124.25-124.25 0-19.115-4.326-37.227-12.051-53.411z" fill="#fff"/>
         </svg>
         `;
@@ -652,10 +674,9 @@ class colorIndIcon extends svgIcon {
         this.lineInd = this.shadowRoot.querySelector("#lineIndicator");
     }
     static get observedAttributes() {
-        return [...super.observedAttributes, 'indcolor'];
+        return ['indcolor'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        super.attributeChangedCallback(name, oldValue, newValue);
         if(this.hasAttribute('indcolor')){
             this.lineInd.style.fill = this.getAttribute('indcolor');
         }
@@ -670,8 +691,7 @@ class resizeIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m221 301.87v-58.506c0-12.345 10.023-22.368 22.368-22.368h58.506 187.76c12.345 0 22.368 10.023 22.368 22.368v58.506c0 12.346-10.023 22.368-22.368 22.368h-165.39v165.39c0 12.345-10.022 22.368-22.368 22.368h-58.506c-12.345 0-22.368-10.023-22.368-22.368v-187.76zm638 475.25v58.506c0 12.345-10.023 22.368-22.368 22.368h-58.506-187.76c-12.345 0-22.368-10.023-22.368-22.368v-58.506c0-12.346 10.023-22.368 22.368-22.368h165.39v-165.39c0-12.345 10.022-22.368 22.368-22.368h58.506c12.345 0 22.368 10.023 22.368 22.368v187.76z" fill-rule="evenodd"/>
+            <path class="text" d="m221 301.87v-58.506c0-12.345 10.023-22.368 22.368-22.368h58.506 187.76c12.345 0 22.368 10.023 22.368 22.368v58.506c0 12.346-10.023 22.368-22.368 22.368h-165.39v165.39c0 12.345-10.022 22.368-22.368 22.368h-58.506c-12.345 0-22.368-10.023-22.368-22.368v-187.76zm638 475.25v58.506c0 12.345-10.023 22.368-22.368 22.368h-58.506-187.76c-12.345 0-22.368-10.023-22.368-22.368v-58.506c0-12.346 10.023-22.368 22.368-22.368h165.39v-165.39c0-12.345 10.022-22.368 22.368-22.368h58.506c12.345 0 22.368 10.023 22.368 22.368v187.76z" fill-rule="evenodd"/>
         </svg>
         `;
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
@@ -683,8 +703,7 @@ class settingsIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z" fill-rule="evenodd"/>
+            <path class="text" d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z" fill-rule="evenodd"/>
         </svg>
         
         `;
@@ -697,24 +716,63 @@ class mobileTabIcon extends svgIcon {
         super();
         this.shadowRoot.innerHTML += `
         <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle id="circleBackground" class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m133 540c0-224.63 182.37-407 407-407s407 182.37 407 407-182.37 407-407 407-407-182.37-407-407zm205.02 186.16c-102.75-111.48-95.658-285.4 15.819-388.15 111.48-102.75 285.4-95.658 388.15 15.819 102.75 111.48 95.658 285.4-15.819 388.15-111.48 102.75-285.4 95.658-388.15-15.819z" fill-rule="evenodd"/>
+            <path class="text" d="m133 540c0-224.63 182.37-407 407-407s407 182.37 407 407-182.37 407-407 407-407-182.37-407-407zm205.02 186.16c-102.75-111.48-95.658-285.4 15.819-388.15 111.48-102.75 285.4-95.658 388.15 15.819 102.75 111.48 95.658 285.4-15.819 388.15-111.48 102.75-285.4 95.658-388.15-15.819z" fill-rule="evenodd"/>
         </svg>
         `;
         this.circleBg = this.shadowRoot.querySelector("#circleBackground");
     }
 }
 customElements.define("mobile-tab-icon", mobileTabIcon);
+class editIcon extends svgIcon{
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <path class="text" d="m253.93 811.84c-1.505 0.419-3.119-2e-3 -4.227-1.102-1.107-1.098-1.541-2.711-1.133-4.219 5.403-19.997 20.293-75.131 25.649-94.957 0.405-1.495 1.574-2.66 3.067-3.064 1.497-0.401 3.092 0.022 4.192 1.114 14.493 14.387 54.625 54.223 69.118 68.61 1.098 1.09 1.534 2.685 1.146 4.183-0.391 1.5-1.55 2.674-3.042 3.09-19.788 5.501-74.811 20.801-94.768 26.346l-2e-3 -1e-3zm449.5-531.86 79.095 78.514 40.135-40.432c15.001-15.113 10.654-43.794-9.708-64.006l-2.656-2.636c-21.826-21.667-52.606-26.103-68.689-9.9l-38.177 38.46zm-405.91 407.24 384.64-387.5c3.829-3.857 10.07-3.881 13.928-0.051l65.247 64.767c3.857 3.829 3.88 10.07 0.051 13.927l-384.64 387.5c-3.829 3.858-10.07 3.881-13.928 0.051l-65.247-64.767c-3.857-3.829-3.88-10.07-0.051-13.927z" fill-rule="evenodd"/>
+        </svg>
+        `;
+    }
+}
+customElements.define("edit-icon", editIcon);
+class shareIcon extends svgIcon{
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <path class="text"  d="m343 829.4c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm288.47-288.42c0-52.025 42.237-94.263 94.263-94.263 52.025 0 94.263 42.238 94.263 94.263s-42.238 94.263-94.263 94.263c-52.026 0-94.263-42.238-94.263-94.263zm-288.47-290.39c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm145.82 102.92 135.93 135.93c10.857-21.215 28.204-38.568 49.414-49.433l-135.92-135.92c-10.862 21.213-28.212 38.563-49.424 49.424zm135.93 239-135.91 135.91c21.21 10.865 38.557 28.218 49.414 49.433l135.91-135.91c-21.21-10.865-38.557-28.218-49.414-49.433z" fill-rule="evenodd"/>
+        </svg>
+        `;
+    }
+}
+customElements.define("share-icon", shareIcon);
+class switchIcon extends svgIcon{
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <path class="text" d="m677.38 225.1c-46.86-25.01-100.36-39.19-157.14-39.19-184.6 0-334.47 149.87-334.47 334.47 0 56.783 14.18 110.28 39.19 157.14l66.733-66.733c-11.093-27.988-17.19-58.491-17.19-90.407 0-135.63 110.11-245.74 245.74-245.74 31.916 0 62.419 6.097 90.407 17.19l66.733-66.733zm-285.35 552.38c0.804 2.927-0.025 6.063-2.171 8.209-2.143 2.143-5.281 2.974-8.209 2.171-38.829-10.645-145.89-39.983-184.39-50.536-2.903-0.797-5.159-3.079-5.934-5.984-0.769-2.912 0.066-6.01 2.196-8.14 28.068-28.068 105.79-105.79 133.86-133.85 2.127-2.127 5.231-2.962 8.139-2.197 2.912 0.769 5.187 3.032 5.985 5.934 10.55 38.502 39.894 145.56 50.529 184.39l-3e-3 3e-3zm10.583 77.414c46.86 25.01 100.36 39.19 157.14 39.19 184.6 0 334.47-149.87 334.47-334.47 0-56.783-14.18-110.28-39.19-157.14l-66.733 66.733c11.093 27.988 17.19 58.491 17.19 90.407 0 135.63-110.11 245.74-245.74 245.74-31.916 0-62.419-6.097-90.407-17.19l-66.733 66.733zm285.35-552.38c-0.804-2.927 0.025-6.063 2.171-8.209 2.143-2.143 5.281-2.974 8.209-2.171 38.829 10.645 145.89 39.983 184.39 50.536 2.903 0.798 5.159 3.079 5.934 5.984 0.769 2.912-0.066 6.01-2.196 8.14-28.068 28.068-105.79 105.79-133.86 133.85-2.127 2.127-5.231 2.962-8.139 2.197-2.912-0.769-5.187-3.032-5.985-5.934-10.55-38.502-39.894-145.56-50.529-184.39l3e-3 -3e-3z" fill="#ebebeb" fill-rule="evenodd"/>
+        </svg>
+        `;
+    }
+}
+customElements.define("switch-icon", switchIcon);
+class copyIcon extends svgIcon{
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        <svg id="svgAsset" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <path d="m700.11 286v-10.116c0-29.392-23.863-53.255-53.255-53.255h-299.31c-29.392 0-53.255 23.863-53.255 53.255v443.08c0 29.392 23.863 53.255 53.255 53.255h16.269v-57.521c-9.499-5.544-15.887-15.846-15.887-27.628v-379.3c0-17.643 14.324-31.967 31.967-31.967h234.61c9.232 0 17.555 3.922 23.393 10.189h62.211zm29.841 482.85m-264.45-407.89h234.61c17.643 0 31.967 14.324 31.967 31.967v379.3c0 17.643-14.324 31.967-31.967 31.967h-234.61c-17.643 0-31.967-14.324-31.967-31.967v-379.3c0-17.643 14.324-31.967 31.967-31.967zm-32.349-53.182h299.31c29.392 0 53.255 23.863 53.255 53.255v443.08c0 29.392-23.863 53.255-53.255 53.255h-299.31c-29.392 0-53.255-23.863-53.255-53.255v-443.08c0-29.392 23.863-53.255 53.255-53.255z" class="text" fill-rule="evenodd"/>
+        </svg>
+        `;
+    }
+}
+customElements.define("copy-icon", copyIcon);
 //Icons End
-class EquatInput extends HTMLElement {
+class EquatInput extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-        .svgText {
-            fill: var(--text);
-        }
         #containerDiv{
             height: inherit;
             width: 100%;
@@ -767,7 +825,7 @@ class EquatInput extends HTMLElement {
         <div id="containerDiv">
             <div id="dynamicEquation" class="editDiv"
                 contenteditable="true" value="" autofocus>‎</div>
-            <error-icon id="errorIcon"></error-icon>
+            <error-icon id="errorIcon" class="iconType"></error-icon>
         </div>`;
         this.container = this.shadowRoot.querySelector('#containerDiv');
         this.input = this.shadowRoot.querySelector("#dynamicEquation");
@@ -904,41 +962,56 @@ class EquatInput extends HTMLElement {
     }
 }
 customElements.define("rich-input", EquatInput);
-class historyDisplay extends HTMLElement {
+class titleCard extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
+            <style>
+                #textDisplay {
+                    font-size: 1.5em;
+                    font-weight: 500;
+                    text-align: center;
+                    display: grid;
+                    justify-content: center;
+                    align-content: center;
+                }
+
+                #text {
+                    background-color: var(--primary);
+                    padding: 5px 10px 5px 10px;
+                }
+            </style>
+            <div id="textDisplay">
+                <h2 id="text"></h2>
+            </div>
+        `;
+    }
+    static get observedAttributes() {
+        return ['text'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('text') && this.text == undefined) {
+            this.setText(this.getAttribute('text'));
+        }
+    }
+    setText(text){
+        this.text = text;
+        this.shadowRoot.querySelector("#text").innerHTML = text;
+    }
+}
+customElements.define("title-card", titleCard);
+class historyDisplay extends recursiveComponent {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
             <link rel="stylesheet" href="./styling/animations.css">
             <style>
-              * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-              }
-              
               .imgDivClass {
                 aspect-ratio: 1 / 1;
                 height: 40px;
               }
               
-              .svgText {
-                fill: var(--text);
-              }
-              .secondary {
-                fill: var(--secondary);
-              }
-              
-              .pane {
-                border-radius: 25px;
-                background-color: var(--primary);
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
-              }
               .historyDateHeader {
-                border-radius: 25px;
                 width: fit-content;
                 margin-left: 5px;
                 padding-left: 10px;
@@ -968,35 +1041,6 @@ class historyDisplay extends HTMLElement {
                 font-size: 40px;
               }
               
-              #uifCalculator::-webkit-scrollbar {
-                width: 2vh;
-              
-              }
-              
-              #uifCalculator::-webkit-scrollbar-track {
-                background: transparent;
-                margin-bottom: 40px;
-              }
-              
-              #uifCalculator::-webkit-scrollbar-thumb {
-                width: 5;
-                min-height: 30px;
-                background: var(--translucent);
-                border-radius: 10px;
-              }
-              
-              #uifCalculator::-webkit-scrollbar-button:end:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-              #uifCalculator::-webkit-scrollbar-button:start:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
               [contenteditable] {
                 outline: 0px solid transparent;
               }
@@ -1024,7 +1068,6 @@ class historyDisplay extends HTMLElement {
                 background-color: var(--secondary);
                 align-content: center;
                 justify-content: center;
-                border-radius: 50%;
               }
               
               .memText {
@@ -1040,7 +1083,6 @@ class historyDisplay extends HTMLElement {
                 height: 40px;
                 position: absolute;
                 bottom: 10px;
-                border-radius: 25px;
                 left: 10px;
               }
               
@@ -1048,8 +1090,6 @@ class historyDisplay extends HTMLElement {
                 top: 10px;
                 left: 10px;
                 z-index: 1;
-                padding: 2.5px;
-                border-radius: 50%;
                 position: absolute;
               }
               
@@ -1086,7 +1126,6 @@ class historyDisplay extends HTMLElement {
                 width: auto;
                 position: absolute;
                 overflow-x: hidden;
-                border-radius: 25px;
                 visibility: hidden;
                 padding-left: 10px;
                 padding-right: 10px;
@@ -1098,12 +1137,14 @@ class historyDisplay extends HTMLElement {
               
               #leftOverlayNav {
                 position: absolute;
+                background-color: var(--secondary);
                 z-index: 1;
                 right: 45px;
               }
               
               #rightOverlayNav {
                 position: absolute;
+                background-color: var(--secondary);
                 z-index: 1;
                 right: 0px;
               }
@@ -1112,7 +1153,6 @@ class historyDisplay extends HTMLElement {
                 width: 100%;
                 height: 100%;
                 overflow: hidden;
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
               }
               
               .text-area {
@@ -1139,65 +1179,16 @@ class historyDisplay extends HTMLElement {
                 color: var(--accent);
                 direction: ltr
               }
-              
-              #customFuncDisplay::-webkit-scrollbar-button:end:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-              #customFuncDisplay::-webkit-scrollbar-button:start:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-              ::-webkit-scrollbar {
-                width: 10px;
-              }
-              
-              ::-webkit-scrollbar-track {
-                background: transparent;
-              }
-              
-              ::-webkit-scrollbar-thumb {
-                width: 5px;
-                background: #00000080;
-                border-radius: 10px;
-              }
-              
-              ::-webkit-scrollbar-button:end:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-              ::-webkit-scrollbar-button:start:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-button:end:increment {
-                height: 0px;
-                background: transparent;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-button:start:increment {
-                height: 0px;
-                background: transparent;
-              
-              }
             </style>
-            <div id="displayClip" class="pane">
-                        <history-icon id="deleteHistory" class="imgDivClass" height='45px' style="isolation:isolate" bgcolor="secondary"></history-icon>
+            <div id="displayClip" class="paneType">
+                        <history-icon id="deleteHistory" class="imgDivClass iconType" style="isolation:isolate; height: 45px; background-color: var(--secondary)"></history-icon>
 
                         <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
                             autocorrect="off">
                             <h3 contenteditable="false" id="historyHeader">
                             </h3>
-                            <template class="historyDateTemp">
-                                <h3 class='historyDateHeader' id="header"></h3>
+                            <template id="historyDateTemp">
+                                <h3 class='titleType historyDateHeader' id="header"></h3>
                                 <br>
                             </template>
                             <template class="historyHeaders">
@@ -1209,22 +1200,22 @@ class historyDisplay extends HTMLElement {
                         </div>
                         <div id="overlayContainer">
                                 <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
-                                    <div class="matchCircle">
+                                    <div class="matchCircle iconType">
                                         <h3 class="memText">MRC</h3>
                                     </div>
                                 </button>
                                 <button id="MAddOverlay" class="textOverlay" name="Memory Add">
-                                    <div class="matchCircle">
+                                    <div class="matchCircle iconType">
                                         <h3 class="memText">M+</h3>
                                     </div>
                                 </button>
                                 <div id="memoryDiv" name="Recorded Text">
-                                    <div id="memoryTextBoarder">
+                                    <div id="memoryTextBoarder" class="entryType">
 
                                     </div>
                                 </div>
-                                <arrow-icon id="leftOverlayNav" class="arrows imgDivClass" direction="left" name="backward" bgcolor="secondary"></arrow-icon>
-                                <arrow-icon id="rightOverlayNav" class="arrows imgDivClass navLeft" direction="right" name="forward" bgcolor="secondary"></arrow-icon>
+                                <arrow-icon id="leftOverlayNav" class="arrows imgDivClass iconType" direction="left" name="backward" ></arrow-icon>
+                                <arrow-icon id="rightOverlayNav" class="arrows imgDivClass navLeft iconType" direction="right" name="forward" ></arrow-icon>
                         </div>
                     </div>
         `
@@ -1354,7 +1345,7 @@ class historyDisplay extends HTMLElement {
         let preEquat = clon.getElementById('previousEquation');
 
         if (dates.length == 0 || dates[dates.length - 1].innerHTML != getDate()) {
-            let clon = this.shadowRoot.querySelector(".historyDateTemp").content.cloneNode(true);
+            let clon = this.shadowRoot.querySelector("#historyDateTemp").content.cloneNode(true);
             clon.getElementById('header').innerHTML = getDate();
             this.historyHeader.appendChild(clon);
         }
@@ -1438,30 +1429,18 @@ class historyDisplay extends HTMLElement {
     }
 }
 customElements.define("history-display", historyDisplay);
-class FuncButton extends HTMLElement {
+class FuncButton extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
           
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
           #customFuncButton{
             height: 100%;
             width: 100%;
             border: none;
             background-color: transparent;
-          }
-          .svgText {
-            fill: var(--text);
           }
           #nameLabel {
             transition:  0.5s;
@@ -1474,12 +1453,13 @@ class FuncButton extends HTMLElement {
                 top: 0;
                 right: calc(50% - 37.5px);
                 visibility: hidden;
+                background-color: var(--primary);
             }
         </style>
         <button id="customFuncButton">
             <h2 id="equationLabel"></h2>
             <h5 id="nameLabel"></h5>
-            <remove-icon id="removeFunc" bgcolor="primary" ></remove-icon>
+            <remove-icon id="removeFunc" class="iconType"></remove-icon>
         </button>
         `;
         this.buttonNode = this.shadowRoot.querySelector("#customFuncButton");
@@ -1592,11 +1572,10 @@ class FuncButton extends HTMLElement {
     }
 }
 customElements.define("func-button", FuncButton);
-class advTable extends HTMLElement {
+class advTable extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
             <style>
             #table{
                 border-spacing: 5px;
@@ -1604,7 +1583,6 @@ class advTable extends HTMLElement {
                 height: 100%;
             }
             td {
-                border-radius: 20px;
                 text-indent: 10px;
                 padding: 5px;
                 background-color: var(--secondary);
@@ -1613,14 +1591,13 @@ class advTable extends HTMLElement {
                 width: 100px;
                 margin: 5px;
                 background-color: var(--accent);
-                border-radius: 20px;
             }
             </style>
             <table id="table">
                 <tBody id="tableBody">
                 <tr id="headerRow">
-                    <th class="filler">x</th>
-                    <th class="filler">y</th>
+                    <th class="filler entryType">x</th>
+                    <th class="filler entryType">y</th>
                 </tr>
                 </tBody>
             </table>
@@ -1640,6 +1617,7 @@ class advTable extends HTMLElement {
             let rowCount = this.shadowRoot.querySelectorAll(".tableRow").length;
             let entryHeader = document.createElement("th");
             entryHeader.classList.add("tableHeader");
+            entryHeader.classList.add("entryType");
             entryHeader.innerHTML = `y<sup>${columnCount}</sup>`;
             entryHeader.style.backgroundColor = arguments[1] ? arguments[1] : "";
             this.headerRow.appendChild(entryHeader);
@@ -1650,6 +1628,7 @@ class advTable extends HTMLElement {
                 }
                 if (!this.shadowRoot.querySelector("#xHeader")) {
                     let xHeader = document.createElement("th");
+                    xHeader.classList.add("entryType");
                     xHeader.id = "xHeader";
                     xHeader.innerHTML = "x";
                     this.headerRow.prepend(xHeader);
@@ -1659,13 +1638,13 @@ class advTable extends HTMLElement {
                     let row = document.createElement("tr");
                     row.id = "row" + i;
                     row.classList.add("tableRow");
-                    row.innerHTML = `<td>${tableEntry[i].x}</td>`
+                    row.innerHTML = `<td class="entryType">${tableEntry[i].x}</td>`
                     this.table.appendChild(row);
                 }
             }
             tableEntry.forEach((entry, index) => {
                 let targetRow = this.shadowRoot.querySelector("#row" + index);
-                targetRow.innerHTML += `<td>${entry.y}</td>`;
+                targetRow.innerHTML += `<td class="entryType">${entry.y}</td>`;
             });
         }
     }
@@ -1678,10 +1657,9 @@ class advTable extends HTMLElement {
     }
 }
 customElements.define("adv-table", advTable);
-class inputMethod extends HTMLElement {
+class inputMethod extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.firstTargets = {};
         this.keyTargets = {}
         this.linkedElems = [];
@@ -1912,7 +1890,7 @@ class Keypad extends inputMethod { //Keypad class
     constructor() {
         super();
 
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
         #extraFuncPopUp {
@@ -1928,7 +1906,7 @@ class Keypad extends inputMethod { //Keypad class
             height: 100%;
             width: 100%;
             overflow: hidden;
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
+            background-color: var(--primary);
         }
         #mainCacGrid {
             position: absolute;
@@ -1945,24 +1923,17 @@ class Keypad extends inputMethod { //Keypad class
                 "num4 num5 num6 backspace"
                 "num7 num8 num9 plus"
                 "pi num0 point minus"
-                "percent pars pow mutiplication"
+                "percent pars pow multiplication"
                 "enter pow2 sqrt division";
         }
-    
-        #num1 {
-            border-radius: 15px 0 0 0;
-        }
-    
-        #num3 {
-            border-radius: 0 15px 0 0;
-        }
-    
-        #piButton {
-            border-radius: 0 0 0 15px;
-        }
-    
-        #pointButton {
-            border-radius: 0 0 15px 0;
+        #gridBackDrop{
+            position: absolute;
+            width: 75%;
+            height: 66.6666%;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+            background-color: var(--accent);
         }
     
         #moreFunctionsButton {
@@ -1970,9 +1941,7 @@ class Keypad extends inputMethod { //Keypad class
             width: 100%;
             font-size: 15px;
             color: var(--text);
-            background-color: var(--primary);
             text-align: center;
-            text-indent: -30px;
             border-style: none;
             position: relative;
             grid-area: moreFuncBut;
@@ -1992,6 +1961,7 @@ class Keypad extends inputMethod { //Keypad class
             z-index: 2;
             height: 35px;
             pointer-events: all;
+            background-color: var(--secondary);
         }
     
         #backspace {
@@ -2007,7 +1977,6 @@ class Keypad extends inputMethod { //Keypad class
       width: 100%;
       top: 0;
       background-color: var(--accent);
-      border-radius: 15px;
       position: absolute;
       z-index: 1;
       overflow-x: auto;
@@ -2033,8 +2002,6 @@ class Keypad extends inputMethod { //Keypad class
         width: calc(100% - 10px);
         z-index: 2;
         flex-shrink: 0;
-        border: none;
-        border-radius: 25px;
         top: 2.5%;
         height: 95%
       }
@@ -2056,15 +2023,6 @@ class Keypad extends inputMethod { //Keypad class
       "sin cos tan mod"
       ;
     }
-    .button-item {
-        padding: 0px;
-        height: 100%;
-        width: 100%;
-        font-size: 100%;
-        position: absolute;
-        background-color: var(--secondary);
-        text-align: center;
-      }
       .keypadButton {
         overflow: hidden;
         text-align: center;
@@ -2116,15 +2074,6 @@ class Keypad extends inputMethod { //Keypad class
         --neutralColor: #80808080;
       }
       
-      * {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-        font-family: ubuntu;
-        color: var(--text);
-        -webkit-tap-highlight-color: transparent;
-      }
-      
       body {
         background: var(--secondary);
         overflow: hidden;
@@ -2135,32 +2084,6 @@ class Keypad extends inputMethod { //Keypad class
       
       .imgDivClass {
         aspect-ratio: 1 / 1;
-      }
-      
-      .svgText {
-        fill: var(--text);
-      }
-      
-      .pane {
-        border-radius: 25px;
-        background-color: var(--primary);
-        filter: drop-shadow(-5px 5px 5px var(--translucent));
-      }
-      
-      /*********************************Injected css from mode***********************************/
-      
-      /*end*/
-      
-      #uifCalculator::-webkit-scrollbar-button:end:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
-      
-      #uifCalculator::-webkit-scrollbar-button:start:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
       }
       
       button:focus {
@@ -2185,17 +2108,16 @@ class Keypad extends inputMethod { //Keypad class
         outline: none;
         box-shadow: none;
       }
-      
-      .button-item {
-        padding: 0px;
+      .gridButton {
         height: 100%;
         width: 100%;
-        font-size: 100%;
-        position: absolute;
-        background-color: var(--secondary);
+        font-size: 20px;
+        color: var(--text);
+        background-color: transparent;
         text-align: center;
+        border-style: none;
+        position: absolute;
       }
-      
       .funcbutton {
         height: 100%;
         width: 100%;
@@ -2206,11 +2128,7 @@ class Keypad extends inputMethod { //Keypad class
         border-style: none;
       }
       
-      .specialElements {
-        background-color: var(--primary);
-      }
-      
-      .funcbutton:focus {
+      button:focus {
         outline: none;
         box-shadow: none;
       }
@@ -2257,20 +2175,21 @@ class Keypad extends inputMethod { //Keypad class
       }
       .standaloneButtons{
         height: 35px;
+        width: 35px;
         top: 10px;
         margin-left: 10px;
       }
       #addIconPopup {
         background-color: transparent;
-        border: none;
         position: absolute;
+        background-color: var(--secondary);
       }
       
       #minusIconPopup {
         background-color: transparent;
-        border: none;
         margin-left: 50px;
         position: absolute;
+        background-color: var(--secondary);
       }
       
       .customFuncDisplayBackgroundPopup {
@@ -2292,7 +2211,7 @@ class Keypad extends inputMethod { //Keypad class
         margin: 0px;
         grid-template-columns: 25% 25% 25% 25%;
         grid-template-rows: 25% 25% 25% 25%;
-        background-color: #00000000;
+        background-color: var(--primary);
         grid-template-areas:
           "help dToF vars ac"
           "log ln e fact"
@@ -2301,188 +2220,89 @@ class Keypad extends inputMethod { //Keypad class
         ;
       }
       
-      #customFuncDisplay::-webkit-scrollbar-button:end:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
-      
-      #customFuncDisplay::-webkit-scrollbar-button:start:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
-      
-      ::-webkit-scrollbar {
-        width: 10px;
-      }
-      
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      
-      ::-webkit-scrollbar-thumb {
-        width: 5px;
-        background: #00000080;
-        border-radius: 10px;
-      }
-      
-      ::-webkit-scrollbar-button:end:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
         </style>
         <style id="modeStyle"></style>
         <style id="dynamicStyle"></style>
         <style id="styleInjector"></style>
-        <div id="keypad" class="pane" style="visibility: inherit;">
-        <arrow-icon id="arrowIcon" class="arrows imgDivClass" bgcolor="secondary" direction="up" ></arrow-icon>
-            <div id="mainCacGrid">
-                <div id="specialElements button-item" name="1" class="button-item" style="grid-area: num1;">
-                    <button class="numsbutton keypadButton" name="1" id="num1" focusable="false">1</button>
-                </div>
-                <div class="button-item" name="2" style="grid-area: num2;">
-                    <button class="numsbutton keypadButton" id="num2">2</button>
-                </div>
-                <div class="specialElements button-item" style="grid-area: num3;">
-                    <button class="numsbutton keypadButton" id="num3">3</button>
-                </div>
-                <div class="button-item fI" style="grid-area: moreFuncBut;">
-                    <button id="moreFunctionsButton" class="keypadButton" tabindex="-1">𝑓</button>
-                </div>
-                <div class="button-item" style="grid-area: num4;">
-                    <button class="numsbutton keypadButton" id="num4">4</button>
-                </div>
-                <div class="button-item" style="grid-area: num5;">
-                    <button class="numsbutton keypadButton" id="num5">5</button>
-                </div>
-                <div class="button-item" style="grid-area: num6;">
-                    <button class="numsbutton keypadButton" id="num6">6</button>
-                </div>
-                <div class="button-item fI" id="backspaceDiv" style="grid-area: backspace;">
-                    <button class="funcbutton keypadButton" id="backspace"
-                        style="display: grid;justify-content: center;align-content: center;">
-                        <svg id="backspcaeIcon" style="height: 20px; width: 40px;isolation:isolate" viewBox="0 0 1080 540"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <rect width="1080" height="540" fill-opacity="0" />
-                            <path class="svgText"
-                                d="m657.21 270-147.56 147.13 37.394 37.284 147.56-147.13 147.56 147.13 37.395-37.284-147.56-147.13 147.56-147.13-37.395-37.284-147.56 147.13-147.56-147.13-37.394 37.284 147.56 147.13zm-231.69-247.29v-1.106l-403.92 248.4 403.92 248.4v-1.106c14.803 14.068 34.815 22.706 56.829 22.706h515.12c45.548 0 82.527-36.979 82.527-82.527v-374.95c0-45.548-36.979-82.527-82.527-82.527h-515.12c-22.014 0-42.026 8.638-56.829 22.706z"
-                                fill-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="button-item" style="grid-area: num7;">
-                    <button class="numsbutton keypadButton" id="num7">7</button>
-                </div>
-                <div class="button-item" style="grid-area: num8;">
-                    <button class="numsbutton keypadButton" id="num8">8</button>
-                </div>
-                <div class="button-item" style="grid-area: num9;">
-                    <button class="numsbutton keypadButton" id="num9">9</button>
-                </div>
-                <div class="button-item fI" style="grid-area: plus;">
-                    <button class="funcbutton keypadButton" id="plus">+</button>
-                </div>
-                <div class="button-item specialElements" style="grid-area: pi;">
-                    <button class="numsbutton keypadButton" id="piButton">π</button>
-                </div>
-                <div class="button-item" style="grid-area: num0;">
-                    <button class="numsbutton keypadButton" id="num0">0</button>
-                </div>
-                <div class="specialElements button-item" style="grid-area: point;">
-                    <button class="numsbutton keypadButton" id="pointButton">.</button>
-                </div>
-                <div class="button-item fI" style="grid-area: minus;">
-                    <button class="funcbutton keypadButton" id="minus">-</button>
-                </div>
-                <div class="button-item fI" style="grid-area: percent;">
-                    <button class="funcbutton keypadButton" id="percent">%</button>
-                </div>
-                <div class="button-item fI" style="grid-area: pars;">
-                    <button class="funcbutton keypadButton" id="pars">( )</button>
-                </div>
-                <div class="button-item fI" style="grid-area: pow;">
-                    <button class="funcbutton keypadButton" id="pow">^</button>
-                </div>
-                <div class="button-item fI" style="grid-area: mutiplication;">
-                    <button class="funcbutton keypadButton" id="mutiplication">×</button>
-                </div>
-                <div class="button-item fI" style="grid-area: enter;">
-                    <button class="funcbutton keypadButton" id="enter">enter</button>
-                </div>
-                <div class="button-item fI" style="grid-area: pow2;">
-                    <button class="funcbutton keypadButton" id="pow2">x²</button>
-                </div>
-                <div class="button-item fI" style="grid-area: sqrt;">
-                    <button class="funcbutton keypadButton" id="sqrt">√x</button>
-                </div>
-                <div class="button-item fI" style="grid-area: division;">
-                    <button class="funcbutton keypadButton" id="divison">÷</button>
-                </div>
-            </div>
+        <div id="keypad" class="paneType" style="visibility: inherit;">
+
+
+        <arrow-icon id="arrowIcon" class="arrows imgDivClass iconType" direction="up" ></arrow-icon>
+        <div id="mainCacGrid">
+            <div id="gridBackDrop" class="paneType"></div>
+        <button class="gridButton keypadButton" id="num1" name="1" style="grid-area: num1;">1</button>
+        <button class="gridButton keypadButton" id="num2" name="2" style="grid-area: num2;">2</button>
+        <button class="gridButton keypadButton" id="num3" name="3" style="grid-area: num3;">3</button>
+        <button id="moreFunctionsButton" class="keypadButton gridButton fI" style="grid-area: moreFuncBut;"
+            tabindex="-1">𝑓</button>
+        <button class="gridButton keypadButton" id="num4" style="grid-area: num4;">4</button>
+        <button class="gridButton keypadButton" id="num5" style="grid-area: num5;">5</button>
+        <button class="gridButton keypadButton" id="num6" style="grid-area: num6;">6</button>
+        <button class="gridButton keypadButton fI" id="backspace"
+            style="grid-area: backspace;display: grid;justify-content: center;align-content: center;">
+            <svg id="backspcaeIcon" style="height: 20px; width: 40px;isolation:isolate" viewBox="0 0 1080 540"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="1080" height="540" fill-opacity="0" />
+                <path class="text"
+                    d="m657.21 270-147.56 147.13 37.394 37.284 147.56-147.13 147.56 147.13 37.395-37.284-147.56-147.13 147.56-147.13-37.395-37.284-147.56 147.13-147.56-147.13-37.394 37.284 147.56 147.13zm-231.69-247.29v-1.106l-403.92 248.4 403.92 248.4v-1.106c14.803 14.068 34.815 22.706 56.829 22.706h515.12c45.548 0 82.527-36.979 82.527-82.527v-374.95c0-45.548-36.979-82.527-82.527-82.527h-515.12c-22.014 0-42.026 8.638-56.829 22.706z"
+                    fill-rule="evenodd" />
+            </svg>
+        </button>
+        <button class="gridButton keypadButton" id="num7" style="grid-area: num7;">7</button>
+        <button class="gridButton keypadButton" id="num8" style="grid-area: num8;">8</button>
+        <button class="gridButton keypadButton" id="num9" style="grid-area: num9;">9</button>
+        <button class="gridButton keypadButton fI" id="plus" style="grid-area: plus;">+</button>
+        <button class="gridButton keypadButton" id="piButton" style="grid-area: pi;">π</button>
+        <button class="gridButton keypadButton" id="num0" style="grid-area: num0;">0</button>
+        <button class="gridButton keypadButton" id="pointButton" style="grid-area: point;">.</button>
+        <button class="gridButton keypadButton fI" id="minus" style="grid-area: minus;">-</button>
+        <button class="gridButton keypadButton fI" id="percent" style="grid-area: percent;">%</button>
+        <button class="gridButton keypadButton fI" id="pars" style="grid-area: pars;">( )</button>
+        <button class="gridButton keypadButton fI" id="pow" style="grid-area: pow;">^</button>
+        <button class="gridButton keypadButton fI" id="multiplication" style="grid-area: multiplication;">×</button>
+        <button class="gridButton keypadButton fI" id="enter" style="grid-area: enter;">enter</button>
+        <button class="gridButton keypadButton fI" id="pow2" style="grid-area: pow2;">x²</button>
+        <button class="gridButton keypadButton fI" id="sqrt" style="grid-area: sqrt;">√x</button>
+        <button class="gridButton keypadButton fI" id="division" style="grid-area: division;">÷</button>
+    </div>
             <div id="extraFuncPopUp">
-                <div id="customFuncDisplayPopup" data-element="popup">
-                    <plus-icon id="addIconPopup" class="standaloneButtons" bgcolor="secondary" test="sd"></plus-icon>
-                    <minus-icon id="minusIconPopup" class="standaloneButtons" animated="true" bgcolor="secondary" ></minus-icon>
+                <div id="customFuncDisplayPopup" class="paneType" data-element="popup">
+                    <plus-icon id="addIconPopup" class="standaloneButtons iconType" test="sd"></plus-icon>
+                    <minus-icon id="minusIconPopup" class="standaloneButtons iconType" animated="true" ></minus-icon>
                     <div id="custFuncGridPopup">
                     </div>
                 </div>
                 <div class="customFuncDisplayBackgroundPopup" width="100%">
                 </div>
+
+                
+
                 <div id="extraFuncPopUpGrid">
-                    <div class="button-item fI" style="grid-area: help;"><button class="funcbutton keypadButton" id="helpPopup"
-                            style="display: grid;justify-content: center;align-content: center;">
-                            <svg class="helpIcon imgDivClass" style="height: 30px;isolation:isolate" viewBox="0 0 45 45"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path class="svgText"
-                                    d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
-                                    fill-rule="evenodd" />
-                            </svg>
-                        </button></div>
-                    <div class="button-item" style="grid-area: dToF;"><button class="funcbutton keypadButton"
-                            id="deciToFracPopup">d→f</button></div>
-                    <div class="button-item" style="grid-area: vars;"><button class="funcbutton keypadButton"
-                            id="keyboardPopup">xyz</button></div>
-                    <div class="button-item" style="grid-area: ac;">
-                        <button class="funcbutton keypadButton" id="acPopup">ac</button>
-                    </div>
-                    <div class="button-item" style="grid-area: log;"><button class="funcbutton keypadButton"
-                            id="log10Popup">log<sub>10</sub></button></div>
-                    <div class="button-item" style="grid-area: ln;">
-                        <button class="funcbutton keypadButton" id="lnPopup">ln</button>
-                    </div>
-                    <div class="button-item" style="grid-area: e;">
-                        <button class="funcbutton keypadButton" id="ePopup">e</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: fact;">
-                        <button class="funcbutton keypadButton" id="factorialPopup">n!</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: deg;">
-                        <button class="funcbutton keypadButton" id="degPopup">deg</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: arc;">
-                        <button class="funcbutton keypadButton" id="arcPopup">arc</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: inv;">
-                        <button class="funcbutton keypadButton" id="invPopup">inv</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: abs;">
-                        <button class="funcbutton keypadButton" id="absPopup">|
-                            |</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: sin;">
-                        <button class="trigButton keypadButton" id="sinPopup">sin</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: cos;">
-                        <button class="trigButton keypadButton" id="cosPopup">cos</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: tan;">
-                        <button class="trigButton keypadButton" id="tanPopup">tan</button>
-                    </div>
-                    <div class="button-item fI" style="grid-area: mod;"><button class="funcbutton keypadButton"
-                            id="modPopup">mod</button></div>
-                </div>
+        <button class="gridButton keypadButton fI" id="helpPopup"
+            style="grid-area: help;display: grid;justify-content: center;align-content: center;">
+            <svg class="helpIcon imgDivClass" style="height: 30px;isolation:isolate" viewBox="0 0 45 45"
+            xmlns="http://www.w3.org/2000/svg">
+            <path class="text"
+                d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
+                fill-rule="evenodd" />
+            </svg>
+        </button>
+        <button class="gridButton keypadButton" id="deciToFracPopup" style="grid-area: dToF;">d→f</button>
+        <button class="gridButton keypadButton" id="keyboardPopup" style="grid-area: vars;">xyz</button>
+        <button class="gridButton keypadButton" id="acPopup" style="grid-area: ac;">ac</button>
+        <button class="gridButton keypadButton" id="log10Popup" style="grid-area: log;">log<sub>10</sub></button>
+        <button class="gridButton keypadButton" id="lnPopup" style="grid-area: ln;">ln</button>
+        <button class="gridButton keypadButton" id="ePopup" style="grid-area: e;">e</button>
+        <button class="gridButton keypadButton fI" id="factorialPopup" style="grid-area: fact;">n!</button>
+        <button class="gridButton keypadButton fI" id="degPopup" style="grid-area: deg;">deg</button>
+        <button class="gridButton keypadButton fI" id="arcPopup" style="grid-area: arc;">arc</button>
+        <button class="gridButton keypadButton fI" id="invPopup" style="grid-area: inv;">inv</button>
+        <button class="gridButton keypadButton fI" id="absPopup" style="grid-area: abs;">||</button>
+        <button class="trigButton keypadButton gridButton fI" id="sinPopup" style="grid-area: sin;">sin</button>
+        <button class="trigButton keypadButton gridButton fI" id="cosPopup" style="grid-area: cos;">cos</button>
+        <button class="trigButton keypadButton gridButton fI" id="tanPopup" style="grid-area: tan;">tan</button>
+        <button class="gridButton keypadButton fI" id="modPopup" style="grid-area: mod;">mod</button>
+    </div>
             </div>
         
         </div>
@@ -2688,9 +2508,9 @@ class Keypad extends inputMethod { //Keypad class
             },
             {
 
-                "def": this.shadowRoot.querySelector('#mutiplication'),
-                "id": 'mutiplication',
-                "name": "mutiplication",
+                "def": this.shadowRoot.querySelector('#multiplication'),
+                "id": 'multiplication',
+                "name": "multiplication",
                 "function": () => {
                     this.frontButtonPressed('×');
                 },
@@ -2729,9 +2549,9 @@ class Keypad extends inputMethod { //Keypad class
             },
             {
 
-                "def": this.shadowRoot.querySelector('#divison'),
-                "id": 'divison',
-                "name": "divison",
+                "def": this.shadowRoot.querySelector('#division'),
+                "id": 'division',
+                "name": "division",
                 "function": () => {
                     this.frontButtonPressed('÷');
                 },
@@ -2976,7 +2796,6 @@ class Keypad extends inputMethod { //Keypad class
               visibility: hidden;
             }
             #customFuncDisplayPopup{
-              border-radius: 25px;
               height: 16.6666%;
             }
             #extraFuncPopUpGrid{
@@ -3195,36 +3014,18 @@ class Keypad extends inputMethod { //Keypad class
     addFuncButton(button) {
         super.addFuncButton(button);
         button.classList.add('customButton');
+        button.classList.add('entryType');
     }
 }
 customElements.define("func-keypad", Keypad);
 class extendedKeypad extends inputMethod {
     constructor() {
         super();
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
-    * {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-        font-family: ubuntu;
-        color: var(--text);
-        -webkit-tap-highlight-color: transparent;
-    }
-
     .imgDivClass {
         aspect-ratio: 1 / 1;
-    }
-
-    .svgText {
-        fill: var(--text);
-    }
-
-    .pane {
-        border-radius: 25px;
-        background-color: var(--primary);
-        filter: drop-shadow(-5px 5px 5px var(--translucent));
     }
 
     button:focus {
@@ -3235,6 +3036,7 @@ class extendedKeypad extends inputMethod {
         height: 100%;
         width: 100%;
         overflow: hidden;
+        background-color: var(--primary);
     }
 
     #extendedFuncGrid {
@@ -3312,22 +3114,23 @@ class extendedKeypad extends inputMethod {
         width: calc(100% - 10px);
         z-index: 2;
         border: none;
-        border-radius: 25px;
         top: 2.5%;
         height: 95%
       }
     .extendIcons{
-        padding: 5px;
         height: 35px;
+        aspect-ratio: 1/1;
+        margin: 5px;
+        background-color: var(--secondary);
     }
 </style>
 <style id="modeStyle"></style>
-<div id="extendedKeypad" class="pane">
+<div id="extendedKeypad" class="paneType">
     <div id="extendedFuncGrid">
         <div class="button-item fI" style="grid-area: help;"><button class="funcbutton" id="helpEx">
                 <svg class="helpIcon imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 45 45"
                     xmlns="http://www.w3.org/2000/svg">\
-                    <path class="svgText"
+                    <path class="text"
                         d="m4 22.5c0-10.21 8.29-18.5 18.5-18.5s18.5 8.29 18.5 18.5-8.29 18.5-18.5 18.5-18.5-8.29-18.5-18.5zm20.474 6.395h-4.095q-0.016-0.883-0.016-1.076 0-1.991 0.659-3.276 0.658-1.284 2.633-2.89 1.976-1.606 2.361-2.104 0.594-0.787 0.594-1.734 0-1.317-1.052-2.257-1.052-0.939-2.834-0.939-1.718 0-2.875 0.979-1.156 0.98-1.59 2.987l-4.143-0.513q0.177-2.875 2.449-4.882 2.273-2.008 5.966-2.008 3.886 0 6.183 2.032 2.296 2.031 2.296 4.729 0 1.494-0.843 2.826-0.843 1.333-3.605 3.63-1.429 1.188-1.775 1.911-0.345 0.722-0.313 2.585zm0.418 6.071h-4.513v-4.513h4.513v4.513z"
                         fill-rule="evenodd" />
                 </svg>
@@ -3369,9 +3172,9 @@ class extendedKeypad extends inputMethod {
         </div>
     </div>
     <div id="funcDisplay">
-    <arrow-icon class="extendIcons" id="backIcon" bgcolor="secondary" direction="left"></arrow-icon>
-    <plus-icon class="extendIcons" id="addIcon" bgcolor="secondary" ></plus-icon>
-    <minus-icon class="extendIcons" id="minusIcon" animated="true" bgcolor="secondary"></minus-icon>
+    <arrow-icon class="extendIcons iconType" id="backIcon" direction="left"></arrow-icon>
+    <plus-icon class="extendIcons iconType" id="addIcon" ></plus-icon>
+    <minus-icon class="extendIcons iconType" id="minusIcon" animated="true"></minus-icon>
     <div id="funcGrid">
 
     </div>
@@ -3588,11 +3391,10 @@ class extendedKeypad extends inputMethod {
     }
 }
 customElements.define('keypad-ex', extendedKeypad);
-class tabContainer extends HTMLElement {
+class tabContainer extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
           #tabContainer {
             height: 100%;
@@ -3606,15 +3408,14 @@ class tabContainer extends HTMLElement {
             height: 35px;
             top: 10px;
             margin-left: 10px;
+            background-color: var(--secondary);
           }
           #addIcon {
-            background-color: transparent;
             border: none;
             position: absolute;
           }
           
           #minusIcon {
-            background-color: transparent;
             border: none;
             margin-left: 50px;
             position: absolute;
@@ -3638,7 +3439,6 @@ class tabContainer extends HTMLElement {
             background-color: var(--accent);
             z-index: 2;
             border: none;
-            border-radius: 25px;
             height: 120px;
             width: 175px;
           }
@@ -3649,8 +3449,8 @@ class tabContainer extends HTMLElement {
           }
         </style>
         <div id="tabContainer" data-element="popup">
-            <plus-icon id="addIcon" class="standaloneButtons" bgcolor="secondary" test="sd"></plus-icon>
-            <minus-icon id="minusIcon" class="standaloneButtons" animated="true" bgcolor="secondary" ></minus-icon>
+            <plus-icon id="addIcon" class="standaloneButtons iconType"  test="sd"></plus-icon>
+            <minus-icon id="minusIcon" class="standaloneButtons iconType" animated="true" ></minus-icon>
             <div id="funcGrid"></div>
         </div>
         `;
@@ -3668,6 +3468,7 @@ class tabContainer extends HTMLElement {
     }
     addFuncButton(button) {
         this.funcButtonList.push(button);
+        button.classList.add('entryType');
         button.classList.add('customButton');
         this.funcGrid.appendChild(button)
     }
@@ -3712,11 +3513,10 @@ class tabContainer extends HTMLElement {
     }
 }
 customElements.define('tab-container', tabContainer);
-class funcGridPage extends HTMLElement {
+class funcGridPage extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
             #funcGridPage{
@@ -3731,8 +3531,10 @@ class funcGridPage extends HTMLElement {
             }
             #backArrow{
                 height: 45px;
+                width: 45px;
                 aspect-ratio: 1/1;
                 margin: 5px;
+                background-color: var(--primary);
             }
             #searchBar{
                 height: 100px;
@@ -3753,7 +3555,7 @@ class funcGridPage extends HTMLElement {
             }
         </style>
         <div id="funcGridPage">
-            <arrow-icon id="backArrow" direction="left" bgcolor="primary" ></arrow-icon>
+            <arrow-icon id="backArrow" class="iconType" direction="left" ></arrow-icon>
             <rich-input id="searchBar" placeholder="Search" type="text" ></rich-input>
             <tab-container id="tabContainer"></tab-container>
         </div>
@@ -3772,11 +3574,10 @@ class funcGridPage extends HTMLElement {
     
 }
 customElements.define('func-grid-page', funcGridPage);
-class menuPane extends HTMLElement {
+class menuPane extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
         #modeContainer{
@@ -3794,10 +3595,8 @@ class menuPane extends HTMLElement {
             aspect-ratio: 1/1;
         }
         .modeButton{
-            background-color: var(--accent);
+            background-color: var(--primary);
             overflow: hidden;
-            border:none; 
-            border-radius: 25px;
             align-content: space-evenly;
             align-items: center; 
             display: flex;
@@ -3840,11 +3639,11 @@ class menuPane extends HTMLElement {
         </style>
         <div id="paneContainer">
             <div id="modeSwitcher">
-                <arrow-icon class="backIcon imgDivClass" id="mainBack" style="height: 50px;"></arrow-icon>
+                <arrow-icon  id="mainBack" class="iconType" direction="left" style="height: 50px; aspect-ratio: 1/1;"></arrow-icon>
                 <h1 class="menuTitle" id="title"></h1>
             </div>
             <div id="modeContainer">
-                <arrow-icon class="backIcon imgDivClass" id="pageBack" style="height: 50px;"></arrow-icon>
+                <arrow-icon class="backIcon class="iconType" imgDivClass" direction="left" id="pageBack" style="height: 50px;"></arrow-icon>
             </div>
         </div>
         `;
@@ -3901,6 +3700,7 @@ class menuPane extends HTMLElement {
                         get def() {
                             let modeButton = document.createElement('button');
                             modeButton.id = 'modeButton';
+                            modeButton.classList.add('iconType');
                             modeButton.innerHTML = "mode";
                             modeButton.addEventListener('click', () => {
                                 genRef.pageReturn();
@@ -3941,8 +3741,9 @@ class menuPane extends HTMLElement {
             if (this.shadowRoot.querySelector("#modeContainer").createButton == undefined) {
                 this.pages = []
                 this.shadowRoot.querySelector("#modeContainer").createButton = (name, icon, page) => {
-                    let button = document.createElement("button")
+                    let button = document.createElement("button");
                     button.classList.add("modeButton");
+                    button.classList.add("paneType");
                     this.pages.push(page)
                     button.innerHTML = `
                 <h3 id="modeText" class="text"></h3>
@@ -3967,8 +3768,7 @@ class menuPane extends HTMLElement {
                     backIcon.classList.add("imgDivClass");
                     backIcon.innerHTML = `
                 <rect width="1080" height="1080" fill-opacity="0" />
-                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                    <path class="svgText"
+                    <path class="text"
                       d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
                 `;
                     backIcon.addEventListener("click", () => { this.pageReturn() });
@@ -3999,10 +3799,8 @@ class menuPane extends HTMLElement {
         }
         let hiddenPages = [...this.pages].filter(page => page != tPage)
         if (tPage.hasKeypad) {
-            console.log("has keypad")
-            if (typeof keypad !== 'undefined') {
-                console.log(keypad)
-                keypad.setVisibility(true);
+            if (envObject.mainKeypad != undefined) {
+                envObject.mainKeypad.setVisibility(true);
             }
         }
         hideElements(hiddenPages);
@@ -4010,10 +3808,15 @@ class menuPane extends HTMLElement {
     }
     pageReturn() {
         this.container.style.zIndex = -1;
-
-        hideElements([...this.pages, this.shadowRoot.querySelector("#modeButton")]);
-        if (keypad != undefined) {
-            keypad.setVisibility(false);
+        let hideArray = [
+            ...this.pages
+        ]
+        if(this.type == "mode"){
+            hideArray.push(this.shadowRoot.querySelector("#modeButton"))
+        }
+        hideElements(hideArray);
+        if (envObject.mainKeypad != undefined) {
+            envObject.mainKeypad.setVisibility(false);
         }
         pullUpElements([this.switcher]);
     }
@@ -4034,8 +3837,6 @@ class menuPane extends HTMLElement {
             .modeButton{
                 overflow: hidden;
                 padding: 0px;
-                border:none; 
-                border-radius: 25px;
                 align-content: space-evenly;
                 align-items: center; 
                 text-indent: 5px;
@@ -4046,11 +3847,11 @@ class menuPane extends HTMLElement {
                 z-index: 2;
                 height: fit-content;
                 position: absolute;
-                border: none;
                 background-color: var(--secondary);
                 font-size: 20px;
                 padding: 10px;
                 border-radius: 50px;
+                aspect-ratio: unset;
             }
             #paneContainer{
                 background-color: transparent;
@@ -4114,7 +3915,6 @@ class menuPane extends HTMLElement {
                 margin-left:10px;
             }
             .backIcon{
-                transform: rotate(180deg);
                 background-color: transparent;
                 height: 45px;
                 z-index: 1;
@@ -4155,10 +3955,8 @@ class menuPane extends HTMLElement {
                     #modeContainer{
                         width: calc(100% - 20px);
                         height: calc(100% - 20px);
-                        border-radius: 25px;
                         margin-left: 10px;
                         margin-top: 10px;
-                        background-color: var(--primary);
                         grid-area: container;
                     }
                     #pageBack{
@@ -4176,11 +3974,10 @@ class menuPane extends HTMLElement {
     }
 }
 customElements.define("menu-pane", menuPane);
-class menuPage extends HTMLElement {
+class menuPage extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
         #modePage{
             height: 100%;
@@ -4227,15 +4024,11 @@ class menuPage extends HTMLElement {
     }
 }
 customElements.define("menu-page", menuPage);
-class colorTextInput extends HTMLElement {
+class colorTextInput extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-        .primary {
-            fill: var(--primary);
-        }
         #colorInput{
             height: 100%;
             width: 100%;
@@ -4260,7 +4053,7 @@ class colorTextInput extends HTMLElement {
         }
         </style>
         <div id="colorInput">
-            <color-ind-icon id="colorIndicator" ></color-ind-icon>
+            <color-ind-icon id="colorIndicator" class="iconType" ></color-ind-icon>
             <rich-input id="dynamicEquation"></rich-input>
         </div>
         `
@@ -4295,27 +4088,16 @@ class colorTextInput extends HTMLElement {
 
 }
 customElements.define("color-text", colorTextInput);
-class templateMode extends HTMLElement {
+class templateMode extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-        * {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-        font-family: ubuntu;
-        color: var(--text);
-        -webkit-tap-highlight-color: transparent;
-      }
+        
       
       .imgDivClass {
         aspect-ratio: 1 / 1;
-      }
-      
-      .svgText {
-        fill: var(--text);
+        background-color: var(--secondary);
       }
       
       .dynamicContent {
@@ -4330,7 +4112,6 @@ class templateMode extends HTMLElement {
         height: 100%;
         display: grid;
         position: absolute;
-        filter: drop-shadow(-5px 5px 5px var(--translucent));
         transition: 0.5s;
       }
       .modeContainerClass.fullScreen {
@@ -4351,7 +4132,6 @@ class templateMode extends HTMLElement {
         top: 0;
         left: 0;
         bottom: calc(40% + 10px);
-        border-radius: 25px;
         background-color: var(--primary);
       }
       
@@ -4362,7 +4142,6 @@ class templateMode extends HTMLElement {
         height: calc(100% - 20px);
         margin-top: 10px;
         margin-left: 10px;
-        border-radius: 25px;
         background-color: var(--primary);
         overflow: hidden;
       }
@@ -4376,15 +4155,12 @@ class templateMode extends HTMLElement {
         display: grid;
         overflow-x: hidden;
         grid-auto-rows: 80px;
-        filter: drop-shadow(-5px 5px 5px var(--translucent));
       }
       
       #addEquation {
-        width: 60px;
-        height: 60px;
-        margin-left: calc(50% - 30px);
-        border-radius: 30px;
-        border: none;
+        width: 50px;
+        height: 50px;
+        margin-left: calc(50% - 25px);
         background-color: var(--secondary);
         font-size: 30px;
         font-weight: bold;
@@ -4403,48 +4179,23 @@ class templateMode extends HTMLElement {
         outline: none;
       }
       
-      ::-webkit-scrollbar {
-        width: 10px;
-      }
-      
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      
-      ::-webkit-scrollbar-thumb {
-        width: 5px;
-        background: #00000080;
-        border-radius: 10px;
-      }
-      
-      ::-webkit-scrollbar-button:end:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
-      
-      ::-webkit-scrollbar-button:start:increment {
-        height: 7px;
-        display: block;
-        background: transparent;
-      }
-        </style>
+      </style>
         <style id="styler"></style>
         <style id="orientationStyle"></style>
         <style id="keypadStyling"></style>
         <div id="modeContainer" class="modeContainerClass">
-                    <div id="contentPane" style="grid-area: content;">
+                    <div id="contentPane" class="paneType" style="grid-area: content;">
                         <div id="contentContainer" class="dynamicContent">
 
                         </div>
-                        <resize-icon bgcolor="secondary" id="fullContent" class="imgDivClass" style="height: 45px;"></resize-icon>
+                        <resize-icon id="fullContent" class="imgDivClass iconType" style="height: 45px;"></resize-icon>
                     </div>
-                    <div id="contentControls" style="grid-area: controls;">
+                    <div id="contentControls" class="paneType" style="grid-area: controls;">
                         <div id="modeFuncGrid">
                             <color-text id="initEquation" class="dynamicEquation" placeholder="Equation" popup="true" style="width: 100%; height: calc(100% - 10px); font-size: 60px;"></color-text>
-                            <button id="addEquation">+</button>
+                            <button id="addEquation" class="iconType">+</button>
                         </div>
-                        <settings-icon id="settingsCog" class="imgDivClass" style="height: 45px;" bgcolor="secondary"></settings-icon>
+                        <settings-icon id="settingsCog" class="imgDivClass iconType" style="height: 45px;"></settings-icon>
                     </div>
                 </div>
         `
@@ -4814,28 +4565,17 @@ class tableMode extends templateMode {
     }
 }
 customElements.define("table-mode", tableMode);
-class settingsSec extends HTMLElement {
+class settingsSec extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
             <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-            }
+            
             input:focus, textarea:focus, select:focus{
                 outline: none;
             }
             #settingsSection{
                 min-width: 300px;
-            }
-            .svgText {
-                fill: var(--text);
             }
             .calculationsLabels {
                 display: flex;
@@ -4937,14 +4677,12 @@ class settingsSec extends HTMLElement {
           }
           .settingsDiv {
             background-color: var(--secondary);
-            border-radius: 25px;
             align-self: center;
             position: relative;
             top: 5px;
             margin-bottom: 15px;
             left: 2.5%;
             width: 95%;
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
           }
             </style>
             <div id="settingsSection">
@@ -4971,6 +4709,7 @@ class settingsSec extends HTMLElement {
                 if (this.mode == 'panes') {
                     let container = document.createElement('div')
                     container.classList.add('settingsDiv');
+                    container.classList.add('paneType');
                     targetSection.appendChild(container)
                     targetSection = container
                 }
@@ -5093,11 +4832,131 @@ class settingsSec extends HTMLElement {
 
 }
 customElements.define('settings-section', settingsSec);
-class tabPage extends HTMLElement {
+class settingsPane extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
+            <style>
+            #settingsDiv{
+                    background-color: var(--secondary);
+                    align-self: center;
+                    width: 100%;
+                    height: fit-content;
+                    display: flex;
+                    flex-direction: column;
+                }
+                #titleCard{
+                    color: var(--text);
+                    text-align: center;
+                    position: relative;
+                    width: fit-content;
+                    font-size: 30px;
+                    margin: 5px;
+                    background-color: var(--accent);
+                    padding: 5px 10px;
+                    border-radius: 25px;
+                }
+                #contentDiv{
+                    width: 100%;
+                }
+            </style>
+            <div id="settingsDiv" class="paneType">
+                <h2 id="titleCard"></h2>
+                <div id="contentDiv"></div>
+            </div>
+        `
+        this.titleCard = this.shadowRoot.querySelector("#titleCard")
+        this.contentDiv = this.shadowRoot.querySelector("#contentDiv")
+    }
+    setTitle(name){
+        this.titleCard.innerHTML = name;
+    }
+}
+customElements.define('settings-pane',settingsPane);
+class accColorPane extends settingsPane {
+    constructor() {
+        super();
+        this.contentDiv.innerHTML = `
+        <style>
+        #accentColorGrid {
+            display: grid;
+            margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, 65px);
+            grid-auto-rows: 65px;
+            width: 100%;
+            height: fit-content;
+            justify-content: space-evenly;
+            justify-items: center;
+        }
+        .accButton {
+            height: 55px;
+            width: 55px;
+            padding: none;
+            border-radius: 50%;
+            border: none;
+        }
+          
+        .accButton.active {
+            border: solid;
+            border-color: var(--text);
+        }
+        </style>
+        <div id="accentColorGrid" class="colorDiv">
+            <button class="accButton" id="red" style="background-color: #e81a1a;"></button>
+            <button class="accButton" id="orange" style="background-color: #e8691a;"></button>
+            <button class="accButton" id="yellow" style="background-color: #fcce62;"></button>
+            <button class="accButton" id="green" style="background-color: #64e053"></button>
+            <button class="accButton" id="blue" style="background-color: #2e87e6;"></button>
+            <button class="accButton" id="purple" style="background-color: #6b1bb5;"></button>
+            <button class="accButton" id="grey" style="background-color: #adadad;"></button>
+        </div>
+        `;
+        this.setTitle("Accent Color");
+    }
+}
+customElements.define('accent-color-pane', accColorPane);
+class settingsPage extends recursiveComponent {
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+            <style>
+                #mainContainer {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                }
+            </style>
+            <div id="mainContainer">
+                <menu-pane name="Settings">
+                    <menu-page name="Colors">
+                    <svg id="icon" class="settingsIcon imgDivClass imgContainer"
+                    style="height: 100%;isolation:isolate;" viewBox="0 0 1080 1080"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <circle class='secondary' cx="540" cy="539.53" r="411" vector-effect="non-scaling-stroke" />
+                    <path
+                        d="m743.22 742.79h38.854c22.453 0 40.682-18.229 40.682-40.682v-325.16c0-22.453-18.229-40.682-40.682-40.682h-38.854v406.52z"
+                        fill="#b9b7b7" />
+                    <rect x="333.01" y="336.27" width="84.071" height="406.52" fill="#ffad50" />
+                    <rect x="413.98" y="336.27" width="82.636" height="406.52" fill="#f0ff50" />
+                    <rect x="493.81" y="336.27" width="82.341" height="406.52" fill="#50ff96" />
+                    <rect x="573.64" y="336.27" width="82.046" height="406.52" fill="#50a5ff" />
+                    <rect x="655.69" y="336.27" width="87.528" height="406.52" fill="#ad50ff" />
+                    <path
+                        d="m257.25 585.07v-208.11c0-22.453 18.229-40.682 40.682-40.682h38.071v234.98c51.586 9.971 90.594 55.413 90.594 109.89 0 61.775-50.153 111.93-111.93 111.93-61.774 0-111.93-50.153-111.93-111.93 0-40.79 21.868-76.514 54.509-96.077z"
+                        fill="#ff5050" />
+                </svg>
+                        <accent-color-pane style="width: calc(100% - 20px); margin-left: 10px; height: fit-content; display: block;"></accent-color-pane>
+                    </menu-page>
+                </menu-pane>
+            </div>
+        `;
+    }
+}
+customElements.define('settings-page', settingsPage);
+class tabPage extends recursiveComponent {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
             <style>
                 #pageContainer {
                     width: 100%;
@@ -5143,11 +5002,10 @@ class tabPage extends HTMLElement {
     }
 }
 customElements.define('tab-page', tabPage);
-class tabMenu extends HTMLElement {
+class tabMenu extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
         @font-face {
@@ -5161,33 +5019,10 @@ class tabMenu extends HTMLElement {
             font-weight: bold;
           }
           
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
-          
           .imgDivClass {
             aspect-ratio: 1 / 1;
-          }
-          
-          .svgText {
-            fill: var(--text);
-          }
-          
-          .primary {
-            fill: var(--primary);
-          }
-          
-          .secondary {
-            fill: var(--secondary);
-          }
-          
-          .accent {
-            fill: var(--accent);
+            height: 40px;
+            background-color: var(--secondary);
           }
           
           /*********************************Injected css from mode***********************************/
@@ -5239,7 +5074,7 @@ class tabMenu extends HTMLElement {
             width: 100%;
             display: grid; 
             grid-template-columns: repeat(auto-fill, 175px);
-            grid-auto-rows: 290px;
+            grid-auto-rows: 300px;
             padding-top: 20px; 
             position: absolute;
             background-color: var(--semi-transparent); 
@@ -5255,12 +5090,11 @@ class tabMenu extends HTMLElement {
             background-color: var(--secondary);
             color: var(--text);
             border: none;
-            padding: 0px 15px 0 15px;
             font-size: 17px;
             display: inline-flex;
             -webkit-tap-highlight-color: transparent;
             width: 175px; 
-            height: 280px; 
+            height: 290px; 
             top: unset; 
             border-radius: 20px; 
             text-align: center;
@@ -5283,36 +5117,8 @@ class tabMenu extends HTMLElement {
           #settingsCogIcon {
             top: 5px;
             right: 5px;
-            width: 40px;
-            height: 40px;
             position: absolute;
             aspect-ratio: 1 / 1;
-          }
-          
-          ::-webkit-scrollbar {
-            width: 10px;
-          }
-          
-          ::-webkit-scrollbar-track {
-            background: transparent;
-          }
-          
-          ::-webkit-scrollbar-thumb {
-            width: 5px;
-            background: #00000080;
-            border-radius: 10px;
-          }
-          
-          ::-webkit-scrollbar-button:end:increment {
-            height: 7px;
-            display: block;
-            background: transparent;
-          }
-          
-          ::-webkit-scrollbar-button:start:increment {
-            height: 7px;
-            display: block;
-            background: transparent;
           }
           
           .tabcontent {
@@ -5337,37 +5143,21 @@ class tabMenu extends HTMLElement {
             filter: drop-shadow(-5px 5px 5px var(--translucent));
             position: absolute;
           }
-          #mobileTabIcon{
-            width: 40px;
-          }
           #tabRemove {
-            right: 0;
+            height: 35px;
+            position: absolute;
+            right: 5px;
+            top: 5px;
           }
           #newTabName {
-            width: calc(100% - 31.5px);
+            width: fit-content;
+            height: 40px;
+            margin: 10px 10px 0 10px;
             text-align: start;
-          }
-          .svgText {
-            fill: var(--text);
+            text-align: center;
           }
           
           .settingCircle {
-            fill: var(--text)
-          }
-          
-          .primary {
-            fill: var(--primary);
-          }
-          
-          .secondary {
-            fill: var(--secondary);
-          }
-          
-          .accent {
-            fill: var(--accent);
-          }
-          
-          .text {
             fill: var(--text)
           }
           .tabPage {
@@ -5380,13 +5170,13 @@ class tabMenu extends HTMLElement {
         <style id="typeStyle"></style>
         <div class="page" id="mainPage">
             <button id="mobileTabs">
-                <mobile-tab-icon id="mobileTabIcon" class="imgDivClass" width="40px" viewBox="0 0 1080 1080" bgcolor="secondary"></mobile-tab-icon>
+                <mobile-tab-icon id="mobileTabIcon" class="imgDivClass iconType" viewBox="0 0 1080 1080"></mobile-tab-icon>
                 <h3 id="tabNum">1</h3>
             </button>
             <div id="tabContainer">
                 
             </div>
-            <settings-icon id="settingsCogIcon" name="Open Settings" bgcolor="secondary"></settings-icon>
+            <settings-icon id="settingsCogIcon" class="imgDivClass iconType" name="Open Settings" ></settings-icon>
 
         <div id="tabPageContainer" class="tabcontent" style="display:flex" data-tab="mainTab">
             
@@ -5410,6 +5200,7 @@ class tabMenu extends HTMLElement {
         this.key = generateUniqueKey();
         mediaTypeArray.addMethodTo('landscape', {
             name: this.key, func: () => {
+                console.log("This is fucking ")
                 this.setStyling();
             }
         });
@@ -5430,14 +5221,10 @@ class tabMenu extends HTMLElement {
 
     setStyling() {
         let type = this.type
-        let orientation = "";
+        let orientation = envObject.globalOrientation;
         let styling = "";
-        if (this.container.offsetWidth / this.container.offsetHeight > 3 / 4) {
-            orientation = "horizontal";
-        } else {
-            orientation = "vertical";
-        }
-        if (orientation == "horizontal") {
+        if (orientation == "landscape") {
+            this.tabIndController(true)
             styling = `
                 #mobileTabs {
                     visibility: hidden;
@@ -5485,8 +5272,6 @@ class tabMenu extends HTMLElement {
                     top: 0;
                     right: 0;
                     position: absolute;
-                    height : 40px;
-                    width: 40px;
                     aspect-ratio: 1 / 1;
                 }
   
@@ -5500,6 +5285,11 @@ class tabMenu extends HTMLElement {
                 .tablinks.active{
                     background-color: var(--secondary);
                   }
+                #tabRemove{
+                    position: relative;
+                    height: 26px;
+                    top: 5px;
+                }
             `;
             if (this.indVisible == undefined) {
                 this.indVisible = false;
@@ -5518,14 +5308,7 @@ class tabMenu extends HTMLElement {
         tabButton.name = name;
         tabButton.innerHTML = `
         <h3 id="newTabName"></h3>
-        <svg div id="tabRemove" class="imgDivClass" height="31.5px" style="isolation:isolate"
-            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="m221.8 858.2c-175.62-175.62-175.62-460.78 0-636.4s460.78-175.62 636.4 0 175.62 460.78 0 636.4-460.78 175.62-636.4 0z"
-                fill-opacity=".2" />
-            <path class="svgText"
-                d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
-        </svg>
+        <remove-icon id="tabRemove" class="imgDivClass iconType" height="31.5px" name="Remove Tab"></remove-icon>
 
         <svg class="displayBase tabIcons" id="displayFunc" preserveAspectRatio="none"
             style="isolation:isolate" viewBox="0 0 1080 1572" xmlns="http://www.w3.org/2000/svg">
@@ -5644,13 +5427,13 @@ class tabMenu extends HTMLElement {
         })
         page.tabInd.classList.add('active');
         for (let tabPage of tabPages) {
-            if (!isHidden(tabPage) && tabPage.hasAttribute('hasKeypad') && !isHidden(keypad)) {
+            if (!isHidden(tabPage) && tabPage.hasAttribute('hasKeypad') && !isHidden(envObject.mainKeypad)) {
                 tabPage.returnKepad = true;
-                hideElements([keypad]);
+                hideElements([envObject.mainKeypad]);
             }
         }
         if (page.returnKepad != undefined && page.returnKepad) {
-            pullUpElements([keypad]);
+            pullUpElements([envObject.mainKeypad]);
         }
         hideElements(tabPages);
         pullUpElements([page]);
@@ -5668,7 +5451,7 @@ class tabMenu extends HTMLElement {
                 visibility = false;
             }
         }
-        if (this.orientation == 'vertical') {
+        if (this.orientation == 'portrait') {
             if (visibility) {
                 this.tabIndicatorContainer.style.zIndex = '5';
                 pullUpElements([this.tabIndicatorContainer]);
@@ -5689,11 +5472,10 @@ class tabMenu extends HTMLElement {
     }
 }
 customElements.define('tab-menu', tabMenu);
-class equationMap extends HTMLElement {
+class equationMap extends recursiveComponent {
     constructor() {
         super();
-        this.shadow = this.attachShadow({ mode: 'open' });
-        this.shadow.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
         @font-face {
             font-family: ubuntu;
@@ -5706,35 +5488,21 @@ class equationMap extends HTMLElement {
             font-weight: bold;
           }
           
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
-          
           .imgDivClass {
             aspect-ratio: 1 / 1;
-          }
-          
-          .svgText {
-            fill: var(--text);
           }
           #varEquationContainer {
             background-color: var(--primary);
             display: block;
             flex-wrap: wrap;
-            border-radius: 25px;
             top: 15%;
             height: 100%;
             max-height: inherit;
             overflow-y: auto;
             overflow-x: hidden;
+            border-radius: inherit;
             width: 100%;
             padding: 10px;
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
           }
           
           #varGrid {
@@ -5763,6 +5531,7 @@ class equationMap extends HTMLElement {
           }
           
           #variableName {
+            aspect-ratio: unset;
             border-radius: 25px;
             height: 25px;
             min-width: 25px;
@@ -5779,6 +5548,7 @@ class equationMap extends HTMLElement {
             left: 25px;
             width: 100%;
             bottom: 0;
+            aspect-ratio: unset;
             margin-right: 2.5px;
             height: 25px;
             text-align: center;
@@ -5799,7 +5569,7 @@ class equationMap extends HTMLElement {
         </style>
         <style id="modeStyler"></style>
         <div id="varEquationContainer" value="">
-            <rich-input id="EquationFunc" placeholder="Equation" style="padding-left: 10px;"></rich-input>
+            <rich-input id="EquationFunc" class="titleType" placeholder="Equation" style="padding-left: 10px;"></rich-input>
             <div id="varGrid"></div>
         </div>
         `;
@@ -5902,10 +5672,11 @@ class equationMap extends HTMLElement {
     createVar(name) {
         let varContainer = document.createElement('div');
         varContainer.classList.add('variableContainer');
+        varContainer.classList.add('entryType');
         varContainer.innerHTML = `
             <label id="varLabel">
-                <h3 id="variableName"></h3>
-                <rich-input id="variableEntry" placeholder="value"></rich-input>
+                <h3 id="variableName" class="entryType"></h3>
+                <rich-input id="variableEntry" class="entryType" placeholder="value"></rich-input>
             </label>
         `;
         let variableEntry = varContainer.querySelector('#variableEntry');
@@ -5964,11 +5735,10 @@ class equationMap extends HTMLElement {
     }
 }
 customElements.define('equation-map', equationMap);
-class slideSwitcher extends HTMLElement {
+class slideSwitcher extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
             #modeSwitcher {
                 height: 100%;
@@ -6053,11 +5823,10 @@ class slideSwitcher extends HTMLElement {
     }
 }
 customElements.define('slide-switcher', slideSwitcher);
-class dataViewer extends HTMLElement {
+class dataViewer extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
         @font-face {
@@ -6075,9 +5844,9 @@ class dataViewer extends HTMLElement {
             background-color: var(--primary);
             width: 100%;
             height: 100%;
-            border-radius: 25px;
-            filter: drop-shadow(-5px 5px 5px var(--translucent));
+            position: absolute;
             display: grid;
+            border-radius: inherit;
             grid-template-areas: "switcher" "data";
             grid-template-rows: 50px calc(100% - 50px);
             padding: 10px;
@@ -6088,7 +5857,7 @@ class dataViewer extends HTMLElement {
           }
           
           #modeSwitcher {
-            position: relative;
+            position: absolute;
             height: 40px;
             display: inline-block;
             width: fit-content;
@@ -6099,8 +5868,6 @@ class dataViewer extends HTMLElement {
             height: 100%;
             width: 70px;
             background-color: transparent;
-            border: none;
-            border-radius: 25px;
             z-index: 2;
           }
           #modeContainer{
@@ -6165,29 +5932,17 @@ class dataViewer extends HTMLElement {
     }
 }
 customElements.define('data-viewer', dataViewer);
-class dataPage extends HTMLElement {
+class dataPage extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                 -webkit-tap-highlight-color: transparent;
-            }
             #dataContainer{
                 height: 100%;
                 width: 100%;
                 max-height: 100%;
                 display: block;
             }
-            .svgText {
-                fill: var(--text);
-              }
         </style>
         <div id="dataContainer">
             
@@ -6233,15 +5988,6 @@ class singleData extends dataPage {
             font-family: ubuntu;
             src: url(../fontAssets/Roboto-Bold.ttf);
             font-weight: bold;
-          }
-          
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
           }
           
           button:focus {
@@ -6348,15 +6094,6 @@ class graphData extends dataPage {
         super();
         this.container.innerHTML = `
             <style>
-              * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-              }
-              
               input:focus {
                 outline: none;
               }
@@ -6427,13 +6164,9 @@ class graphData extends dataPage {
               }
             </style>
             <div id="graphContainer"><canvas id="funcChart"></canvas></div>
-            <svg id="settingsCog" class="imgDivClass" style="height: 50px;isolation:isolate"
-                viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                    <path class="svgText"
-                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
-                        fill-rule="evenodd" />
-            </svg>
+            <settings-icon id="settingsCog" class="imgDivClass iconType" style="height: 50px;isolation:isolate"
+            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            </settings-icon >
         `;
         let graphCanvas = this.shadowRoot.querySelector('#funcChart')
         this.ctx = graphCanvas.getContext('2d')
@@ -6545,13 +6278,9 @@ class tableData extends dataPage {
               }
             </style>
             <adv-table id="dataTable"></adv-table>
-            <svg id="settingsCog" class="imgDivClass" style="height: 50px;isolation:isolate"
-                viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="540" cy="540" r="500" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                    <path class="svgText"
-                        d="m244.67 697.55c-11.852-22.099-21.29-45.683-27.96-70.398h-32.694c-26.815 0-48.585-21.77-48.585-48.585v-74.282c0-26.815 21.77-48.585 48.585-48.585h31.938c8.86-34.024 22.953-65.946 41.369-94.851l-21.66-23.5c-18.173-19.717-16.919-50.479 2.798-68.652l54.621-50.343c19.717-18.173 50.479-16.919 68.652 2.798l21.569 23.401c22.071-11.686 45.606-20.971 70.255-27.506v-32.313c0-26.815 21.77-48.585 48.585-48.585h74.282c26.815 0 48.585 21.77 48.585 48.585v32.313c33.72 8.94 65.355 23.027 94.011 41.367l24.634-22.704c19.717-18.173 50.479-16.919 68.652 2.798l50.343 54.621c18.173 19.717 16.92 50.479-2.798 68.652l-24.795 22.854c11.534 21.894 20.708 45.22 27.182 69.641h33.737c26.815 0 48.585 21.77 48.585 48.585v74.282c0 26.815-21.77 48.585-48.585 48.585h-33.737c-8.913 33.62-22.943 65.167-41.203 93.755l22.246 24.137c18.173 19.717 16.919 50.479-2.798 68.652l-54.621 50.343c-19.718 18.173-50.48 16.92-68.653-2.798l-22.29-24.184c-21.971 11.601-45.389 20.823-69.91 27.324v32.313c0 26.815-21.77 48.585-48.585 48.585h-74.282c-26.815 0-48.585-21.77-48.585-48.585v-32.313c-32.904-8.723-63.822-22.348-91.924-40.042l-24.332 22.426c-19.717 18.173-50.479 16.919-68.652-2.798l-50.343-54.621c-18.173-19.717-16.919-50.479 2.798-68.652l23.565-21.72zm153.29-26.633c-71.988-78.105-67.021-199.96 11.084-271.95 78.105-71.987 199.96-67.021 271.95 11.084 71.987 78.105 67.021 199.96-11.084 271.95s-199.96 67.021-271.95-11.084z"
-                        fill-rule="evenodd" />
-            </svg>
+            <settings-icon id="settingsCog" class="imgDivClass iconType" style="height: 50px;isolation:isolate"
+            viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            </settings-icon >
         `
         this.target = "tableData"
         this.pageName = "Table"
@@ -6593,10 +6322,9 @@ class tableData extends dataPage {
     }
 }
 customElements.define('table-data', tableData);
-class funcPage extends HTMLElement {
+class funcPage extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
     }
     static get observedAttributes() {
         return ['name'];
@@ -6611,7 +6339,7 @@ class funcPage extends HTMLElement {
 class customFuncPage extends funcPage {
     constructor() {
         super();
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
             #pageContainer {
@@ -6630,7 +6358,7 @@ class customFuncPage extends funcPage {
 class templateFuncPage extends funcPage {
     constructor() {
         super();
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
             <link rel="stylesheet" href="./styling/animations.css">
             <style>
                 #pageContainer {
@@ -6662,31 +6390,17 @@ class templateFuncPage extends funcPage {
                     visibility: inherit;
                     margin-left: 5px;
                     top: 5px;
-                }
-                .svgText {
-                    fill: var(--text);
-                }
-                .primary {
-                    fill: var(--primary);
+                    height: 42.5px;
+                    aspect-ratio: 1/1;
                 }
             </style>
             <div id="pageContainer">
                 <rich-input id="nameInput"></rich-input>
-                <equation-map id="equationMap"></equation-map>
-                <svg id="editIcon" class="imgDivClass" height="42.5px"
-                style="isolation:isolate;" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                    <circle class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
-                    <path class="svgText" d="m253.93 811.84c-1.505 0.419-3.119-2e-3 -4.227-1.102-1.107-1.098-1.541-2.711-1.133-4.219 5.403-19.997 20.293-75.131 25.649-94.957 0.405-1.495 1.574-2.66 3.067-3.064 1.497-0.401 3.092 0.022 4.192 1.114 14.493 14.387 54.625 54.223 69.118 68.61 1.098 1.09 1.534 2.685 1.146 4.183-0.391 1.5-1.55 2.674-3.042 3.09-19.788 5.501-74.811 20.801-94.768 26.346l-2e-3 -1e-3zm449.5-531.86 79.095 78.514 40.135-40.432c15.001-15.113 10.654-43.794-9.708-64.006l-2.656-2.636c-21.826-21.667-52.606-26.103-68.689-9.9l-38.177 38.46zm-405.91 407.24 384.64-387.5c3.829-3.857 10.07-3.881 13.928-0.051l65.247 64.767c3.857 3.829 3.88 10.07 0.051 13.927l-384.64 387.5c-3.829 3.858-10.07 3.881-13.928 0.051l-65.247-64.767c-3.857-3.829-3.88-10.07-0.051-13.927z" fill-rule="evenodd"/>
-                </svg>
-                <svg id="shareIcon" class="imgDivClass" style="left:47.5px;" height="42.5px"
-                style="isolation:isolate;" viewBox="0 0 1080 1080"
-                xmlns="http://www.w3.org/2000/svg">
-                    <circle class="primary" cx="540" cy="540" r="540" vector-effect="non-scaling-stroke"/>
-                    <path class="svgText"  d="m343 829.4c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm288.47-288.42c0-52.025 42.237-94.263 94.263-94.263 52.025 0 94.263 42.238 94.263 94.263s-42.238 94.263-94.263 94.263c-52.026 0-94.263-42.238-94.263-94.263zm-288.47-290.39c0-52.025 42.238-94.263 94.263-94.263 52.026 0 94.263 42.238 94.263 94.263s-42.237 94.263-94.263 94.263c-52.025 0-94.263-42.238-94.263-94.263zm145.82 102.92 135.93 135.93c10.857-21.215 28.204-38.568 49.414-49.433l-135.92-135.92c-10.862 21.213-28.212 38.563-49.424 49.424zm135.93 239-135.91 135.91c21.21 10.865 38.557 28.218 49.414 49.433l135.91-135.91c-21.21-10.865-38.557-28.218-49.414-49.433z" fill-rule="evenodd"/>
-                </svg>
+                <equation-map id="equationMap" class="paneType"></equation-map>
+                <edit-icon id="editIcon" class="imgDivClass iconType" ></edit-icon>
+                <share-icon id="shareIcon" class="imgDivClass iconType" style="left:47.5px;"></share-icon>
 
-                <data-viewer id="dataViewer">
+                <data-viewer id="dataViewer" class="paneType">
                     <single-data style="position: absolute; height: 100%; width: 100%;"></single-data>
                     <graph-data style="position: absolute; height: 100%; width: 100%;"></graph-data>
                     <table-data style="position: absolute; height: 100%; width: 100%;"></table-data>
@@ -6863,21 +6577,11 @@ class templateFuncPage extends funcPage {
     }
 }
 customElements.define('template-func', templateFuncPage);
-class codeTerminal extends HTMLElement {
+class codeTerminal extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
             <style>
-              * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-              }
-              
               textarea {
                 border: none;
                 overflow: auto;
@@ -6902,36 +6606,8 @@ class codeTerminal extends HTMLElement {
                 background-color: transparent;
               }
               
-              #creatorEditor::-webkit-scrollbar {
-                width: 10px;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-track {
-                background: transparent;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-thumb {
-                width: 5px;
-                background: #00000080;
-                border-radius: 10px;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-button:end:increment {
-                height: 0px;
-                background: transparent;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-button:start:increment {
-                height: 0px;
-                background: transparent;
-              
-              }
               .numberedHeader {
                 font-size: 25px;
-              }
-              
-              #creatorEditor::-webkit-scrollbar-corner {
-                background-color: transparent;
               }
               
               .codeEditor {
@@ -6996,22 +6672,12 @@ class codeTerminal extends HTMLElement {
     }
 }
 customElements.define('code-terminal', codeTerminal);
-class createPage extends HTMLElement {
+class createPage extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <link rel="stylesheet" href="./styling/animations.css">
         <style>
-          
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
           
           .imgDivClass {
             aspect-ratio: 1 / 1;
@@ -7026,12 +6692,6 @@ class createPage extends HTMLElement {
             height: 45px;
             width: 45px;
           }
-          .svgText {
-            fill: var(--text);
-          }
-          .primary {
-            fill: var(--primary);
-          }
           
           input:focus {
             outline: none;
@@ -7045,57 +6705,31 @@ class createPage extends HTMLElement {
             outline: none;
           }
           
-          ::-webkit-scrollbar {
-            width: 10px;
-          }
-          
-          ::-webkit-scrollbar-track {
-            background: transparent;
-          }
-          
-          ::-webkit-scrollbar-thumb {
-            width: 5px;
-            background: #00000080;
-            border-radius: 10px;
-          }
-          
-          ::-webkit-scrollbar-button:end:increment {
-            height: 7px;
-            display: block;
-            background: transparent;
-          }
-          
-          ::-webkit-scrollbar-button:start:increment {
-            height: 7px;
-            display: block;
-            background: transparent;
-          }
-          
           #custCreatorPage {
             background-color: var(--secondary);
             width: 100%;
             height: 100%;
+            display: flex;
+            flex-direction: column;
           }
           
           #nameCreator {
             background-color: var(--accent);
             border: none;
-            font-size: 50px;
+            font-size: 75px;
             width: calc(100% - 20px);
-            left: 10px;
+            height: 100px;
+            margin-left: 10px;
             padding: 5px;
-            border-radius: 15px;
-            top: 55px;
-            position: absolute;
+            border-radius: 20px;
           }
           
           #mainCreator {
             background-color: var(--primary);
-            top: 135px;
-            bottom: 10px;
+            height: calc(100% - 20px);
             width: calc(100% - 20px);
-            left: 10px;
-            position: absolute;
+            margin: 10px;
+            position: relative;
             border-radius: 20px;
           }
           
@@ -7140,34 +6774,6 @@ class createPage extends HTMLElement {
             overflow: auto;
           }
           
-          #creatorEditor::-webkit-scrollbar {
-            width: 10px;
-          }
-          
-          #creatorEditor::-webkit-scrollbar-track {
-            background: transparent;
-          }
-          
-          #creatorEditor::-webkit-scrollbar-thumb {
-            width: 5px;
-            background: #00000080;
-            border-radius: 10px;
-          }
-          
-          #creatorEditor::-webkit-scrollbar-button:end:increment {
-            height: 0px;
-            background: transparent;
-          }
-          
-          #creatorEditor::-webkit-scrollbar-button:start:increment {
-            height: 0px;
-            background: transparent;
-          
-          }
-          
-          #creatorEditor::-webkit-scrollbar-corner {
-            background-color: transparent;
-          }
           #slider{
             position: absolute;
             height: 40px;
@@ -7192,9 +6798,9 @@ class createPage extends HTMLElement {
         <style id="modeStyler"></style>
         <div id="custCreatorPage">
 
-        <arrow-icon id="backCreator" direction="left"></arrow-icon>
-        <paste-icon id="pasteCreator" class="imgDivClass"></paste-icon>
-        <scan-icon id="scanCreator" class="imgDivClass"></scan-icon>
+        <arrow-icon id="backCreator" class="iconType" direction="left"></arrow-icon>
+        <paste-icon id="pasteCreator" class="imgDivClass iconType"></paste-icon>
+        <scan-icon id="scanCreator" class="imgDivClass iconType"></scan-icon>
         
         <input type="text" id="nameCreator" placeholder="Name">
         <div id="mainCreator">
@@ -7395,60 +7001,25 @@ class createPage extends HTMLElement {
 }
 customElements.define('create-page', createPage);
 //Popup Section
-class popupBackground extends HTMLElement {
+class popup extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        //this.backgroundDiv = this.shadowRoot.getElementById('backgroundDiv');
-
-    }
-    open(closeMethod) {
-        console.log("open popup background")
-        this.style.zIndex = 0;
-        this.style.visibility = 'visible';
-        this.style.opacity = '1';
-        this.addEventListener('click', () => {
-            console.log('close popup');
-            closeMethod();
-            this.close()
-        }, { once: true });
-    }
-    close() {
-        this.style.zIndex = -1;
-        this.style.opacity = '0';
-        this.style.visibility = 'hidden';
-
-    }
-    connectedCallback() {
-        this.style = `background:var(--semi-transparent); width: 100%;
-        height: 100%; transition: opacity 0.5s ease; opacity: 0; z-index: -1; left: 0px; top: 0px; position: absolute; visibility: hidden;`;
-    }
-}
-customElements.define('popup-background', popupBackground);
-class popup extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-            .svgText {
-                fill: var(--text);
-            }
             #popupDiv {
                 background-color: var(--primary);
-                border-radius: 25px;
                 transition: all 0.5s ease-in-out;
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
                 display: flex;
                 flex-direction: column;
             }
             #backIcon {
-                height: 50px; 
-                width:50px; 
+                height: 40px; 
+                width: 40px;
+                margin: 10px;
                 aspect-ratio: 1/1; 
-                isolation:isolate; 
-                transform: rotate(180deg);
+                isolation:isolate;
                 flex-shrink: 0;
+                background-color: var(--secondary);
             }
             #contentDiv {
                 width: 100%;
@@ -7485,14 +7056,8 @@ class popup extends HTMLElement {
         <style id="styler">
         </style>
         <div id="popupContainer" >
-            <div id="popupDiv" >
-                <svg id="backIcon" viewBox="0 0 1080 1080"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <rect width="1080" height="1080" fill-opacity="0" />
-                    <circle cx="540" cy="540" r="450" fill-opacity=".2" vector-effect="non-scaling-stroke" />
-                    <path class="svgText"
-                        d="m648.99 620.2-186.73 186.73-80.256-80.257 186.73-186.73-186.61-186.61 80.256-80.256 186.61 186.61 0.011-0.01 80.256 80.256-0.011 0.01 0.132 0.132-80.256 80.256-0.132-0.132z" />
-                </svg>
+            <div id="popupDiv" class="paneType">
+                <arrow-icon id="backIcon" class="iconType" direction="left"></arrow-icon>
                 <div id="contentDiv"></div>
             </div>
         </div>
@@ -7587,14 +7152,14 @@ class popup extends HTMLElement {
             <button id="confirmButton" class="uiButton" style="background-color: var(--accent)">
             <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
             xmlns="http://www.w3.org/2000/svg">
-            <path class="svgText"
+            <path class="text"
                 d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
             </svg>
             </button>   
             <button id="exitConfirmPage" class="uiButton" style="background-color: var(--secondary)">
             <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
                 xmlns="http://www.w3.org/2000/svg">
-                <path class="svgText"
+                <path class="text"
                     d="m457.47 540-137.54 137.55 82.527 82.527 137.55-137.54 137.55 137.54 82.527-82.527-137.54-137.55 137.54-137.55-82.527-82.527-137.55 137.54-137.55-137.54-82.527 82.527 137.54 137.55z" />
             </svg>
             </button>
@@ -7620,11 +7185,10 @@ class popup extends HTMLElement {
         }
     }
 }
-class qrCode extends HTMLElement {
+class qrCode extends recursiveComponent {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
             <canvas id="qrCanvas" width="100%" height="100%">
         `;
         this.qrCanvas = this.shadowRoot.getElementById('qrCanvas');
@@ -7650,20 +7214,13 @@ class qrCode extends HTMLElement {
     }
 }
 customElements.define('qr-code', qrCode);
-class QrCodeReader extends HTMLElement {
+class QrCodeReader extends recursiveComponent {
     constructor() {
         super();
         this.qrCodeReader = null;
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML += `
         <style>
-          .svgText {
-            fill: var(--text);
-          }
-          .primary {
-            fill: var(--primary);
-          }
-          #swtichIcon{
+          #switchIcon{
             bottom: 10px;
             right: 10px;
             width: 40px;
@@ -7680,15 +7237,12 @@ class QrCodeReader extends HTMLElement {
         <div id="reader">
         
         </div>
-        <svg id="swtichIcon" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <circle class="primary" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path class="svgText" d="m677.38 225.1c-46.86-25.01-100.36-39.19-157.14-39.19-184.6 0-334.47 149.87-334.47 334.47 0 56.783 14.18 110.28 39.19 157.14l66.733-66.733c-11.093-27.988-17.19-58.491-17.19-90.407 0-135.63 110.11-245.74 245.74-245.74 31.916 0 62.419 6.097 90.407 17.19l66.733-66.733zm-285.35 552.38c0.804 2.927-0.025 6.063-2.171 8.209-2.143 2.143-5.281 2.974-8.209 2.171-38.829-10.645-145.89-39.983-184.39-50.536-2.903-0.797-5.159-3.079-5.934-5.984-0.769-2.912 0.066-6.01 2.196-8.14 28.068-28.068 105.79-105.79 133.86-133.85 2.127-2.127 5.231-2.962 8.139-2.197 2.912 0.769 5.187 3.032 5.985 5.934 10.55 38.502 39.894 145.56 50.529 184.39l-3e-3 3e-3zm10.583 77.414c46.86 25.01 100.36 39.19 157.14 39.19 184.6 0 334.47-149.87 334.47-334.47 0-56.783-14.18-110.28-39.19-157.14l-66.733 66.733c11.093 27.988 17.19 58.491 17.19 90.407 0 135.63-110.11 245.74-245.74 245.74-31.916 0-62.419-6.097-90.407-17.19l-66.733 66.733zm285.35-552.38c-0.804-2.927 0.025-6.063 2.171-8.209 2.143-2.143 5.281-2.974 8.209-2.171 38.829 10.645 145.89 39.983 184.39 50.536 2.903 0.798 5.159 3.079 5.934 5.984 0.769 2.912-0.066 6.01-2.196 8.14-28.068 28.068-105.79 105.79-133.86 133.85-2.127 2.127-5.231 2.962-8.139 2.197-2.912-0.769-5.187-3.032-5.985-5.934-10.55-38.502-39.894-145.56-50.529-184.39l3e-3 -3e-3z" fill="#ebebeb" fill-rule="evenodd"/>
-        </svg>
+        <switch-icon id="switchIcon"></switch-icon>
 
       `;
         this.reader = this.shadowRoot.querySelector('#reader');
         this.qrCodeReader = new Html5Qrcode(this.reader);
-        this.switchIcon = this.shadowRoot.querySelector('#swtichIcon');
+        this.switchIcon = this.shadowRoot.querySelector('#switchIcon');
         this.facing = 'environment';
         this.switchIcon.addEventListener('click', () => {
             this.facing = this.facing === 'environment' ? 'user' : 'environment';
@@ -7735,20 +7289,6 @@ class sharePage extends popup {
         super();
         this.contentDiv.innerHTML = `
             <style>
-                * {
-                    box-sizing: border-box;
-                    padding: 0;
-                    margin: 0;
-                    font-family: ubuntu;
-                    color: var(--text);
-                    -webkit-tap-highlight-color: transparent;
-                }
-                .svgText {
-                    fill: var(--text)
-                }
-                .accent {
-                    fill: var(--accent);
-                }
                 #qrCenter{
                     display: grid;
                     justify-content: space-evenly;
@@ -7798,21 +7338,9 @@ class sharePage extends popup {
         this.qrCode.setAttribute('text', this.text);
         this.isOpen = false;
 
-        let copyIcon = new DOMParser().parseFromString(`
-            <svg width="50px" height="50px" style="isolation:isolate" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-            <clipPath id="a">
-            <rect width="1080" height="1080"/>
-            </clipPath>
-            </defs>
-            <g clip-path="url(#a)">
-            <circle class="accent" cx="540" cy="540" r="540" fill="#c3cfd9" vector-effect="non-scaling-stroke"/>
-            <path d="m700.11 286v-10.116c0-29.392-23.863-53.255-53.255-53.255h-299.31c-29.392 0-53.255 23.863-53.255 53.255v443.08c0 29.392 23.863 53.255 53.255 53.255h16.269v-57.521c-9.499-5.544-15.887-15.846-15.887-27.628v-379.3c0-17.643 14.324-31.967 31.967-31.967h234.61c9.232 0 17.555 3.922 23.393 10.189h62.211zm29.841 482.85m-264.45-407.89h234.61c17.643 0 31.967 14.324 31.967 31.967v379.3c0 17.643-14.324 31.967-31.967 31.967h-234.61c-17.643 0-31.967-14.324-31.967-31.967v-379.3c0-17.643 14.324-31.967 31.967-31.967zm-32.349-53.182h299.31c29.392 0 53.255 23.863 53.255 53.255v443.08c0 29.392-23.863 53.255-53.255 53.255h-299.31c-29.392 0-53.255-23.863-53.255-53.255v-443.08c0-29.392 23.863-53.255 53.255-53.255z" class="svgText" fill-rule="evenodd"/>
-            </g>
-            </svg>
-            
-            `, "text/xml").firstChild;;
-        console.log(copyIcon.firstChild);
+        let copyIcon = document.createElement('copy-icon');
+        copyIcon.style = "height: 50px;";
+        copyIcon.classList.add('iconType');
         this.createShareGroup('Copy', copyIcon, () => {
             navigator.clipboard.writeText(this.text);
         });
@@ -7853,15 +7381,10 @@ class qrScanPage extends popup {
         super();
         this.contentDiv.innerHTML = `
         <style>
-            .svgText {
-                fill: var(--text)
-            }
             #qrScanPage{
                 width: 100%;
                 height: inherit;
                 background-color: var(--primary);
-                border-radius: 25px;
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -7946,21 +7469,8 @@ class editPage extends popup {
         super();
         this.contentDiv.innerHTML = `
             <style>
-              * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-              }
-              
               .imgDivClass {
                 aspect-ratio: 1 / 1;
-              }
-              
-              .svgText {
-                fill: var(--text);
               }
               
               #editDiv {
@@ -8014,7 +7524,6 @@ class editPage extends popup {
                 width: 100%;
                 display:grid;
                 background: var(--accent);
-                border-radius: 20px;
                 padding: 0 10px 0 10px;
                 font-size: 65px;
               }
@@ -8030,17 +7539,17 @@ class editPage extends popup {
             </style>
             <div id="editDiv">
                 <h1 id="custFuncEditHeader">Edit</h1>
-                    <div id="textEditor">
+                    <div id="textEditor" class="paneType">
                         <code-terminal style="width: 100%; height: 100%;"></code-terminal>
                     </div>
-                  <div id="funcEditor">
+                  <div id="funcEditor" class="paneType">
                         <rich-input id="nameEditor" class="funcEditors"></rich-input>
                         <rich-input id="equationEditor" class="funcEditors"></rich-input>
                   </div>
                   <button id="confirm" style="background-color: var(--accent)">
                             <svg class="imgDivClass" style="height: 40px;isolation:isolate" viewBox="0 0 1080 1080"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path class="svgText"
+                                <path class="text"
                                     d="m407.03 677.37-0.178 0.178 82.528 82.527 0.178-0.177 0.177 0.177 82.528-82.527-0.178-0.178 274.91-274.91-82.528-82.527-274.91 274.91-136.1-136.1-82.527 82.528 136.1 136.1z" />
                             </svg>
                     </button>   
@@ -8102,14 +7611,6 @@ class confirmPage extends popup {
         super();
         this.contentDiv.innerHTML = `
         <style>
-          * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-            font-family: ubuntu;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-          }
           #confirmDiv {
             width: 100%;
             border-radius: 25px;
@@ -8179,20 +7680,9 @@ class quickSettings extends popup {
         super();
         this.contentDiv.innerHTML = `
         <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-            }
             input:focus, textarea:focus, select:focus{
                 outline: none;
             }
-            .svgText {
-                fill: var(--text);
-              }
             #settingsPane{
                 width: 100%;
                 height: auto;

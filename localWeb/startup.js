@@ -122,7 +122,6 @@ class MediaType {
   }
   addMethod(method){
     this.#methodArray.push(method);
-    console.log("Added method: "+ method.name)
     if(this.#matchMedia.matches){
       method.func();
     }
