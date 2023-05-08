@@ -11,9 +11,9 @@ let funcList = [
     "inverse": "asin",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.sin(input * getAngleCon("deg"));
+      return Math.sin(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -23,9 +23,9 @@ let funcList = [
     "inverse": "sin",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.asin(input) * getAngleCon("rad");
+      return Math.asin(input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -35,9 +35,9 @@ let funcList = [
     "inverse": "acos",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.cos(input * getAngleCon("deg"));
+      return Math.cos(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -47,9 +47,9 @@ let funcList = [
     "inverse": "cos",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.acos(input) * getAngleCon("rad");
+      return Math.acos(input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -59,9 +59,9 @@ let funcList = [
     "inverse": "atan",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.tan(input * getAngleCon("deg"));
+      return Math.tan(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -71,9 +71,9 @@ let funcList = [
     "inverse": "tan",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.atan(input) * getAngleCon("rad");
+      return Math.atan(input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -83,9 +83,9 @@ let funcList = [
     "inverse": "acsc",
     'mth': (arry) => {
       let input = arry[0];
-      return 1 / Math.sin(input * getAngleCon("deg"));
+      return 1 / Math.sin(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -95,9 +95,9 @@ let funcList = [
     "inverse": "csc",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.asin(1 / input) * getAngleCon("rad");
+      return Math.asin(1 / input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -107,9 +107,9 @@ let funcList = [
     "inverse": "asec",
     'mth': (arry) => {
       let input = arry[0];
-      return 1 / Math.cos(input * getAngleCon("deg"));
+      return 1 / Math.cos(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -119,9 +119,9 @@ let funcList = [
     "inverse": "sec",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.acos(1 / input) * getAngleCon("rad");
+      return Math.acos(1 / input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -131,9 +131,9 @@ let funcList = [
     "inverse": "acot",
     'mth': (arry) => {
       let input = arry[0];
-      return 1 / Math.tan(input * getAngleCon("deg"));
+      return 1 / Math.tan(input * getAngleConversion("deg"));
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -143,9 +143,9 @@ let funcList = [
     "inverse": "cot",
     'mth': (arry) => {
       let input = arry[0];
-      return Math.atan(1 / input) * getAngleCon("rad");
+      return Math.atan(1 / input) * getAngleConversion("rad");
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -156,7 +156,7 @@ let funcList = [
       let input = arry[0];
       return Math.abs(input);
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -167,7 +167,7 @@ let funcList = [
       let input = arry[0];
       return Math.abs(input);
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -178,7 +178,7 @@ let funcList = [
       let input = arry[0];
       return Math.abs(input);
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -202,7 +202,7 @@ let funcList = [
         return trailingRound(Math.sqrt(2 * Math.PI) * Math.pow(t, (z + 0.5)) * Math.exp(-t) * x);
       }
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -242,7 +242,7 @@ let funcList = [
         return value;
       }
     },
-    "predef" : true
+    "predef": true
   },
   {
     'type': 'method',
@@ -254,7 +254,7 @@ let funcList = [
       let arg = arry[1]
       return Math.log10(arg) / Math.log10(base)
     },
-    "predef" : true
+    "predef": true
   }
 ];
 let ignoreList = [
@@ -299,18 +299,28 @@ String.prototype.indexOfAll = function (value) {
   return retArry;
 };
 String.prototype.innerVar = function (tVar) {
-  let posArry = this.indexOfAll(tVar);
-  let posFunc = funcsContainingVar(tVar);
-  for (let idx of posArry) {
+  let testString = this;
+  for (let func of funcList) {
+    if (testString.includes(func.func)) {
+      testString.replaceAll(func.func, "");
+    }
+  }
+  if (testString.includes(tVar)) {
+    return true;
+  } else {
+    return false;
+  }
+  /*for (let idx of posArry) {
     for (let func of posFunc) {
       if (idx >= func.idx && this.length - idx >= func.name.length - func.idx) {
         if (this.substring(idx - func.idx, idx - func.idx + func.name.length) != func.name) {
+          console.log("false condition is true")
           return false;
         }
       }
     }
     return true;
-  }
+  }*/
 };
 String.prototype.varIns = function (tVar) {
   let count = 0;
@@ -331,6 +341,34 @@ String.prototype.hasVar = function () {
   } else {
     return false;
   }
+}
+String.prototype.findMatch = function (start, end) {
+  let copyString = this;
+  let fromIndex = 0;
+  let matchIdx = -1;
+  let direction = true;
+  if(arguments[2] != undefined){
+    direction = arguments[2];
+  }
+  while (true) {
+    let startIndex = direction ? copyString.indexOf(start, fromIndex): copyString.lastIndexOf(start, fromIndex);
+    let endIndex = direction ? copyString.indexOf(end, fromIndex) : copyString.lastIndexOf(end, fromIndex);
+    if (startIndex > -1 && endIndex > -1) {
+      if (direction ? startIndex < endIndex : startIndex > endIndex) {
+        fromIndex = direction ? endIndex + end.length : startIndex;
+      } else {
+        matchIdx = direction ? endIndex : startIndex+start.length;
+        break;
+      }
+    } else if (direction ? endIndex > -1 : startIndex > -1) {
+      matchIdx = direction ? endIndex : startIndex+start.length;
+      break;
+    } else if (startIndex == -1 && endIndex == -1) {
+      matchIdx = direction ? this.length : 0;
+      break;
+    }
+  }
+  return matchIdx;
 }
 class DefinedTerm {
   pow = [];
@@ -447,13 +485,11 @@ class CmpxTerm extends DefinedTerm {
   }
 }
 class VarTerm extends DefinedTerm {
-  constructor(input, pos, mutiplican, pow, innerPos) {
+  constructor(input, pos, mutiplican, pow) {
     super(mutiplican, pow, pos)
     this.subtype = "var"
 
     this.letter = input;
-
-    this.innerPos = innerPos
   }
   get getNumeric() {
     for (let varI of GlobalVars) {
@@ -467,9 +503,18 @@ class VarTerm extends DefinedTerm {
     let stringPow = this.getComputedPow != "1" ? "^(" + this.getComputedPow + ')' : '';
     let strignMutiplican = this.getComputedMuti != '1' ? this.getComputedMuti + "*" : '';
     let stringAddican = this.getAdditions.length != 0 ? '+' + this.getAdditions : '';
-    return strignMutiplican + this.getNumeric + stringPow + stringAddican;
+    return "(" + strignMutiplican + this.getNumeric + stringPow + stringAddican + ")";
   }
 
+}
+class TextTerm {
+  constructor(string){
+    this.type = "term"
+    this.ogString = string;
+  }
+  get text(){
+    return this.ogString;
+  }
 }
 class solveEnv {
   constructor(object) {
@@ -483,8 +528,6 @@ class solveEnv {
   calcPoints(type, equation) {
     if (type == "graph" || type == "table") {
       let solvableEquat = setVarEquat(equation, this.vars);
-      console.log(equation)
-      console.log(solvableEquat)
       if (type == "graph") {
         return { "points": calculatePoints(solvableEquat, this.envVars.gMin, this.envVars.gMax, settings.gR, settings), "extrema": calculateExtrema(setVarEquat(equation, this.vars)) }
       } else {
@@ -544,8 +587,6 @@ class StaticEnv extends solveEnv {
   }
   getParsedEquation() {
     if (this.isFunc) {
-      //console.log("%c func vars", "color: red");
-      //console.log(this.vars)
       let funcMap = this.vars.map(val => {
         if (val.value != undefined && val.value != "") {
           return `(${val.value})`
@@ -553,13 +594,12 @@ class StaticEnv extends solveEnv {
           return val.letter
         }
       })
-      //console.log(funcMap)
-      if(this.func.type == "method"){
+      if (this.func.type == "method") {
         return `${this.func.func}(${funcMap.join(",")})`
-      }else{
+      } else {
         return assembly([...this.func.funcParse], funcMap)
       }
-      
+
     } else {
       return setVarEquat(this.equation, this.vars, false);
     }
@@ -649,7 +689,7 @@ class DynamicEnv extends solveEnv {
     super(object)
     this.type = "dynamic"
     this.target = object.target
-    if (this.target) {
+    if (this.target == "graph") {
       this.envVars = {
         "gMin": settings.gMin,
         "gMax": settings.gMax
@@ -752,105 +792,76 @@ class DynamicEnv extends solveEnv {
 onmessage = function (e) {
   let object = e.data;
   let port = e.ports[0];
-
-  if (object.callType == "set") {
-    if (object.method == 'init') {
-      //{callType: "set", method: "init", settings: blank for brevity}
-      try {
-        settings = object.settings;
-        port.postMessage({ result: "Set Settings" })
-      } catch (eve) {
-        //console.log(eve)
-        port.postMessage({ error: eve })
-        this.postMessage({ 'type': 'posError', 'mes': `Error Setting Calc settings` })
-      }
-    } else if (object.method == "var") {
-      if (object.targetEnv == undefined) {
-        let targVar = GlobalVars.find(elem => elem.name == object.target)
-        targVar.value = object.value
-        port.postMessage({ result: "Set Var" })
+  if (object.set != undefined) {
+    if (object.set == "settings") {
+      if (object.id == undefined) {
+        if (object.settings.degRad != undefined) {
+          settings.degRad = object.settings.degRad;
+        }
+        if (object.settings.gMin != undefined) {
+          settings.gMin = object.settings.gMin;
+        }
+        if (object.settings.gMax != undefined) {
+          settings.gMax = object.settings.gMax;
+        }
+        if (object.settings.gR != undefined) {
+          settings.gR = object.settings.gR;
+        }
+        if (object.settings.tMin != undefined) {
+          settings.tMin = object.settings.tMin;
+        }
+        if (object.settings.tMax != undefined) {
+          settings.tMax = object.settings.tMax;
+        }
+        if (object.settings.tC != undefined) {
+          settings.tC = object.settings.tC;
+        }
       } else {
+        let env = runners.find(elem => elem.id == object.id);
         console.log(runners)
-        port.postMessage({ result: runners.find(elem => { return elem.id == object.targetEnv }).setVar(object.target, object.value), return: true })
-      }
+        if (env != undefined) {
+          env.setEnvVar(object.settings);
+          if (env.envType == "static") {
+            port.postMessage({ result: env.calcGraph() });
+          } else {
+            port.postMessage({ result: "Done" });
+          }
 
-    } else if (object.method == "env") {
-      if (!runners.find(elem => elem.id == object.targetEnv)) {
-        if (object.envType == "static") {
+        }
+
+      }
+    } else if (object.set == "env") {
+      if (!runners.find(elem => elem.id == object.id)) {
+        if (object.type == "static") {
           runners.push(new StaticEnv(object))
+          console.log(runners);
         } else {
           runners.push(new DynamicEnv(object))
+          console.log(runners);
         }
         port.postMessage({ result: true })
       } else {
-        port.postMessage({ result: false })
+        port.postMessage({ error: "env already exists" })
       }
-    } else if (object.method == "envEquat") {
-      runners.find(elem => elem.id == object.targetEnv).changeEquat(object.equation)
-    } else if (object.method == "envVar") {
-      let env = runners.find(elem => elem.id == object.targetEnv);
-      env.setEnvVar(object.newVars)
-      port.postMessage({ result: env.calcGraph()});
-    }
-  } else if (object.callType == "get") {
-    if (object.method == 'list') {
-      port.postMessage({ result: getNameList() })
-    } else if (object.method == 'vars') {
-      //{callType: "get", method: "vars", text : blank for brevity}
-      if (object.existing == undefined || object.existing == false) {
-        port.postMessage({ result: varInEquat(object.text) })
-      } else if (object.existing == true) {
-        let thing = funcList.find(elem => {
-          if (Array.isArray(elem.func)) {
-            return elem.func.includes(object.funcName);
-          } else {
-            return elem.func == object.funcName;
-          }
+    } else if (object.set == "envClear") {
+      if (object.id != undefined) {
+        let env = runners.find(elem => elem.id == object.id);
+        if (env != undefined) {
+          env.clearVars();
         }
-        )
-        port.postMessage({
-          result: thing.vars
-        })
       }
-
-    } else if (object.method == 'parseEquation') {
-      //console.log("parsedEquation")
-      if (!object.existing) {
-        port.postMessage({
-          result: setVarEquat(object.text, object.vars, false)
-        });
+    } else if (object.set == "var") {
+      if (object.id == undefined) {
+        if (GlobalVars.find(elem => elem.name == object.varName)) {
+          GlobalVars.find(elem => elem.name == object.varName).value = object.value;
+        } else {
+          GlobalVars.push({ name: object.varName, value: object.varValue })
+        }
       } else {
-        let env = runners.find(elem => elem.id == object.funcName)
-        port.postMessage({
-          result: env.getParsedEquation()
-        });
+        port.postMessage({ result: runners.find(elem => { return elem.id == object.id }).setVar(object.varName, object.varValue), return: true })
       }
-
-    } else if (object.method == 'func') {
-      port.postMessage({ result: getMethod(object.name) })
-    } else if (object.method == 'parsedMeth') {
-      //{callType: "get", method: "parsedMeth", text : blank for brevity}
-      port.postMessage({ result: parseFunction(object.text) })
-    } else if (object.method == 'envData') {
-      let env = runners.find(elem => elem.id == object.targetEnv);
-      if (env.envType == "static") {
-        env.getUndefVars();
-        if (object.target == "equation") {
-          port.postMessage({ result: env.calcEquation() })
-        } else if (object.target == "graph") {
-          port.postMessage({ result: env.calcGraph() })
-        } else if (object.target == "table") {
-          port.postMessage({ result: env.calcTable() })
-        }
-      }
-    }else if (object.method == "envPacket"){
-      let env = runners.find(elem => elem.id == object.targetEnv);
-      port.postMessage({result: env.checkCalculable()})
-    }
-
-  } else if (object.callType == "func") {
-    if (object.method == 'add') {
-      let list = Array.isArray(object.newFuncs) ? object.newFuncs : [object.newFuncs]
+    } else if (object.set == "func") {
+      let list = Array.isArray(object.funcs) ? object.funcs : [object.funcs]
       try {
         for (let def of list) {
           if (!getByName(def.name)) {
@@ -871,26 +882,61 @@ onmessage = function (e) {
         }
       } catch (eve) {
         port.postMessage({ error: eve })
-        this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` })
-        //console.log('issues adding to algo')
+        this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` });
       }
-    } else if (object.method == 'change') {
-      port.postMessage({ result: changeFunc(object.name, object.changes) });
-    } else if (object.remove == 'remove') {
+
+    } else if (object.set == "changeFunc") {
+      if (object.name == undefined && object.changes == undefined) {
+        port.postMessage({ result: changeFunc(object.name, object.changes) });
+      }
+    } else if (object.set == "removeFunc") {
       removeFunction(object.name)
     }
-  } else if (object.callType == 'env') {
-    switch (object.method) {
-      case 'setGraphVar':
-        let env = runners.find(elem => elem.id == object.targetEnv)
-        env.setEnvVar(object.newVars)
-        //console.log(object.newVars.gMax)
+  } else if (object.get != undefined) {
+    if (object.get == "func") {
+      if (object.name != undefined) {
+        port.postMessage({ result: getMethod(object.name) });
+      }
+    } else if (object.get == "list") {
+      port.postMessage({ result: getNameList() })
+    } else if (object.get == "vars") {
+      if (object.name == undefined) {
+        port.postMessage({ result: varInEquat(object.equation) })
+      } else {
+        let thing = funcList.find(elem => {
+          if (Array.isArray(elem.func)) {
+            return elem.func.includes(object.name);
+          } else {
+            return elem.func == object.name;
+          }
+        }
+        )
         port.postMessage({
-          result: 'done'
+          result: thing.vars
         })
-        break;
-      case 'solve':
-        let targetEnv = runners.find(elem => elem.id == object.targetEnv);
+      }
+
+    } else if (object.get == "equationParse") {
+      if (object.id == undefined) {
+        port.postMessage({
+          result: setVarEquat(object.equation, object.vars, false)
+        });
+      } else {
+        let env = runners.find(elem => elem.id == object.id)
+        port.postMessage({
+          result: env.getParsedEquation()
+        });
+      }
+    } else if (object.get == "calc") {
+      if (object.id == undefined) {
+        if (object.target == "single") {
+          port.postMessage({
+            result: fullSolve(object.equation, settings)
+          })
+        }
+      } else {
+        let targetEnv = runners.find(elem => elem.id == object.id);
+        console.log(targetEnv)
         if (targetEnv.type == "dynamic") {
           if (targetEnv.target == "single") {
             port.postMessage({
@@ -902,83 +948,27 @@ onmessage = function (e) {
             })
           }
         } else if (targetEnv.type == "static") {
-          if(object.evalType == "point"){
+          if (object.type == "point") {
             port.postMessage({
               result: targetEnv.calcEquation()
             })
-          }else if (object.evalType == "graph"){
+          } else if (object.type == "graph") {
             port.postMessage({
               result: targetEnv.calcGraph()
             })
-          }else if (object.evalType == "table"){
+          } else if (object.type == "table") {
             port.postMessage({
               result: targetEnv.calcTable()
             })
           }
 
         }
-        break;
-      case 'clear':
-        runners.find(elem => elem.id == object.targetEnv).clearVars()
-        break;
-      case "log":
-        break;
-    }
-  } else if (object.callType == 'calc') {
-    if (object.method == 'solve') {
-      //{callType: "calc", method: "solve", text : blank for brevity}
-      try {
-        if (object.targetEnv == undefined) {
-          port.postMessage({ result: fullSolve(object.text, settings) })
-        } else {
-          let tarEnv = runners.find(elem => elem.id == object.targetEnv);
-          if (tarEnv.type == "dynamic") {
-            port.postMessage({ result: tarEnv.solveEquation(object.equation) })
-          } else {
-            port.postMessage({ result: tarEnv.calcSingle(object.target) })
-          }
-        }
-
-      } catch (eve) {
-        port.postMessage({ error: 'eve' })
-        this.postMessage({ 'type': 'posError', 'mes': `Error Solving` })
       }
-    } else if (object.method == 'points') {
-      //{callType: "calc", method: "points", target: "graph"|"table", text : blank for brevity, if graph dime: {min, max, res}}
-      //console.log('geting points')
-      if (object.target == 'graph') {
-        try {
-          if (object.targetEnv == undefined) {
-            port.postMessage({ "result": calculatePoints(object.text, object.dime.min, object.dime.max, object.dime.res) })
-          } else {
-            let tarEnv = runners.find(elem => elem.id == object.targetEnv);
-            if (tarEnv.type == "dynamic") {
-              port.postMessage({ "result": tarEnv.calcPoints("graph", object.target, object.equation, object.dime) })
-            } else {
-              port.postMessage({ "result": tarEnv.calcPoints("graph", object.target, object.dime) })
-            }
-          }
-        } catch (eve) {
-          port.postMessage({ error: eve })
-          this.postMessage({ 'type': 'posError', 'mes': `Error Calculating points for graph` })
-        }
-      } else {
-        //console.log('Solving for table')
-        try {
-          if (object.targetEnv == undefined) {
-            port.postMessage({ "result": calculatePoints(object.text, settings.tMin, settings.tMax, settings.tC) })
-          } else {
-            let tarEnv = runners.find(elem => elem.id == object.targetEnv);
-            if (tarEnv.type == "dynamic") {
-              port.postMessage({ "result": tarEnv.calcPoints("table", object.target, object.equation) })
-            } else {
-              port.postMessage({ "result": tarEnv.calcPoints("table", object.target) })
-            }
-          }
-        } catch (eve) {
-          port.postMessage({ error: eve })
-          this.postMessage({ 'type': 'posError', 'mes': `Error Calculating points for table` })
-        }
+    } else if (object.get == "calcPacket") {
+      console.log("callingPacket")
+      if (object.id == undefined) {
+        let env = runners.find(elem => elem.id == object.id);
+        port.postMessage({ result: env.checkCalculable() })
       }
     }
   }
@@ -1144,21 +1134,15 @@ function parComplete(input) {
 }
 //A method to find the end of a parenthesis and make one if there is none
 function parEncap(sub) {
-  for (let i = 1; i < sub.length; i++) {
-    if (sub.charAt(i) == "(") {
-      i = i + parEncap(sub.substring(i)).length;
-    } else if (sub.charAt(i) == ")") {
-      sub = sub.substring(0, i + 1);
-      break;
-    } else if (i == sub.length - 1) {
-      sub = sub + ")";
-      break;
-    }
+  let direction = true;
+  if(arguments[1] != undefined){
+    direction = arguments[1];
   }
-  return sub;
+  let endIdx = sub.findMatch("(",")",direction);
+  return direction ? sub.substring(0,endIdx) : sub.substring(endIdx);
 }
 //A method to find the beginning of a parenthesis and make one if there is none
-function parEncap2(sub) {
+/*function parEncap2(sub) {
   for (let i = sub.length - 2; i >= 0; i--) {
     if (sub.charAt(i) == ')') {
       i = i + parEncap2(sub.substring(0, i + 1)).length;
@@ -1171,18 +1155,19 @@ function parEncap2(sub) {
     }
   }
   return sub;
-}
+}*/
 //A method to find the ending of a superscript html tag. Doesn't make one if there is none
 function supEncap(sub) {
-  for (let i = 5; i < sub.length; i++) {
+  /*for (let i = 5; i < sub.length; i++) {
     if (sub.substring(i, i + 5) == "<sup>") {
       i = i + supEncap(sub.substring(i)).length;
     } else if (sub.substring(i, i + 6) == "</sup>") {
       sub = sub.substring(0, i + 6);
       break;
     }
-  }
-  return sub;
+  }*/
+  let endIdx = sub.findMatch("<sup","</sup>",direction);
+  return sub.substring(0, endIdx);
 }
 //A deprecated Method to find the postion of a function in the equation string
 function funcIndex(func, equation, funcList) {
@@ -1215,8 +1200,8 @@ function builtInFunc(equation) {
       let base = "";
       let baseRAW = "";
       if (equation.charAt(i - 1) == ")") {
-        base = equatInner(parEncap2(equation.substring(0, i)).substring(1, parEncap2(equation.substring(0, i)).length - 1));
-        baseRAW = parEncap2(equation.substring(0, i));
+        base = equatInner(parEncap(equation.substring(0, i),false).substring(1, parEncap(equation.substring(0, i),false).length - 1));
+        baseRAW = parEncap(equation.substring(0, i),false);
       } else {
         base = forward(equation.substring(0, i));
         baseRAW = forward(equation.substring(0, i));
@@ -1228,8 +1213,8 @@ function builtInFunc(equation) {
       let base = "";
       let baseRAW = "";
       if (equation.charAt(i - 1) == ")") {
-        base = equatInner(parEncap2(equation.substring(0, i)).substring(1, parEncap2(equation.substring(0, i)).length - 1));
-        baseRAW = parEncap2(equation.substring(0, i));
+        base = equatInner(parEncap(equation.substring(0, i),false).substring(1, parEncap(equation.substring(0, i),false).length - 1));
+        baseRAW = parEncap(equation.substring(0, i),false);
       } else {
         base = forward(equation.substring(0, i));
         baseRAW = forward(equation.substring(0, i));
@@ -1426,32 +1411,6 @@ function cacInputs(array) {
   }
   return num;
 }
-let trigDef = [
-  'sin',
-  'cos',
-  'tan',
-  'asin',
-  'acos',
-  'atan',
-  'arcsin',
-  'arccos',
-  'arctan',
-  'csc',
-  'sec',
-  'cot',
-  'acsc',
-  'asec',
-  'acot',
-  'arccsc',
-  'arcsec',
-  'arccot',
-];
-//searches an equation string for any trig and returns a true or false question
-function containsTrig(string) {
-  for (let statement of trigDef) {
-    return string.includes(statement);
-  }
-}
 //Return the string forms of a function defined in the function list
 function stringifyMethod(object) {
   let name = object.func;
@@ -1542,7 +1501,6 @@ function removeFunction(name) {
   })
 }
 function fullSolve(input) {
-  console.log(input)
   if (!input.includes('XMLHttpRequest')) {
     return eval(solveInpr(input, settings.degRad))
   } else {
@@ -1577,7 +1535,11 @@ function createSidedEquation(equation, target) {
   console.log(arryToString(part1Parse))
   let part2Parse = combineTerms(solveFor(side2, target));
   console.log(arryToString(part2Parse))
+  console.log(decSide)
+  console.log(arryToString(part1Parse));
+  console.log(part1Parse);
   let trace = equatTrace(decSide ? part1Parse : part2Parse, target)
+  console.log(trace);
   let sided = solveForSide(decSide ? part1Parse : part2Parse, decSide ? part2Parse : part1Parse, trace)
   console.log(arryToString(sided[1]))
   return arryToString(sided[1])
@@ -1696,12 +1658,16 @@ function swapBase(term, mSide) {
 }
 function equatTrace(arry, tVar) {
   let termArry = []
+  console.log(arry)
   //console.log(arry)
   arry.forEach((term, i) => {
     let textualVal = "" + term.text
+    console.log(textualVal);
+    console.log(tVar)
     if (textualVal.innerVar(tVar)) {
+      console.log("var in term");
       if (term.subtype == "cmpxTerm") {
-        //console.log("term")
+        console.log(term)
         let textAryVar = arryToString(term.textArray);
         let powVar = term.getComputedPow;
         let mutiVar = term.getComputedMuti;
@@ -1747,23 +1713,98 @@ function solveFor(equat, varDef) {
   let fullArray = returned.arry;
   console.log(arryToString(fullArray))
   console.log(equat)
-  fullArray = termsInEquat(equat, fullArray)
-
-
+  fullArray = termsInEquat(equat, fullArray);
   for (let i = 0; i < fullArray.length; i++) {
     fullArray[i] = fullArray[i].subtype == "varContainer" ? fullArray[i] = parseTextTerm(fullArray[i], varDef) : fullArray[i];
   }
   fullArray = parLinkMap(fullArray);
   return fullArray
 }
-function hasTerm(item, target) {
-  let fullArray = [];
-  let nextTrm = item[0]
-  while (nextTrm.ad.undefined) {
+//********************************************** */
+function parseEquation(equation) {
+  let equatParse = [];
+  while (true) {
+    let cutString = 0;
+    let currentSec = [];
+    let termText = backward(equation);
+    let currTerm;
+    let currOp;
+    let func;
+    if(termText){
+      currTerm = { 'type': "term", "text": backward(equation), "pos": 0 };
+      cutString += currTerm.text.length;
+      currentSec.push(currTerm);
+      func = funcMatch(currTerm.text, false);
+      if (func != "") {
+        if (currTerm.text.replace(func.func, "").length != 0) {
+          currTerm.text = currTerm.text.replace(func.func, "")
+          currentSec.push(...[{ 'type': "op", "subtype": "Muti", "text": "*", "pos": i }, { 'type': "func", "text": func.func, "pos": i }]);
+        } else {
+          currentSec.shift();
+          currentSec.unshift({ 'type': "func", "text": func.func, "pos": i });
+        }
+      }
+      if(varInEquat(currTerm.text).length != 0){
+        //here
+        currentSec.shift();
+        currentSec.unshift(parseTextTerm({ "type": "term", "subtype": 'varContainer', "text": currTerm.text, "pos": null }));
+      }
+    }
+    if (equation.substring(cutString) != "") {
+      currOp = createOp(equation.substring(cutString));
+      cutString++;
+      currentSec.push(currOp);
+      if (currOp.subtype == "ParStart" && currTerm != undefined) {
+        if (func == "") {
+          currentSec.splice(1, 0, { 'type': "op", "subtype": "Muti", "text": "*", "pos": i });
+        }
+      }
+    }
 
+    equation = equation.substring(cutString);
+    equatParse.push(...currentSec);
+    if(equation.length == 0){
+      break;
+    }
   }
+  return equatParse;
 }
 
+function createOp(section) {
+  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',']
+  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma']
+  return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null };
+  /*for (let i = 0; i < equation.length; i++) {
+    if (ops.includes(equation.charAt(i))) {
+      opsArry.push({ 'type': "op", "subtype": typeIndex[ops.indexOf(equation.charAt(i))], "text": equation.charAt(i), "pos": i })
+    }
+    switch (equation.charAt(i)) {
+      case ('÷'):
+        opsArry.push({ 'type': "op", "subtype": "Div", "text": '/', "pos": i })
+        break;
+      case ('×'):
+        opsArry.push({ 'type': "op", "subtype": "Muti", "text": '*', "pos": i })
+        break;
+      case ('<'):
+        if (equation.substring(i, i + 5).includes('<sup>')) {
+          let sub = supEncap(equation.substring(i))
+          let subArry = opsInEquat(sub.substring(5, sub.length - 6)).arry
+          for (let item of subArry) {
+            item.pos += i + 2;
+          }
+          let replacement = "^(" + sub.substring(5, sub.length - 6) + ")";
+          subArry.unshift({ 'type': "op", "subtype": "Pow", "text": "^", "pos": i }, { 'type': "op", "subtype": "ParStart", "text": "(", "pos": i + 1 })
+          subArry.push({ 'type': "op", "subtype": "ParEnd", "text": ')', "pos": (i + replacement.length - 1) })
+          opsArry = opsArry.concat(subArry)
+          equation = equation.substring(0, i) + replacement + equation.substring(i + sub.length)
+          i += replacement.length - 1;
+        }
+        break;
+    }
+
+  }
+  return { "arry": opsArry, "equat": equation }*/
+}
 function opsInEquat(equation) {
   //console.log(`Equation before the ops method ${equation}`)
   let opsArry = []
@@ -1808,7 +1849,6 @@ function termsInEquat(equation, fullArray) {
     let index = item.pos;
     let modIndex = index - diff
     let termBefore = forward(modEquat.substring(0, modIndex));
-    console.log("%c the one before", "color: green;", termBefore)
     let termAfter = backward(modEquat.substring(modIndex + 1));
     let prelength = termAfter.length;
     let beforeFunc = false
@@ -1817,14 +1857,12 @@ function termsInEquat(equation, fullArray) {
       let func = funcMatch(termBefore, false);
       let aindex = completeArray.indexOf(item);
       completeArray.splice(aindex, 0, { 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
-      //termArry.push({ 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
       termBefore = termBefore.substring(0, termBefore.length - (func.func.length))
 
     }
     if (funcMatch(termAfter, false) != "") {
       let func = funcMatch(termAfter, false)
       let aindex = completeArray.indexOf(item);
-      //afterFunc = { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] }
       completeArray.splice(aindex + 1, 0, { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] })
       termAfter = termAfter.substring(0, termAfter.length - (func.func.length))
     }
@@ -1860,14 +1898,8 @@ function termsInEquat(equation, fullArray) {
       }
       completeArray.splice(aindex + 1, 0, term)
     }
-    /*if (afterFunc != null) {
-      termArry.push(afterFunc)
-    }*/
     modEquat = modEquat.substring(modIndex + prelength + 1)
-    //console.log(modEquat)
   }
-  ////console.log(termArry)
-  //console.log(completeArray)
   return completeArray;
 }
 function combineTerms(fullArray, varDef) {
@@ -1962,11 +1994,8 @@ function combineTerms(fullArray, varDef) {
   //Pow processing
   for (let i = 0; i < fullArray.length; i++) {
     if (fullArray[i].subtype == 'Pow') {
-      //console.log('Pow Found')
-      //console.log(fullArray[i])
       let index = i;
       let termBefore = fullArray[index - 1]
-      //console.log(termBefore.type)
       let termAfter = fullArray[index + 1]
       if (termBefore.type == "defTerm") {
         //console.log(termAfter)
@@ -2020,12 +2049,10 @@ function combineTerms(fullArray, varDef) {
   }
   //Additive processing
   for (let i = 0; i < fullArray.length; i++) {
-    //console.log(fullArray)
     if (fullArray[i].subtype == 'Plus' || fullArray[i].subtype == 'Minus') {
       let termBefore = fullArray[i - 1];
       let termAfter = fullArray[i + 1];
       if (termBefore.type != "defTerm" && termAfter.type != "defTerm") {
-        //console.log("functional additive")
         let op = fullArray[i].text;
         let calculated = "" + fullSolve(`${termBefore.text}${op}${termAfter.text}`)
         fullArray.splice(i - 1, 3, { 'type': "term", "text": calculated })
@@ -2033,7 +2060,6 @@ function combineTerms(fullArray, varDef) {
       }
     }
   }
-  //console.log(fullArray)
   return fullArray
 }
 function parLinkMap(fullArray) {
@@ -2066,10 +2092,6 @@ function parEncapArray(fullArray, startIndex) {
   }
   return [fullArray, length];
 }
-function parInArray(subArray) {
-
-}
-
 function updateFullArray(startPos, fullArray, changeInPos, changeInArry) {
   //console.log("Updating")
   //console.log(changeInPos)
@@ -2085,7 +2107,6 @@ function updateFullArray(startPos, fullArray, changeInPos, changeInArry) {
   }
   return fullArray;
 }
-
 function arryToString(arry) {
   let string = ""
   for (let item of arry) {
@@ -2093,18 +2114,19 @@ function arryToString(arry) {
   }
   return string;
 }
-function parseTextTerm(elem, target) {
+function parseTextTerm(elem) {
   let text = elem.text;
-  //console.log(text)
+  console.log(text);
   let pos = elem.pos;
   let varList = varInEquat(text)
-  //console.log(varList)
   let textualArry = []
   let locals = []
-  let targetVar = varList.filter(elem => elem.letter == target)
-  if (targetVar.length == 0) {
-    targetVar = [varList[0]]
-    //varList.shift();
+  let targetVar = varList[0];
+  if(arguments[1] != undefined){
+    let testVar = varList.find(elem => {return elem.letter == arguments[1]})
+    if (testVar != undefined) {
+      targetVar = testVar;
+    }
   }
   let subsituteText = text;
   for (let dVar of varList) {
@@ -2122,13 +2144,10 @@ function parseTextTerm(elem, target) {
     temp.substring(pos + 1) != '' ? textualArry.unshift({ "text": temp.substring(pos + 1), "pos": pos + 1 == temp.length - 1 ? pos + 1 : [pos + 1, temp.length - 1] }) : false
     temp.substring(0, pos) != '' ? textualArry.unshift({ "text": temp.substring(0, pos), "pos": 0 == pos ? 0 : [0, pos] }) : false
   }
-  //filter out targeted var
-  //console.log(targetVar[0].positions.length)
-  let targetVarDef = new VarTerm(targetVar[0].letter, pos, textualArry.length > 0 ? textualArry[0] : { "type": 'term', 'text': '1' }, { "type": 'term', 'text': targetVar[0].positions.length }, targetVar[0].positions);
-  //console.log(targetVarDef.text)
+  let targetVarDef = new VarTerm(targetVar.letter, pos, textualArry.length > 0 ? textualArry[0] : { "type": 'term', 'text': '1' }, { "type": 'term', 'text': targetVar.positions.length });
   if (varList.length > 1) {
-    let otherVars = varList.filter(elem => elem.letter != target)
-    let max = targetVar[0].positions[targetVar[0].positions.length - 1]
+    let otherVars = varList.filter(elem => elem.letter != targetVar.letter)
+    let max = targetVar.positions[targetVar.positions.length - 1]
     let targetMaxElem = targetVarDef
     for (let oVar of otherVars) {
       let newVarDef = new VarTerm(oVar.letter, pos, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': oVar.positions.length }, oVar.positions);
@@ -2164,9 +2183,6 @@ function arrayEquals(a, b) {
     Array.isArray(b) &&
     a.length === b.length &&
     a.every((val, index) => val === b[index]);
-}
-function solveParse(parseArry) {
-
 }
 function replaceVars(arry, vars) {
   //console.log(arry)
@@ -2263,7 +2279,6 @@ function createParseEquat(equation) {
   return solveArry
 }
 function calculatePoints(equation, start, end, res) {
-  console.log(equation)
   let pointArray = [];
   let parseEquation = createParseEquat(equation);
   let invRes = 1 / res;
@@ -2278,8 +2293,6 @@ function calculatePoints(equation, start, end, res) {
     if (i < 0.00000001 && i > -0.00000001) {
       newPoint.x = Math.round(i);
     }
-    console.log(parseEquation)
-    console.log(newPoint)
     let proper = parseEquation.length > 0 ? parseEquation.join(newPoint.x) : "" + newPoint.x;
     newPoint.y = fullSolve(proper);
     pointArray.push(newPoint);
@@ -2292,7 +2305,7 @@ function calculateExtrema(equation) {
   let parseEquation = createParseEquat(equation);
   //console.log("%c parseEquation", "color: yellow", parseEquation)
   let copy = parseEquation.length > 0 ? parseEquation.join("x") : "x";
-  //console.log("%c parseEquation", "color: yellow", copy)
+  console.log("%c parseEquation", "color: yellow", copy)
   if (varInEquat(copy).length == 1) {
     extrema.push({ x: fullSolve(createSidedEquation(copy + "=0", "x"), settings.degRad), y: 0 })
   }
@@ -2358,9 +2371,6 @@ function changeFunc(name, newObject) {
 function getMethod(name) {
   return JSON.parse(JSON.stringify(getByName(name)));
 }
-function getParsedMethod(text) {
-  return parseFunction(text)
-}
 function setVarEquat(equation, varList) {
   for (let data of varList) {
     for (let i = 0; i < equation.length; i++) {
@@ -2400,7 +2410,7 @@ function funcsContainingVar(varLetter) {
   }
   return funcs;
 }
-function getAngleCon(type) {
+function getAngleConversion(type) {
   if (settings.degRad) {
     if (type == 'deg') {
       return (Math.PI / 180);
@@ -2412,16 +2422,10 @@ function getAngleCon(type) {
   }
 }
 //end
-console.log(varInEquat('x'))
+console.log("things from eval")
+console.log(arryToString(parseEquation("4x*5(u6)")))
+console.log(solveFor("x*5+(u)", "x"))
+console.log(parEncap("((78)",false))
 console.log(createNewFunction("function", 'testor', "x*5+u"))
 console.log(createNewFunction("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
 console.log("%c testor", "color: yellow;", createSidedEquation("testor((6),x)=0", "x"))
-/*let part1 = "6*5"
-let part2 = "5^x"
-let part1pre = solveFor(part1, "x");
-let part2pre = solveFor(part2, "x");
-let part1Parse = combineTerms(part1pre)
-let part2Parse = combineTerms(part2pre)
-let trace = equatTrace(part2Parse, "x")
-//console.log(trace)
-//console.log(arryToString(solveForSide(part2Parse, part1Parse, trace)[1]))*/

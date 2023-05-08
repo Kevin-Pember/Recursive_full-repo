@@ -70,7 +70,7 @@ setSettings();
 if (document.getElementById("mainBody") != null) {
   //Responsible for creating and implementing the custom functions at runtime ********************************
   var funcs = Object.getPrototypeOf(funcListProxy);
-  callCalc({ "callType": 'func', "method": 'add', "newFuncs": funcs });
+  callCalc({ "set": 'func', "funcs": funcs });
   for (let funcObject of funcs) {
     switch (funcObject.type) {
       case "Function":
@@ -1298,7 +1298,7 @@ function changeImplemented(name, newObject) {
 //Responsible for taking the funclist and making it into a localStorage value (main backend)
 //Responsible for removing a value for the funcList (main backend)
 function removeFunc(funcName) {
-  callCalc({ "callType": 'func', "method": 'remove', "name": funcName });
+  callCalc({ "set": 'removeFunc', "name": funcName });
   for (let item of funcListProxy) {
     if (item.name == funcName) {
       //removeImplemented(item);
@@ -1450,7 +1450,7 @@ function solveTable(parsedEquation, clon) {
 
 //Responsible for (IDFK work on this later)
 function checkVar(name, def) {
-  callCalc({ "callType": "get", 'method': 'vars', "existing": true, "funcName": name }).then(value => {
+  callCalc({ "get": "vars", "name": name }).then(value => {
     let checkList = value;
     //let varGrid = clon.querySelector("#varGrid");
     //let funcTabs = [clon.querySelector('#functionDiv'), clon.querySelector('#graphDiv'), clon.querySelector('#tableDiv')]
@@ -1865,7 +1865,7 @@ function setSettings() {
   document.getElementById('rMinT').value = settings.tMin;
   document.getElementById('rMaxT').value = settings.tMax;
   document.getElementById('tableCells').value = settings.tC;
-  callCalc({ 'callType': 'set', 'method': 'init', 'settings': settings });
+  callCalc({ 'set': 'settings', 'settings': settings });
   /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     colorMessager.postMessage(colorArray[0]);
   }*/
@@ -1897,7 +1897,7 @@ function report(message, meaning) {
 function inputSolver(equation, errorStatement) {
   //equation = solveInpr(equation, settings.degRad)
   try {
-    equation = callCalc({ "callType": "calc", 'method': 'solve', 'text': equation })
+    equation = callCalc({ "get": "calc","target": "single", 'equation': equation })
     console.log(equation)
     return equation
   } catch (eve) {
@@ -1959,7 +1959,7 @@ function getDate() {
   return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
 }
 function queryVars(equat) {
-  return callCalc({ "callType": "get", 'method': 'vars', 'text': equat })
+  return callCalc({ "get": "vars", 'equation': equat })
 }
 //Responsible for finding where variables are in a given equation
 /*function varInEquat(equation) {
@@ -2409,7 +2409,7 @@ function autoStitch(elem) {
   }
 }
 async function funcMatch(equation, way) {
-  let funcList = await callCalc({ "callType": 'get', 'method': 'list' }).then()
+  let funcList = await callCalc({ "get": 'list'}).then()
   var returned = "";
   for (let func of funcList) {
     let check
@@ -2568,7 +2568,7 @@ function generateVars(length) {
   }
   return newVars;
 }
-class FuncPage {
+/*class FuncPage {
   constructor(config) {
     //this.def = {}
     this.srtConfig = config
@@ -2628,7 +2628,7 @@ class TemplatePage extends FuncPage {
     this.tabPage = tabCopy;
     this.tab = newTabButton(config, tabCopy);
     this.chart = createGraph(chart)
-    callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
+    callCalc({ get: 'func', name: this.name }).then(value => {
       this.funcDef = value;
       this.vars = this.funcDef.vars;
       let varNames = []
@@ -2829,4 +2829,4 @@ class EquatPage extends TemplatePage {
       checkVar(this.id, this)
     })
   }
-}
+}*/

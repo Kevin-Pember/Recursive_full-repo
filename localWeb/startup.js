@@ -137,7 +137,7 @@ class MediaType {
   }
   removeMethod(methodName){
     this.#methodArray.find((element, idx) => {
-      if(element.name = methodName){
+      if(element.name == methodName){
         this.#methodArray.splice(idx, 1);
         return true;
       };
@@ -153,6 +153,83 @@ let envObject = {
   keypads: [],
   cardContainers: [],
   stylers: [],
+  universalStyle: `
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: ubuntu;
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .primary {
+    fill: var(--primary);
+  }
+  
+  .secondary {
+    fill: var(--secondary);
+  }
+  
+  .accent {
+    fill: var(--accent);
+  }
+  
+  .text {
+    fill: var(--text)
+  }
+  .iconType{
+    border: none;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    background-color: var(--primary);
+    display: grid;
+    place-items: center;
+    align-content: center;
+  }
+  .entryType{
+    border: none;
+    border-radius: 15px;
+  }
+  .titleType{
+    border: none;
+    border-radius: 20px;
+    filter: drop-shadow(5px 5px 5px var(--translucent));
+  }
+  .paneType{
+    border: none;
+    border-radius: 25px;
+    background-color: var(--primary);
+    filter: drop-shadow(5px 5px 5px var(--translucent));
+  }
+  ::-webkit-scrollbar {
+    width: 2vh;
+  
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    margin-bottom: 40px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    width: 5;
+    min-height: 30px;
+    background: var(--translucent);
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-button:end:increment {
+    height: 7px;
+    display: block;
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-button:start:increment {
+    height: 7px;
+    display: block;
+    background: transparent;
+  }
+    `
 }
 let funcList = getFuncList();
 const funcListProxy = new Proxy(funcList, {
@@ -197,6 +274,7 @@ let mediaTypeArray = {
     }
   },
   remove: function (name){
+    console.log(name)
     this.queries.forEach((element, idx) => {
       element.removeMethod(name);
       console.log(element)
@@ -349,7 +427,7 @@ function setSettings() {
     document.getElementById('rMinT').value = settings.tMin;
     document.getElementById('rMaxT').value = settings.tMax;
     document.getElementById('tableCells').value = settings.tC;
-    callCalc({ 'callType': 'set', 'method': 'init', 'settings': settings });
+    callCalc({ 'set': 'settings', 'settings': settings });
     /*if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       colorMessager.postMessage(colorArray[0]);
     }*/

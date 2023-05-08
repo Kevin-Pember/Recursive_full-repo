@@ -43,11 +43,16 @@
         }});
     </script>
     <style id="bodyStyle"></style>
+    <style id="universalStyle">
+        
+    </style>
     <script>envObject.stylers.push({ "id": "mainBody", "styler": document.getElementById('bodyStyle') })</script>
-    <func-keypad id="mainKeypad" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
+    <func-keypad id="mainKeypad" class="paneType" history="mainScroll" input="mainEntry" linked="extendedMainKeypad"></func-keypad>
     <script>
         let keypad = document.getElementById("mainKeypad");
         envObject.mainKeypad = keypad;
+        envObject.bodyStyle = document.getElementById('bodyStyle');
+        document.getElementById('universalStyle').innerHTML = envObject.universalStyle;
     </script>
     <div class="page" id="mainPage">
         <tab-menu id="mainTabs">
@@ -86,7 +91,7 @@
                                     fill="#D9D9D9" />
                             </svg>
                             <div id="mainPageContainer">
-                                <history-display id="mainScroll" style="">
+                                <history-display id="mainScroll" class="paneType" style="">
                                 </history-display>
                                 <script>
                                 </script>
@@ -117,6 +122,7 @@
                                             width: calc(100% - 15px);
                                             left: 10px;
                                             top: 10px;
+                                            overflow: hidden;
                                         }
                                         #extendedMainKeypad{
                                             grid-area: exKeypad;
@@ -129,7 +135,8 @@
                                         }
                                     `;
                                     extendedMainKeypad.setAttribute("mode", 'triple');
-                                    envObject.mainKeypad.style=`
+                                    bodyStyle.innerHTML =`
+                                        #mainKeypad{
                                             position: absolute;
                                             animation: 0.15s ease-in 0s 1 normal forwards running fadeEffect;
                                             width: calc(33.3333% - 15px);
@@ -138,6 +145,7 @@
                                             top: 50px;
                                             margin-left: 5px;
                                             z-index: 3;
+                                        }
                                     `;
                                     keypad.setAttribute("mode", "half");
                                     keypad.ogMode = "half";
@@ -151,25 +159,24 @@
                                         top: 10px;
                                         width: calc(100% - 20px);
                                         left: 10px;
+                                        overflow: hidden;
                                     }
                                     #extendedMainKeypad {
                                         visibility: hidden;
                                     }
                                     `
                                     keypad.setAttribute("mode", "full");
-                                    envObject.mainKeypad.style = `
-                                        
+                                    bodyStyle.innerHTML = `
+                                        #mainKeypad{
                                             animation: fadeEffect 0.50s linear 1 none;
                                             width: calc(100% - 20px);
                                             left: 10px;
                                             bottom: 10px;
-                                            border-radius: 25px;
                                             z-index: 2;
                                             top: calc(35% + 45px);
                                             position: absolute;
                                             overflow: hidden;
-                                            filter: drop-shadow(-5px 5px 5px var(--translucent));
-
+                                        }
                                     `;
                                 
                                 }});

@@ -287,7 +287,7 @@ function addImplemented(funcConfig) {
 
     funcConfig.callType = "func"
     funcConfig.method =
-        callCalc({ "callType": 'func', "method": 'add', "newFuncs": [funcConfig] });
+        callCalc({ "set": 'func', "funcs": [funcConfig] });
 }
 function findFuncConfig(name) {
     let funcList = Object.getPrototypeOf(funcListProxy);
@@ -417,83 +417,11 @@ class recursiveComponent extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
-        <style>
-            * {
-                box-sizing: border-box;
-                padding: 0;
-                margin: 0;
-                font-family: ubuntu;
-                color: var(--text);
-                -webkit-tap-highlight-color: transparent;
-            }
-            .primary {
-                fill: var(--primary);
-            }
-              
-            .secondary {
-                fill: var(--secondary);
-            }
-              
-            .accent {
-                fill: var(--accent);
-            }
-              
-            .text {
-                fill: var(--text)
-            }
-            .iconType{
-                border-radius: 50%;
-                aspect-ratio: 1/1;
-                background-color: var(--primary);
-                border: 1px solid var(--text);
-                display: grid;
-                place-items: center;
-                align-content: center;
-            }
-            .entryType{
-                border-radius: 15px;
-                border: 1px solid var(--text);
-            }
-            .titleType{
-                border-radius: 20px;
-                border: 1px solid var(--text);
-            }
-            .paneType{
-                border: 1px solid var(--text);
-                border-radius: 25px;
-                background-color: var(--primary);
-                filter: drop-shadow(-5px 5px 5px var(--translucent));
-            }
-            ::-webkit-scrollbar {
-                width: 2vh;
-              
-              }
-              
-            ::-webkit-scrollbar-track {
-                background: transparent;
-                margin-bottom: 40px;
-              }
-              
-            ::-webkit-scrollbar-thumb {
-                width: 5;
-                min-height: 30px;
-                background: var(--translucent);
-                border-radius: 10px;
-              }
-              
-            ::-webkit-scrollbar-button:end:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
-              
-            ::-webkit-scrollbar-button:start:increment {
-                height: 7px;
-                display: block;
-                background: transparent;
-              }
+        <style id="universalStyle">
         </style>
         `;
+        this.universalStyle = this.shadowRoot.getElementById("universalStyle");
+        this.universalStyle.innerHTML = envObject.universalStyle;
     }
 }
 //Icons Start
@@ -981,8 +909,8 @@ class titleCard extends recursiveComponent {
                     padding: 5px 10px 5px 10px;
                 }
             </style>
-            <div id="textDisplay">
-                <h2 id="text"></h2>
+            <div id="textDisplay" >
+                <h2 id="text" class="titleType"></h2>
             </div>
         `;
     }
@@ -1000,6 +928,33 @@ class titleCard extends recursiveComponent {
     }
 }
 customElements.define("title-card", titleCard);
+class subTitleCard extends recursiveComponent {
+    constructor() {
+        super();
+        this.shadowRoot.innerHTML += `
+        <style>
+                #text {
+                    background-color: var(--accent);
+                    padding: 5px 10px 5px 10px;
+                }
+            </style>
+        <h4 id="smallTitle" class="titleType"></h4>
+        `;
+    }
+    static get observedAttributes() {
+        return ['text'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.hasAttribute('text') && this.text == undefined) {
+            this.setText(this.getAttribute('text'));
+        }
+    }
+    setText(text){
+        this.text = text;
+        this.shadowRoot.querySelector("#smallTitle").innerHTML = text;
+    }
+}
+customElements.define("sub-title-card", subTitleCard);
 class historyDisplay extends recursiveComponent {
     constructor() {
         super();
@@ -1153,6 +1108,8 @@ class historyDisplay extends recursiveComponent {
                 width: 100%;
                 height: 100%;
                 overflow: hidden;
+                background-color: var(--primary);
+                border-radius: inherit;
               }
               
               .text-area {
@@ -1180,7 +1137,7 @@ class historyDisplay extends recursiveComponent {
                 direction: ltr
               }
             </style>
-            <div id="displayClip" class="paneType">
+            <div id="displayClip">
                         <history-icon id="deleteHistory" class="imgDivClass iconType" style="isolation:isolate; height: 45px; background-color: var(--secondary)"></history-icon>
 
                         <div id="uifCalculator" inputmode="none" class="text-area" name="uifCalculator" value="things"
@@ -1932,7 +1889,7 @@ class Keypad extends inputMethod { //Keypad class
             height: 66.6666%;
             top: 0px;
             left: 0px;
-            z-index: -1;
+            z-index: 0;
             background-color: var(--accent);
         }
     
@@ -2224,7 +2181,7 @@ class Keypad extends inputMethod { //Keypad class
         <style id="modeStyle"></style>
         <style id="dynamicStyle"></style>
         <style id="styleInjector"></style>
-        <div id="keypad" class="paneType" style="visibility: inherit;">
+        <div id="keypad" style="visibility: inherit;">
 
 
         <arrow-icon id="arrowIcon" class="arrows imgDivClass iconType" direction="up" ></arrow-icon>
@@ -2780,7 +2737,6 @@ class Keypad extends inputMethod { //Keypad class
             //this mode is the keypads more limited mode removing the more functions tile and other func buttons
             this.shadowRoot.querySelector("#modeStyle").innerHTML = `
             #arrowIcon{
-              width: 50px;
               visibility: inherit;
             }
             #moreFunctionsButton{
@@ -3409,16 +3365,11 @@ class tabContainer extends recursiveComponent {
             top: 10px;
             margin-left: 10px;
             background-color: var(--secondary);
-          }
-          #addIcon {
-            border: none;
             position: absolute;
           }
           
           #minusIcon {
-            border: none;
             margin-left: 50px;
-            position: absolute;
           }
           #funcGrid {
             position: absolute;
@@ -3426,21 +3377,18 @@ class tabContainer extends recursiveComponent {
             width: 100%;
             top: 50px;
             display: grid; 
-            grid-template-columns: repeat(auto-fill, 185px);
+            grid-template-columns: repeat(auto-fill, 175px);
             grid-auto-rows: 130px;
             justify-content: space-evenly;
             justify-items: center; 
             overflow: visible;
           }
           .customButton {
-            margin-top: 5px;
-            margin-left: 5px;
             position: relative;
             background-color: var(--accent);
             z-index: 2;
-            border: none;
             height: 120px;
-            width: 175px;
+            width: 165px;
           }
           .hiddenButton {
             display: none;
@@ -3539,9 +3487,8 @@ class funcGridPage extends recursiveComponent {
             #searchBar{
                 height: 100px;
                 font-size: 75px;
-                width: calc(100% - 40px);
+                width: calc(100% - 20px);
                 margin: 0 10px 0 10px;
-                border-radius: 20px;
                 background-color: var(--primary);
                 padding: 0 10px 0 10px;
             }
@@ -3556,8 +3503,8 @@ class funcGridPage extends recursiveComponent {
         </style>
         <div id="funcGridPage">
             <arrow-icon id="backArrow" class="iconType" direction="left" ></arrow-icon>
-            <rich-input id="searchBar" placeholder="Search" type="text" ></rich-input>
-            <tab-container id="tabContainer"></tab-container>
+            <rich-input id="searchBar" class="titleType" placeholder="Search" type="text" ></rich-input>
+            <tab-container id="tabContainer" class="paneType"></tab-container>
         </div>
         `;
         this.searchBar = this.shadowRoot.querySelector('#searchBar');
@@ -4057,8 +4004,6 @@ class colorTextInput extends recursiveComponent {
             <rich-input id="dynamicEquation"></rich-input>
         </div>
         `
-        this.style.backgroundColor = "var(--accent)"
-        this.style.borderRadius = "15px"
         this.colorInd = this.shadowRoot.querySelector("#colorIndicator");
         this.richInput = this.shadowRoot.querySelector("#dynamicEquation");
         this.input = this.richInput.input;
@@ -4147,11 +4092,10 @@ class templateMode extends recursiveComponent {
       }
       
       #modeFuncGrid {
-        padding-top: 10px;
-        width: calc(100% - 20px);
+        padding: 10px;
+        width: 100%;
         height: 100%;
         overflow-y: auto;
-        margin-left: 10px;
         display: grid;
         overflow-x: hidden;
         grid-auto-rows: 80px;
@@ -4178,7 +4122,12 @@ class templateMode extends recursiveComponent {
       button:focus {
         outline: none;
       }
-      
+      .dynamicEquation{
+        width: 100%; 
+        height: calc(100% - 10px);
+        font-size: 60px;
+        background-color: var(--accent);
+      }
       </style>
         <style id="styler"></style>
         <style id="orientationStyle"></style>
@@ -4192,7 +4141,7 @@ class templateMode extends recursiveComponent {
                     </div>
                     <div id="contentControls" class="paneType" style="grid-area: controls;">
                         <div id="modeFuncGrid">
-                            <color-text id="initEquation" class="dynamicEquation" placeholder="Equation" popup="true" style="width: 100%; height: calc(100% - 10px); font-size: 60px;"></color-text>
+                            <color-text id="initEquation" class="dynamicEquation titleType" placeholder="Equation" popup="true"></color-text>
                             <button id="addEquation" class="iconType">+</button>
                         </div>
                         <settings-icon id="settingsCog" class="imgDivClass iconType" style="height: 45px;"></settings-icon>
@@ -4208,8 +4157,8 @@ class templateMode extends recursiveComponent {
             let gEContainer = this.shadowRoot.querySelector('#modeFuncGrid')
             let element = document.createElement('color-text')
             element.setAttribute('placeholder', 'Equation')
-            element.setAttribute('style', 'width: 100%; height: calc(100% - 10px);font-size: 60px;')
             element.classList.add('dynamicEquation');
+            element.classList.add('titleType');
             element.richInput.addEventListener('input', (e) => {
                 this.inputMethod();
             });
@@ -4330,11 +4279,21 @@ class templateMode extends recursiveComponent {
         let equations = []
         let equationElements = this.shadowRoot.querySelectorAll('.dynamicEquation')
         equationElements.forEach((element) => {
-            equations.push(element.input.innerHTML)
+            equations.push(element.input.innerHTML.replaceAll("‎",""))
         })
         return equations
     }
-
+    static get observedAttributes() {
+        return ['id'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.getAttribute("id") != undefined) {
+            if(this.id == undefined){
+                this.id = this.getAttribute("id");
+            }
+            
+        }
+    }
 }
 class graphMode extends templateMode {
     constructor() {
@@ -4352,9 +4311,7 @@ class graphMode extends templateMode {
         }
         #graphContainer{
             width: calc(100% - 20px);
-            height: calc(100% - 20px);
-            margin-left: 10px;
-            margin-top: 10px;
+            height: 100%;
             position: relative;
             display: block;
         }
@@ -4407,9 +4364,13 @@ class graphMode extends templateMode {
     connectedCallback() {
         setTimeout(() => {
             this.connectedInit()
-            if (this.key == undefined) {
+            if (this.key != undefined) {
+
+                if(this.id == undefined){
+                    this.id = generateUniqueKey();
+                }
                 this.key = this.id;
-                callCalc({ callType: "set", id: this.key, method: "env", envType: "dynamic", target: "graph" });
+                callCalc({ set: "env", id: this.key, type: "dynamic", target: "graph" });
             }
             if (this.graph == undefined) {
                 this.graph = createGraph(this.ctx);
@@ -4419,9 +4380,7 @@ class graphMode extends templateMode {
                 this.graph.options.plugins.zoom.pan.onPanComplete = () => {
                     setTimeout(() => {
                         let vars = getGraphVars(this.graph)
-                        console.log("garph vars")
-                        console.log(vars)
-                        callCalc({ "callType": "env", "targetEnv": this.key, "method": "setGraphVar", "newVars": vars }).then(() => {
+                        callCalc({ "set": "settings", "id": this.key, "settings": vars }).then(() => {
                             this.graphInMode()
                         });
 
@@ -4438,8 +4397,11 @@ class graphMode extends templateMode {
     graphInMode() {
         let equations = this.getEquations();
         let equationElements = this.shadowRoot.querySelectorAll('.dynamicEquation')
-        callCalc({ "callType": "env", "targetEnv": this.key, "method": "setGraphVar", "newVars": getGraphVars(this.graph) }).then(() => {
-            callCalc({ "callType": "env", "method": "solve", "targetEnv": this.key, "array": equations }).then((values) => {
+        console.log("Starting query")
+        callCalc({ "set": "settings", "id": this.key, "settings": getGraphVars(this.graph) }).then(() => {
+            console.log("Post settings")
+            callCalc({ "get": "calc", "id": this.key, "array": equations }).then((values) => {
+                console.log("calculating Graph")
                 console.log(values)
                 for (let i = 0; i < values.length; i++) {
                     let points = values[i].points
@@ -4547,8 +4509,7 @@ class tableMode extends templateMode {
             this.connectedInit()
             if (this.key == undefined) {
                 this.key = this.id
-                callCalc({ callType: "set", id: this.key, method: "env", envType: "dynamic", target: "table" });
-                callCalc({ "callType": "env", "method": "log", "targetEnv": this.key });
+                callCalc({ set: "env", id: this.key, type: "dynamic", target: "table" });
             }
         })
     }
@@ -4556,8 +4517,7 @@ class tableMode extends templateMode {
         let equations = this.getEquations();
         this.table.clearTable();
         let equationElements = this.shadowRoot.querySelectorAll('.dynamicEquation')
-        callCalc({ "callType": "env", "method": "solve", "targetEnv": this.key, "array": equations }).then((values) => {
-            console.log(values)
+        callCalc({ get: "calc", "id": this.key, "array": equations }).then((values) => {
             values.forEach((value, idx) => {
                 this.table.addData(value, equationElements[idx].color)
             })
@@ -4588,7 +4548,6 @@ class settingsSec extends recursiveComponent {
             }
             .settingsTextInput {
                 background-color: var(--accent);
-                border: none;
                 border-width: 1.5px;
                 height: 35px;
                 width: 60px;
@@ -4596,7 +4555,6 @@ class settingsSec extends recursiveComponent {
                 color: var(--text);
                 text-indent: 5px;
                 font-size: 15px;
-                border-radius: 8px;
                 margin-right: 10px;
                 right: 0;
                 position: absolute;
@@ -4776,6 +4734,7 @@ class settingsSec extends recursiveComponent {
                         textInput.id = setting.title + `Input`;
                         textInput.value = setting.value;
                         textInput.classList.add("settingsTextInput");
+                        textInput.classList.add("entryType");
                         textInput.addEventListener("input", () => {
                             setting.setMethod(textInput.value)
                         });
@@ -4789,6 +4748,7 @@ class settingsSec extends recursiveComponent {
                         textInput1.id = setting.title + `Input1`;
                         textInput1.value = setting.range[0];
                         textInput1.classList.add("settingsTextInput");
+                        textInput1.classList.add("entryType");
                         textInput1.style.right = "70px";
                         textInput1.addEventListener("input", () => {
                             setting.setMethod(textInput1.value, textInput2.value)
@@ -4800,6 +4760,7 @@ class settingsSec extends recursiveComponent {
                         textInput2.id = setting.title + `Input2`;
                         textInput2.value = setting.range[1];
                         textInput2.classList.add("settingsTextInput");
+                        textInput2.classList.add("entryType");
                         textInput2.addEventListener("input", () => {
                             setting.setMethod(textInput1.value, textInput2.value)
                         });
@@ -4861,7 +4822,7 @@ class settingsPane extends recursiveComponent {
                 }
             </style>
             <div id="settingsDiv" class="paneType">
-                <h2 id="titleCard"></h2>
+                <sub-title-card id="titleCard"></sub-title-card>
                 <div id="contentDiv"></div>
             </div>
         `
@@ -4869,7 +4830,7 @@ class settingsPane extends recursiveComponent {
         this.contentDiv = this.shadowRoot.querySelector("#contentDiv")
     }
     setTitle(name){
-        this.titleCard.innerHTML = name;
+        this.titleCard.setText(name);
     }
 }
 customElements.define('settings-pane',settingsPane);
@@ -4915,6 +4876,256 @@ class accColorPane extends settingsPane {
     }
 }
 customElements.define('accent-color-pane', accColorPane);
+class typePickerPane extends settingsPane {
+    constructor(){
+        super();
+        this.contentDiv.innerHTML = `
+        <style>
+        #themeCont {
+            width: 100%;
+            padding: 10px;
+            grid-auto-columns: 180px;
+            grid-template-rows: 100%;
+            grid-auto-flow: column;
+            border-radius: 10px;
+            display: grid;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        .typeButton.active{
+            background-color: var(--accent);
+        }
+        </style>
+        <div id="themeCont">
+        
+        </div>
+        `;
+        this.typeButtonList = [];
+    }
+    connectedCallback(){
+        setTimeout(() => {
+            if(this.singleChildrenAppend == undefined){
+                console.log(this.childNodes)
+                for(let elem of this.childNodes){
+                    if(elem.componentType == "typeButton"){
+                        this.typeButtonList.push(elem);
+                        elem.classList.add("titleType");
+                        elem.classList.add("typeButton");
+                        this.shadowRoot.querySelector("#themeCont").append(elem);
+                        elem.addEventListener("click", () => {
+                            for(let typeButton of this.typeButtonList){
+                                typeButton.classList.remove("active");
+                            }
+                            elem.classList.add("active");
+                        });
+                    }
+                }
+                this.singleChildrenAppend = true;
+            }
+        });
+    }
+    static get observedAttributes() {
+        return ['name'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if(this.getAttribute('name') != null){
+            this.setTitle(this.getAttribute('name'));
+        }
+    }
+}
+customElements.define('type-picker-pane', typePickerPane);
+class typeButton extends recursiveComponent {
+    constructor(){
+        super();
+        this.shadowRoot.innerHTML += `
+        <style>
+        #typeContainer {
+            height: 100%;
+            width: 100%;
+            border: none;
+            color: var(--backgroundColor);
+            font-size: 15px;
+            text-align: center;
+            padding: 10px;
+          }
+          
+          #primaryHalf {
+            height: 100%;
+            width: 50%;
+            left: 0;
+            position: absolute;
+          }
+          #secondaryHalf {
+            height: 100%;
+            width: 50%;
+            right: 0;
+            position: absolute;
+          }
+          #iconContainer {
+            position: relative;
+            overflow: hidden;
+          }
+          #centerBuy{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background-color: var(--translucent);
+            display: grid;
+            justify-content: center;
+            align-content: center;
+            z-index: -1;
+          }
+          #buyType {
+            height: 30px;
+            background-color: var(--accent);
+            padding: 5px 20px;
+          }
+        </style>
+        <div id="typeContainer" unselectable="on">
+            <div id="iconContainer" class="iconType">
+                <div id="primaryHalf"></div>
+                <div id="secondaryHalf"></div>
+                <div id="centerBuy"><button id="buyType" class="entryType">Buy</button></div>
+            </div>
+            <h3 id="typeLabel"></h3>
+            
+        </div>
+        `;
+        this.componentType = "typeButton";
+        this.typeContainer = this.shadowRoot.querySelector("#typeContainer");
+        this.typeLabel = this.shadowRoot.querySelector("#typeLabel");
+    }
+    static get observedAttributes() {
+        return ['name', 'primary', 'secondary'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if(this.getAttribute('name') != null){
+            this.typeLabel.innerHTML = this.getAttribute('name');
+        }
+        if(this.getAttribute('primary') != null){
+            this.shadowRoot.querySelector("#primaryHalf").style.backgroundColor = this.getAttribute('primary');
+        }
+        if(this.getAttribute('secondary') != null){
+            this.shadowRoot.querySelector("#secondaryHalf").style.backgroundColor = this.getAttribute('secondary');
+        }
+    }
+    connectedCallback(){
+        if(this.singleChildrenAppend == undefined){
+            this.typeContainer.append(...this.childNodes);
+            this.singleChildrenAppend = true;
+        }
+        
+    }
+}
+customElements.define('type-button', typeButton);
+class colorPickerPane extends settingsPane {
+    constructor(){
+        super();
+        this.contentDiv.innerHTML = `
+        <style>
+            #primaryColorPicker {
+            initial-value: var(--secondary);
+          }
+          
+          .h5Colors {
+            color: var(--text);
+            text-align: left;
+            text-overflow: ellipsis;
+            position: inherit;
+            align-self: center;
+            margin-right: 15px;
+            margin-left: 5px;
+          }
+          
+          #showcaseTextColor {
+            color: var(--text);
+          }
+          
+          .colorPicker {
+            align-self: center;
+            height: 25px;
+            position: relative;
+            border-style: solid;
+            border-color: var(--text);
+            border-radius: 15px;
+            outline: none;
+            right: 15px;
+            background-color: transparent;
+            position: absolute;
+          }
+          
+          .colorPicker::-webkit-color-swatch-wrapper {
+            padding: 0;
+          }
+          
+          .colorPicker::-webkit-color-swatch {
+            border: none;
+            border-radius: 15px;
+          }
+          
+          .colorsLabels {
+            display: flex;
+            left: 15px;
+            position: relative;
+            align-self: center;
+            align-content: center;
+            color: var(--text);
+          }
+          
+          #colorPickerGrid {
+            top: 50px;
+            display: grid;
+            position: absolute;
+            height: 250px;
+            right: 10px;
+            left: 190px;
+            grid-template-columns: 100%;
+            grid-template-rows: 62.5px 62.5px 62.5px 62.5px;
+            justify-content: center;
+            align-content: end;
+          }
+          
+          #displayPreview {
+            border-width: 0.0000000005px;
+          }
+          
+          .displayBase {
+            
+          }
+          
+        </style>
+        <div id="displayPreview" class="paneType" style="background-color: var(--secondary);height: 928px;width: 720px; transform-origin: top left; transform: scale(0.25);position: absolute;border: 0.5px solid var(--translucent);top: 60px;left: 15px;overflow: hidden;filter: drop-shadow(-5px 5px 5px var(--translucent));">
+                    <div id="displayPreview" class="paneType" style="background-color: var(--primary);height: calc(33.3333% - 20px);width: calc(100% - 40px);margin-left: 20px;top: 20px;position: absolute;">
+                        <div id="historyPreview" class="titleType" style="width: 40%; height: 20%; background-color: var(--accent); margin-top: 20px;margin-left: 20px;"></div>
+                        <h2 id="showcaseTextColor" style="color: var(--text);text-align: center; position: absolute;left: 20px; margin-top:20px; font-size: 50px;">T</h2>
+                    </div>
+                    <div id="numsPreview" class="paneType" style="background-color: var(--accent);height: 44.4444%;width: calc(75% - 40px);margin-left: 20px;position: absolute;top: calc(33.3333% + 20px);z-index: 1;"></div>
+                    <div id="funcPreview" class="paneType" style="background-color: var(--primary);height: calc(66.6666% - 40px);width: calc(100% - 40px);margin-left: 20px;margin-bottom: 5px;top: calc(33.3333% + 20px);position: absolute;"></div>
+                </div>
+                <div id="colorPickerGrid">
+                    <Label class="colorsLabels">
+                        <h5 class="h5Colors" id="DisplayLabel">Primary</h5>
+                        <input id="primaryColorPicker" class="colorPicker" type="color">
+                    </Label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Secondary</h5>
+                        <input id="secondaryColorPicker" class="colorPicker" value="#1a1a1a" type="color">
+                    </label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Accent</h5>
+                        <input id="accentColorPicker" class="colorPicker" value="#000000" type="color">
+                    </label>
+                    <label class="colorsLabels">
+                        <h5 class="h5Colors">Text</h5>
+                        <input id="textColorPicker" class="colorPicker" value="#000000" type="color">
+                    </label>
+                </div>
+        `;
+        this.setTitle("Colors");
+        this.colorButtonList = [];
+    }
+}
+customElements.define('color-picker-pane', colorPickerPane);
 class settingsPage extends recursiveComponent {
     constructor(){
         super();
@@ -4945,7 +5156,22 @@ class settingsPage extends recursiveComponent {
                         d="m257.25 585.07v-208.11c0-22.453 18.229-40.682 40.682-40.682h38.071v234.98c51.586 9.971 90.594 55.413 90.594 109.89 0 61.775-50.153 111.93-111.93 111.93-61.774 0-111.93-50.153-111.93-111.93 0-40.79 21.868-76.514 54.509-96.077z"
                         fill="#ff5050" />
                 </svg>
-                        <accent-color-pane style="width: calc(100% - 20px); margin-left: 10px; height: fit-content; display: block;"></accent-color-pane>
+                <style>
+                .settingsPanes{
+                    width: calc(100% - 20px); 
+                    margin-left: 10px; 
+                    height: fit-content; 
+                    display: block;
+                    margin-top: 10px;
+                }
+                </style>
+                        <title-card text="Colors"></title-card>
+                        <accent-color-pane class="settingsPanes"></accent-color-pane>
+                        <type-picker-pane name="Color Schemes" class="settingsPanes"> 
+                            <type-button class="active" name="Dark" primary="#000000" secondary="#1f1f1f"></type-button>
+                            <type-button name="Light" primary="#ffffff" secondary="#dedede"></type-button>
+                        </type-picker-pane>
+                        <color-picker-pane class="settingsPanes"></color-picker-pane>
                     </menu-page>
                 </menu-pane>
             </div>
@@ -5520,6 +5746,7 @@ class equationMap extends recursiveComponent {
             background-color: var(--secondary);
             height: 25px;
             width: 95%;
+            box-sizing: content-box;
             border-radius: 25px;
             display: inline-block;
             flex-wrap: nowrap;
@@ -5635,9 +5862,9 @@ class equationMap extends recursiveComponent {
         let callMethod;
         console.log(this.vars)
         if (this.type == 'func') {
-            callMethod = callCalc({ "callType": "get", 'method': 'vars', "existing": true, "funcName": this.name })
+            callMethod = callCalc({ "get": "vars", "name": this.name })
         } else {
-            callMethod = callCalc({ "callType": "get", 'method': 'vars', "existing": false, "text": this.input.innerHTML })
+            callMethod = callCalc({ "get": "vars", "equation": this.input.innerHTML })
         }
         console.log(callMethod)
         callMethod.then(value => {
@@ -5684,7 +5911,7 @@ class equationMap extends recursiveComponent {
         variableEntry.input.addEventListener('input', (e) => {
             console.log("input")
             if (this.type == 'func') {
-                callCalc({ callType: "set", method: "var", targetEnv: this.name, target: name, value: variableEntry.value }).then((value) => {
+                callCalc({ set: "var", id: this.name, varName: name, varValue: variableEntry.value }).then((value) => {
                     if (this.parentVarCallBack != undefined) {
                         this.parentVarCallBack(value);
                     }
@@ -5716,10 +5943,10 @@ class equationMap extends recursiveComponent {
     parseEquation() {
         let promiseEquation;
         if (this.type == "func") {
-            promiseEquation = callCalc({ callType: "get", method: "parseEquation", existing: true, funcName: this.name })
+            promiseEquation = callCalc({ get: "equationParse", id: this.name })
         } else {
             let parsedVars = JSON.parse(JSON.stringify(this.vars));
-            promiseEquation = callCalc({ callType: "get", method: "parseEquation", text: this.ogEquation, vars: parsedVars })
+            promiseEquation = callCalc({ get: "equationParse", equation: this.ogEquation, vars: parsedVars })
         }
         promiseEquation.then(value => {
             this.input.innerHTML = value;
@@ -5759,7 +5986,6 @@ class slideSwitcher extends recursiveComponent {
                 width: 70px;
                 position: absolute;
                 background-color: var(--secondary);
-                border-radius: 25px;
                 transition: margin-left 0.2s;
             }
             #buttonContainer{
@@ -5770,7 +5996,7 @@ class slideSwitcher extends recursiveComponent {
             }
         </style>
         <div id=modeSwitcher>
-            <div id="selectorSlider"></div>
+            <div id="selectorSlider" class="titleType"></div>
             <div id="buttonContainer">
             </div>
         </div>
@@ -5998,7 +6224,8 @@ class singleData extends dataPage {
             align-content: center;
             display: inline-block;
             left: 1.5px;
-            padding-top: 10px;
+            overflow: hidden;
+            background-color: var(--accent);
           }
           
           #funcModify:hover .drop-cont {
@@ -6007,10 +6234,8 @@ class singleData extends dataPage {
           
           .drop-cont {
             display: none;
-            background-color: var(--accent);
             min-width: 50px;
             z-index: 1;
-            border-radius: 0px 0 15px 15px;
           }
           
           .drop-cont a {
@@ -6021,14 +6246,9 @@ class singleData extends dataPage {
             display: block;
           }
           
-          #funcModify:hover #modBtn {
-            border-radius: 15px 15px 0px 0px;
-          }
-          
           #modBtn {
-            background-color: var(--accent);
+            background-color: transparent;
             color: var(--text);
-            border-radius: 25px;
             width: 50px;
             font-size: 15px;
             border: none;
@@ -6043,7 +6263,6 @@ class singleData extends dataPage {
             padding: 5px;
             padding-left: 10px;
             padding-right: 10px;
-            border-radius: 25px;
             background-color: var(--accent);
             width: fit-content;
             max-width: 100%;
@@ -6052,14 +6271,14 @@ class singleData extends dataPage {
           }
           
         </style>
-        <div id="funcModify">
+        <div id="funcModify" class="entryType">
             <button id="modBtn">deg</button>
             <div class="drop-cont">
                 <a id="selectorRad">rad</a>
                 <a id="selectorDeg">deg</a>
             </div>
         </div>
-        <h2 id="equalsHeader">=</h2>
+        <h2 id="equalsHeader" class="entryType">=</h2>
         `;
         this.target = "singleData";
         this.pageName = "Function";
@@ -6105,7 +6324,6 @@ class graphData extends dataPage {
                 display: block;
                 width: 100%;
                 background-color: var(--secondary);
-                border-radius: 20px;
               }
               
               #funcChart {
@@ -6163,7 +6381,7 @@ class graphData extends dataPage {
                 right: 0;
               }
             </style>
-            <div id="graphContainer"><canvas id="funcChart"></canvas></div>
+            <div id="graphContainer" class="paneType"><canvas id="funcChart"></canvas></div>
             <settings-icon id="settingsCog" class="imgDivClass iconType" style="height: 50px;isolation:isolate"
             viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
             </settings-icon >
@@ -6221,7 +6439,7 @@ class graphData extends dataPage {
     graphChangeMethod() {
         let changeFunc = () => {
             console.log(this.key)
-            callCalc({ 'callType': 'set', 'method': 'envVar', "targetEnv": this.key, "newVars": this.graphVars }).then((value) => {
+            callCalc({ 'set': 'settings', "id": this.key, "settings": this.graphVars }).then((value) => {
                 console.log(value)
                 this.parseMethod(value)
             });
@@ -6444,7 +6662,7 @@ class templateFuncPage extends funcPage {
         this.nameInput.input.innerHTML = this.name;
         this.funcListDef = findFuncConfig(this.name).def;
         this.dataViewer.upstreamRequest = (type) => {
-            callCalc({ callType: 'get', method: 'envData', targetEnv: this.name, target: type }).then(value => {
+            callCalc({ get: 'calc', id: this.name, type: type }).then(value => {
                 if (type == "equation") {
                     parseObject.Function(value);
                 } else if (type == "graph") {
@@ -6480,7 +6698,7 @@ class templateFuncPage extends funcPage {
             this.changeMethod(this.nameInput.input.innerHTML, this.funcDef.ogFunc)
         });
 
-        callCalc({ callType: 'get', method: 'func', "name": this.name }).then(value => {
+        callCalc({ get: 'func', name: this.name }).then(value => {
             this.funcDef = value;
             this.vars = this.funcDef.vars;
             let varNames = []
@@ -6516,8 +6734,8 @@ class templateFuncPage extends funcPage {
                 this.type = "method";
                 this.equationMap.equat = `${this.name}(${varNames.join(',')})`
             }
-            callCalc({ callType: 'set', method: "env", envType: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` }).then(() => {
-                callCalc({ callType: 'get', method: 'envPacket', targetEnv: this.name }).then(value => {
+            callCalc({ set: 'env', type: 'static', id: this.name, isFunc: true, vars: value.vars, equation: `${this.name}(${varNames.join(',')})` }).then(() => {
+                callCalc({ get: 'calcPacket', id: this.name }).then(value => {
                     this.parseMethod(value)
                 })
             })
@@ -6534,7 +6752,7 @@ class templateFuncPage extends funcPage {
     changeMethod(name, value) {
         let testQuery = findFuncConfig(name);
         if (testQuery === false || testQuery.def == this.funcListDef) {
-            let parseObject = { callType: "func", method: "change", name: this.funcDef.func, changes: {} };
+            let parseObject = { set: "changeFunc", name: this.funcDef.func, changes: {} };
             if (this.funcDef.type == "function") {
                 parseObject.changes = { "type": "Function", "name": name, "equation": value };
             } else {
@@ -6949,7 +7167,7 @@ class createPage extends recursiveComponent {
         if (this.createType == "Function") {
             createFunc("Function", this.nameCreator.value, this.creatorEquationFuncInput.text)
         } else if (this.createType == "Hybrid") {
-            callCalc({ "callType": 'func', "method": 'add', 'newFuncs': [{ 'type': "Hybrid", 'code': document.getElementById('hybridEditor').value }] }).then((value) => {
+            callCalc({ "set": 'func', 'funcs': [{ 'type': "Hybrid", 'code': document.getElementById('hybridEditor').value }] }).then((value) => {
                 createFunc("Hybrid", value, this.terminal.text)
             });
         } else if (this.createType == "Code") {
@@ -7302,7 +7520,6 @@ class sharePage extends popup {
                 #shareActions{
                     display: grid;
                     height: calc(100% - 20px);
-                    border-radius: 15px;
                     margin: 10px;
                     width: calc(100% - 20px);
                     background-color: var(--secondary);
@@ -7325,7 +7542,7 @@ class sharePage extends popup {
                 <div id="qrCenter">
                     <qr-code id="qrCode" text="nothing to see here"></qr-code>
                 </div>
-                <div id="shareActions">
+                <div id="shareActions" class="titleType">
 
                 </div>
         `;
@@ -7696,7 +7913,6 @@ class quickSettings extends popup {
                 font-size: 50px;
                 padding-top: 5px;
                 padding-bottom: 5px;
-                border-radius: 25px;
                 color: var(--text);
                 background-color: var(--accent);
             }
@@ -7787,7 +8003,7 @@ class quickSettings extends popup {
               }
         </style>
             <div id="settingsPane">
-                <h1 id="settingsTitle"><h1>
+                <h1 id="settingsTitle" class="titleType"><h1>
                 <settings-section id="settingsDef"></settings-section>
             </div>
         `;

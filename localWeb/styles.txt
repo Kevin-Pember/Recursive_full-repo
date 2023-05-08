@@ -1,0 +1,147 @@
+default
+`
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: ubuntu;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+.primary {
+  fill: var(--primary);
+}
+
+.secondary {
+  fill: var(--secondary);
+}
+
+.accent {
+  fill: var(--accent);
+}
+
+.text {
+  fill: var(--text)
+}
+.iconType{
+  border: none;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+  background-color: var(--primary);
+  display: grid;
+  place-items: center;
+  align-content: center;
+}
+.entryType{
+  border: none;
+  border-radius: 15px;
+}
+.titleType{
+  border: none;
+  border-radius: 20px;
+  filter: drop-shadow(5px 5px 5px var(--translucent));
+}
+.paneType{
+  border: none;
+  border-radius: 25px;
+  background-color: var(--primary);
+  filter: drop-shadow(5px 5px 5px var(--translucent));
+}
+::-webkit-scrollbar {
+  width: 2vh;
+
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin-bottom: 40px;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 5;
+  min-height: 30px;
+  background: var(--translucent);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-button:end:increment {
+  height: 7px;
+  display: block;
+  background: transparent;
+}
+
+::-webkit-scrollbar-button:start:increment {
+  height: 7px;
+  display: block;
+  background: transparent;
+}
+  `
+Brutalist
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: ubuntu;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+.primary {
+  fill: var(--primary);
+}
+
+.secondary {
+  fill: var(--secondary);
+}
+
+.accent {
+  fill: var(--accent);
+}
+
+.text {
+  fill: var(--text)
+}
+.iconType{
+  border: solid 1px black;
+  aspect-ratio: 1/1;
+  background-color: transparent;
+  display: grid;
+  place-items: center;
+  align-content: center;
+}
+.entryType{
+  border: solid 1px black;
+}
+.titleType{
+  border: solid 1px black;
+}
+.paneType{
+  border: solid 1px black;
+}
+::-webkit-scrollbar {
+  width: 2vh;
+
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin-bottom: 40px;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 5;
+  min-height: 30px;
+  background: var(--translucent);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-button:end:increment {
+  height: 7px;
+  display: block;
+  background: transparent;
+}
+
+::-webkit-scrollbar-button:start:increment {
+  height: 7px;
+  display: block;
+  background: transparent;
+}
