@@ -255,6 +255,17 @@ let funcList = [
       return Math.log10(arg) / Math.log10(base)
     },
     "predef": true
+  },
+  {
+    'type': 'method',
+    'func': 'pow',
+    'funcRadDeg': false,
+    'funcLength': 3,
+    'mth': (arry) => {
+      let base = arry[0]
+      let arg = arry[1]
+      return Math.pow(base, arg);
+    }
   }
 ];
 let ignoreList = [
@@ -344,15 +355,18 @@ String.prototype.hasVar = function () {
 }
 String.prototype.findMatch = function (start, end) {
   let copyString = this;
-  let fromIndex = 0;
+  
   let matchIdx = -1;
   let direction = true;
   if(arguments[2] != undefined){
     direction = arguments[2];
   }
+  let fromIndex = direction ? 0 : copyString.length;
   while (true) {
     let startIndex = direction ? copyString.indexOf(start, fromIndex): copyString.lastIndexOf(start, fromIndex);
+    console.log("start index: " + startIndex)
     let endIndex = direction ? copyString.indexOf(end, fromIndex) : copyString.lastIndexOf(end, fromIndex);
+    console.log("end index: " + endIndex)
     if (startIndex > -1 && endIndex > -1) {
       if (direction ? startIndex < endIndex : startIndex > endIndex) {
         fromIndex = direction ? endIndex + end.length : startIndex;
@@ -369,6 +383,25 @@ String.prototype.findMatch = function (start, end) {
     }
   }
   return matchIdx;
+}
+String.prototype.findCharMatch = function (char){
+  console.log('find Char ')
+  let direction = true;
+  if(arguments[3] != undefined){
+    direction = arguments[3];
+  }
+  let indexes = this.indexOfAll(char);
+  
+  console.log(indexes)
+  for(let i = direction ? 0 : indexes.length-1; direction ? i < indexes.length : i >= 0; direction ? i++ : i--){
+    if(isOperator(direction ? this[indexes[i]-1] : this[indexes[i]+1])){
+      i++;
+      continue;
+    }else{
+      return indexes[i];
+    }
+  }
+  return direction ? this.length : 0;
 }
 class DefinedTerm {
   pow = [];
@@ -1158,16 +1191,18 @@ function parEncap(sub) {
 }*/
 //A method to find the ending of a superscript html tag. Doesn't make one if there is none
 function supEncap(sub) {
-  /*for (let i = 5; i < sub.length; i++) {
-    if (sub.substring(i, i + 5) == "<sup>") {
-      i = i + supEncap(sub.substring(i)).length;
-    } else if (sub.substring(i, i + 6) == "</sup>") {
-      sub = sub.substring(0, i + 6);
-      break;
-    }
-  }*/
-  let endIdx = sub.findMatch("<sup","</sup>",direction);
-  return sub.substring(0, endIdx);
+  let direction = true;
+  if(arguments[1] != undefined){
+    direction = arguments[1];
+  }
+  let endIdx
+  if(arguments[2] != undefined){
+    endIdx = arguments[2];
+  }else{
+    endIdx = sub.findMatch("<sup","</sup>",direction);
+  }
+  
+  return direction ? sub.substring(0, endIdx): sub.substring(sub.indexOf(">",endIdx)+1);
 }
 //A deprecated Method to find the postion of a function in the equation string
 function funcIndex(func, equation, funcList) {
@@ -1189,89 +1224,51 @@ function funcIndex(func, equation, funcList) {
 }
 //A method to parse functions that don't fit into the conventions of the function list 
 function builtInFunc(equation) {
-  equation = equation.replaceAll('‎', '');
-  equation = equation.replaceAll('e', 'Math.E');
+  console.log(equation)
   equation = equation.replaceAll('×', '*');
   equation = equation.replaceAll('÷', '/');
-  for (let i = 0; i < equation.length; i++) {
-    if (equation.substring(i, i + 5) == "<sup>") {
-      let exponent = equatInner(supEncap(equation.substring(i)).substring(5, supEncap(equation.substring(i)).length - 6));
-      let exponentRAW = supEncap(equation.substring(i));
-      let base = "";
-      let baseRAW = "";
-      if (equation.charAt(i - 1) == ")") {
-        base = equatInner(parEncap(equation.substring(0, i),false).substring(1, parEncap(equation.substring(0, i),false).length - 1));
-        baseRAW = parEncap(equation.substring(0, i),false);
-      } else {
-        base = forward(equation.substring(0, i));
-        baseRAW = forward(equation.substring(0, i));
-      }
-      equation = equation.substring(0, i - baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i + exponentRAW.length);
-    } else if (equation.charAt(i) == "^") {
-      let exponent = "";
-      let exponentRAW = "";
-      let base = "";
-      let baseRAW = "";
-      if (equation.charAt(i - 1) == ")") {
-        base = equatInner(parEncap(equation.substring(0, i),false).substring(1, parEncap(equation.substring(0, i),false).length - 1));
-        baseRAW = parEncap(equation.substring(0, i),false);
-      } else {
-        base = forward(equation.substring(0, i));
-        baseRAW = forward(equation.substring(0, i));
-      }
-      if (equation.charAt(i + 1) == "(") {
-        exponent = equatInner(parEncap(equation.substring(i + 1)));
-        exponentRAW = parEncap(equation.substring(i + 1));
-      } else {
-        exponent = backward(equation.substring(i + 1));
-        exponentRAW = backward(equation.substring(i + 1));
-      }
-      equation = equation.substring(0, i - baseRAW.length) + "Math.pow(" + base + "," + exponent + ")" + equation.substring(i + exponentRAW.length + 1);
-    } else if (equation.charAt(i) == "√") {
-      if (equation.charAt(i + 1) == '(') {
-        equation = equation.substring(0, i) + "Math.sqrt" + equation.substring(i + 1);
-      } else {
-        let inner = equatInner(backward(equation.substring(i + 1)));
-        let innerRAW = backward(equation.substring(i + 1));
-        equation = equation.substring(0, i) + "Math.sqrt(" + inner + ")" + equation.substring(i + innerRAW.length + 1);
-        i = i + inner.length + 7;
-      }
-    } else if (equation.charAt(i) == "π") {
-      let parseString = "Math.PI";
-      if (backward(equation.substring(i + 1)).length > 0) {
-        let number = backward(equation.substring(i + 1));
-        parseString = Math.PI * Number(number);
-        equation = equation.substring(0, i) + parseString + equation.substring(i + number.length + 1);
-        break;
-      }
-      if (forward(equation.substring(0, i)).length > 0) {
-        let number = forward(equation.substring(0, i));
-        parseString = Math.PI * Number(number);
-        equation = equation.substring(0, i - number.length) + parseString + equation.substring(i + 1);
-        break;
-      }
-      equation = equation.substring(0, i) + parseString + equation.substring(i + 1);
-    } else if (equation.charAt(i) == "|") {
-      let sub = "";
-      if (equation.charAt(i - 1) == "(") {
-        sub = equation.substring(i - 1);
-      } else {
-        sub = equation.substring(i);
-      }
-      let type = false;
-      if (sub.charAt() == "(") {
-        type = true;
-        sub = sub.substring(1);
-      }
-
-      for (let i = 1; i < sub.length; i++) {
-        if (sub.charAt(i) == "|" && sub.charAt(i + 1) != ")" && !type) {
-
-        } else if (sub.charAt(i) == "|" && sub.charAt(i + 1) == ")" && type) {
-
-        }
-      }
+  let indexValue = equation.indexOf("√");
+  while(indexValue >= 0){
+    let root = "2";
+    let from = indexValue;
+    console.log(equation.substring(indexValue - 7, indexValue))
+    if(indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>"){
+      let matchSup = equation.substring(0,indexValue - 6).findMatch("<sup","</sup>",false);
+      root = findTerm(equation.substring(0,indexValue - 6),false);
+      from = matchSup - 4;  
     }
+    
+    let term = findTerm(equation.substring(indexValue + 1));
+    let replacement = "(" + term + "^(1/" + root + "))";
+    if(from != 0 && !isOperator(equation[from - 1])){
+      replacement = "*" + replacement;
+    }
+    equation = equation.substring(0,from)  + replacement + equation.substring(indexValue + term.length + 1);
+    indexValue = equation.indexOf("√");
+  }
+  indexValue = equation.indexOf("|");
+  while(indexValue >= 0){
+    let matchEnd = equation.substring(indexValue+1).findCharMatch("|",true) + indexValue ;
+    let replacement = "abs(" + equation.substring(indexValue + 1,matchEnd+1) + ")";
+    if(indexValue - 1 >= 0 && !isOperator(equation[indexValue - 1])){
+      replacement = "*" + replacement;
+    }
+    if(matchEnd + 2 <= equation.length && !isOperator(equation[matchEnd + 2])){
+      replacement = replacement + "*";
+    }
+    equation = equation.substring(0,indexValue) + replacement + equation.substring(matchEnd+2);
+    console.log("post operation: "+equation)
+    indexValue = equation.indexOf("|");
+  }
+  indexValue = equation.indexOf("<sup");
+  while(indexValue >= 0){
+    console.log(equation.substring(equation.indexOf(">",indexValue)+1).findMatch("<sup","</sup>"))
+    let matchEnd = equation.substring(equation.indexOf(">",indexValue)+1).findMatch("<sup","</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">",indexValue)+1).length;
+    console.log(matchEnd);
+    let term = findTerm(equation.substring(equation.indexOf(">",indexValue) + 1));
+    equation = equation.substring(0,indexValue) + "^(" + term + ")" + equation.substring(matchEnd+6);
+    console.log(equation)
+    indexValue = equation.indexOf("<sup");
   }
   return equation;
 }
@@ -1344,6 +1341,27 @@ function forward(sub) {
     }
   }
   return outputSub;
+}
+function findTerm(equation){
+  let direction = true;
+  let endIndex = 0;
+  if(arguments[1] != undefined){
+    direction = arguments[1];
+  }
+  for(let i = direction ? 0: equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--){
+    if(equation[i] == "(" || equation[i] == ")"){
+      let nextIndex = direction ? equation.substring(i).findMatch("(",")",direction) : equation.substring(0,i-1).findMatch("(",")",direction);
+      if(nextIndex != -1 ){
+        i = nextIndex - 1 ;
+        endIndex = i;
+      }
+    }else if (equation[i] == '+' || equation[i] == '-' ||equation[i] == '×' ||equation[i] == '<'||equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|'){
+      endIndex = i; 
+      break;
+    }
+    endIndex = endIndex + (direction ? 1 : -1);
+  }
+  return direction ? equation.substring(0,endIndex) : equation.substring(endIndex+1);
 }
 //A method that returns an array of the names of the funcs that are in the Funclist
 function getNameList() {
@@ -1769,10 +1787,9 @@ function parseEquation(equation) {
   }
   return equatParse;
 }
-
 function createOp(section) {
-  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',']
-  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma']
+  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',',"|"]
+  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"]
   return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null };
   /*for (let i = 0; i < equation.length; i++) {
     if (ops.includes(equation.charAt(i))) {
@@ -1840,6 +1857,23 @@ function opsInEquat(equation) {
 
   }
   return { "arry": opsArry, "equat": equation }
+}
+function formatEquation(equation){
+let defs = [
+  {
+    "type": "op",
+    "def": "%",
+    "postEcap": ["(", "/100)"],
+  },
+  {
+    "type": "encap",
+    "def": "<sup",
+    "termination" : ">",
+    "endDef": "</sup>",
+    "pre": "^(",
+    "post": ")",
+  }
+];
 }
 function termsInEquat(equation, fullArray) {
   let modEquat = equation
@@ -2345,6 +2379,10 @@ function isVar(entry) {
     return 0;
   }
 }
+function isOperator(entry) {
+  let operators = ["+", "-", "*", "/", "^"]
+  return operators.includes(entry);
+}
 function changeImplemented(oldName, newObject) {
   let oldConfig = getByName(oldName)
   let oldIndex = funcList.indexOf(oldConfig);
@@ -2423,7 +2461,8 @@ function getAngleConversion(type) {
 }
 //end
 console.log("things from eval")
-console.log(arryToString(parseEquation("4x*5(u6)")))
+console.log(builtInFunc("<sup>42</sup>√23"))
+console.log(parseEquation("√23"))
 console.log(solveFor("x*5+(u)", "x"))
 console.log(parEncap("((78)",false))
 console.log(createNewFunction("function", 'testor', "x*5+u"))

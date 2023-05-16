@@ -3548,6 +3548,9 @@ class menuPane extends recursiveComponent {
             align-items: center; 
             display: flex;
             font-size: large;
+            height: calc(100% - 10px);
+            margin: 5px;
+            width: calc(100% - 10px);
         }
         #paneContainer{
             background-color: var(--primary);
@@ -3560,6 +3563,7 @@ class menuPane extends recursiveComponent {
         #modeSwitcher{
             height: 100%; 
             width:100%; 
+            padding: 5px;
             position: absolute; 
             left:0; 
             top:0;
@@ -3813,10 +3817,6 @@ class menuPane extends recursiveComponent {
                 }
                 .modeButton{
                     display: flex;
-                    height: calc(100% - 20px);
-                    margin-top: 10px;
-                    margin-left: 10px;
-                    width: calc(100% - 20px);
                 }
                 #modeButton{
                     right: 20px;
@@ -3832,10 +3832,6 @@ class menuPane extends recursiveComponent {
                 }
                 .modeButton{
                     display: grid;
-                    width: calc(100% - 20px);
-                    margin-left: 10px;
-                    margin-top: 10px;
-                    height: calc(100% - 20px);
                     align-content: center;
                     align-items: center;
                     justify-content: center;
@@ -3856,10 +3852,9 @@ class menuPane extends recursiveComponent {
         } else {
             styling += `
             .modeButton{
-                width: calc(100% - 20px); 
+                width: calc(100% - 10px); 
                 height: 175px; 
-                margin-top:10px; 
-                margin-left:10px;
+                margin: 5px;
             }
             .backIcon{
                 background-color: transparent;
@@ -4445,8 +4440,10 @@ class tableMode extends templateMode {
         super();
         this.styler.innerHTML += `
         #modeTable {
-            width: 100%;
-            height: 100%;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            position: absolute;
+            margin: 5px;
             border-spacing: 5px;
         }
           
