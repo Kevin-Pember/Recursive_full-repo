@@ -6,7 +6,7 @@ function setFocus(node, index) {
     let sel = window.getSelection();
     let range = document.createRange();
     range.setStart(node, index);
-    range.collapse(true);
+    range.collapse(true); 
     sel.removeAllRanges();
     sel.addRange(range);
     console.log(arguments)

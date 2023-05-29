@@ -403,143 +403,6 @@ String.prototype.findCharMatch = function (char){
   }
   return direction ? this.length : 0;
 }
-class DefinedTerm {
-  pow = [];
-  mutiplican = [];
-  constructor(mutiplican, pow, pos) {
-    this.pos = pos
-
-    this.type = "defTerm"
-
-    Array.isArray(mutiplican) ? this.mutiplican = combineTerms(mutiplican) : this.mutiplican = [mutiplican];
-
-    Array.isArray(pow) ? this.pow = combineTerms(pow) : this.pow = [pow]
-
-    this.additions = []
-
-    this.endElem = this;
-  }
-  get getPow() {
-
-    return arryToString(this.pow);
-  }
-  get getMutiplican() {
-    //console.log(this.mutiplican)
-    return arryToString(this.mutiplican);
-  }
-  get getAdditions() {
-    return arryToString(this.additions);
-  }
-  get getComputedPow() {
-    return arryToString(this.pow);
-  }
-  get getComputedMuti() {
-    return arryToString(this.mutiplican);
-  }
-  changeMuti(add) {
-    let test = add.find(elem => {
-      if (this.subtype == 'var' && elem.subtype == 'var' && this.letter == elem.letter) {
-        return true;
-      } else if (this.subtype == 'cmpxTerm' && elem.subtype == 'cmpxTerm' && arrayEquals(this.textArray, elem.textArray)) {
-        return true;
-      }
-    })
-    if (test != undefined) {
-      let taegElem = test;
-      //console.log(taegElem)
-      let addPowArry = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.pow.length + taegElem.pow.length + 2 }];
-      addPowArry = addPowArry.concat(taegElem.pow)
-      addPowArry.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.pow.length + 1 })
-      this.changePow(addPowArry)
-
-      let addMutiArray = [{ 'type': 'op', 'subtype': 'Muti', 'text': '*' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.mutiplican.length + taegElem.mutiplican.length + 2 }]
-      addMutiArray = addMutiArray.concat(taegElem.mutiplican)
-      addMutiArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.mutiplican.length + 1 })
-      this.changeMuti(addMutiArray)
-    } else {
-      let newArray = this.mutiplican.concat(add);
-      this.mutiplican = combineTerms(newArray);
-    }
-  }
-
-  changePow(add) {
-    let newArray = this.endElem.pow.concat(add)
-    this.pow = combineTerms(newArray)
-    //console.log(this.endElem.pow)
-  }
-
-  changeAddition(add) {
-    let test = add.find(elem => {
-      if (this.subtype == 'var' && elem.subtype == 'var' && this.letter == elem.letter && arrayEquals(this.pow, elem.pow)) {
-        return true;
-      } else if (this.subtype == 'cmpxTerm' && elem.subtype == 'cmpxTerm' && arrayEquals(this.textArray, elem.textArray) && arrayEquals(this.pow, elem.pow)) {
-        return true;
-      }
-    });
-    if (test != undefined) {
-      let targetedElem = test;
-      let addMutiArray = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.mutiplican.length + targetedElem.mutiplican.length + 2 }]
-      addMutiArray = addMutiArray.concat(targetedElem.mutiplican)
-      addMutiArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.mutiplican.length + 1 })
-      this.changeMuti(addMutiArray)
-
-      let addAdditiveArray = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.additions.length + targetedElem.additions.length + 2 }]
-      addAdditiveArray = addAdditiveArray.concat(targetedElem.additions)
-      addAdditiveArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.additions.length + 1 })
-      this.changeAddition(addAdditiveArray)
-    } else {
-      if (this.additions.length == 0) {
-        add.shift()
-      }
-      let newArray = this.additions.concat(add)
-      this.additions = combineTerms(newArray)
-    }
-  }
-}
-class CmpxTerm extends DefinedTerm {
-  constructor(array, pos, mutiplican, pow, elemB) {
-    super(mutiplican, pow, pos)
-    this.subtype = "cmpxTerm";
-    //console.log(array)
-    this.textArray = combineTerms(array)
-    if (elemB) {
-      if (elemB.type == "func") {
-        this.func = elemB
-      }
-    }
-  }
-  get text() {
-    let stringPow = this.getComputedPow != "1" ? "^(" + this.getComputedPow + ')' : '';
-    let stringMutiplican = this.getComputedMuti != '1' ? this.getComputedMuti + "*" : '';
-    let stringAddican = this.getAdditions.length != 0 ? '+' + this.getAdditions : '';
-    let stringFunc = this.func != undefined ? this.func.text : '';
-
-    return stringFunc + stringMutiplican + "(" + arryToString(this.textArray) + ")" + stringPow + stringAddican;
-  }
-}
-class VarTerm extends DefinedTerm {
-  constructor(input, pos, mutiplican, pow) {
-    super(mutiplican, pow, pos)
-    this.subtype = "var"
-
-    this.letter = input;
-  }
-  get getNumeric() {
-    for (let varI of GlobalVars) {
-      if (varI.name == this.letter) {
-        return varI.value
-      }
-    }
-    return this.letter
-  }
-  get text() {
-    let stringPow = this.getComputedPow != "1" ? "^(" + this.getComputedPow + ')' : '';
-    let strignMutiplican = this.getComputedMuti != '1' ? this.getComputedMuti + "*" : '';
-    let stringAddican = this.getAdditions.length != 0 ? '+' + this.getAdditions : '';
-    return "(" + strignMutiplican + this.getNumeric + stringPow + stringAddican + ")";
-  }
-
-}
 class TextTerm {
   constructor(string){
     this.type = "term"
@@ -1276,7 +1139,7 @@ function builtInFunc(equation) {
 function backward(sub) {
   let outputSub = "";
   for (i = 0; i <= sub.length - 1; i++) {
-    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != 'e' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
+    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
       if (i == sub.length - 1) {
         outputSub = sub.substring(0, i + 1);
         break;
@@ -1739,8 +1602,147 @@ function solveFor(equat, varDef) {
   return fullArray
 }
 //********************************************** */
+class DefinedTerm {
+  pow = [];
+  mutiplican = [];
+  constructor(mutiplican, pow, pos) {
+    this.pos = pos
+
+    this.type = "defTerm"
+
+    Array.isArray(mutiplican) ? this.mutiplican = combineTerms(mutiplican) : this.mutiplican = [mutiplican];
+
+    Array.isArray(pow) ? this.pow = combineTerms(pow) : this.pow = [pow]
+
+    this.additions = []
+
+    this.endElem = this;
+  }
+  get getPow() {
+
+    return arryToString(this.pow);
+  }
+  get getMutiplican() {
+    //console.log(this.mutiplican)
+    return arryToString(this.mutiplican);
+  }
+  get getAdditions() {
+    return arryToString(this.additions);
+  }
+  get getComputedPow() {
+    return arryToString(this.pow);
+  }
+  get getComputedMuti() {
+    return arryToString(this.mutiplican);
+  }
+  changeMuti(add) {
+    let test = add.find(elem => {
+      if (this.subtype == 'var' && elem.subtype == 'var' && this.letter == elem.letter) {
+        return true;
+      } else if (this.subtype == 'cmpxTerm' && elem.subtype == 'cmpxTerm' && arrayEquals(this.textArray, elem.textArray)) {
+        return true;
+      }
+    })
+    if (test != undefined) {
+      let taegElem = test;
+      //console.log(taegElem)
+      let addPowArry = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.pow.length + taegElem.pow.length + 2 }];
+      addPowArry = addPowArry.concat(taegElem.pow)
+      addPowArry.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.pow.length + 1 })
+      this.changePow(addPowArry)
+
+      let addMutiArray = [{ 'type': 'op', 'subtype': 'Muti', 'text': '*' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.mutiplican.length + taegElem.mutiplican.length + 2 }]
+      addMutiArray = addMutiArray.concat(taegElem.mutiplican)
+      addMutiArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.mutiplican.length + 1 })
+      this.changeMuti(addMutiArray)
+    } else {
+      let newArray = this.mutiplican.concat(add);
+      this.mutiplican = combineTerms(newArray);
+    }
+  }
+
+  changePow(add) {
+    let newArray = this.endElem.pow.concat(add)
+    this.pow = combineTerms(newArray)
+    //console.log(this.endElem.pow)
+  }
+
+  changeAddition(add) {
+    let test = add.find(elem => {
+      if (this.subtype == 'var' && elem.subtype == 'var' && this.letter == elem.letter && arrayEquals(this.pow, elem.pow)) {
+        return true;
+      } else if (this.subtype == 'cmpxTerm' && elem.subtype == 'cmpxTerm' && arrayEquals(this.textArray, elem.textArray) && arrayEquals(this.pow, elem.pow)) {
+        return true;
+      }
+    });
+    if (test != undefined) {
+      let targetedElem = test;
+      let addMutiArray = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.mutiplican.length + targetedElem.mutiplican.length + 2 }]
+      addMutiArray = addMutiArray.concat(targetedElem.mutiplican)
+      addMutiArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.mutiplican.length + 1 })
+      this.changeMuti(addMutiArray)
+
+      let addAdditiveArray = [{ 'type': 'op', 'subtype': 'Plus', 'text': '+' }, { "type": 'op', "subtype": "ParStart", 'text': '(', 'matchPar': this.additions.length + targetedElem.additions.length + 2 }]
+      addAdditiveArray = addAdditiveArray.concat(targetedElem.additions)
+      addAdditiveArray.push({ "type": 'op', "subtype": "ParEnd", 'text': ')', 'matchPar': this.additions.length + 1 })
+      this.changeAddition(addAdditiveArray)
+    } else {
+      if (this.additions.length == 0) {
+        add.shift()
+      }
+      let newArray = this.additions.concat(add)
+      this.additions = combineTerms(newArray)
+    }
+  }
+}
+class CmpxTerm extends DefinedTerm {
+  constructor(array, pos, mutiplican, pow, elemB) {
+    super(mutiplican, pow, pos)
+    this.subtype = "cmpxTerm";
+    //console.log(array)
+    this.textArray = combineTerms(array)
+    if (elemB) {
+      if (elemB.type == "func") {
+        this.func = elemB
+      }
+    }
+  }
+  get text() {
+    let stringPow = this.getComputedPow != "1" ? "^(" + this.getComputedPow + ')' : '';
+    let stringMutiplican = this.getComputedMuti != '1' ? this.getComputedMuti + "*" : '';
+    let stringAddican = this.getAdditions.length != 0 ? '+' + this.getAdditions : '';
+    let stringFunc = this.func != undefined ? this.func.text : '';
+
+    return stringFunc + stringMutiplican + "(" + arryToString(this.textArray) + ")" + stringPow + stringAddican;
+  }
+}
+class VarTerm {
+  constructor(input) {
+    this.subtype = "var"
+
+    this.letter = input;
+  }
+  get getNumeric() {
+    for (let varI of GlobalVars) {
+      if (varI.name == this.letter) {
+        return varI.value
+      }
+    }
+    return this.letter
+  }
+
+}
 function parseEquation(equation) {
   let equatParse = [];
+  let parseObj={
+    "type": "equat",
+    "equatArry": [],
+    "par":[],
+    "pow":[],
+    "muti":[],
+    "add":[],
+  }
+  cutLength = 0;
   while (true) {
     let cutString = 0;
     let currentSec = [];
@@ -1749,11 +1751,13 @@ function parseEquation(equation) {
     let currOp;
     let func;
     if(termText){
-      currTerm = { 'type': "term", "text": backward(equation), "pos": 0 };
+      currTerm = { 'type': "term", "text": termText, "pos": 0 };
       cutString += currTerm.text.length;
       currentSec.push(currTerm);
+      console.log("The term text is "+termText)
       func = funcMatch(currTerm.text, false);
       if (func != "") {
+        console.log("The function is "+func.func)
         if (currTerm.text.replace(func.func, "").length != 0) {
           currTerm.text = currTerm.text.replace(func.func, "")
           currentSec.push(...[{ 'type': "op", "subtype": "Muti", "text": "*", "pos": i }, { 'type': "func", "text": func.func, "pos": i }]);
@@ -1765,62 +1769,59 @@ function parseEquation(equation) {
       if(varInEquat(currTerm.text).length != 0){
         //here
         currentSec.shift();
-        currentSec.unshift(parseTextTerm({ "type": "term", "subtype": 'varContainer', "text": currTerm.text, "pos": null }));
+        currentSec.unshift(...parseTextTerm({ "type": "term", "subtype": 'varContainer', "text": currTerm.text, "pos": null }));
       }
     }
     if (equation.substring(cutString) != "") {
       currOp = createOp(equation.substring(cutString));
-      cutString++;
-      currentSec.push(currOp);
-      if (currOp.subtype == "ParStart" && currTerm != undefined) {
-        if (func == "") {
+      let opIndex = parseObj.equatArry.length + currentSec.length;
+      switch (currOp.group) {
+        case "par":
+          parseObj.par.push(opIndex);
+          break;
+        case "pow":
+          parseObj.pow.push(opIndex);
+          break;
+        case "muti":
+          parseObj.muti.push(opIndex);
+          break;
+        case "add":
+          parseObj.add.push(opIndex);
+          break;
+      }
+      if (currOp.subtype == "ParStart") {
+        if (func == ""&& currTerm != undefined) {
           currentSec.splice(1, 0, { 'type': "op", "subtype": "Muti", "text": "*", "pos": i });
         }
+        let encap = parEncap(equation.substring(cutString+1));
+        cutString += encap.length + 2;
+        let encapParse = parseEquation(encap);
+        currentSec.push({type: "parSec", "text": encap, "pos": i, "parse": encapParse});
+      }else{
+        currentSec.push(currOp);
+        cutString ++;
       }
     }
-
+    cutLength += cutString;
     equation = equation.substring(cutString);
-    equatParse.push(...currentSec);
+    parseObj.equatArry.push(...currentSec);
     if(equation.length == 0){
       break;
     }
   }
-  return equatParse;
+  return parseObj;
+}
+function solveParse(parse){
+
+}
+function mapEquation(equatArry) {
+
 }
 function createOp(section) {
   const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',',"|"]
   const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"]
-  return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null };
-  /*for (let i = 0; i < equation.length; i++) {
-    if (ops.includes(equation.charAt(i))) {
-      opsArry.push({ 'type': "op", "subtype": typeIndex[ops.indexOf(equation.charAt(i))], "text": equation.charAt(i), "pos": i })
-    }
-    switch (equation.charAt(i)) {
-      case ('÷'):
-        opsArry.push({ 'type': "op", "subtype": "Div", "text": '/', "pos": i })
-        break;
-      case ('×'):
-        opsArry.push({ 'type': "op", "subtype": "Muti", "text": '*', "pos": i })
-        break;
-      case ('<'):
-        if (equation.substring(i, i + 5).includes('<sup>')) {
-          let sub = supEncap(equation.substring(i))
-          let subArry = opsInEquat(sub.substring(5, sub.length - 6)).arry
-          for (let item of subArry) {
-            item.pos += i + 2;
-          }
-          let replacement = "^(" + sub.substring(5, sub.length - 6) + ")";
-          subArry.unshift({ 'type': "op", "subtype": "Pow", "text": "^", "pos": i }, { 'type': "op", "subtype": "ParStart", "text": "(", "pos": i + 1 })
-          subArry.push({ 'type': "op", "subtype": "ParEnd", "text": ')', "pos": (i + replacement.length - 1) })
-          opsArry = opsArry.concat(subArry)
-          equation = equation.substring(0, i) + replacement + equation.substring(i + sub.length)
-          i += replacement.length - 1;
-        }
-        break;
-    }
-
-  }
-  return { "arry": opsArry, "equat": equation }*/
+  const group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non"];
+  return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null, "group": group[ops.indexOf(section.charAt(0))] };
 }
 function opsInEquat(equation) {
   //console.log(`Equation before the ops method ${equation}`)
@@ -1939,7 +1940,6 @@ function termsInEquat(equation, fullArray) {
 function combineTerms(fullArray, varDef) {
   parLinkMap(fullArray)
   //par processing
-
   let parStarts = fullArray.filter(elem => elem.subtype == "ParStart")
   while (true) {
     var start;
@@ -1948,7 +1948,6 @@ function combineTerms(fullArray, varDef) {
     } else {
       break;
     }
-    //console.log(fullArray)
     let endElem = fullArray[start.matchPar]
     let startPos = endElem.matchPar;
     let endPos = start.matchPar;
@@ -1958,15 +1957,11 @@ function combineTerms(fullArray, varDef) {
       let termB = endElem.matchPar > 0 ? fullArray[endElem.matchPar - 1] : undefined;
       let term = new CmpxTerm(fullArray.slice(endElem.matchPar + 1, start.matchPar), [start.pos + 1, endElem.pos], { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': 1 }, termB)
       if (term.func == undefined) {
-        //console.log(fullArray)
         fullArray.splice(startPos, start.matchPar - endElem.matchPar + 1, term)
         let result = term.text
         updateFullArray(startPos, fullArray, -(stringVer.length - result.length + 1), start.matchPar - endElem.matchPar)
-        //console.log(fullArray)
       } else {
-        //console.log(term.func.text)
         let func = getByName(term.func.text);
-        //console.log(getByName(term.func.text))
         if (func.type == "function") {
           let arrayed = term.textArray
           let termInOrder = []
@@ -2149,52 +2144,28 @@ function arryToString(arry) {
   return string;
 }
 function parseTextTerm(elem) {
+  let retArry = [];
   let text = elem.text;
-  console.log(text);
-  let pos = elem.pos;
-  let varList = varInEquat(text)
-  let textualArry = []
-  let locals = []
-  let targetVar = varList[0];
-  if(arguments[1] != undefined){
-    let testVar = varList.find(elem => {return elem.letter == arguments[1]})
-    if (testVar != undefined) {
-      targetVar = testVar;
+  let nums = numInEquat(text);
+  let product = 1;
+  for(let num of nums){
+    product *= num;
+  }
+  if(product != 1){
+    retArry.push({'type': "term", "text": product, "pos": 0 });
+    retArry.push(createOp("*"));
+  }
+  let varList = varInEquat(text);
+  for(let varIn of varList){
+    retArry.push(new VarTerm(varIn.letter));
+    if(varIn.positions.length > 1){
+      retArry.push(createOp("^"));
+      retArry.push({'type': "term", "text": varIn.positions.length, "pos": 0 });
     }
+    retArry.push(createOp("*"));
   }
-  let subsituteText = text;
-  for (let dVar of varList) {
-    locals = locals.concat(dVar.positions);
-  }
-  locals.sort((a, b) => a - b)
-  locals = locals.reverse();
-
-  subsituteText.substring(locals[0] + 1) != '' ? textualArry.unshift({ "text": subsituteText.substring(locals[0] + 1), "pos": locals[0] + 1 == subsituteText.length - 1 ? locals[0] + 1 : [locals[0] + 1, subsituteText.length - 1] }) : false;
-  subsituteText.substring(0, locals[0]) != '' ? textualArry.unshift({ "text": subsituteText.substring(0, locals[0]), "pos": 0 == locals[0] ? 0 : [0, locals[0]] }) : false
-  locals.shift();
-  for (let pos of locals) {
-    let temp = textualArry[0].text
-    textualArry.shift();
-    temp.substring(pos + 1) != '' ? textualArry.unshift({ "text": temp.substring(pos + 1), "pos": pos + 1 == temp.length - 1 ? pos + 1 : [pos + 1, temp.length - 1] }) : false
-    temp.substring(0, pos) != '' ? textualArry.unshift({ "text": temp.substring(0, pos), "pos": 0 == pos ? 0 : [0, pos] }) : false
-  }
-  let targetVarDef = new VarTerm(targetVar.letter, pos, textualArry.length > 0 ? textualArry[0] : { "type": 'term', 'text': '1' }, { "type": 'term', 'text': targetVar.positions.length });
-  if (varList.length > 1) {
-    let otherVars = varList.filter(elem => elem.letter != targetVar.letter)
-    let max = targetVar.positions[targetVar.positions.length - 1]
-    let targetMaxElem = targetVarDef
-    for (let oVar of otherVars) {
-      let newVarDef = new VarTerm(oVar.letter, pos, { 'type': 'term', 'text': 1 }, { 'type': 'term', 'text': oVar.positions.length }, oVar.positions);
-      targetVarDef.changeMuti([{ 'type': 'op', 'subtype': 'Muti', 'text': '*' }, newVarDef])
-      if (oVar.positions[oVar.positions.length - 1] > max) {
-        max = oVar.positions[oVar.positions.length - 1]
-        targetMaxElem = newVarDef
-      }
-    }
-    targetVarDef.endElem = targetMaxElem;
-  }
-  //console.log(targetVarDef.text)
-  return targetVarDef
+  retArry.pop();
+  return retArry;
 }
 function basicNumInter(equation) {
   let reverEquat = reverseString(equation)
@@ -2269,6 +2240,19 @@ function varInEquat(equation) {
     }
   }
   return varArray;
+}
+function numInEquat(equation){
+  let numArry = []; 
+  let currentNum = "";
+  for (let i = 0; i < equation.length; i++) {
+    if(!isNaN(equation[i])){
+      currentNum += equation[i];
+    }else if(currentNum != ""){
+      numArry.push(currentNum);
+      currentNum = "";
+    }
+  }
+  return numArry;
 }
 function varInFunc(method) {
   method = method.substring(method.indexOf("("))
@@ -2462,9 +2446,10 @@ function getAngleConversion(type) {
 //end
 console.log("things from eval")
 console.log(builtInFunc("<sup>42</sup>√23"))
-console.log(parseEquation("√23"))
+console.log(createNewFunction("function", 'testor', "x*5+u"))
+console.log(parseEquation("testor(23)+9xxf"))
 console.log(solveFor("x*5+(u)", "x"))
 console.log(parEncap("((78)",false))
-console.log(createNewFunction("function", 'testor', "x*5+u"))
+
 console.log(createNewFunction("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
 console.log("%c testor", "color: yellow;", createSidedEquation("testor((6),x)=0", "x"))
