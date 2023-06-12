@@ -1,3 +1,4 @@
+import Decimal from './packages/decimal.mjs';
 let runners = [];
 let self = this;
 let GlobalVars = [];
@@ -355,15 +356,15 @@ String.prototype.hasVar = function () {
 }
 String.prototype.findMatch = function (start, end) {
   let copyString = this;
-  
+
   let matchIdx = -1;
   let direction = true;
-  if(arguments[2] != undefined){
+  if (arguments[2] != undefined) {
     direction = arguments[2];
   }
   let fromIndex = direction ? 0 : copyString.length;
   while (true) {
-    let startIndex = direction ? copyString.indexOf(start, fromIndex): copyString.lastIndexOf(start, fromIndex);
+    let startIndex = direction ? copyString.indexOf(start, fromIndex) : copyString.lastIndexOf(start, fromIndex);
     console.log("start index: " + startIndex)
     let endIndex = direction ? copyString.indexOf(end, fromIndex) : copyString.lastIndexOf(end, fromIndex);
     console.log("end index: " + endIndex)
@@ -371,11 +372,11 @@ String.prototype.findMatch = function (start, end) {
       if (direction ? startIndex < endIndex : startIndex > endIndex) {
         fromIndex = direction ? endIndex + end.length : startIndex;
       } else {
-        matchIdx = direction ? endIndex : startIndex+start.length;
+        matchIdx = direction ? endIndex : startIndex + start.length;
         break;
       }
     } else if (direction ? endIndex > -1 : startIndex > -1) {
-      matchIdx = direction ? endIndex : startIndex+start.length;
+      matchIdx = direction ? endIndex : startIndex + start.length;
       break;
     } else if (startIndex == -1 && endIndex == -1) {
       matchIdx = direction ? this.length : 0;
@@ -384,31 +385,35 @@ String.prototype.findMatch = function (start, end) {
   }
   return matchIdx;
 }
-String.prototype.findCharMatch = function (char){
+String.prototype.findCharMatch = function (char) {
   console.log('find Char ')
   let direction = true;
-  if(arguments[3] != undefined){
+  if (arguments[3] != undefined) {
     direction = arguments[3];
   }
   let indexes = this.indexOfAll(char);
-  
+
   console.log(indexes)
-  for(let i = direction ? 0 : indexes.length-1; direction ? i < indexes.length : i >= 0; direction ? i++ : i--){
-    if(isOperator(direction ? this[indexes[i]-1] : this[indexes[i]+1])){
+  for (let i = direction ? 0 : indexes.length - 1; direction ? i < indexes.length : i >= 0; direction ? i++ : i--) {
+    if (isOperator(direction ? this[indexes[i] - 1] : this[indexes[i] + 1])) {
       i++;
       continue;
-    }else{
+    } else {
       return indexes[i];
     }
   }
   return direction ? this.length : 0;
 }
+
+
+
+
 class TextTerm {
-  constructor(string){
+  constructor(string) {
     this.type = "term"
     this.ogString = string;
   }
-  get text(){
+  get text() {
     return this.ogString;
   }
 }
@@ -464,7 +469,7 @@ class StaticEnv extends solveEnv {
 
     this.equation = object.equation;
     if (object.isFunc) {
-      this.func = getByName(this.id);
+      this.func = getFuncByName(this.id);
       this.isFunc = object.isFunc;
       this.vars = this.func.vars;
     } else {
@@ -493,7 +498,7 @@ class StaticEnv extends solveEnv {
       if (this.func.type == "method") {
         return `${this.func.func}(${funcMap.join(",")})`
       } else {
-        return assembly([...this.func.funcParse], funcMap)
+        return combineFuncParse([...this.func.funcParse], funcMap)
       }
 
     } else {
@@ -685,923 +690,6 @@ class DynamicEnv extends solveEnv {
     this.vars = [];
   }
 }
-onmessage = function (e) {
-  let object = e.data;
-  let port = e.ports[0];
-  if (object.set != undefined) {
-    if (object.set == "settings") {
-      if (object.id == undefined) {
-        if (object.settings.degRad != undefined) {
-          settings.degRad = object.settings.degRad;
-        }
-        if (object.settings.gMin != undefined) {
-          settings.gMin = object.settings.gMin;
-        }
-        if (object.settings.gMax != undefined) {
-          settings.gMax = object.settings.gMax;
-        }
-        if (object.settings.gR != undefined) {
-          settings.gR = object.settings.gR;
-        }
-        if (object.settings.tMin != undefined) {
-          settings.tMin = object.settings.tMin;
-        }
-        if (object.settings.tMax != undefined) {
-          settings.tMax = object.settings.tMax;
-        }
-        if (object.settings.tC != undefined) {
-          settings.tC = object.settings.tC;
-        }
-      } else {
-        let env = runners.find(elem => elem.id == object.id);
-        console.log(runners)
-        if (env != undefined) {
-          env.setEnvVar(object.settings);
-          if (env.envType == "static") {
-            port.postMessage({ result: env.calcGraph() });
-          } else {
-            port.postMessage({ result: "Done" });
-          }
-
-        }
-
-      }
-    } else if (object.set == "env") {
-      if (!runners.find(elem => elem.id == object.id)) {
-        if (object.type == "static") {
-          runners.push(new StaticEnv(object))
-          console.log(runners);
-        } else {
-          runners.push(new DynamicEnv(object))
-          console.log(runners);
-        }
-        port.postMessage({ result: true })
-      } else {
-        port.postMessage({ error: "env already exists" })
-      }
-    } else if (object.set == "envClear") {
-      if (object.id != undefined) {
-        let env = runners.find(elem => elem.id == object.id);
-        if (env != undefined) {
-          env.clearVars();
-        }
-      }
-    } else if (object.set == "var") {
-      if (object.id == undefined) {
-        if (GlobalVars.find(elem => elem.name == object.varName)) {
-          GlobalVars.find(elem => elem.name == object.varName).value = object.value;
-        } else {
-          GlobalVars.push({ name: object.varName, value: object.varValue })
-        }
-      } else {
-        port.postMessage({ result: runners.find(elem => { return elem.id == object.id }).setVar(object.varName, object.varValue), return: true })
-      }
-    } else if (object.set == "func") {
-      let list = Array.isArray(object.funcs) ? object.funcs : [object.funcs]
-      try {
-        for (let def of list) {
-          if (!getByName(def.name)) {
-            if (def.type == 'Function') {
-              try {
-                port.postMessage({ result: createNewFunction('function', def.name, def.equation) })
-              } catch (eve) {
-                this.postMessage({ 'type': 'posError', 'mes': `Issue adding ${def.name} to algo` })
-              }
-            } else if (def.type == 'Hybrid') {
-              try {
-                port.postMessage({ result: createNewFunction('method', def.code) })
-              } catch (e) {
-                this.postMessage({ 'type': 'posError', 'mes': `Issue adding hybrid to algo` })
-              }
-            }
-          }
-        }
-      } catch (eve) {
-        port.postMessage({ error: eve })
-        this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` });
-      }
-
-    } else if (object.set == "changeFunc") {
-      if (object.name == undefined && object.changes == undefined) {
-        port.postMessage({ result: changeFunc(object.name, object.changes) });
-      }
-    } else if (object.set == "removeFunc") {
-      removeFunction(object.name)
-    }
-  } else if (object.get != undefined) {
-    if (object.get == "func") {
-      if (object.name != undefined) {
-        port.postMessage({ result: getMethod(object.name) });
-      }
-    } else if (object.get == "list") {
-      port.postMessage({ result: getNameList() })
-    } else if (object.get == "vars") {
-      if (object.name == undefined) {
-        port.postMessage({ result: varInEquat(object.equation) })
-      } else {
-        let thing = funcList.find(elem => {
-          if (Array.isArray(elem.func)) {
-            return elem.func.includes(object.name);
-          } else {
-            return elem.func == object.name;
-          }
-        }
-        )
-        port.postMessage({
-          result: thing.vars
-        })
-      }
-
-    } else if (object.get == "equationParse") {
-      if (object.id == undefined) {
-        port.postMessage({
-          result: setVarEquat(object.equation, object.vars, false)
-        });
-      } else {
-        let env = runners.find(elem => elem.id == object.id)
-        port.postMessage({
-          result: env.getParsedEquation()
-        });
-      }
-    } else if (object.get == "calc") {
-      if (object.id == undefined) {
-        if (object.target == "single") {
-          port.postMessage({
-            result: fullSolve(object.equation, settings)
-          })
-        }
-      } else {
-        let targetEnv = runners.find(elem => elem.id == object.id);
-        console.log(targetEnv)
-        if (targetEnv.type == "dynamic") {
-          if (targetEnv.target == "single") {
-            port.postMessage({
-              result: targetEnv.solveEquation(object.equation)
-            })
-          } else {
-            port.postMessage({
-              result: targetEnv.solvePointArray(object.array)
-            })
-          }
-        } else if (targetEnv.type == "static") {
-          if (object.type == "point") {
-            port.postMessage({
-              result: targetEnv.calcEquation()
-            })
-          } else if (object.type == "graph") {
-            port.postMessage({
-              result: targetEnv.calcGraph()
-            })
-          } else if (object.type == "table") {
-            port.postMessage({
-              result: targetEnv.calcTable()
-            })
-          }
-
-        }
-      }
-    } else if (object.get == "calcPacket") {
-      console.log("callingPacket")
-      if (object.id == undefined) {
-        let env = runners.find(elem => elem.id == object.id);
-        port.postMessage({ result: env.checkCalculable() })
-      }
-    }
-  }
-};
-/*********************************************Solve Toothless****************************************** */
-
-//Main method called to parse an Equation
-function solveInpr(equation, degRad) {
-  for (let i = 0; i < equation.length; i++) {
-    let func = funcMatch(equation.substring(i), true);
-    if (func != "") {
-      let innerRAW = parEncap(
-        equation.substring(i + func.funcLength)
-      );
-      let parsedFunc = solveFunc(equation, i)
-      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
-      i = i + parsedFunc.length - 1;
-    }
-  }
-  equation = builtInFunc(equation);
-  return equation;
-}
-//Func method to find if the current postion has a function defined in the funclist
-function getByName(name) {
-  for (let func of funcList) {
-    if (Array.isArray(func.func)) {
-      if (func.func.includes(name)) {
-        return func;
-      }
-    } else {
-      if (func.func == name) {
-        return func;
-      }
-    }
-  }
-  return false;
-}
-//A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
-function funcMatch(equation, way) {
-  var returned = "";
-  var longestMatch = "";
-  for (let func of funcList) {
-    let check = "";
-    if (Array.isArray(func.func)) {
-      for (let funcName of func.func) {
-        if (equation.includes(funcName)) {
-          check = funcName;
-        }
-      }
-    } else {
-      if (equation.includes(func.func)) {
-        check = func.func;
-      }
-    }
-    if (check.length > longestMatch.length) {
-      longestMatch = check;
-      returned = func;
-    }
-  }
-  for (let func of secondList) {
-    let check = equation.substring(0, (func.length));
-    if (check == func) {
-      returned = "";
-    }
-  }
-  return returned;
-}
-function ignoreTest(equation) {
-  const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
-  if (ignore != undefined) {
-    return ignore.length;
-  } else {
-    return undefined;
-  }
-}
-//A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
-function findMethod(funcUn, degRad) {
-  let func = JSON.parse(JSON.stringify(funcUn));
-  let array = func.funcParse;
-  if (func.funcRadDeg) {
-    if (degRad) {
-      if (array.includes("toDeg")) {
-        array.splice(func.funcParse.indexOf("toDeg"), 1, "*(Math.PI/180)");
-      } else {
-        array.splice(func.funcParse.indexOf("toRad"), 1, "*(180/Math.PI)");
-      }
-    } else {
-      if (array.includes("toDeg")) {
-        array.splice(func.funcParse.indexOf("toDeg"), 1);
-      } else {
-        array.splice(func.funcParse.indexOf("toRad"), 1);
-      }
-    }
-  }
-  return array;
-}
-//A method to parse a function array into a string so it can be add to the equation string
-function assembly(parsedFunc, values) {
-  let i = 1;
-  while (true) {
-    let numVar = "v" + i;
-    if (parsedFunc.includes(numVar)) {
-      parsedFunc = parsedFunc.replaceAll(numVar, values[i - 1])
-      i++;
-    } else {
-      break;
-    }
-
-  }
-  let parsedString = parsedFunc.join("");
-  return parsedString;
-}
-//A method which takes the inputs value from a func object in the funclist and gets how many inputs that function has and parses each
-function recrSolve(equation) {
-  let values = [];
-  while (equation.length != 0) {
-    if (equation.includes(',')) {
-      values.push(equation.substring(0, equation.indexOf(",")));
-      equation = equation.substring(equation.indexOf(",") + 1);
-    } else {
-      values.push(equation);
-      break;
-    }
-  }
-  values = values.filter(e => e != "");
-  return values
-}
-//A method to solve for the inner values of encapsulated functions
-function equatInner(equation, degRad) {
-  equation = solveInpr(equation, degRad);
-  return equation;
-}
-function solveFunc(equation, index) {
-  let degRad = settings.degRad;
-  let i = index;
-  let func = funcMatch(equation.substring(i), true);
-  let innerRAW = parEncap(
-    equation.substring(i + func.funcLength)
-  );
-  let values = recrSolve(innerRAW.substring(1, innerRAW.length - 1), func);
-  let parsedFunc = "";
-  if (func.type == "function") {
-    let funcTemp = findMethod(func, degRad);
-    parsedFunc = assembly(funcTemp, values);
-  } else if (func.type == "method") {
-    parsedFunc = func.mth(values)
-  }
-  return parsedFunc;
-}
-//A meothod for creating the end of a parenthesis
-function parComplete(input) {
-  for (let i = 0; i < input.length; i++) {
-    if (input.charAt(i) == "(") {
-      if (
-        i + parEncap(input.substring(i)).length >= input.length &&
-        input.charAt(input.length - 1) != ")"
-      ) {
-        input += ")";
-      }
-    }
-  }
-  return input;
-}
-//A method to find the end of a parenthesis and make one if there is none
-function parEncap(sub) {
-  let direction = true;
-  if(arguments[1] != undefined){
-    direction = arguments[1];
-  }
-  let endIdx = sub.findMatch("(",")",direction);
-  return direction ? sub.substring(0,endIdx) : sub.substring(endIdx);
-}
-//A method to find the beginning of a parenthesis and make one if there is none
-/*function parEncap2(sub) {
-  for (let i = sub.length - 2; i >= 0; i--) {
-    if (sub.charAt(i) == ')') {
-      i = i + parEncap2(sub.substring(0, i + 1)).length;
-    } else if (sub.charAt(i) == '(') {
-      sub = sub.substring(i);
-      break;
-    } else if (i == 0) {
-      sub = "(" + sub;
-      break;
-    }
-  }
-  return sub;
-}*/
-//A method to find the ending of a superscript html tag. Doesn't make one if there is none
-function supEncap(sub) {
-  let direction = true;
-  if(arguments[1] != undefined){
-    direction = arguments[1];
-  }
-  let endIdx
-  if(arguments[2] != undefined){
-    endIdx = arguments[2];
-  }else{
-    endIdx = sub.findMatch("<sup","</sup>",direction);
-  }
-  
-  return direction ? sub.substring(0, endIdx): sub.substring(sub.indexOf(">",endIdx)+1);
-}
-//A deprecated Method to find the postion of a function in the equation string
-function funcIndex(func, equation, funcList) {
-  let has = false;
-  var hasVal = -1;
-  for (let i = funcList.length - 1; i >= 0; i--) {
-    if (funcList[i].func == func) {
-      has = true;
-      if (hasVal < funcList[i].index) {
-        hasVal = funcList[i].index + funcList[i].func.length;
-      }
-    }
-  }
-  if (has) {
-    return hasVal + equation.substring(hasVal).indexOf(func);
-  } else {
-    return equation.indexOf(func);
-  }
-}
-//A method to parse functions that don't fit into the conventions of the function list 
-function builtInFunc(equation) {
-  console.log(equation)
-  equation = equation.replaceAll('×', '*');
-  equation = equation.replaceAll('÷', '/');
-  let indexValue = equation.indexOf("√");
-  while(indexValue >= 0){
-    let root = "2";
-    let from = indexValue;
-    console.log(equation.substring(indexValue - 7, indexValue))
-    if(indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>"){
-      let matchSup = equation.substring(0,indexValue - 6).findMatch("<sup","</sup>",false);
-      root = findTerm(equation.substring(0,indexValue - 6),false);
-      from = matchSup - 4;  
-    }
-    
-    let term = findTerm(equation.substring(indexValue + 1));
-    let replacement = "(" + term + "^(1/" + root + "))";
-    if(from != 0 && !isOperator(equation[from - 1])){
-      replacement = "*" + replacement;
-    }
-    equation = equation.substring(0,from)  + replacement + equation.substring(indexValue + term.length + 1);
-    indexValue = equation.indexOf("√");
-  }
-  indexValue = equation.indexOf("|");
-  while(indexValue >= 0){
-    let matchEnd = equation.substring(indexValue+1).findCharMatch("|",true) + indexValue ;
-    let replacement = "abs(" + equation.substring(indexValue + 1,matchEnd+1) + ")";
-    if(indexValue - 1 >= 0 && !isOperator(equation[indexValue - 1])){
-      replacement = "*" + replacement;
-    }
-    if(matchEnd + 2 <= equation.length && !isOperator(equation[matchEnd + 2])){
-      replacement = replacement + "*";
-    }
-    equation = equation.substring(0,indexValue) + replacement + equation.substring(matchEnd+2);
-    console.log("post operation: "+equation)
-    indexValue = equation.indexOf("|");
-  }
-  indexValue = equation.indexOf("<sup");
-  while(indexValue >= 0){
-    console.log(equation.substring(equation.indexOf(">",indexValue)+1).findMatch("<sup","</sup>"))
-    let matchEnd = equation.substring(equation.indexOf(">",indexValue)+1).findMatch("<sup","</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">",indexValue)+1).length;
-    console.log(matchEnd);
-    let term = findTerm(equation.substring(equation.indexOf(">",indexValue) + 1));
-    equation = equation.substring(0,indexValue) + "^(" + term + ")" + equation.substring(matchEnd+6);
-    console.log(equation)
-    indexValue = equation.indexOf("<sup");
-  }
-  return equation;
-}
-//A method that finds the end of a number from the start of the number
-function backward(sub) {
-  let outputSub = "";
-  for (i = 0; i <= sub.length - 1; i++) {
-    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
-      if (i == sub.length - 1) {
-        outputSub = sub.substring(0, i + 1);
-        break;
-      } else if (sub.charAt(i) == '+') {
-        if (sub.charAt(i - 1) == 'E') {
-
-        } else {
-          outputSub = sub.substring(0, i);
-          break;
-        }
-      } else if (sub.charAt(i) == '-') {
-        if (i == 0) {
-
-        } else if (sub.charAt(i - 1) == 'E') {
-
-        } else {
-          outputSub = sub.substring(0, i);
-          break;
-        }
-      }
-    } else if (i == 0) {
-      outputSub = "";
-      break;
-    } else {
-      outputSub = sub.substring(0, i);
-      break;
-    }
-  }
-  return outputSub;
-}
-//A method that finds the start of a number from the end of the number
-function forward(sub) {
-  let outputSub = "";
-  for (let i = sub.length - 1; i >= 0; i--) {
-    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
-      if (i == 0) {
-        outputSub = sub.substring(i);
-        break;
-      } else if (sub.charAt(i) == '+') {
-        if (sub.charAt(i - 1) == 'E') {
-
-        } else {
-          outputSub = sub.substring(i + 1);
-          break;
-        }
-      } else if (sub.charAt(i) == '-') {
-        if (i == 0) {
-
-        } else if (sub.charAt(i - 1) == 'E') {
-
-        } else {
-          outputSub = sub.substring(i + 1);
-          break;
-        }
-      }
-    } else if (i == sub.length - 1) {
-      outputSub = "";
-      break;
-    } else {
-      outputSub = sub.substring(i + 1);
-      break;
-    }
-  }
-  return outputSub;
-}
-function findTerm(equation){
-  let direction = true;
-  let endIndex = 0;
-  if(arguments[1] != undefined){
-    direction = arguments[1];
-  }
-  for(let i = direction ? 0: equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--){
-    if(equation[i] == "(" || equation[i] == ")"){
-      let nextIndex = direction ? equation.substring(i).findMatch("(",")",direction) : equation.substring(0,i-1).findMatch("(",")",direction);
-      if(nextIndex != -1 ){
-        i = nextIndex - 1 ;
-        endIndex = i;
-      }
-    }else if (equation[i] == '+' || equation[i] == '-' ||equation[i] == '×' ||equation[i] == '<'||equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|'){
-      endIndex = i; 
-      break;
-    }
-    endIndex = endIndex + (direction ? 1 : -1);
-  }
-  return direction ? equation.substring(0,endIndex) : equation.substring(endIndex+1);
-}
-//A method that returns an array of the names of the funcs that are in the Funclist
-function getNameList() {
-  let nameList = [];
-  for (let func of funcList) {
-    if (Array.isArray(func.func)) {
-      nameList.concat(func.func)
-    } else {
-      nameList.push(func.func);
-    }
-  }
-  return nameList;
-}
-//Takes string and returns an array for funclist
-function createParseable(equation) {
-  for (let i = equation.length - 1; i >= 0; i--) {
-    let func = funcMatch(equation.substring(i), true);
-    if (func != "") {
-      let innerRAW = parEncap(
-        equation.substring(i + func.funcLength)
-      );
-      let parsedFunc = solveFunc(equation, i)
-      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
-      i = i - parsedFunc.length + 1;
-    }
-  }
-  let equationArray = [equation];
-  let variables = varInEquat(equation);
-  let variableIndexes = [];
-  for (let i = 0; i < variables.length; i++) {
-    variables[i].numVar = 'v' + (i + 1);
-  }
-  for (let data of variables) {
-    for (let i = 0; i < equation.length; i++) {
-      let ignore = ignoreTest(equation.substring(i));
-      if (ignore != undefined) {
-        i += ignore - 1;
-      } else if (equation.charAt(i) == data.letter) {
-        variableIndexes.push(i);
-      }
-    }
-  }
-  variableIndexes.sort(function (a, b) {
-    return b - a;
-  });
-  for (let index of variableIndexes) {
-    let temp = equationArray[0].charAt(index);
-    let match = variables.find(e => e.letter == temp);
-    let newarry = [];
-    newarry.push(equationArray[0].substring(0, index));
-    newarry.push(match.numVar);
-    newarry.push(equationArray[0].substring(index + 1));
-    equationArray.splice(0, 1, ...newarry);
-  }
-  equationArray = equationArray.filter(val => val != "" && val != "‎");
-  return equationArray;
-}
-//calculate inputs
-function cacInputs(array) {
-  let num = 0;
-  for (let item of array) {
-    if (item.charAt(0) == 'v') {
-      num++;
-    }
-  }
-  return num;
-}
-//Return the string forms of a function defined in the function list
-function stringifyMethod(object) {
-  let name = object.func;
-  let string = object.string;
-  let vars = object.variables;
-  let parsedVariables = "";
-  for (let i = 0; i < vars.length; i++) {
-    if (i == 0) {
-      parsedVariables += vars[i].letter;
-    } else {
-      parsedVariables += "," + vars[i].letter;
-    }
-  }
-  return `function ${name}(${parsedVariables}) ${string}`;
-}
-//a method that takes the object from the function list and parses it into a fuunction
-function stringFunction(object) {
-  let name = object.func;
-  let string = object.string;
-  let vars = object.vars;
-  for (let i = vars.length - 1; i >= 0; i--) {
-    string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
-  }
-  string = `var ${name} = function (array)${string} \n return ${name};`;
-  return Function(string);
-}
-//Method that takes a string function and uses the text to get all needed info
-function parseFunction(StringFunction) {
-  let preserved = StringFunction;
-  StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
-  let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
-  let variables = varInFunc(StringFunction)
-  StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
-  let finalObject = {
-    "func": name,
-    "type": "method",
-    "string": StringFunction,
-    "vars": variables,
-    'full': preserved,
-    "inputs": variables.length,
-    "funcRadDeg": false,
-    "funcLength": name.length
-  }
-  return finalObject;
-}
-//A basic method that takes an input and determine which type of function should be added to the func list
-function createNewFunction() {
-  let object = {};
-  if (arguments[0] == "function") {
-    object = parseFuncEntry(arguments[0], arguments[1], arguments[2]);
-  } else if (arguments[0] == "method" && !arguments[1].includes('XMLHttpRequest')) {
-    object = parseFuncEntry(arguments[0], arguments[1]);
-  }
-  funcList.push(object);
-  return object;
-}
-//Method that takes a type and text info to get all atritbutes of a funcList element
-function parseFuncEntry() {
-  let returnedObject = {}
-  if (arguments[0] == "function") {
-    let name = arguments[1];
-    let func = arguments[2];
-    let parseable = createParseable(func, settings.degRad);
-    returnedObject.type = arguments[0];
-    returnedObject.func = name;
-    returnedObject.ogFunc = func;
-    returnedObject.funcParse = parseable;
-    returnedObject.inputs = cacInputs(parseable);
-    returnedObject.vars = varInEquat(func);
-    returnedObject.funcRadDeg = false;
-    returnedObject.funcLength = name.length;
-  } else if (arguments[0] == "method") {
-    let funcString = arguments[1];
-    returnedObject = parseFunction(funcString);
-    //console.log(returnedObject)
-    returnedObject.mth = stringFunction(returnedObject)();
-  }
-  return returnedObject;
-}
-//Responsible for removal of functions from the func list
-function removeFunction(name) {
-  funcList = funcList.filter(function (value, index, arr) {
-    if (Array.isArray(value.func)) {
-      return !value.func.includes(name);
-    } else {
-      return value.func != name;
-    }
-  })
-}
-function fullSolve(input) {
-  if (!input.includes('XMLHttpRequest')) {
-    return eval(solveInpr(input, settings.degRad))
-  } else {
-    return undefined;
-  }
-}
-//end
-/***********************************************Solve For Algo*****************************************/
-function findValueOf(tVar, equat) {
-  let side1 = equat.substring(0, equat.indexOf('='));
-  let side2 = equat.substring(equat.indexOf('=') + 1);
-  let conS1 = solveFor(side1, tVar);
-  let conS2 = solveFor(side2, tVar);
-  if ((highTerms(conS2).length > 0 && highTerms(conS1).length > 0) && (conS2.text.includes(tVar) && conS1.text.includes(tVar))) {
-    let longSide = highTerms(conS1, tVar).length > highTerms(conS2, tVar).length ? highTerms(conS1, tVar) : highTerms(conS2, tVar);
-    let shortSide = highTerms(conS1, tVar).length > highTerms(conS2, tVar).length ? highTerms(conS2, tVar) : highTerms(conS1, tVar);
-  } else {
-
-  }
-
-}
-function createSidedEquation(equation, target) {
-  let decSide = false;
-  let side1 = equation.substring(0, equation.indexOf('='))
-  let side2 = equation.substring(equation.indexOf('=') + 1)
-  if (side1.varIns(target) > side2.varIns(target)) {
-    decSide = true;
-  } else {
-    decSide = false;
-  }
-  let part1Parse = combineTerms(solveFor(side1, target));
-  console.log(arryToString(part1Parse))
-  let part2Parse = combineTerms(solveFor(side2, target));
-  console.log(arryToString(part2Parse))
-  console.log(decSide)
-  console.log(arryToString(part1Parse));
-  console.log(part1Parse);
-  let trace = equatTrace(decSide ? part1Parse : part2Parse, target)
-  console.log(trace);
-  let sided = solveForSide(decSide ? part1Parse : part2Parse, decSide ? part2Parse : part1Parse, trace)
-  console.log(arryToString(sided[1]))
-  return arryToString(sided[1])
-}
-function solveForSide(vSide, mSide, trace) {
-  if (trace.length > 0) {
-    let targetedElem = trace[0].term;
-    let indOfElem = trace[0].index;
-    let addArry = [...vSide]
-    if (vSide.length != 1) {
-      if (indOfElem != addArry.length - 1) {
-        addArry.splice(indOfElem + 1, 1)
-      } else {
-        addArry.splice(indOfElem - 1, 2)
-      }
-      addArry.splice(indOfElem, 1);
-      addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
-      mSide = mSide.concat(addArry);
-      vSide = [targetedElem]
-    }
-    if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
-      if (vSide[0].getComputedMuti != 1 && vSide[0].getComputedMuti != undefined) {
-        //console.log(vSide[0])
-        let postMuti = swapMuti(vSide[0], mSide)
-        mSide = postMuti[0]
-      }
-      if (vSide[0].getComputedPow != 1 && vSide[0].getComputedPow != undefined) {
-        let postPow = swapPow(vSide[0], mSide)
-        mSide = postPow[0]
-      }
-      if (targetedElem.subtype == "cmpxTerm") {
-        //console.log("is complex term")
-        if (targetedElem.func) {
-          //console.log("has func")
-          let intFunc = getByName(targetedElem.func.text)
-          //console.log(targetedElem.func)
-          //console.log(typeof intFunc)
-          if (intFunc.inverse) {
-            let replacement = [...targetedElem.textArray]
-            replacement.splice(trace[1].index, 1, ...mSide)
-            mSide = [new CmpxTerm(replacement, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": intFunc.inverse })]
-          }
-        }
-      }
-      //console.log(vSide)
-      vSide = vSide[0].textArray
-      //console.log(vSide)
-    } else if (trace[0].loc == "pow") {
-      if (vSide[0].getComputedMuti != 1) {
-        let postMuti = swapMuti(vSide[0], mSide)
-        mSide = postMuti[0]
-      }
-      let postBase = swapBase(vSide[0], mSide)
-      mSide = postBase[0]
-      vSide = vSide[0].pow
-    }
-    let final = solveForSide(vSide, mSide, trace.slice(1));
-    vSide = final[0]
-    mSide = final[1]
-  }
-  return [vSide, mSide]
-}
-function swapMuti(term, mSide) {
-  //console.log(term)
-  mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-  mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
-  let newMuti = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.mutiplican.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
-  newMuti = newMuti.concat(term.mutiplican)
-  newMuti.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-  //console.log(arryToString(mSide).hasVar())
-  //console.log(arryToString(newMuti).hasVar())
-  if (arryToString(mSide).hasVar() || arryToString(newMuti).hasVar()) {
-    if (mSide.legnth == 1 && mSide[0].type == 'cmpxTerm') {
-      mSide[0].mutiplican.concat(newMuti)
-    } else {
-      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, newMuti, { "type": "term", "text": '1', "pos": 0 }, undefined)]
-    }
-    term.mutiplican = []
-  } else {
-    //console.log(arryToString(mSide) + "*" + arryToString(newMuti));
-    let solved = fullSolve(arryToString(mSide) + "*" + arryToString(newMuti))
-    mSide = [{ "type": "term", "text": solved, "pos": 0 }]
-    term.mutiplican = []
-  }
-  return [mSide, term]
-}
-function swapPow(term, mSide) {
-  mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-  mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
-  let newPow = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.pow.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
-  newPow = newPow.concat(term.pow)
-  newPow.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
-  //console.log(arryToString(mSide).hasVar())
-  //console.log(arryToString(newPow).hasVar())
-  if (arryToString(mSide).hasVar() || arryToString(newPow).hasVar()) {
-    if (mSide.legnth == 1 && mSide[0].type == 'cmpxTerm') {
-      mSide[0].pow.concat(newPow)
-    } else {
-      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, { "type": "term", "text": '1', "pos": 0 }, newPow, undefined)]
-    }
-    term.pow = []
-  } else {
-    let solved = fullSolve(arryToString(mSide) + "^" + arryToString(newPow))
-    mSide = [{ "type": "term", "text": solved, "pos": 0 }]
-    term.pow = []
-  }
-  return [mSide, term]
-}
-function swapBase(term, mSide) {
-  let newBase = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.textArray.length },]
-  newBase = newBase.concat(term.textArray)
-  newBase = newBase.concat([{ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 }, { "type": "op", "subtype": "Comma", "text": "," }, ...mSide])
-  mSide = [new CmpxTerm(newBase, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": "logB" })]
-  term = term.pow
-  return [mSide, term]
-}
-function equatTrace(arry, tVar) {
-  let termArry = []
-  console.log(arry)
-  //console.log(arry)
-  arry.forEach((term, i) => {
-    let textualVal = "" + term.text
-    console.log(textualVal);
-    console.log(tVar)
-    if (textualVal.innerVar(tVar)) {
-      console.log("var in term");
-      if (term.subtype == "cmpxTerm") {
-        console.log(term)
-        let textAryVar = arryToString(term.textArray);
-        let powVar = term.getComputedPow;
-        let mutiVar = term.getComputedMuti;
-        if (textAryVar.innerVar(tVar)) {
-          termArry.push({ "term": term, "index": i, "loc": "textArray" })
-          termArry = termArry.concat(equatTrace(term.textArray, tVar))
-          return termArry;
-        } else if (powVar.innerVar(tVar)) {
-          termArry.push({ "term": term, "index": i, "loc": "pow" })
-          termArry = termArry.concat(equatTrace(term.pow, tVar))
-          return termArry;
-        } else if (mutiVar.innerVar(tVar)) {
-          termArry.push({ "term": term, "index": i, "loc": "muti" })
-          termArry = termArry.concat(equatTrace(term.mutiplican, tVar))
-          return termArry;
-        }
-      } else if (term.subtype == "var") {
-        if (term.letter == tVar) {
-          //console.log("var term found")
-          termArry.push({ "term": term, "index": i, "loc": "letter" })
-          return termArry
-        }
-      }
-    }
-  });
-  return termArry;
-}
-function highTerms(arry, varDef) {
-  var highTerms = [];
-  arry.forEach(elem => {
-    if (typeof DefinedTerm === elem && elem.text.includes(varDef)) {
-      highTerms.push(elem)
-    }
-  })
-  return highTerms;
-}
-function matchingPowers(array1, array2) {
-
-}
-function solveFor(equat, varDef) {
-  let returned = opsInEquat(equat);
-  equat = returned.equat
-  let fullArray = returned.arry;
-  console.log(arryToString(fullArray))
-  console.log(equat)
-  fullArray = termsInEquat(equat, fullArray);
-  for (let i = 0; i < fullArray.length; i++) {
-    fullArray[i] = fullArray[i].subtype == "varContainer" ? fullArray[i] = parseTextTerm(fullArray[i], varDef) : fullArray[i];
-  }
-  fullArray = parLinkMap(fullArray);
-  return fullArray
-}
-//********************************************** */
 class DefinedTerm {
   pow = [];
   mutiplican = [];
@@ -1732,212 +820,532 @@ class VarTerm {
   }
 
 }
-function parseEquation(equation) {
-  let equatParse = [];
-  let parseObj={
-    "type": "equat",
-    "equatArry": [],
-    "par":[],
-    "pow":[],
-    "muti":[],
-    "add":[],
-  }
-  cutLength = 0;
-  while (true) {
-    let cutString = 0;
-    let currentSec = [];
-    let termText = backward(equation);
-    let currTerm;
-    let currOp;
-    let func;
-    if(termText){
-      currTerm = { 'type': "term", "text": termText, "pos": 0 };
-      cutString += currTerm.text.length;
-      currentSec.push(currTerm);
-      console.log("The term text is "+termText)
-      func = funcMatch(currTerm.text, false);
-      if (func != "") {
-        console.log("The function is "+func.func)
-        if (currTerm.text.replace(func.func, "").length != 0) {
-          currTerm.text = currTerm.text.replace(func.func, "")
-          currentSec.push(...[{ 'type': "op", "subtype": "Muti", "text": "*", "pos": i }, { 'type': "func", "text": func.func, "pos": i }]);
+
+
+
+const onmessage = function (e) {
+  let object = e.data;
+  let port = e.ports[0];
+  if (object.set != undefined) {
+    if (object.set == "settings") {
+      if (object.id == undefined) {
+        if (object.settings.degRad != undefined) {
+          settings.degRad = object.settings.degRad;
+        }
+        if (object.settings.gMin != undefined) {
+          settings.gMin = object.settings.gMin;
+        }
+        if (object.settings.gMax != undefined) {
+          settings.gMax = object.settings.gMax;
+        }
+        if (object.settings.gR != undefined) {
+          settings.gR = object.settings.gR;
+        }
+        if (object.settings.tMin != undefined) {
+          settings.tMin = object.settings.tMin;
+        }
+        if (object.settings.tMax != undefined) {
+          settings.tMax = object.settings.tMax;
+        }
+        if (object.settings.tC != undefined) {
+          settings.tC = object.settings.tC;
+        }
+      } else {
+        let env = runners.find(elem => elem.id == object.id);
+        console.log(runners)
+        if (env != undefined) {
+          env.setEnvVar(object.settings);
+          if (env.envType == "static") {
+            port.postMessage({ result: env.calcGraph() });
+          } else {
+            port.postMessage({ result: "Done" });
+          }
+
+        }
+
+      }
+    } else if (object.set == "env") {
+      if (!runners.find(elem => elem.id == object.id)) {
+        if (object.type == "static") {
+          runners.push(new StaticEnv(object))
+          console.log(runners);
         } else {
-          currentSec.shift();
-          currentSec.unshift({ 'type': "func", "text": func.func, "pos": i });
+          runners.push(new DynamicEnv(object))
+          console.log(runners);
+        }
+        port.postMessage({ result: true })
+      } else {
+        port.postMessage({ error: "env already exists" })
+      }
+    } else if (object.set == "envClear") {
+      if (object.id != undefined) {
+        let env = runners.find(elem => elem.id == object.id);
+        if (env != undefined) {
+          env.clearVars();
         }
       }
-      if(varInEquat(currTerm.text).length != 0){
-        //here
-        currentSec.shift();
-        currentSec.unshift(...parseTextTerm({ "type": "term", "subtype": 'varContainer', "text": currTerm.text, "pos": null }));
-      }
-    }
-    if (equation.substring(cutString) != "") {
-      currOp = createOp(equation.substring(cutString));
-      let opIndex = parseObj.equatArry.length + currentSec.length;
-      switch (currOp.group) {
-        case "par":
-          parseObj.par.push(opIndex);
-          break;
-        case "pow":
-          parseObj.pow.push(opIndex);
-          break;
-        case "muti":
-          parseObj.muti.push(opIndex);
-          break;
-        case "add":
-          parseObj.add.push(opIndex);
-          break;
-      }
-      if (currOp.subtype == "ParStart") {
-        if (func == ""&& currTerm != undefined) {
-          currentSec.splice(1, 0, { 'type': "op", "subtype": "Muti", "text": "*", "pos": i });
+    } else if (object.set == "var") {
+      if (object.id == undefined) {
+        if (GlobalVars.find(elem => elem.name == object.varName)) {
+          GlobalVars.find(elem => elem.name == object.varName).value = object.value;
+        } else {
+          GlobalVars.push({ name: object.varName, value: object.varValue })
         }
-        let encap = parEncap(equation.substring(cutString+1));
-        cutString += encap.length + 2;
-        let encapParse = parseEquation(encap);
-        currentSec.push({type: "parSec", "text": encap, "pos": i, "parse": encapParse});
-      }else{
-        currentSec.push(currOp);
-        cutString ++;
+      } else {
+        port.postMessage({ result: runners.find(elem => { return elem.id == object.id }).setVar(object.varName, object.varValue), return: true })
+      }
+    } else if (object.set == "func") {
+      let list = Array.isArray(object.funcs) ? object.funcs : [object.funcs]
+      try {
+        for (let def of list) {
+          if (!getFuncByName(def.name)) {
+            if (def.type == 'Function') {
+              try {
+                port.postMessage({ result: createFunction('function', def.name, def.equation) })
+              } catch (eve) {
+                this.postMessage({ 'type': 'posError', 'mes': `Issue adding ${def.name} to algo` })
+              }
+            } else if (def.type == 'Hybrid') {
+              try {
+                port.postMessage({ result: createFunction('method', def.code) })
+              } catch (e) {
+                this.postMessage({ 'type': 'posError', 'mes': `Issue adding hybrid to algo` })
+              }
+            }
+          }
+        }
+      } catch (eve) {
+        port.postMessage({ error: eve })
+        this.postMessage({ 'type': 'posError', 'mes': `Issue adding functions to algo` });
+      }
+
+    } else if (object.set == "changeFunc") {
+      if (object.name == undefined && object.changes == undefined) {
+        port.postMessage({ result: changeFunc(object.name, object.changes) });
+      }
+    } else if (object.set == "removeFunc") {
+      removeFunction(object.name)
+    }
+  } else if (object.get != undefined) {
+    if (object.get == "func") {
+      if (object.name != undefined) {
+        port.postMessage({ result: getMethod(object.name) });
+      }
+    } else if (object.get == "list") {
+      port.postMessage({ result: getNameList() })
+    } else if (object.get == "vars") {
+      if (object.name == undefined) {
+        port.postMessage({ result: varInEquat(object.equation) })
+      } else {
+        let thing = funcList.find(elem => {
+          if (Array.isArray(elem.func)) {
+            return elem.func.includes(object.name);
+          } else {
+            return elem.func == object.name;
+          }
+        }
+        )
+        port.postMessage({
+          result: thing.vars
+        })
+      }
+
+    } else if (object.get == "equationParse") {
+      if (object.id == undefined) {
+        port.postMessage({
+          result: setVarEquat(object.equation, object.vars, false)
+        });
+      } else {
+        let env = runners.find(elem => elem.id == object.id)
+        port.postMessage({
+          result: env.getParsedEquation()
+        });
+      }
+    } else if (object.get == "calc") {
+      if (object.id == undefined) {
+        if (object.target == "single") {
+          port.postMessage({
+            result: fullSolve(object.equation, settings)
+          })
+        }
+      } else {
+        let targetEnv = runners.find(elem => elem.id == object.id);
+        console.log(targetEnv)
+        if (targetEnv.type == "dynamic") {
+          if (targetEnv.target == "single") {
+            port.postMessage({
+              result: targetEnv.solveEquation(object.equation)
+            })
+          } else {
+            port.postMessage({
+              result: targetEnv.solvePointArray(object.array)
+            })
+          }
+        } else if (targetEnv.type == "static") {
+          if (object.type == "point") {
+            port.postMessage({
+              result: targetEnv.calcEquation()
+            })
+          } else if (object.type == "graph") {
+            port.postMessage({
+              result: targetEnv.calcGraph()
+            })
+          } else if (object.type == "table") {
+            port.postMessage({
+              result: targetEnv.calcTable()
+            })
+          }
+
+        }
+      }
+    } else if (object.get == "calcPacket") {
+      console.log("callingPacket")
+      if (object.id == undefined) {
+        let env = runners.find(elem => elem.id == object.id);
+        port.postMessage({ result: env.checkCalculable() })
       }
     }
-    cutLength += cutString;
-    equation = equation.substring(cutString);
-    parseObj.equatArry.push(...currentSec);
-    if(equation.length == 0){
+  }
+};
+const fullSolve = function (input) {
+  if (!input.includes('XMLHttpRequest')) {
+    return eval(solveInterpreter(input, settings.degRad))
+  } else {
+    return undefined;
+  }
+}
+const isOperator = function (entry) {
+  let operators = ["+", "-", "*", "/", "^"]
+  return operators.includes(entry);
+}
+//A method that returns an array of the names of the funcs that are in the Funclist
+const getNameList = function () {
+  let nameList = [];
+  for (let func of funcList) {
+    if (Array.isArray(func.func)) {
+      nameList.concat(func.func)
+    } else {
+      nameList.push(func.func);
+    }
+  }
+  return nameList;
+}
+const highTerms = function (arry, varDef) {
+  var highTerms = [];
+  arry.forEach(elem => {
+    if (typeof DefinedTerm === elem && elem.text.includes(varDef)) {
+      highTerms.push(elem)
+    }
+  })
+  return highTerms;
+}
+const findValueOf = function (tVar, equat) {
+  let side1 = equat.substring(0, equat.indexOf('='));
+  let side2 = equat.substring(equat.indexOf('=') + 1);
+  let conS1 = solveFor(side1, tVar);
+  let conS2 = solveFor(side2, tVar);
+  if ((highTerms(conS2).length > 0 && highTerms(conS1).length > 0) && (conS2.text.includes(tVar) && conS1.text.includes(tVar))) {
+    let longSide = highTerms(conS1, tVar).length > highTerms(conS2, tVar).length ? highTerms(conS1, tVar) : highTerms(conS2, tVar);
+    let shortSide = highTerms(conS1, tVar).length > highTerms(conS2, tVar).length ? highTerms(conS2, tVar) : highTerms(conS1, tVar);
+  } else {
+
+  }
+
+}
+//Method that takes a type and text info to get all atritbutes of a funcList element
+const parseFuncEntry = function () {
+  let returnedObject = {}
+  if (arguments[0] == "function") {
+    let name = arguments[1];
+    let func = arguments[2];
+    let parseable = parseEquation(func);
+    returnedObject.type = arguments[0];
+    returnedObject.func = name;
+    returnedObject.ogFunc = func;
+    returnedObject.funcParse = parseable;
+    //returnedObject.inputs = cacInputs(parseable);
+    returnedObject.vars = varInEquat(func);
+    returnedObject.funcRadDeg = false;
+    returnedObject.funcLength = name.length;
+  } else if (arguments[0] == "method") {
+    let funcString = arguments[1];
+    returnedObject = parseFunction(funcString);
+    //console.log(returnedObject)
+    returnedObject.mth = stringFunction(returnedObject)();
+  }
+  return returnedObject;
+}
+//A basic method that takes an input and determine which type of function should be added to the func list
+const createFunction = function () {
+  let object = {};
+  if (arguments[0] == "function") {
+    object = parseFuncEntry(arguments[0], arguments[1], arguments[2]);
+  } else if (arguments[0] == "method" && !arguments[1].includes('XMLHttpRequest')) {
+    object = parseFuncEntry(arguments[0], arguments[1]);
+  }
+  funcList.push(object);
+  return object;
+}
+//Responsible for removal of functions from the func list
+const removeFunction = function (name) {
+  funcList = funcList.filter(function (value, index, arr) {
+    if (Array.isArray(value.func)) {
+      return !value.func.includes(name);
+    } else {
+      return value.func != name;
+    }
+  })
+}
+/*********************************************Solve Toothless****************************************** */
+//Func method to find if the current postion has a function defined in the funclist
+const getFuncByName = function(name) {
+  for (let func of funcList) {
+    if (Array.isArray(func.func)) {
+      if (func.func.includes(name)) {
+        return func;
+      }
+    } else {
+      if (func.func == name) {
+        return func;
+      }
+    }
+  }
+  return false;
+}
+
+//A method to parse for functions that are defined diffrenely depending on weather or not in rad or deg
+const getFuncParse = function (funcUn, degRad) {
+  let func = JSON.parse(JSON.stringify(funcUn));
+  let array = func.funcParse;
+  if (func.funcRadDeg) {
+    if (degRad) {
+      if (array.includes("toDeg")) {
+        array.splice(func.funcParse.indexOf("toDeg"), 1, "*(Math.PI/180)");
+      } else {
+        array.splice(func.funcParse.indexOf("toRad"), 1, "*(180/Math.PI)");
+      }
+    } else {
+      if (array.includes("toDeg")) {
+        array.splice(func.funcParse.indexOf("toDeg"), 1);
+      } else {
+        array.splice(func.funcParse.indexOf("toRad"), 1);
+      }
+    }
+  }
+  return array;
+}
+//A method which takes the inputs value from a func object in the funclist and gets how many inputs that function has and parses each
+const funcParenthesisParse = function (equation) {
+  let values = [];
+  while (equation.length != 0) {
+    if (equation.includes(',')) {
+      values.push(equation.substring(0, equation.indexOf(",")));
+      equation = equation.substring(equation.indexOf(",") + 1);
+    } else {
+      values.push(equation);
       break;
     }
   }
-  return parseObj;
+  values = values.filter(e => e != "");
+  return values
 }
-function solveParse(parse){
+//A method to parse a function array into a string so it can be add to the equation string
+const combineFuncParse = function (parsedFunc, values) {
+  let i = 1;
+  while (true) {
+    let numVar = "v" + i;
+    if (parsedFunc.includes(numVar)) {
+      parsedFunc = parsedFunc.replaceAll(numVar, values[i - 1])
+      i++;
+    } else {
+      break;
+    }
 
+  }
+  let parsedString = parsedFunc.join("");
+  return parsedString;
 }
-function mapEquation(equatArry) {
-
+const varInFunc = function (method) {
+  method = method.substring(method.indexOf("("))
+  let variableDefs = method.substring(1, method.indexOf(")")).trim();
+  let variables = [];
+  while (variableDefs.length > 0) {
+    if (variableDefs.includes(',')) {
+      variables.push({ "letter": variableDefs.substring(0, variableDefs.indexOf(',')) });
+      variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
+    } else {
+      variables.push({ "letter": variableDefs });
+      variableDefs = 0;
+    }
+  }
+  return variables;
 }
-function createOp(section) {
-  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',',"|"]
-  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"]
-  const group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non"];
-  return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null, "group": group[ops.indexOf(section.charAt(0))] };
+const solveFunc = function (equation, index) {
+  let degRad = settings.degRad;
+  let i = index;
+  let func = funcInString(equation.substring(i), true);
+  let innerRAW = parInnerString(
+    equation.substring(i + func.funcLength)
+  );
+  let values = funcParenthesisParse(innerRAW.substring(1, innerRAW.length - 1), func);
+  let parsedFunc = "";
+  if (func.type == "function") {
+    let funcTemp = getFuncParse(func, degRad);
+    parsedFunc = combineFuncParse(funcTemp, values);
+  } else if (func.type == "method") {
+    parsedFunc = func.mth(values)
+  }
+  return parsedFunc;
 }
-function opsInEquat(equation) {
-  //console.log(`Equation before the ops method ${equation}`)
-  let opsArry = []
-  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',']
-  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma']
+const findTerm = function (equation) {
+  let direction = true;
+  let endIndex = 0;
+  if (arguments[1] != undefined) {
+    direction = arguments[1];
+  }
+  for (let i = direction ? 0 : equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--) {
+    if (equation[i] == "(" || equation[i] == ")") {
+      let nextIndex = direction ? equation.substring(i).findMatch("(", ")", direction) : equation.substring(0, i - 1).findMatch("(", ")", direction);
+      if (nextIndex != -1) {
+        i = nextIndex - 1;
+        endIndex = i;
+      }
+    } else if (equation[i] == '+' || equation[i] == '-' || equation[i] == '×' || equation[i] == '<' || equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|') {
+      endIndex = i;
+      break;
+    }
+    endIndex = endIndex + (direction ? 1 : -1);
+  }
+  return direction ? equation.substring(0, endIndex) : equation.substring(endIndex + 1);
+}
+//Main method called to parse an Equation
+const solveInterpreter = function(equation, degRad) {
   for (let i = 0; i < equation.length; i++) {
-    if (ops.includes(equation.charAt(i))) {
-      opsArry.push({ 'type': "op", "subtype": typeIndex[ops.indexOf(equation.charAt(i))], "text": equation.charAt(i), "pos": i })
+    let func = funcInString(equation.substring(i), true);
+    if (func != "") {
+      let innerRAW = parInnerString(
+        equation.substring(i + func.funcLength)
+      );
+      let parsedFunc = solveFunc(equation, i)
+      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+      i = i + parsedFunc.length - 1;
     }
-    switch (equation.charAt(i)) {
-      case ('÷'):
-        opsArry.push({ 'type': "op", "subtype": "Div", "text": '/', "pos": i })
-        break;
-      case ('×'):
-        opsArry.push({ 'type': "op", "subtype": "Muti", "text": '*', "pos": i })
-        break;
-      case ('<'):
-        if (equation.substring(i, i + 5).includes('<sup>')) {
-          let sub = supEncap(equation.substring(i))
-          let subArry = opsInEquat(sub.substring(5, sub.length - 6)).arry
-          for (let item of subArry) {
-            item.pos += i + 2;
-          }
-          let replacement = "^(" + sub.substring(5, sub.length - 6) + ")";
-          subArry.unshift({ 'type': "op", "subtype": "Pow", "text": "^", "pos": i }, { 'type': "op", "subtype": "ParStart", "text": "(", "pos": i + 1 })
-          subArry.push({ 'type': "op", "subtype": "ParEnd", "text": ')', "pos": (i + replacement.length - 1) })
-          opsArry = opsArry.concat(subArry)
-          equation = equation.substring(0, i) + replacement + equation.substring(i + sub.length)
-          i += replacement.length - 1;
-        }
-        break;
-    }
+  }
+  equation = builtInFunc(equation);
+  return equation;
+}
+const testIgnore = function (equation) {
+  const ignore = ignoreList.find(element => equation.substring(0, element.length) == element);
+  if (ignore != undefined) {
+    return ignore.length;
+  } else {
+    return undefined;
+  }
+}
+//A method to find the ending of a superscript html tag. Doesn't make one if there is none
+const supInnerString = function (sub) {
+  let direction = true;
+  if (arguments[1] != undefined) {
+    direction = arguments[1];
+  }
+  let endIdx
+  if (arguments[2] != undefined) {
+    endIdx = arguments[2];
+  } else {
+    endIdx = sub.findMatch("<sup", "</sup>", direction);
+  }
 
-  }
-  return { "arry": opsArry, "equat": equation }
+  return direction ? sub.substring(0, endIdx) : sub.substring(sub.indexOf(">", endIdx) + 1);
 }
-function formatEquation(equation){
-let defs = [
-  {
-    "type": "op",
-    "def": "%",
-    "postEcap": ["(", "/100)"],
-  },
-  {
-    "type": "encap",
-    "def": "<sup",
-    "termination" : ">",
-    "endDef": "</sup>",
-    "pre": "^(",
-    "post": ")",
+//Takes string and returns an array for funclist
+const createParseable = function (equation) {
+  for (let i = equation.length - 1; i >= 0; i--) {
+    let func = funcInString(equation.substring(i), true);
+    if (func != "") {
+      let innerRAW = parInnerString(
+        equation.substring(i + func.funcLength)
+      );
+      let parsedFunc = solveFunc(equation, i)
+      equation = equation.substring(0, i) + parsedFunc + equation.substring(i + func.funcLength + innerRAW.length);
+      i = i - parsedFunc.length + 1;
+    }
   }
-];
+  let equationArray = [equation];
+  let variables = varInEquat(equation);
+  let variableIndexes = [];
+  for (let i = 0; i < variables.length; i++) {
+    variables[i].numVar = 'v' + (i + 1);
+  }
+  for (let data of variables) {
+    for (let i = 0; i < equation.length; i++) {
+      let ignore = testIgnore
+    (equation.substring(i));
+      if (ignore != undefined) {
+        i += ignore - 1;
+      } else if (equation.charAt(i) == data.letter) {
+        variableIndexes.push(i);
+      }
+    }
+  }
+  variableIndexes.sort(function (a, b) {
+    return b - a;
+  });
+  for (let index of variableIndexes) {
+    let temp = equationArray[0].charAt(index);
+    let match = variables.find(e => e.letter == temp);
+    let newarry = [];
+    newarry.push(equationArray[0].substring(0, index));
+    newarry.push(match.numVar);
+    newarry.push(equationArray[0].substring(index + 1));
+    equationArray.splice(0, 1, ...newarry);
+  }
+  equationArray = equationArray.filter(val => val != "" && val != "‎");
+  return equationArray;
 }
-function termsInEquat(equation, fullArray) {
-  let modEquat = equation
-  let completeArray = fullArray.length > 0 ? fullArray : [{ 'type': "term", "text": equation, "pos": 0 }]
-  for (let item of fullArray) {
-    let diff = equation.length - modEquat.length
-    let index = item.pos;
-    let modIndex = index - diff
-    let termBefore = forward(modEquat.substring(0, modIndex));
-    let termAfter = backward(modEquat.substring(modIndex + 1));
-    let prelength = termAfter.length;
-    let beforeFunc = false
-    if (funcMatch(termBefore, false) != "") {
-      beforeFunc = true;
-      let func = funcMatch(termBefore, false);
-      let aindex = completeArray.indexOf(item);
-      completeArray.splice(aindex, 0, { 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
-      termBefore = termBefore.substring(0, termBefore.length - (func.func.length))
+//calculate inputs
+const cacInputs = function (array) {
+  let num = 0;
+  for (let item of array) {
+    if (item.charAt(0) == 'v') {
+      num++;
+    }
+  }
+  return num;
+}
+//a method that takes the object from the function list and parses it into a fuunction
+const stringFunction = function (object) {
+  let name = object.func;
+  let string = object.string;
+  let vars = object.vars;
+  for (let i = vars.length - 1; i >= 0; i--) {
+    string = string.substring(0, 1) + `var ${vars[i].letter} = array[${i}];` + string.substring(1);
+  }
+  string = `var ${name} = function (array)${string} \n return ${name};`;
+  return Function(string);
+}
+//Method that takes a string function and uses the text to get all needed info
+const parseFunction = function (StringFunction) {
+  let preserved = StringFunction;
+  StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
+  let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
+  let variables = varInFunc(StringFunction)
+  StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
+  let finalObject = {
+    "func": name,
+    "type": "method",
+    "string": StringFunction,
+    "vars": variables,
+    'full': preserved,
+    "inputs": variables.length,
+    "funcRadDeg": false,
+    "funcLength": name.length
+  }
+  return finalObject;
+}
 
-    }
-    if (funcMatch(termAfter, false) != "") {
-      let func = funcMatch(termAfter, false)
-      let aindex = completeArray.indexOf(item);
-      completeArray.splice(aindex + 1, 0, { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] })
-      termAfter = termAfter.substring(0, termAfter.length - (func.func.length))
-    }
-    termBefore = basicNumInter(termBefore);
-    termAfter = basicNumInter(termAfter);
-    if (termBefore) {
-      let aindex = completeArray.indexOf(item);
-      let pos = termBefore.length > 1 ? [index - termBefore.length, index] : index - 1;
-      let term = {};
-      if (varInEquat(termBefore).length != 0) {
-        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos });
-        term = { "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos }
-      } else {
-        //termArry.push({ "type": "term", "text": termBefore, "pos": pos });\
-        term = { "type": "term", "text": termBefore, "pos": pos }
-      }
-      if (beforeFunc) {
-        completeArray.splice(aindex - 1, 0, term)
-      } else {
-        completeArray.splice(aindex, 0, term)
-      }
-    }
-    if (termAfter) {
-      let aindex = completeArray.indexOf(item);
-      let pos = termAfter.length > 1 ? [index + 1, index + termAfter.length] : index + 1;
-      let term = {};
-      if (varInEquat(termAfter).length != 0) {
-        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos });
-        term = { "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos }
-      } else {
-        //termArry.push({ "type": "term", "text": termAfter, "pos": pos });
-        term = { "type": "term", "text": termAfter, "pos": pos }
-      }
-      completeArray.splice(aindex + 1, 0, term)
-    }
-    modEquat = modEquat.substring(modIndex + prelength + 1)
-  }
-  return completeArray;
-}
-function combineTerms(fullArray, varDef) {
+//end
+/***********************************************Solve For Algo*****************************************/
+const combineTerms = function (fullArray, varDef) {
   parLinkMap(fullArray)
   //par processing
   let parStarts = fullArray.filter(elem => elem.subtype == "ParStart")
@@ -1961,7 +1369,7 @@ function combineTerms(fullArray, varDef) {
         let result = term.text
         updateFullArray(startPos, fullArray, -(stringVer.length - result.length + 1), start.matchPar - endElem.matchPar)
       } else {
-        let func = getByName(term.func.text);
+        let func = getFuncByName(term.func.text);
         if (func.type == "function") {
           let arrayed = term.textArray
           let termInOrder = []
@@ -2091,22 +1499,308 @@ function combineTerms(fullArray, varDef) {
   }
   return fullArray
 }
-function parLinkMap(fullArray) {
+const createSidedEquation = function (equation, target) {
+  let decSide = false;
+  let side1 = equation.substring(0, equation.indexOf('='))
+  let side2 = equation.substring(equation.indexOf('=') + 1)
+  if (side1.varIns(target) > side2.varIns(target)) {
+    decSide = true;
+  } else {
+    decSide = false;
+  }
+  let part1Parse = combineTerms(solveFor(side1, target));
+  console.log(arryToString(part1Parse))
+  let part2Parse = combineTerms(solveFor(side2, target));
+  console.log(arryToString(part2Parse))
+  console.log(decSide)
+  console.log(arryToString(part1Parse));
+  console.log(part1Parse);
+  let trace = equatTrace(decSide ? part1Parse : part2Parse, target)
+  console.log(trace);
+  let sided = solveForSide(decSide ? part1Parse : part2Parse, decSide ? part2Parse : part1Parse, trace)
+  console.log(arryToString(sided[1]))
+  return arryToString(sided[1])
+}
+const solveForSide = function (vSide, mSide, trace) {
+  if (trace.length > 0) {
+    let targetedElem = trace[0].term;
+    let indOfElem = trace[0].index;
+    let addArry = [...vSide]
+    if (vSide.length != 1) {
+      if (indOfElem != addArry.length - 1) {
+        addArry.splice(indOfElem + 1, 1)
+      } else {
+        addArry.splice(indOfElem - 1, 2)
+      }
+      addArry.splice(indOfElem, 1);
+      addArry.unshift({ 'type': 'op', 'subtype': 'Minus', 'text': '-' });
+      mSide = mSide.concat(addArry);
+      vSide = [targetedElem]
+    }
+    if (trace[0].loc == "textArray" || trace[0].loc == "letter") {
+      if (vSide[0].getComputedMuti != 1 && vSide[0].getComputedMuti != undefined) {
+        //console.log(vSide[0])
+        let postMuti = swapMuti(vSide[0], mSide)
+        mSide = postMuti[0]
+      }
+      if (vSide[0].getComputedPow != 1 && vSide[0].getComputedPow != undefined) {
+        let postPow = swapPow(vSide[0], mSide)
+        mSide = postPow[0]
+      }
+      if (targetedElem.subtype == "cmpxTerm") {
+        //console.log("is complex term")
+        if (targetedElem.func) {
+          //console.log("has func")
+          let intFunc = getFuncByName(targetedElem.func.text)
+          //console.log(targetedElem.func)
+          //console.log(typeof intFunc)
+          if (intFunc.inverse) {
+            let replacement = [...targetedElem.textArray]
+            replacement.splice(trace[1].index, 1, ...mSide)
+            mSide = [new CmpxTerm(replacement, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": intFunc.inverse })]
+          }
+        }
+      }
+      //console.log(vSide)
+      vSide = vSide[0].textArray
+      //console.log(vSide)
+    } else if (trace[0].loc == "pow") {
+      if (vSide[0].getComputedMuti != 1) {
+        let postMuti = swapMuti(vSide[0], mSide)
+        mSide = postMuti[0]
+      }
+      let postBase = swapBase(vSide[0], mSide)
+      mSide = postBase[0]
+      vSide = vSide[0].pow
+    }
+    let final = solveForSide(vSide, mSide, trace.slice(1));
+    vSide = final[0]
+    mSide = final[1]
+  }
+  return [vSide, mSide]
+}
+const swapMuti = function (term, mSide) {
+  //console.log(term)
+  mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
+  mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
+  let newMuti = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.mutiplican.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
+  newMuti = newMuti.concat(term.mutiplican)
+  newMuti.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
+  //console.log(arryToString(mSide).hasVar())
+  //console.log(arryToString(newMuti).hasVar())
+  if (arryToString(mSide).hasVar() || arryToString(newMuti).hasVar()) {
+    if (mSide.legnth == 1 && mSide[0].type == 'cmpxTerm') {
+      mSide[0].mutiplican.concat(newMuti)
+    } else {
+      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, newMuti, { "type": "term", "text": '1', "pos": 0 }, undefined)]
+    }
+    term.mutiplican = []
+  } else {
+    //console.log(arryToString(mSide) + "*" + arryToString(newMuti));
+    let solved = fullSolve(arryToString(mSide) + "*" + arryToString(newMuti))
+    mSide = [{ "type": "term", "text": solved, "pos": 0 }]
+    term.mutiplican = []
+  }
+  return [mSide, term]
+}
+const swapPow = function (term, mSide) {
+  mSide.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
+  mSide.unshift({ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': mSide.length });
+  let newPow = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.pow.length + 2 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "op", "subtype": "Div", "text": "/" }]
+  newPow = newPow.concat(term.pow)
+  newPow.push({ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 })
+  //console.log(arryToString(mSide).hasVar())
+  //console.log(arryToString(newPow).hasVar())
+  if (arryToString(mSide).hasVar() || arryToString(newPow).hasVar()) {
+    if (mSide.legnth == 1 && mSide[0].type == 'cmpxTerm') {
+      mSide[0].pow.concat(newPow)
+    } else {
+      mSide = [new CmpxTerm(mSide.slice(0, mSide.length), 0, { "type": "term", "text": '1', "pos": 0 }, newPow, undefined)]
+    }
+    term.pow = []
+  } else {
+    let solved = fullSolve(arryToString(mSide) + "^" + arryToString(newPow))
+    mSide = [{ "type": "term", "text": solved, "pos": 0 }]
+    term.pow = []
+  }
+  return [mSide, term]
+}
+const swapBase = function (term, mSide) {
+  let newBase = [{ 'type': 'op', 'subtype': 'ParStart', 'text': '(', 'matchPar': term.textArray.length },]
+  newBase = newBase.concat(term.textArray)
+  newBase = newBase.concat([{ 'type': 'op', 'subtype': 'ParEnd', 'text': ')', 'matchPar': 0 }, { "type": "op", "subtype": "Comma", "text": "," }, ...mSide])
+  mSide = [new CmpxTerm(newBase, 0, { "type": "term", "text": '1', "pos": 0 }, { "type": "term", "text": '1', "pos": 0 }, { "type": "func", "text": "logB" })]
+  term = term.pow
+  return [mSide, term]
+}
+const equatTrace = function (arry, tVar) {
+  let termArry = []
+  console.log(arry)
+  //console.log(arry)
+  arry.forEach((term, i) => {
+    let textualVal = "" + term.text
+    console.log(textualVal);
+    console.log(tVar)
+    if (textualVal.innerVar(tVar)) {
+      console.log("var in term");
+      if (term.subtype == "cmpxTerm") {
+        console.log(term)
+        let textAryVar = arryToString(term.textArray);
+        let powVar = term.getComputedPow;
+        let mutiVar = term.getComputedMuti;
+        if (textAryVar.innerVar(tVar)) {
+          termArry.push({ "term": term, "index": i, "loc": "textArray" })
+          termArry = termArry.concat(equatTrace(term.textArray, tVar))
+          return termArry;
+        } else if (powVar.innerVar(tVar)) {
+          termArry.push({ "term": term, "index": i, "loc": "pow" })
+          termArry = termArry.concat(equatTrace(term.pow, tVar))
+          return termArry;
+        } else if (mutiVar.innerVar(tVar)) {
+          termArry.push({ "term": term, "index": i, "loc": "muti" })
+          termArry = termArry.concat(equatTrace(term.mutiplican, tVar))
+          return termArry;
+        }
+      } else if (term.subtype == "var") {
+        if (term.letter == tVar) {
+          //console.log("var term found")
+          termArry.push({ "term": term, "index": i, "loc": "letter" })
+          return termArry
+        }
+      }
+    }
+  });
+  return termArry;
+}
+const solveFor = function (equat, varDef) {
+  let returned = opsInEquat(equat);
+  equat = returned.equat
+  let fullArray = returned.arry;
+  console.log(arryToString(fullArray))
+  console.log(equat)
+  fullArray = termsInEquat(equat, fullArray);
+  for (let i = 0; i < fullArray.length; i++) {
+    fullArray[i] = fullArray[i].subtype == "varContainer" ? fullArray[i] = parseTextTerm(fullArray[i], varDef) : fullArray[i];
+  }
+  fullArray = parLinkMap(fullArray);
+  return fullArray
+}
+//********************************************** */
+
+const opsInEquat =function (equation) {
+  //console.log(`Equation before the ops method ${equation}`)
+  let opsArry = []
+  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',']
+  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma']
+  for (let i = 0; i < equation.length; i++) {
+    if (ops.includes(equation.charAt(i))) {
+      opsArry.push({ 'type': "op", "subtype": typeIndex[ops.indexOf(equation.charAt(i))], "text": equation.charAt(i), "pos": i })
+    }
+    switch (equation.charAt(i)) {
+      case ('÷'):
+        opsArry.push({ 'type': "op", "subtype": "Div", "text": '/', "pos": i })
+        break;
+      case ('×'):
+        opsArry.push({ 'type': "op", "subtype": "Muti", "text": '*', "pos": i })
+        break;
+      case ('<'):
+        if (equation.substring(i, i + 5).includes('<sup>')) {
+          let sub = supInnerString
+        (equation.substring(i))
+          let subArry = opsInEquat(sub.substring(5, sub.length - 6)).arry
+          for (let item of subArry) {
+            item.pos += i + 2;
+          }
+          let replacement = "^(" + sub.substring(5, sub.length - 6) + ")";
+          subArry.unshift({ 'type': "op", "subtype": "Pow", "text": "^", "pos": i }, { 'type': "op", "subtype": "ParStart", "text": "(", "pos": i + 1 })
+          subArry.push({ 'type': "op", "subtype": "ParEnd", "text": ')', "pos": (i + replacement.length - 1) })
+          opsArry = opsArry.concat(subArry)
+          equation = equation.substring(0, i) + replacement + equation.substring(i + sub.length)
+          i += replacement.length - 1;
+        }
+        break;
+    }
+
+  }
+  return { "arry": opsArry, "equat": equation }
+}
+const termsInEquat =function (equation, fullArray) {
+  let modEquat = equation
+  let completeArray = fullArray.length > 0 ? fullArray : [{ 'type': "term", "text": equation, "pos": 0 }]
+  for (let item of fullArray) {
+    let diff = equation.length - modEquat.length
+    let index = item.pos;
+    let modIndex = index - diff
+    let termBefore = forward(modEquat.substring(0, modIndex));
+    let termAfter = backward(modEquat.substring(modIndex + 1));
+    let prelength = termAfter.length;
+    let beforeFunc = false
+    if  (funcInString(termBefore, false) != "") {
+      beforeFunc = true;
+      let func = funcInString(termBefore, false);
+      let aindex = completeArray.indexOf(item);
+      completeArray.splice(aindex, 0, { 'type': "func", 'text': func.func, "pos": [index + (termAfter.length - (func.func.length)), index + termAfter.length] })
+      termBefore = termBefore.substring(0, termBefore.length - (func.func.length))
+
+    }
+    if  (funcInString(termAfter, false) != "") {
+      let func = funcInString(termAfter, false)
+      let aindex = completeArray.indexOf(item);
+      completeArray.splice(aindex + 1, 0, { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] })
+      termAfter = termAfter.substring(0, termAfter.length - (func.func.length))
+    }
+    termBefore = basicNumInter(termBefore);
+    termAfter = basicNumInter(termAfter);
+    if (termBefore) {
+      let aindex = completeArray.indexOf(item);
+      let pos = termBefore.length > 1 ? [index - termBefore.length, index] : index - 1;
+      let term = {};
+      if (varInEquat(termBefore).length != 0) {
+        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos });
+        term = { "type": "term", "subtype": 'varContainer', "text": termBefore, "pos": pos }
+      } else {
+        //termArry.push({ "type": "term", "text": termBefore, "pos": pos });\
+        term = { "type": "term", "text": termBefore, "pos": pos }
+      }
+      if (beforeFunc) {
+        completeArray.splice(aindex - 1, 0, term)
+      } else {
+        completeArray.splice(aindex, 0, term)
+      }
+    }
+    if (termAfter) {
+      let aindex = completeArray.indexOf(item);
+      let pos = termAfter.length > 1 ? [index + 1, index + termAfter.length] : index + 1;
+      let term = {};
+      if (varInEquat(termAfter).length != 0) {
+        //termArry.push({ "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos });
+        term = { "type": "term", "subtype": 'varContainer', "text": termAfter, "pos": pos }
+      } else {
+        //termArry.push({ "type": "term", "text": termAfter, "pos": pos });
+        term = { "type": "term", "text": termAfter, "pos": pos }
+      }
+      completeArray.splice(aindex + 1, 0, term)
+    }
+    modEquat = modEquat.substring(modIndex + prelength + 1)
+  }
+  return completeArray;
+}
+const parLinkMap =function (fullArray) {
   for (let j = 0; j < fullArray.length; j++) {
     if (fullArray[j].subtype == "ParStart") {
-      let returned = parEncapArray(fullArray, j)
+      let returned = parInnerStringArray(fullArray, j)
       fullArray = returned[0]
       j += returned[1]
     }
   }
   return fullArray;
 }
-function parEncapArray(fullArray, startIndex) {
+const parInnerStringArray =function (fullArray, startIndex) {
   let length = 0;
   for (let i = startIndex + 1; i < fullArray.length; i++) {
     length++
     if (fullArray[i].subtype === "ParStart") {
-      let inner = parEncapArray(fullArray, i)
+      let inner = parInnerStringArray(fullArray, i)
       fullArray = inner[0]
       i = i + inner[1];
     } else if (fullArray[i].subtype === "ParEnd") {
@@ -2121,7 +1815,7 @@ function parEncapArray(fullArray, startIndex) {
   }
   return [fullArray, length];
 }
-function updateFullArray(startPos, fullArray, changeInPos, changeInArry) {
+const updateFullArray =function (startPos, fullArray, changeInPos, changeInArry) {
   //console.log("Updating")
   //console.log(changeInPos)
   for (let i = startPos + 1; i < fullArray.length; i++) {
@@ -2136,38 +1830,14 @@ function updateFullArray(startPos, fullArray, changeInPos, changeInArry) {
   }
   return fullArray;
 }
-function arryToString(arry) {
+const arryToString =function (arry) {
   let string = ""
   for (let item of arry) {
     string += item.text;
   }
   return string;
 }
-function parseTextTerm(elem) {
-  let retArry = [];
-  let text = elem.text;
-  let nums = numInEquat(text);
-  let product = 1;
-  for(let num of nums){
-    product *= num;
-  }
-  if(product != 1){
-    retArry.push({'type': "term", "text": product, "pos": 0 });
-    retArry.push(createOp("*"));
-  }
-  let varList = varInEquat(text);
-  for(let varIn of varList){
-    retArry.push(new VarTerm(varIn.letter));
-    if(varIn.positions.length > 1){
-      retArry.push(createOp("^"));
-      retArry.push({'type': "term", "text": varIn.positions.length, "pos": 0 });
-    }
-    retArry.push(createOp("*"));
-  }
-  retArry.pop();
-  return retArry;
-}
-function basicNumInter(equation) {
+const basicNumInter =function (equation) {
   let reverEquat = reverseString(equation)
   let replacePos = [];
   for (let i = reverEquat.length - 1; i >= 0; i--) {
@@ -2180,16 +1850,16 @@ function basicNumInter(equation) {
   }
   return equation;
 }
-function reverseString(str) {
+const reverseString =function (str) {
   return (str === '') ? '' : reverseString(str.substr(1)) + str.charAt(0);
 }
-function arrayEquals(a, b) {
+const arrayEquals =function (a, b) {
   return Array.isArray(a) &&
     Array.isArray(b) &&
     a.length === b.length &&
     a.every((val, index) => val === b[index]);
 }
-function replaceVars(arry, vars) {
+const replaceVars =function (arry, vars) {
   //console.log(arry)
   //console.log(vars)
   let value = vars.length
@@ -2203,7 +1873,7 @@ function replaceVars(arry, vars) {
   })
   return arry
 }
-function parseableConverter(parseArry, varsInOrder, varDef) {
+const parseableConverter =function (parseArry, varsInOrder, varDef) {
   let genVars = generateVars(varsInOrder.length)
   for (let i = 0; i < genVars.length; i++) {
     parseArry.replaceAll("v" + (i + 1), "(" + genVars[i] + ")")
@@ -2216,7 +1886,276 @@ function parseableConverter(parseArry, varsInOrder, varDef) {
 }
 //end
 /*********************************************************spill over***************************************** */
-function varInEquat(equation) {
+const numInEquat =function (equation) {
+  let numArry = [];
+  let currentNum = "";
+  for (let i = 0; i < equation.length; i++) {
+    if (!isNaN(equation[i])) {
+      currentNum += equation[i];
+    } else if (currentNum != "") {
+      numArry.push(currentNum);
+      currentNum = "";
+    }
+  }
+  return numArry;
+}
+const varInList =function (list, varLetter) {
+  for (let item of list) {
+    if (item.letter == varLetter) {
+      return item;
+    }
+  }
+  return null;
+}
+const createParseEquat =function (equation) {
+  let vars = varInEquat(equation);
+  let solveArry = [];
+  if (vars.length == 1) {
+    let pos = vars[0].positions.reverse();
+    for (let i = 0; i < pos.length; i++) {
+      let sec = equation.substring(pos[i] + 1)
+      solveArry.unshift(sec)
+      equation = equation.substring(0, pos[i])
+      if (pos[i] == pos.length - 1 || pos.length == 1) {
+        solveArry.unshift(equation)
+      }
+    }
+  } else {
+    solveArry = [equation]
+  }
+  //console.log(solveArry)
+  return solveArry
+}
+const calculatePoints =function (equation, start, end, res) {
+  let pointArray = [];
+  let parseEquation = createParseEquat(equation);
+  let invRes = 1 / res;
+  let step = Math.abs(end - start) * invRes;
+
+  start = Math.floor(start)
+  end = Math.ceil(end)
+
+  for (let i = start; i <= end; i += step) {
+    let newPoint = {};
+    newPoint.x = i;
+    if (i < 0.00000001 && i > -0.00000001) {
+      newPoint.x = Math.round(i);
+    }
+    let proper = parseEquation.length > 0 ? parseEquation.join(newPoint.x) : "" + newPoint.x;
+    newPoint.y = fullSolve(proper);
+    pointArray.push(newPoint);
+
+  }
+  return pointArray;
+}
+const calculateExtrema =function (equation) {
+  let extrema = [];
+  let parseEquation = createParseEquat(equation);
+  //console.log("%c parseEquation", "color: yellow", parseEquation)
+  let copy = parseEquation.length > 0 ? parseEquation.join("x") : "x";
+  console.log("%c parseEquation", "color: yellow", copy)
+  if (varInEquat(copy).length == 1) {
+    extrema.push({ x: fullSolve(createSidedEquation(copy + "=0", "x"), settings.degRad), y: 0 })
+  }
+  let proper = parseEquation.length > 0 ? parseEquation.join('0') : '0';
+  extrema.push({ x: 0, y: fullSolve(parseEquation.join("0")) })
+  return extrema;
+}
+const trailingRound =function (num) {
+  let stringDef = String(num)
+  stringDef = stringDef.substring(stringDef.indexOf('.'))
+  let arry = stringDef.split('')
+  let count = 0;
+  for (let val of arry) {
+    if (val == '0') {
+      count++
+    }
+  }
+  if (count > 4) {
+    return String(num).substring(0, String(num).indexOf('.'))
+  } else {
+    return num;
+  }
+}
+const isVar =function (entry) {
+  let func = funcInString(entry, true);
+  let ignore = testIgnore
+(entry);
+  if (func != "") {
+    if (getFuncByName(func) != false) {
+      let object = getFuncByName(func);
+      return object.funcLength;
+    } else {
+      return func.func.length
+    }
+  } else if (ignore != undefined) {
+    return ignore
+  } else {
+    return 0;
+  }
+}
+
+const changeFunc =function (name, newObject) {
+  let target = funcList.find(elem => elem.func == name);
+  let object = {};
+  if (newObject.type == "Function") {
+    object = parseFuncEntry("function", newObject.name, newObject.equation);
+  } else if (newObject.type == "Hybrid" && !newObject.code.includes('XMLHttpRequest')) {
+    object = parseFuncEntry("method", newObject.code);
+  }
+  runners.forEach((runner) => {
+    if (runner.isFunc == true && runner.func == target) {
+      runner.equation = newObject.equation;
+      runner.func = object;
+      runner.vars = object.vars;
+    }
+  });
+  funcList.splice(funcList.indexOf(target), 1, object);
+  return object;
+}
+const getMethod =function (name) {
+  return JSON.parse(JSON.stringify(getFuncByName(name)));
+}
+const setVarEquat =function (equation, varList) {
+  for (let data of varList) {
+    for (let i = 0; i < equation.length; i++) {
+      let funcInStringVar = funcInString(equation.substring(i), true);
+      if  (funcInStringVar != "") {
+        i += funcInStringVar.func.length - 1;
+      } else if (equation.substring(i, i + data.letter.length) == data.letter) {
+        if (data.value != "" && data.value != undefined) {
+          equation = equation.substring(0, i) + "(" + data.value + ")" + equation.substring(i + 1);
+        }
+      }
+    }
+  }
+  return equation;
+}
+const generateVars =function (length) {
+  let newVars = [];
+  for (let i = 0; i < length; i++) {
+    newVars.push(String.fromCharCode(97 + i));
+  }
+  return newVars;
+}
+const getAngleConversion =function (type) {
+  if (settings.degRad) {
+    if (type == 'deg') {
+      return (Math.PI / 180);
+    } else if (type = "rad") {
+      return 180 / Math.PI;
+    }
+  } else {
+    return 1;
+  }
+}
+//A method that finds the start of a number from the end of the number
+const forward = function (sub) {
+  let outputSub = "";
+  for (let i = sub.length - 1; i >= 0; i--) {
+    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
+      if (i == 0) {
+        outputSub = sub.substring(i);
+        break;
+      } else if (sub.charAt(i) == '+') {
+        if (sub.charAt(i - 1) == 'E') {
+
+        } else {
+          outputSub = sub.substring(i + 1);
+          break;
+        }
+      } else if (sub.charAt(i) == '-') {
+        if (i == 0) {
+
+        } else if (sub.charAt(i - 1) == 'E') {
+
+        } else {
+          outputSub = sub.substring(i + 1);
+          break;
+        }
+      }
+    } else if (i == sub.length - 1) {
+      outputSub = "";
+      break;
+    } else {
+      outputSub = sub.substring(i + 1);
+      break;
+    }
+  }
+  return outputSub;
+}
+
+
+
+
+/*new version of evalWorker **********************************************************/
+
+//A method that finds the end of a number from the start of the number
+const backward = function (sub) {
+  let outputSub = "";
+  for (let i = 0; i <= sub.length - 1; i++) {
+    if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
+      if (i == sub.length - 1) {
+        outputSub = sub.substring(0, i + 1);
+        break;
+      } else if (sub.charAt(i) == '+') {
+        if (sub.charAt(i - 1) == 'E') {
+
+        } else {
+          outputSub = sub.substring(0, i);
+          break;
+        }
+      } else if (sub.charAt(i) == '-') {
+        if (i == 0) {
+
+        } else if (sub.charAt(i - 1) == 'E') {
+
+        } else {
+          outputSub = sub.substring(0, i);
+          break;
+        }
+      }
+    } else if (i == 0) {
+      outputSub = "";
+      break;
+    } else {
+      outputSub = sub.substring(0, i);
+      break;
+    }
+  }
+  return outputSub;
+}
+//A secondary method to match postions with functions but this one returns the function ength in order to skip through that in a loop
+const funcInString = function (equation, way) {
+  var returned = "";
+  var longestMatch = "";
+  for (let func of funcList) {
+    let check = "";
+    if (Array.isArray(func.func)) {
+      for (let funcName of func.func) {
+        if (equation.includes(funcName)) {
+          check = funcName;
+        }
+      }
+    } else {
+      if (equation.includes(func.func)) {
+        check = func.func;
+      }
+    }
+    if (check.length > longestMatch.length) {
+      longestMatch = check;
+      returned = func;
+    }
+  }
+  for (let func of secondList) {
+    let check = equation.substring(0, (func.length));
+    if (check == func) {
+      returned = "";
+    }
+  }
+  return returned;
+}
+const varInEquat =function (equation) {
   //console.log(`Equation is ${equation}`)
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
@@ -2241,215 +2180,360 @@ function varInEquat(equation) {
   }
   return varArray;
 }
-function numInEquat(equation){
-  let numArry = []; 
-  let currentNum = "";
-  for (let i = 0; i < equation.length; i++) {
-    if(!isNaN(equation[i])){
-      currentNum += equation[i];
-    }else if(currentNum != ""){
-      numArry.push(currentNum);
-      currentNum = "";
-    }
+const parseTextTerm = function (elem) {
+  let retArry = [];
+  let text = elem.text;
+  let nums = numInEquat(text);
+  let product = 1;
+  for (let num of nums) {
+    product *= num;
   }
-  return numArry;
-}
-function varInFunc(method) {
-  method = method.substring(method.indexOf("("))
-  let variableDefs = method.substring(1, method.indexOf(")")).trim();
-  let variables = [];
-  while (variableDefs.length > 0) {
-    if (variableDefs.includes(',')) {
-      variables.push({ "letter": variableDefs.substring(0, variableDefs.indexOf(',')) });
-      variableDefs = variableDefs.substring(variableDefs.indexOf(',') + 1)
-    } else {
-      variables.push({ "letter": variableDefs });
-      variableDefs = 0;
-    }
+  if (product != 1) {
+    retArry.push({ 'type': "term", "text": product, "pos": 0 });
+    retArry.push(createOp("*"));
   }
-  return variables;
-}
-function varInList(list, varLetter) {
-  for (let item of list) {
-    if (item.letter == varLetter) {
-      return item;
+  let varList = varInEquat(text);
+  for (let varIn of varList) {
+    retArry.push(new VarTerm(varIn.letter));
+    if (varIn.positions.length > 1) {
+      retArry.push(createOp("^"));
+      retArry.push({ 'type': "term", "text": varIn.positions.length, "pos": 0 });
     }
+    retArry.push(createOp("*"));
   }
-  return null;
+  retArry.pop();
+  return retArry;
 }
-function createParseEquat(equation) {
-  let vars = varInEquat(equation);
-  let solveArry = [];
-  if (vars.length == 1) {
-    let pos = vars[0].positions.reverse();
-    for (let i = 0; i < pos.length; i++) {
-      let sec = equation.substring(pos[i] + 1)
-      solveArry.unshift(sec)
-      equation = equation.substring(0, pos[i])
-      if (pos[i] == pos.length - 1 || pos.length == 1) {
-        solveArry.unshift(equation)
-      }
+//A method to find the end of a parenthesis and make one if there is none
+const parInnerString = function (sub) {
+  let direction = true;
+  if (arguments[1] != undefined) {
+    direction = arguments[1];
+  }
+  let endIdx = sub.findMatch("(", ")", direction);
+  return direction ? sub.substring(0, endIdx) : sub.substring(endIdx);
+}
+//A method to parse functions that don't fit into the conventions of the function list
+const builtInFunc = function (equation) {
+  console.log(equation)
+  equation = equation.replaceAll('×', '*');
+  equation = equation.replaceAll('÷', '/');
+  let indexValue = equation.indexOf("√");
+  while (indexValue >= 0) {
+    let root = "2";
+    let from = indexValue;
+    if (indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>") {
+      let matchSup = equation.substring(0, indexValue - 6).findMatch("<sup", "</sup>", false);
+      root = findTerm(equation.substring(0, indexValue - 6), false);
+      from = matchSup - 4;
     }
-  } else {
-    solveArry = [equation]
-  }
-  //console.log(solveArry)
-  return solveArry
-}
-function calculatePoints(equation, start, end, res) {
-  let pointArray = [];
-  let parseEquation = createParseEquat(equation);
-  let invRes = 1 / res;
-  let step = Math.abs(end - start) * invRes;
 
-  start = Math.floor(start)
-  end = Math.ceil(end)
-
-  for (let i = start; i <= end; i += step) {
-    let newPoint = {};
-    newPoint.x = i;
-    if (i < 0.00000001 && i > -0.00000001) {
-      newPoint.x = Math.round(i);
+    let term = findTerm(equation.substring(indexValue + 1));
+    let replacement = "(" + term + "^(1/" + root + "))";
+    if (from != 0 && !isOperator(equation[from - 1])) {
+      replacement = "*" + replacement;
     }
-    let proper = parseEquation.length > 0 ? parseEquation.join(newPoint.x) : "" + newPoint.x;
-    newPoint.y = fullSolve(proper);
-    pointArray.push(newPoint);
-
+    equation = equation.substring(0, from) + replacement + equation.substring(indexValue + term.length + 1);
+    indexValue = equation.indexOf("√");
   }
-  return pointArray;
-}
-function calculateExtrema(equation) {
-  let extrema = [];
-  let parseEquation = createParseEquat(equation);
-  //console.log("%c parseEquation", "color: yellow", parseEquation)
-  let copy = parseEquation.length > 0 ? parseEquation.join("x") : "x";
-  console.log("%c parseEquation", "color: yellow", copy)
-  if (varInEquat(copy).length == 1) {
-    extrema.push({ x: fullSolve(createSidedEquation(copy + "=0", "x"), settings.degRad), y: 0 })
-  }
-  let proper = parseEquation.length > 0 ? parseEquation.join('0') : '0';
-  extrema.push({ x: 0, y: fullSolve(parseEquation.join("0")) })
-  return extrema;
-}
-function trailingRound(num) {
-  let stringDef = String(num)
-  stringDef = stringDef.substring(stringDef.indexOf('.'))
-  let arry = stringDef.split('')
-  let count = 0;
-  for (let val of arry) {
-    if (val == '0') {
-      count++
+  indexValue = equation.indexOf("|");
+  while (indexValue >= 0) {
+    let matchEnd = equation.substring(indexValue + 1).findCharMatch("|", true) + indexValue;
+    let replacement = "abs(" + equation.substring(indexValue + 1, matchEnd + 1) + ")";
+    if (indexValue - 1 >= 0 && !isOperator(equation[indexValue - 1])) {
+      replacement = "*" + replacement;
     }
-  }
-  if (count > 4) {
-    return String(num).substring(0, String(num).indexOf('.'))
-  } else {
-    return num;
-  }
-}
-function isVar(entry) {
-  let func = funcMatch(entry, true);
-  let ignore = ignoreTest(entry);
-  if (func != "") {
-    if (getByName(func) != false) {
-      let object = getByName(func);
-      return object.funcLength;
-    } else {
-      return func.func.length
+    if (matchEnd + 2 <= equation.length && !isOperator(equation[matchEnd + 2])) {
+      replacement = replacement + "*";
     }
-  } else if (ignore != undefined) {
-    return ignore
-  } else {
-    return 0;
+    equation = equation.substring(0, indexValue) + replacement + equation.substring(matchEnd + 2);
+    console.log("post operation: " + equation)
+    indexValue = equation.indexOf("|");
   }
-}
-function isOperator(entry) {
-  let operators = ["+", "-", "*", "/", "^"]
-  return operators.includes(entry);
-}
-function changeImplemented(oldName, newObject) {
-  let oldConfig = getByName(oldName)
-  let oldIndex = funcList.indexOf(oldConfig);
-  funcList.splice(oldIndex, 1, newObject);
-}
-function changeFunc(name, newObject) {
-  let target = funcList.find(elem => elem.func == name);
-  let object = {};
-  if (newObject.type == "Function") {
-    object = parseFuncEntry("function", newObject.name, newObject.equation);
-  } else if (newObject.type == "Hybrid" && !newObject.code.includes('XMLHttpRequest')) {
-    object = parseFuncEntry("method", newObject.code);
-  }
-  runners.forEach((runner) => {
-    if (runner.isFunc == true && runner.func == target) {
-      runner.equation = newObject.equation;
-      runner.func = object;
-      runner.vars = object.vars;
-    }
-  });
-  funcList.splice(funcList.indexOf(target), 1, object);
-  return object;
-}
-function getMethod(name) {
-  return JSON.parse(JSON.stringify(getByName(name)));
-}
-function setVarEquat(equation, varList) {
-  for (let data of varList) {
-    for (let i = 0; i < equation.length; i++) {
-      let funcMatchVar = funcMatch(equation.substring(i), true);
-      if (funcMatchVar != "") {
-        i += funcMatchVar.func.length - 1;
-      } else if (equation.substring(i, i + data.letter.length) == data.letter) {
-        if (data.value != "" && data.value != undefined) {
-          equation = equation.substring(0, i) + "(" + data.value + ")" + equation.substring(i + 1);
-        }
-      }
-    }
+  indexValue = equation.indexOf("<sup");
+  while (indexValue >= 0) {
+    console.log(equation.substring(equation.indexOf(">", indexValue) + 1).findMatch("<sup", "</sup>"))
+    let matchEnd = equation.substring(equation.indexOf(">", indexValue) + 1).findMatch("<sup", "</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">", indexValue) + 1).length;
+    console.log(matchEnd);
+    let term = findTerm(equation.substring(equation.indexOf(">", indexValue) + 1));
+    equation = equation.substring(0, indexValue) + "^(" + term + ")" + equation.substring(matchEnd + 6);
+    console.log(equation)
+    indexValue = equation.indexOf("<sup");
   }
   return equation;
 }
-function generateVars(length) {
-  let newVars = [];
-  for (let i = 0; i < length; i++) {
-    newVars.push(String.fromCharCode(97 + i));
-  }
-  return newVars;
+/*Parse equation methods *************************************************************/
+const createOp =function (section) {
+  const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|"]
+  const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"]
+  const group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non"];
+  const groupIdx = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, 4, 4];
+  return { 'type': "op", "subtype": typeIndex[ops.indexOf(section.charAt(0))], "text": section.charAt(0), "pos": null, "group": group[ops.indexOf(section.charAt(0))], "groupIndex": groupIdx[ops.indexOf(section.charAt(0))], "ignore": false };
 }
-function funcsContainingVar(varLetter) {
-  let funcs = [];
-  for (let func of funcList) {
-    if (Array.isArray(func.func)) {
-      for (funcName of func.func) {
-        if (funcName.includes(varLetter)) {
-          funcs.push(funcName)
+const parseEquation = function (equation) {
+  let equatParse = [];
+  let cutLength = 0;
+  while (true) {
+    console.log(equation)
+    let cutString = 0;
+    let currentSec = [];
+    let termText = backward(equation);
+    let currTerm;
+    let currOp;
+    let func;
+    if (termText) {
+      currTerm = { 'type': "term", "text": termText, "pos": 0 };
+      cutString += currTerm.text.length;
+      currentSec.push(currTerm);
+      func = funcInString(currTerm.text, false);
+      if (func != "") {
+        console.log("The function is " + func.func)
+        if (currTerm.text.replace(func.func, "").length != 0) {
+          currTerm.text = currTerm.text.replace(func.func, "")
+          currentSec.push(...[{ 'type': "op", "subtype": "Muti", "text": "*", "pos": i }, { 'type': "func", "text": func.func, "pos": null }]);
+        } else {
+          currentSec.shift();
+          currentSec.unshift({ 'type': "func", "text": func.func, "pos": null });
         }
       }
-    } else {
-      if (func.func.includes(varLetter)) {
-        funcs.push({ "name": func.func, "idx": func.func.indexOf(varLetter) });
+      if (varInEquat(currTerm.text).length != 0) {
+        currentSec.shift();
+        currentSec.unshift(...parseTextTerm({ "type": "term", "subtype": 'varContainer', "text": currTerm.text, "pos": null }));
       }
     }
-  }
-  return funcs;
-}
-function getAngleConversion(type) {
-  if (settings.degRad) {
-    if (type == 'deg') {
-      return (Math.PI / 180);
-    } else if (type = "rad") {
-      return 180 / Math.PI;
+    if (equation.substring(cutString) != "") {
+      currOp = createOp(equation.substring(cutString));
+      if (currOp.subtype == "ParStart") {
+        if (func == "" && currTerm != undefined) {
+          currentSec.splice(1, 0, { 'type': "op", "subtype": "Muti", "text": "*", "pos": null });
+        }
+        let encap = parInnerString(equation.substring(cutString + 1));
+        cutString += encap.length + 2;
+        let encapParse = parseEquation(encap);
+        currentSec.push({ type: "parSec", "text": encap, "pos": null, "parse": encapParse });
+      } else {
+        currentSec.push(currOp);
+        cutString++;
+      }
     }
+    cutLength += cutString;
+    equation = equation.substring(cutString);
+    equatParse.push(...currentSec);
+    if (equation.length == 0) {
+      break;
+    }
+  }
+  
+  return equatParse;
+}
+//end ParseMethods*********************************************************************
+
+/* Combine parse methods *************************************************************/
+const combinable =function (index, parse) {
+  let [termType, borderTerms, combineType] = [parse[index].groupIdx, [parse[index - 1], parse[index + 1]], -1];
+  if (borderTerms[0].ignore != true && borderTerms[1].ignore != true && borderTerms[0].subtype != "var" && borderTerms[1].subtype != "var") {
+    combineType = -2;
+  } else if (borderTerms[1].ignore != true && borderTerms[1].subtype != "var" && (borderTerms[0].ignore == true || borderTerms[0].subtype == "var")) {
+    let sameIdx = parse.findLastIndex((element, idx) => (element.groupIdx == termType && idx < index && element.ignore != true));
+    let diffIdx = parse.findLastIndex((element, idx) => (element.groupIdx < termType && idx < index && element.ignore != true));
+    if (sameIdx > diffIdx) {
+      combineType = sameIdx;
+    }
+  }
+  return combineType;
+}
+const combineParse =function (parse) {
+  /* The object of this function is to go thorugh a function parse using a find method to exmaine various
+  parts of the parse and combine them into a single term. If there is a variable in the way of the
+  combination then it will be left alone and have an ignore tag added to it so that the function
+  will move on to the next term.
+  */
+  let target;
+  let ignoreIndex = -1;
+  let targetIndex;
+  let getFuncParse;
+  let combineIdx;
+  /*Parenthesis Secition************************************************/
+  console.log("parSection")
+  getFuncParse = (e, i) => {
+    targetIndex = i;
+    return (e.type == 'parSec' && e.ignore != true && i > ignoreIndex)
+  };
+  target = parse.find(getFuncParse);
+  while (target) {
+    let combinePar = combineParse(target.parse);
+   if(parse[targetIndex - 1].type == "func" ){
+      let func = getFuncByName(parse[targetIndex - 1].text);
+      if(func.type == "method"){
+        if(combinePar.find(elem => elem.type == "var")){
+          let argumentArray = mapFuncArguements(combinePar);
+          parse.splice(targetIndex - 1, 2, {"type": "term", "text": func.mth(argumentArray)});
+        }else{
+          parse[targetIndex - 1].ignore = true;
+          target.ignoreIndex = true;
+          ignoreIndex = targetIndex+1;
+        }
+      }else{
+        let argumentArray = parseFuncArgs(combinePar);
+        let combineFunc = combineParse(parseVars(func.funcParse, argumentArray));
+        parse.splice(targetIndex - 1, 2, ...Array.isArray(combineFunc) ? combineFunc : [combineFunc]);
+        ignoreIndex = targetIndex-1;
+      }
+    }else{
+      if (Array.isArray(combinePar)) {
+        target.ignore = true;
+        target.parse = combinePar;
+        ignoreIndex = targetIndex + 1;
+      } else {
+        parse.splice(targetIndex, 1, combinePar);
+        ignoreIndex = targetIndex+1;
+      }
+    }
+    
+    target = parse.find(getFuncParse);
+  }
+  console.log(parse)
+  //end*******************************************************************
+  ignoreIndex = 0;
+  /*Powers Secition******************************************************/
+  console.log("powersSection")
+  getFuncParse = (e, i) => {
+    targetIndex = i;
+    return (e.group == 'pow' && e.ignore != true && i > ignoreIndex)
+  }
+  target = parse.find(getFuncParse);
+  while (target) {
+    combineIdx = combinable(targetIndex, parse);
+    if (combineIdx == -2) {
+      parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).pow(Number(parse[targetIndex + 1].text)).toString();
+      parse.splice(targetIndex, 2);
+    } else {
+      parse[targetIndex - 1].ignore = true;
+      target.ignore = true;
+      parse[targetIndex + 1].ignore = true;
+      ignoreIndex = targetIndex + 2;
+    }
+
+    target = parse.find(getFuncParse);
+  }
+  //end*******************************************************************
+  ignoreIndex = 0;
+  /*Muti Secition********************************************************/
+  console.log("mutiSection")
+  getFuncParse = (e, i) => {
+    targetIndex = i;
+    return (e.group == 'muti' && e.ignore != true && i > ignoreIndex)
+  }
+  target = parse.find(getFuncParse);
+  while (target) {
+    combineIdx = combinable(targetIndex, parse);
+    console.log(combineIdx)
+    if (combineIdx == -2) {
+      if (target.subtype == 'Div') {
+        parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).div(Number(parse[targetIndex + 1].text)).toString();
+      } else if (target.subtype == 'Muti') {
+        parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).times(Number(parse[targetIndex + 1].text)).toString();
+      }
+      parse.splice(targetIndex, 2);
+    } else if (combineIdx > -1) {
+      console.log(parse[targetIndex + 1])
+      parse[combineIdx - 1].text = new Decimal(parse[combineIdx - 1].text).plus(Number(parse[targetIndex + 1].text)).toString();
+      parse.splice(targetIndex, 2);
+    } else {
+      parse[targetIndex - 1].ignore = true;
+      target.ignore = true;
+      parse[targetIndex + 1].ignore = true;
+      ignoreIndex = targetIndex + 2;
+    }
+    target = parse.find(getFuncParse);
+  }
+  //end*******************************************************************
+  ignoreIndex = 0;
+  /*Add Secition*********************************************************/
+  console.log("addSection")
+  getFuncParse = (e, i) => {
+    targetIndex = i;
+    return (e.group == 'add' && e.ignore != true && i > ignoreIndex)
+  }
+  target = parse.find(getFuncParse);
+  while (target) {
+    console.log("found an add")
+    combineIdx = combinable(targetIndex, parse);
+    console.log(target.subtype)
+    if (combineIdx == -2) {
+      if (target.subtype == 'Plus') {
+        console.log(JSON.parse(JSON.stringify(parse)));
+        parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).plus(Number(parse[targetIndex + 1].text)).toString();
+      } else if (target.subtype == 'Minus') {
+        parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).minus(Number(parse[targetIndex + 1].text)).toString();
+      }
+      parse.splice(targetIndex, 2);
+    } else if (combineIdx > -1) {
+      parse[combineIdx - 1].text = new Decimal(parse[combineIdx - 1].text).plus(Number(parse[targetIndex + 1].text)).toString();
+      parse.splice(targetIndex, 2);
+    } else {
+      parse[targetIndex - 1].ignore = true;
+      target.ignore = true;
+      parse[targetIndex + 1].ignore = true;
+      ignoreIndex = targetIndex + 2;
+    }
+    target = parse.find(getFuncParse);
+  }
+  //end*******************************************************************
+  console.log(parse)
+  if (parse.length == 1) {
+    return parse[0]
   } else {
-    return 1;
+    parse.complete = false;
+    return parse
   }
 }
+const parseFuncArgs = function (parse) {
+  console.log(JSON.parse(JSON.stringify(parse)))
+  let argArry = [];
+  if(!Array.isArray(parse)){
+    parse = [parse]
+  }
+  let findMethod = (e) => {
+    return (e.subtype == "Comma" )
+  }
+  let commaIndex = parse.findIndex(findMethod);
+  while(commaIndex > -1){
+    argArry.push(parse.splice(0, commaIndex));
+    parse.shift();
+    commaIndex = parse.findIndex(findMethod);
+  }
+  argArry.push(parse);
+  console.log(argArry)
+  return argArry;
+}
+const mapFuncArguements = function (parse) {
+  return parse.map((element) => {
+    if(element.type == "term"){
+      return Number(element.text);
+    }
+  });
+}
+const parseVars = function (parse, varArray){
+  console.log(parse)
+  for(let varDef of varArray){
+    let varIndex = parse.findIndex((element) => (element.subtype == "var" && element.text == varDef.name));
+    if(varIndex > -1){
+      parse.splice(varIndex, 1, ...Array.isArray(varDef) ? varDef : [varDef]);
+    }
+  }
+  return parse;
+}
+//end CombineMethods*******************************************************************
+
+
+
+
 //end
 console.log("things from eval")
-console.log(builtInFunc("<sup>42</sup>√23"))
-console.log(createNewFunction("function", 'testor', "x*5+u"))
-console.log(parseEquation("testor(23)+9xxf"))
-console.log(solveFor("x*5+(u)", "x"))
-console.log(parEncap("((78)",false))
+console.log(parseEquation(builtInFunc("<sup>42</sup>√23")))
+console.log(createFunction("function", 'testor', "x*5+u"))
+console.log(combineParse(parseEquation("testor(23,3)*43")))
 
-console.log(createNewFunction("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
+console.log(createFunction("method", 'function methodTest(test,thing){\ntest*thing;\n}'))
 console.log("%c testor", "color: yellow;", createSidedEquation("testor((6),x)=0", "x"))

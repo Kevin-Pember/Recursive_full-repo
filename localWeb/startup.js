@@ -146,7 +146,7 @@ class MediaType {
 
 }
 var settings;
-let calcWorker = new Worker('evalWorker.js');
+let calcWorker = new Worker('evalWorker.js',{type: 'module'});
 let envObject = {
   funcButtons: [],
   inputs: [],

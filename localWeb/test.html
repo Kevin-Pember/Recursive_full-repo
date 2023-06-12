@@ -8,7 +8,7 @@
     <title>Document</title>
     <meta name="viewport"
         content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <script src="startup.js"></script>
+    <!--<script src="startup.js"></script>
     <link rel="stylesheet" href="./styling/stylesheets.css">
     <script src="./packages/qr-creator.js"></script>
     <script type="text/javascript" src="./packages/html5-qrcode.min.js"></script>
@@ -16,73 +16,13 @@
     <script src="packages/hammer.js"></script>
     <script src="./packages/chartjs-plugin-zoom.js"></script>
     <script src="componets.js"></script>
-    <script src="packages/safariSelectionPolyfill.js"></script>
+    <script src="packages/safariSelectionPolyfill.js"></script>-->
+    <script type="import" src="packages/decimal.mjs"></script>
+    <script src="evalWorker.js"></script>
 </head>
 
 <body>
-    <script>
-        console.log(document.createElement('button').nodeName);
-        let stylers = [
-
-        ]
-        let formats = [
-            {
-                "name": "mobilePortrait",
-                "query": window.matchMedia("(orientation: portrait) and (max-width: 450px)"),
-                "methods": [() => { envObject.globalOrientation = "portrait" }]
-            },
-            {
-                "name": "mobileLandscape",
-                "query": window.matchMedia("(orientation: landscape) and (max-height: 450px)"),
-                "methods": [() => { envObject.globalOrientation = "landscape" }]
-            }
-        ]
-        let appendMethod = (format, method) => {
-            formats.find((elem) => {
-                if (elem.name == format) {
-                    elem.methods.push(method)
-                }
-            })
-        }
-        let array = [{ "name": "jerry", "test": "test" }]
-        let objecty = { "instance": array[0] }
-        objecty.instance.test = "test2";
-        console.log(objecty);
-        console.log(array);
-    </script>
-    <link rel="stylesheet" href="./styling/animations.css">
-    <style>
-        body {
-            height: 100%;
-            width: 100%;
-            background-color: var(--secondary);
-        }
-    </style>
-    <settings-page></settings-page>
     
-    <script>
-        document.body.addEventListener('click', (e) => {
-            console.log(e.target.nodeName);
-            console.log(e.composedPath()[0]);
-        })
-        for (let qElem of formats) {
-            let format = () => {
-
-                for (let method of qElem.methods) {
-                    method();
-                }
-            }
-            qElem.query.addEventListener('change', () => {
-                if (qElem.query.matches) {
-                    format()
-                }
-            })
-            if (qElem.query.matches == true) {
-                format()
-            }
-        }
-    </script>
-    <!--<create-page></create-page>-->
 </body>
 
 </html>
