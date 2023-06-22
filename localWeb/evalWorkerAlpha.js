@@ -281,9 +281,7 @@ let ignoreList = [
   "Math.PI"
 
 ];
-let secondList = [
-  "sup>",
-];
+
 
 Array.prototype.replaceAll = function (value, replacement) {
   let idxs = [];
@@ -1069,9 +1067,26 @@ const parseFuncEntry = function () {
     returnedObject.funcLength = name.length;
   } else if (arguments[0] == "method") {
     let funcString = arguments[1];
-    returnedObject = parseFunction(funcString);
-    //console.log(returnedObject)
-    returnedObject.mth = stringFunction(returnedObject)();
+    let cutString = funcString;
+    cutString = cutString.substring(cutString.indexOf("function") + 9)
+    let name = cutString.substring(0, cutString.indexOf("(")).trim();
+    let variables = varInFunc(cutString)
+    cutString = cutString.substring(cutString.indexOf("{"));
+    let returnedObject = {
+      "func": name,
+      "type": "method",
+      "string": cutString,
+      "vars": variables,
+      'full': funcString,
+      "inputs": variables.length,
+      "funcRadDeg": false,
+      "funcLength": name.length
+    }
+    for (let i = variables.length - 1; i >= 0; i--) {
+      cutString = cutString.substring(0, 1) + `var ${variables[i].letter} = array[${i}];` + cutString.substring(1);
+    }
+    string = `var ${returnedObject.name} = function (array)${cutString} \n return ${returnedObject.name};`;
+    returnedObject.mth = Function(string)();
   }
   return returnedObject;
 }
@@ -1096,9 +1111,27 @@ const removeFunction = function (name) {
     }
   })
 }
+const changeFunc = function (name, newObject) {
+  let target = funcList.find(elem => elem.func == name);
+  let object = {};
+  if (newObject.type == "Function") {
+    object = parseFuncEntry("function", newObject.name, newObject.equation);
+  } else if (newObject.type == "Hybrid" && !newObject.code.includes('XMLHttpRequest')) {
+    object = parseFuncEntry("method", newObject.code);
+  }
+  runners.forEach((runner) => {
+    if (runner.isFunc == true && runner.func == target) {
+      runner.equation = newObject.equation;
+      runner.func = object;
+      runner.vars = object.vars;
+    }
+  });
+  funcList.splice(funcList.indexOf(target), 1, object);
+  return object;
+}
 /*********************************************Solve Toothless****************************************** */
 //Func method to find if the current postion has a function defined in the funclist
-const getFuncByName = function(name) {
+const getFuncByName = function (name) {
   for (let func of funcList) {
     if (Array.isArray(func.func)) {
       if (func.func.includes(name)) {
@@ -1197,29 +1230,8 @@ const solveFunc = function (equation, index) {
   }
   return parsedFunc;
 }
-const findTerm = function (equation) {
-  let direction = true;
-  let endIndex = 0;
-  if (arguments[1] != undefined) {
-    direction = arguments[1];
-  }
-  for (let i = direction ? 0 : equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--) {
-    if (equation[i] == "(" || equation[i] == ")") {
-      let nextIndex = direction ? equation.substring(i).findMatch("(", ")", direction) : equation.substring(0, i - 1).findMatch("(", ")", direction);
-      if (nextIndex != -1) {
-        i = nextIndex - 1;
-        endIndex = i;
-      }
-    } else if (equation[i] == '+' || equation[i] == '-' || equation[i] == '×' || equation[i] == '<' || equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|') {
-      endIndex = i;
-      break;
-    }
-    endIndex = endIndex + (direction ? 1 : -1);
-  }
-  return direction ? equation.substring(0, endIndex) : equation.substring(endIndex + 1);
-}
 //Main method called to parse an Equation
-const solveInterpreter = function(equation, degRad) {
+const solveInterpreter = function (equation, degRad) {
   for (let i = 0; i < equation.length; i++) {
     let func = funcInString(equation.substring(i), true);
     if (func != "") {
@@ -1279,7 +1291,7 @@ const createParseable = function (equation) {
   for (let data of variables) {
     for (let i = 0; i < equation.length; i++) {
       let ignore = testIgnore
-    (equation.substring(i));
+        (equation.substring(i));
       if (ignore != undefined) {
         i += ignore - 1;
       } else if (equation.charAt(i) == data.letter) {
@@ -1325,21 +1337,7 @@ const stringFunction = function (object) {
 }
 //Method that takes a string function and uses the text to get all needed info
 const parseFunction = function (StringFunction) {
-  let preserved = StringFunction;
-  StringFunction = StringFunction.substring(StringFunction.indexOf("function") + 9)
-  let name = StringFunction.substring(0, StringFunction.indexOf("(")).trim();
-  let variables = varInFunc(StringFunction)
-  StringFunction = StringFunction.substring(StringFunction.indexOf("{"));
-  let finalObject = {
-    "func": name,
-    "type": "method",
-    "string": StringFunction,
-    "vars": variables,
-    'full': preserved,
-    "inputs": variables.length,
-    "funcRadDeg": false,
-    "funcLength": name.length
-  }
+
   return finalObject;
 }
 
@@ -1687,7 +1685,7 @@ const solveFor = function (equat, varDef) {
 }
 //********************************************** */
 
-const opsInEquat =function (equation) {
+const opsInEquat = function (equation) {
   //console.log(`Equation before the ops method ${equation}`)
   let opsArry = []
   const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',']
@@ -1706,7 +1704,7 @@ const opsInEquat =function (equation) {
       case ('<'):
         if (equation.substring(i, i + 5).includes('<sup>')) {
           let sub = supInnerString
-        (equation.substring(i))
+            (equation.substring(i))
           let subArry = opsInEquat(sub.substring(5, sub.length - 6)).arry
           for (let item of subArry) {
             item.pos += i + 2;
@@ -1724,7 +1722,7 @@ const opsInEquat =function (equation) {
   }
   return { "arry": opsArry, "equat": equation }
 }
-const termsInEquat =function (equation, fullArray) {
+const termsInEquat = function (equation, fullArray) {
   let modEquat = equation
   let completeArray = fullArray.length > 0 ? fullArray : [{ 'type': "term", "text": equation, "pos": 0 }]
   for (let item of fullArray) {
@@ -1735,7 +1733,7 @@ const termsInEquat =function (equation, fullArray) {
     let termAfter = backward(modEquat.substring(modIndex + 1));
     let prelength = termAfter.length;
     let beforeFunc = false
-    if  (funcInString(termBefore, false) != "") {
+    if (funcInString(termBefore, false) != "") {
       beforeFunc = true;
       let func = funcInString(termBefore, false);
       let aindex = completeArray.indexOf(item);
@@ -1743,7 +1741,7 @@ const termsInEquat =function (equation, fullArray) {
       termBefore = termBefore.substring(0, termBefore.length - (func.func.length))
 
     }
-    if  (funcInString(termAfter, false) != "") {
+    if (funcInString(termAfter, false) != "") {
       let func = funcInString(termAfter, false)
       let aindex = completeArray.indexOf(item);
       completeArray.splice(aindex + 1, 0, { 'type': 'func', 'text': func.func, 'pos': [index + (termAfter.length - (func.func.length) + 1), index + termAfter.length] })
@@ -1785,7 +1783,7 @@ const termsInEquat =function (equation, fullArray) {
   }
   return completeArray;
 }
-const parLinkMap =function (fullArray) {
+const parLinkMap = function (fullArray) {
   for (let j = 0; j < fullArray.length; j++) {
     if (fullArray[j].subtype == "ParStart") {
       let returned = parInnerStringArray(fullArray, j)
@@ -1795,7 +1793,7 @@ const parLinkMap =function (fullArray) {
   }
   return fullArray;
 }
-const parInnerStringArray =function (fullArray, startIndex) {
+const parInnerStringArray = function (fullArray, startIndex) {
   let length = 0;
   for (let i = startIndex + 1; i < fullArray.length; i++) {
     length++
@@ -1815,7 +1813,7 @@ const parInnerStringArray =function (fullArray, startIndex) {
   }
   return [fullArray, length];
 }
-const updateFullArray =function (startPos, fullArray, changeInPos, changeInArry) {
+const updateFullArray = function (startPos, fullArray, changeInPos, changeInArry) {
   //console.log("Updating")
   //console.log(changeInPos)
   for (let i = startPos + 1; i < fullArray.length; i++) {
@@ -1830,14 +1828,14 @@ const updateFullArray =function (startPos, fullArray, changeInPos, changeInArry)
   }
   return fullArray;
 }
-const arryToString =function (arry) {
+const arryToString = function (arry) {
   let string = ""
   for (let item of arry) {
     string += item.text;
   }
   return string;
 }
-const basicNumInter =function (equation) {
+const basicNumInter = function (equation) {
   let reverEquat = reverseString(equation)
   let replacePos = [];
   for (let i = reverEquat.length - 1; i >= 0; i--) {
@@ -1850,16 +1848,16 @@ const basicNumInter =function (equation) {
   }
   return equation;
 }
-const reverseString =function (str) {
+const reverseString = function (str) {
   return (str === '') ? '' : reverseString(str.substr(1)) + str.charAt(0);
 }
-const arrayEquals =function (a, b) {
+const arrayEquals = function (a, b) {
   return Array.isArray(a) &&
     Array.isArray(b) &&
     a.length === b.length &&
     a.every((val, index) => val === b[index]);
 }
-const replaceVars =function (arry, vars) {
+const replaceVars = function (arry, vars) {
   //console.log(arry)
   //console.log(vars)
   let value = vars.length
@@ -1873,7 +1871,7 @@ const replaceVars =function (arry, vars) {
   })
   return arry
 }
-const parseableConverter =function (parseArry, varsInOrder, varDef) {
+const parseableConverter = function (parseArry, varsInOrder, varDef) {
   let genVars = generateVars(varsInOrder.length)
   for (let i = 0; i < genVars.length; i++) {
     parseArry.replaceAll("v" + (i + 1), "(" + genVars[i] + ")")
@@ -1886,7 +1884,7 @@ const parseableConverter =function (parseArry, varsInOrder, varDef) {
 }
 //end
 /*********************************************************spill over***************************************** */
-const numInEquat =function (equation) {
+const numInEquat = function (equation) {
   let numArry = [];
   let currentNum = "";
   for (let i = 0; i < equation.length; i++) {
@@ -1899,7 +1897,7 @@ const numInEquat =function (equation) {
   }
   return numArry;
 }
-const varInList =function (list, varLetter) {
+const varInList = function (list, varLetter) {
   for (let item of list) {
     if (item.letter == varLetter) {
       return item;
@@ -1907,7 +1905,7 @@ const varInList =function (list, varLetter) {
   }
   return null;
 }
-const createParseEquat =function (equation) {
+const createParseEquat = function (equation) {
   let vars = varInEquat(equation);
   let solveArry = [];
   if (vars.length == 1) {
@@ -1926,7 +1924,7 @@ const createParseEquat =function (equation) {
   //console.log(solveArry)
   return solveArry
 }
-const calculatePoints =function (equation, start, end, res) {
+const calculatePoints = function (equation, start, end, res) {
   let pointArray = [];
   let parseEquation = createParseEquat(equation);
   let invRes = 1 / res;
@@ -1948,7 +1946,7 @@ const calculatePoints =function (equation, start, end, res) {
   }
   return pointArray;
 }
-const calculateExtrema =function (equation) {
+const calculateExtrema = function (equation) {
   let extrema = [];
   let parseEquation = createParseEquat(equation);
   //console.log("%c parseEquation", "color: yellow", parseEquation)
@@ -1961,7 +1959,7 @@ const calculateExtrema =function (equation) {
   extrema.push({ x: 0, y: fullSolve(parseEquation.join("0")) })
   return extrema;
 }
-const trailingRound =function (num) {
+const trailingRound = function (num) {
   let stringDef = String(num)
   stringDef = stringDef.substring(stringDef.indexOf('.'))
   let arry = stringDef.split('')
@@ -1977,10 +1975,10 @@ const trailingRound =function (num) {
     return num;
   }
 }
-const isVar =function (entry) {
+const isVar = function (entry) {
   let func = funcInString(entry, true);
   let ignore = testIgnore
-(entry);
+    (entry);
   if (func != "") {
     if (getFuncByName(func) != false) {
       let object = getFuncByName(func);
@@ -1995,32 +1993,14 @@ const isVar =function (entry) {
   }
 }
 
-const changeFunc =function (name, newObject) {
-  let target = funcList.find(elem => elem.func == name);
-  let object = {};
-  if (newObject.type == "Function") {
-    object = parseFuncEntry("function", newObject.name, newObject.equation);
-  } else if (newObject.type == "Hybrid" && !newObject.code.includes('XMLHttpRequest')) {
-    object = parseFuncEntry("method", newObject.code);
-  }
-  runners.forEach((runner) => {
-    if (runner.isFunc == true && runner.func == target) {
-      runner.equation = newObject.equation;
-      runner.func = object;
-      runner.vars = object.vars;
-    }
-  });
-  funcList.splice(funcList.indexOf(target), 1, object);
-  return object;
-}
-const getMethod =function (name) {
+const getMethod = function (name) {
   return JSON.parse(JSON.stringify(getFuncByName(name)));
 }
-const setVarEquat =function (equation, varList) {
+const setVarEquat = function (equation, varList) {
   for (let data of varList) {
     for (let i = 0; i < equation.length; i++) {
       let funcInStringVar = funcInString(equation.substring(i), true);
-      if  (funcInStringVar != "") {
+      if (funcInStringVar != "") {
         i += funcInStringVar.func.length - 1;
       } else if (equation.substring(i, i + data.letter.length) == data.letter) {
         if (data.value != "" && data.value != undefined) {
@@ -2031,14 +2011,14 @@ const setVarEquat =function (equation, varList) {
   }
   return equation;
 }
-const generateVars =function (length) {
+const generateVars = function (length) {
   let newVars = [];
   for (let i = 0; i < length; i++) {
     newVars.push(String.fromCharCode(97 + i));
   }
   return newVars;
 }
-const getAngleConversion =function (type) {
+const getAngleConversion = function (type) {
   if (settings.degRad) {
     if (type == 'deg') {
       return (Math.PI / 180);
@@ -2155,7 +2135,7 @@ const funcInString = function (equation, way) {
   }
   return returned;
 }
-const varInEquat =function (equation) {
+const varInEquat = function (equation) {
   //console.log(`Equation is ${equation}`)
   let varArray = [];
   for (let i = 0; i < equation.length; i++) {
@@ -2263,7 +2243,7 @@ const builtInFunc = function (equation) {
   return equation;
 }
 /*Parse equation methods *************************************************************/
-const createOp =function (section) {
+const createOp = function (section) {
   const ops = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|"]
   const typeIndex = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"]
   const group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non"];
@@ -2323,13 +2303,13 @@ const parseEquation = function (equation) {
       break;
     }
   }
-  
+
   return equatParse;
 }
 //end ParseMethods*********************************************************************
 
 /* Combine parse methods *************************************************************/
-const combinable =function (index, parse) {
+const combinable = function (index, parse) {
   let [termType, borderTerms, combineType] = [parse[index].groupIdx, [parse[index - 1], parse[index + 1]], -1];
   if (borderTerms[0].ignore != true && borderTerms[1].ignore != true && borderTerms[0].subtype != "var" && borderTerms[1].subtype != "var") {
     combineType = -2;
@@ -2342,7 +2322,7 @@ const combinable =function (index, parse) {
   }
   return combineType;
 }
-const combineParse =function (parse) {
+const combineParse = function (parse) {
   /* The object of this function is to go thorugh a function parse using a find method to exmaine various
   parts of the parse and combine them into a single term. If there is a variable in the way of the
   combination then it will be left alone and have an ignore tag added to it so that the function
@@ -2362,34 +2342,34 @@ const combineParse =function (parse) {
   target = parse.find(getFuncParse);
   while (target) {
     let combinePar = combineParse(target.parse);
-   if(parse[targetIndex - 1].type == "func" ){
+    if (parse[targetIndex - 1].type == "func") {
       let func = getFuncByName(parse[targetIndex - 1].text);
-      if(func.type == "method"){
-        if(combinePar.find(elem => elem.type == "var")){
+      if (func.type == "method") {
+        if (combinePar.find(elem => elem.type == "var")) {
           let argumentArray = mapFuncArguements(combinePar);
-          parse.splice(targetIndex - 1, 2, {"type": "term", "text": func.mth(argumentArray)});
-        }else{
+          parse.splice(targetIndex - 1, 2, { "type": "term", "text": func.mth(argumentArray) });
+        } else {
           parse[targetIndex - 1].ignore = true;
           target.ignoreIndex = true;
-          ignoreIndex = targetIndex+1;
+          ignoreIndex = targetIndex + 1;
         }
-      }else{
+      } else {
         let argumentArray = parseFuncArgs(combinePar);
         let combineFunc = combineParse(parseVars(func.funcParse, argumentArray));
         parse.splice(targetIndex - 1, 2, ...Array.isArray(combineFunc) ? combineFunc : [combineFunc]);
-        ignoreIndex = targetIndex-1;
+        ignoreIndex = targetIndex - 1;
       }
-    }else{
+    } else {
       if (Array.isArray(combinePar)) {
         target.ignore = true;
         target.parse = combinePar;
         ignoreIndex = targetIndex + 1;
       } else {
         parse.splice(targetIndex, 1, combinePar);
-        ignoreIndex = targetIndex+1;
+        ignoreIndex = targetIndex + 1;
       }
     }
-    
+
     target = parse.find(getFuncParse);
   }
   console.log(parse)
@@ -2491,14 +2471,14 @@ const combineParse =function (parse) {
 const parseFuncArgs = function (parse) {
   console.log(JSON.parse(JSON.stringify(parse)))
   let argArry = [];
-  if(!Array.isArray(parse)){
+  if (!Array.isArray(parse)) {
     parse = [parse]
   }
   let findMethod = (e) => {
-    return (e.subtype == "Comma" )
+    return (e.subtype == "Comma")
   }
   let commaIndex = parse.findIndex(findMethod);
-  while(commaIndex > -1){
+  while (commaIndex > -1) {
     argArry.push(parse.splice(0, commaIndex));
     parse.shift();
     commaIndex = parse.findIndex(findMethod);
@@ -2509,16 +2489,16 @@ const parseFuncArgs = function (parse) {
 }
 const mapFuncArguements = function (parse) {
   return parse.map((element) => {
-    if(element.type == "term"){
+    if (element.type == "term") {
       return Number(element.text);
     }
   });
 }
-const parseVars = function (parse, varArray){
+const parseVars = function (parse, varArray) {
   console.log(parse)
-  for(let varDef of varArray){
+  for (let varDef of varArray) {
     let varIndex = parse.findIndex((element) => (element.subtype == "var" && element.text == varDef.name));
-    if(varIndex > -1){
+    if (varIndex > -1) {
       parse.splice(varIndex, 1, ...Array.isArray(varDef) ? varDef : [varDef]);
     }
   }
