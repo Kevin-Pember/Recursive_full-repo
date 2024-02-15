@@ -231,14 +231,6 @@ class parseTerm {
         this.opCount = 0;
     }
 }
-class funcTerm extends parseTerm {
-    constructor(func) {
-        super();
-        this.type = "func";
-        this.text = func.name;
-        this.funcStore = func;
-    }
-}
 class parSec extends parseTerm {
     constructor(text) {
         super();
@@ -261,6 +253,8 @@ class varTerm extends parseTerm {
         this.type = "var";
         this.subtype = "var";
         this.letter = letter;
+        this.powId = {};
+        this.mutiId = {};
     }
 }
 class opTerm extends parseTerm {
@@ -268,10 +262,10 @@ class opTerm extends parseTerm {
         super();
         this.type = "op";
         this.text = opText.charAt(0);
-        this.typeIndex = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|"].indexOf(opText.charAt(0));
-        this.subtype = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs"][this.typeIndex];
-        this.group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non"][this.typeIndex];
-        this.groupIndex = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, 4, 4][this.typeIndex];
+        this.typeIndex = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|", "="].indexOf(opText.charAt(0));
+        this.subtype = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs", "Equals"][this.typeIndex];
+        this.group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non", "non"][this.typeIndex];
+        this.groupIndex = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, -1, -1, -1][this.typeIndex];
     }
 }
 
@@ -300,19 +294,6 @@ String.prototype.indexOfAll = function (value) {
     }
     return retArry;
 };
-/*String.prototype.innerVar = function (tVar) {
-    let testString = this;
-    for (let func of funcList.list) {
-        if (testString.includes(func.func)) {
-            testString.replaceAll(func.func, "");
-        }
-    }
-    if (testString.includes(tVar)) {
-        return true;
-    } else {
-        return false;
-    }
-};*/
 String.prototype.varIns = function (tVar) {
     let count = 0;
     let temp = this
@@ -402,7 +383,7 @@ const findTerm = function (equation) {
 const backward = function (sub) {
     let outputSub = "";
     for (let i = 0; i <= sub.length - 1; i++) {
-        if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|') {
+        if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|' && sub.charAt(i) != '=') {
             if (i == sub.length - 1) {
                 outputSub = sub.substring(0, i + 1);
                 break;
@@ -561,10 +542,8 @@ const parseEquation = function (equation) {
             if (func) {
                 if (currTerm.text.replace(func.name, "").length != 0) {
                     currTerm.text = currTerm.text.replace(func.name, "")
-                    currentSec.push(...[new opTerm("*"), new funcTerm(func)]);
                 } else {
                     currentSec.shift();
-                    currentSec.unshift(new funcTerm(func));
                 }
             }
             if (varInEquat(currTerm.text).length != 0) {
@@ -580,7 +559,11 @@ const parseEquation = function (equation) {
                 }
                 let encap = parInnerString(equation.substring(cutString + 1));
                 cutString += encap.length + 2;
-                currentSec.push(new parSec(encap));
+                let parSection = new parSec(encap);
+                if(func){
+                    parSection.func = func;
+                }
+                currentSec.push(parSection);
             } else {
                 currentSec.push(currOp);
                 cutString++;
@@ -601,18 +584,36 @@ const inverseParse = function (targetParse, inverseParse){
     if(arguments[2] != undefined){
         targetVar = arguments[2];
     }else{
-        targetParse.find((element) => (element.type == "var"));
+        targetVar = targetParse.find((element) => (element.type == "var"));
     }
     while(true){
+        if(targetParse.length == 1){
+            if(targetParse[0].type == "parSec"){
+                targetParse = targetParse[0].parse;
+            }else{
+                break;
+            }
+        }
         let first = targetParse.findIndex(element => element.type == "op");
         let last = targetParse.findLastIndex(element => element.type == "op");
-        if(targetParse[last].groupIdx <= targetParse[first].groupIdx){
-
+        let targetIndx = targetParse[last].groupIdx <= targetParse[first].groupIdx ? last : first;
+        if(targetParse[targetIndx-1].type == "parSec" && targetParse[targetIndx-1].type == "var" && targetParse[targetIndx+1].type != "var" && targetParse[targetIndx+1].type != "parSec"){
+            inverseParse.concat([targetParse[targetIndx], targetParse[targetIndx + 1]]);
+            targetParse.splice(targetIndx, 2);
+        }else if(targetParse[targetIndx+1].type == "parSec" && targetParse[targetIndx+1].type == "var" && targetParse[targetIndx-1].type != "var" && targetParse[targetIndx-1].type != "parSec"){
+            inverseParse.concat([targetParse[targetIndx], targetParse[targetIndx - 1]]);
+            targetParse.splice(targetIndx-1, 2);
+        }else{
+            //throw error
+            break;
         }
+        
     }
+    return inverseParse;
 }
 const combinable = function (index, parse) {
-    let [termType, borderTerms, combineType] = [parse[index].groupIdx, [parse[index - 1], parse[index + 1]], -1];
+    let [borderTerms, combineType] = [[parse[index - 1], parse[index + 1]], -2];
+    /*let [termType, borderTerms, combineType] = [parse[index].groupIdx, [parse[index - 1], parse[index + 1]], -1];
     if (borderTerms[0].ignore != true && borderTerms[1].ignore != true && borderTerms[0].subtype != "var" && borderTerms[1].subtype != "var") {
         combineType = -2;
     } else if (borderTerms[1].ignore != true && borderTerms[1].subtype != "var" && (borderTerms[0].ignore == true || borderTerms[0].subtype == "var")) {
@@ -621,6 +622,12 @@ const combinable = function (index, parse) {
         if (sameIdx > diffIdx) {
             combineType = sameIdx;
         }
+    }*/
+    //let combineType = {};
+    if(borderTerms[0].ignore == true || borderTerms[1].ignore == true){
+        combineType = -1;
+    }else if(parse[index].groupIndex > 0 && (borderTerms[0].subtype == "var" || borderTerms[1].subtype == "var")){
+        combineType = -1;
     }
     return combineType;
 }
@@ -643,9 +650,9 @@ const combineParse = function (parse) {
     target = parse.find(getFuncParse);
     while (target) {
         let combinePar = combineParse(target.parse);
-        if (parse[targetIndex - 1].type == "func") {
-            let func = funcList.getFunction(parse[targetIndex - 1].text);
-            parse.splice(targetIndex - 1, 2,func.ParseValue(combinePar))
+        console.log(target.func)
+        if (target.func) {
+            parse.splice(targetIndex, 1,target.func.ParseValue(combinePar))
         } else {
             if (Array.isArray(combinePar)) {
                 target.ignore = true;
@@ -757,6 +764,29 @@ const combineParse = function (parse) {
         return parse
     }
 }
+const fullSolver =function (equation){
+
+    let parsedEquat = parseEquation(builtInFunc(equation));
+    let hasEqual = parsedEquat.findIndex(e => e.subtype == 'Equals');
+    console.log(hasEqual)
+    if(hasEqual > -1){
+        
+    }else{
+        console.log("combining")
+        return combineParse(parsedEquat);
+    }
+}
+const getParseVars = function (parse){
+    let varList = [];
+    parse.forEach(item =>{
+        if(item.subtype == 'var'){
+            varList.push(item.text);
+        }else if(item.type == "parSec"){
+            varList.concat(getParseVars(item.parse))
+        }
+    });
+    return varList;
+}
 const varInList = function (list, varLetter) {
     for (let item of list) {
         if (item.letter == varLetter) {
@@ -793,4 +823,5 @@ console.log(funcList.getFunction("asin"))
 console.log(parseEquation(builtInFunc("<sup>42</sup>√23")))
 console.log(funcList.createFunction("function", 'testor', "x*5+u"))
 console.log(funcList.getFunction("testor"))
-console.log(combineParse(parseEquation("testor(23,3)*43")))
+console.log(parseEquation("testor(23,3)*43=0"))
+console.log(fullSolver("5*43"))
