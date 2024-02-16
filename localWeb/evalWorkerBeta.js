@@ -261,12 +261,20 @@ class opTerm extends parseTerm {
     constructor(opText) {
         super();
         this.type = "op";
-        this.text = opText.charAt(0);
-        this.typeIndex = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|", "="].indexOf(opText.charAt(0));
+        this.setVal(opText.charAt(0));
+    }
+    setInverse(){
+        console.log("setting Inverse to " + this.inverse);
+        this.setVal(this.inverse);
+    }
+    setVal(text){
+        this.text = text;
+        this.typeIndex = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|", "="].indexOf(this.text);
+        this.inverse = ['-', '+', '/', '*', '!', '^', "√", '%', ')', '(', ',', "|", "="][this.typeIndex];
         this.subtype = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs", "Equals"][this.typeIndex];
         this.group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non", "non"][this.typeIndex];
         this.groupIndex = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, -1, -1, -1][this.typeIndex];
-    }
+    };
 }
 
 Array.prototype.replaceAll = function (value, replacement) {
@@ -581,11 +589,16 @@ const parseEquation = function (equation) {
 }
 const inverseParse = function (targetParse, inverseParse){
     let targetVar
+    let first = 0;
+    let last = 0;
+    let targetIdx = 0;
+    let firstLast = false;
     if(arguments[2] != undefined){
         targetVar = arguments[2];
     }else{
         targetVar = targetParse.find((element) => (element.type == "var"));
     }
+    let iter = 0;
     while(true){
         if(targetParse.length == 1){
             if(targetParse[0].type == "parSec"){
@@ -596,15 +609,32 @@ const inverseParse = function (targetParse, inverseParse){
         }
         let first = targetParse.findIndex(element => element.type == "op");
         let last = targetParse.findLastIndex(element => element.type == "op");
-        let targetIndx = targetParse[last].groupIdx <= targetParse[first].groupIdx ? last : first;
-        if(targetParse[targetIndx-1].type == "parSec" && targetParse[targetIndx-1].type == "var" && targetParse[targetIndx+1].type != "var" && targetParse[targetIndx+1].type != "parSec"){
-            inverseParse.concat([targetParse[targetIndx], targetParse[targetIndx + 1]]);
-            targetParse.splice(targetIndx, 2);
-        }else if(targetParse[targetIndx+1].type == "parSec" && targetParse[targetIndx+1].type == "var" && targetParse[targetIndx-1].type != "var" && targetParse[targetIndx-1].type != "parSec"){
-            inverseParse.concat([targetParse[targetIndx], targetParse[targetIndx - 1]]);
-            targetParse.splice(targetIndx-1, 2);
+        
+        if(targetParse[last].groupIdx <= targetParse[first].groupIdx){
+            targetIdx = last;
+            firstLast = false;
         }else{
-            //throw error
+            targetIdx = first;
+            firstLast = true;
+        }
+        if(targetParse[targetIdx-1].type == "parSec" && targetParse[targetIdx-1].type == "var" && targetParse[targetIdx+1].type != "var" && targetParse[targetIdx+1].type != "parSec"){
+            inverseParse = inverseParse.concat([targetParse[targetIdx], targetParse[targetIdx + 1]]);
+            targetParse.splice(targetIdx, 2);
+        }else if(targetParse[targetIdx+1].type == "parSec" && targetParse[targetIdx+1].type == "var" && targetParse[targetIdx-1].type != "var" && targetParse[targetIdx-1].type != "parSec"){
+            inverseParse = inverseParse.concat([targetParse[targetIdx], targetParse[targetIdx - 1]]);
+            targetParse.splice(targetIdx-1, 2);
+        }else{
+            targetParse[targetIdx].setInverse();
+            if(firstLast){
+                inverseParse = inverseParse.concat([targetParse[targetIdx], targetParse[targetIdx + 1]]);
+                targetParse.splice(targetIdx, 2);
+            }else{
+                inverseParse = inverseParse.concat([targetParse[targetIdx], targetParse[targetIdx - 1]]);
+                targetParse.splice(targetIdx-1, 2);
+            }
+        }
+        iter++;
+        if(iter > 100){
             break;
         }
         
@@ -824,4 +854,5 @@ console.log(parseEquation(builtInFunc("<sup>42</sup>√23")))
 console.log(funcList.createFunction("function", 'testor', "x*5+u"))
 console.log(funcList.getFunction("testor"))
 console.log(parseEquation("testor(23,3)*43=0"))
+console.log(inverseParse(parseEquation("x*4"), parseEquation("5")))
 console.log(fullSolver("5*43"))
