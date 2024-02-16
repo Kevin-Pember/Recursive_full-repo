@@ -1,6 +1,236 @@
 import Decimal from './packages/decimal.mjs';
 console.log("Beta Worker Loaded");
 let settings = { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 };
+
+
+//Method Extensions
+Array.prototype.replaceAll = function (value, replacement) {
+    let idxs = [];
+    for (let i = 0; i < this.length; i++) {
+        if (this[i] == value) {
+            idxs.push(i)
+        }
+    }
+    for (let idx of idxs) {
+        this[idx] = replacement
+    }
+    return this;
+};
+String.prototype.indexOfAll = function (value) {
+    let retArry = [];
+    let lastIndex = 0;
+    while (true) {
+        let idx = this.indexOf(value, lastIndex);
+        if (idx == -1) {
+            break;
+        }
+        retArry.push(idx);
+        lastIndex = idx + 1;
+    }
+    return retArry;
+};
+String.prototype.varIns = function (tVar) {
+    let count = 0;
+    let temp = this
+    while (true) {
+        if (temp.includes(tVar)) {
+            temp = temp.substring(temp.indexOf(tVar) + tVar.length)
+            count++;
+        } else {
+            break;
+        }
+    }
+    return count;
+}
+String.prototype.hasVar = function () {
+    if (varInEquat(this).length > 0) {
+        return true
+    } else {
+        return false;
+    }
+}
+String.prototype.findMatch = function (start, end) {
+    let copyString = this;
+
+    let matchIdx = -1;
+    let direction = true;
+    if (arguments[2] != undefined) {
+        direction = arguments[2];
+    }
+    let fromIndex = direction ? 0 : copyString.length;
+    while (true) {
+        let startIndex = direction ? copyString.indexOf(start, fromIndex) : copyString.lastIndexOf(start, fromIndex);
+        let endIndex = direction ? copyString.indexOf(end, fromIndex) : copyString.lastIndexOf(end, fromIndex);
+        if (startIndex > -1 && endIndex > -1) {
+            if (direction ? startIndex < endIndex : startIndex > endIndex) {
+                fromIndex = direction ? endIndex + end.length : startIndex;
+            } else {
+                matchIdx = direction ? endIndex : startIndex + start.length;
+                break;
+            }
+        } else if (direction ? endIndex > -1 : startIndex > -1) {
+            matchIdx = direction ? endIndex : startIndex + start.length;
+            break;
+        } else if (startIndex == -1 && endIndex == -1) {
+            matchIdx = direction ? this.length : 0;
+            break;
+        }
+    }
+    return matchIdx;
+}
+String.prototype.findCharMatch = function (char) {
+    let direction = true;
+    if (arguments[3] != undefined) {
+        direction = arguments[3];
+    }
+    let indexes = this.indexOfAll(char);
+    for (let i = direction ? 0 : indexes.length - 1; direction ? i < indexes.length : i >= 0; direction ? i++ : i--) {
+        if (isOperator(direction ? this[indexes[i] - 1] : this[indexes[i] + 1])) {
+            i++;
+            continue;
+        } else {
+            return indexes[i];
+        }
+    }
+    return direction ? this.length : 0;
+}
+
+//General Helper Functions
+const isVar = function (entry) {
+    let func = funcList.getFunction(entry);
+    if (func) {
+        return func.size;
+    } else {
+        return 0;
+    }
+}
+const varInList = function (list, varLetter) {
+    for (let item of list) {
+        if (item.letter == varLetter) {
+            return item;
+        }
+    }
+    return null;
+}
+const varInEquat = function (equation) {
+    let varArray = [];
+    for (let i = 0; i < equation.length; i++) {
+        if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
+            if (isVar(equation.substring(i)) === 0) {
+                if (varInList(varArray, equation.substring(i, i + 1)) == null) {
+                    varArray.push(
+                        {
+                            "letter": equation.substring(i, i + 1),
+                            "positions": [i]
+                        }
+                    );
+                } else {
+                    let func = varInList(varArray, equation.substring(i, i + 1));
+                    func.positions.push(i);
+                }
+            } else {
+                i += isVar(equation.substring(i)) - 1;
+            }
+        }
+    }
+    return varArray;
+}
+const numInEquat = function (equation) {
+    let numArry = [];
+    let currentNum = "";
+    for (let i = 0; i < equation.length; i++) {
+        if (!isNaN(equation[i])) {
+            currentNum += equation[i];
+        } else if (currentNum != "") {
+            numArry.push(currentNum);
+            currentNum = "";
+        }
+    }
+    return numArry;
+}
+const getParseVars = function (parse){
+    let varList = [];
+    parse.forEach(item =>{
+        if(item.subtype == 'var'){
+            varList.push(item.text);
+        }else if(item.type == "parSec"){
+            varList.concat(getParseVars(item.parse))
+        }
+    });
+    return varList;
+}
+const cleanObject = function (object) {
+    return JSON.parse(JSON.stringify(object));
+}
+
+
+//Preprocessing Methods and helpers
+const findTerm = function (equation) {
+    let direction = true;
+    let endIndex = 0;
+    if (arguments[1] != undefined) {
+        direction = arguments[1];
+    }
+    for (let i = direction ? 0 : equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--) {
+        if (equation[i] == "(" || equation[i] == ")") {
+            let nextIndex = direction ? equation.substring(i).findMatch("(", ")", direction) : equation.substring(0, i - 1).findMatch("(", ")", direction);
+            if (nextIndex != -1) {
+                i = nextIndex - 1;
+                endIndex = i;
+            }
+        } else if (equation[i] == '+' || equation[i] == '-' || equation[i] == '×' || equation[i] == '<' || equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|') {
+            endIndex = i;
+            break;
+        }
+        endIndex = endIndex + (direction ? 1 : -1);
+    }
+    return direction ? equation.substring(0, endIndex) : equation.substring(endIndex + 1);
+}
+const builtInFunc = function (equation) {
+    equation = equation.replaceAll('×', '*');
+    equation = equation.replaceAll('÷', '/');
+    let indexValue = equation.indexOf("√");
+    while (indexValue >= 0) {
+        let root = "2";
+        let from = indexValue;
+        if (indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>") {
+            let matchSup = equation.substring(0, indexValue - 6).findMatch("<sup", "</sup>", false);
+            root = findTerm(equation.substring(0, indexValue - 6), false);
+            from = matchSup - 4;
+        }
+
+        let term = findTerm(equation.substring(indexValue + 1));
+        let replacement = "(" + term + "^(1/" + root + "))";
+        if (from != 0 && !isOperator(equation[from - 1])) {
+            replacement = "*" + replacement;
+        }
+        equation = equation.substring(0, from) + replacement + equation.substring(indexValue + term.length + 1);
+        indexValue = equation.indexOf("√");
+    }
+    indexValue = equation.indexOf("|");
+    while (indexValue >= 0) {
+        let matchEnd = equation.substring(indexValue + 1).findCharMatch("|", true) + indexValue;
+        let replacement = "abs(" + equation.substring(indexValue + 1, matchEnd + 1) + ")";
+        if (indexValue - 1 >= 0 && !isOperator(equation[indexValue - 1])) {
+            replacement = "*" + replacement;
+        }
+        if (matchEnd + 2 <= equation.length && !isOperator(equation[matchEnd + 2])) {
+            replacement = replacement + "*";
+        }
+        equation = equation.substring(0, indexValue) + replacement + equation.substring(matchEnd + 2);
+        indexValue = equation.indexOf("|");
+    }
+    indexValue = equation.indexOf("<sup");
+    while (indexValue >= 0) {
+        let matchEnd = equation.substring(equation.indexOf(">", indexValue) + 1).findMatch("<sup", "</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">", indexValue) + 1).length;
+        let term = findTerm(equation.substring(equation.indexOf(">", indexValue) + 1));
+        equation = equation.substring(0, indexValue) + "^(" + term + ")" + equation.substring(matchEnd + 6);
+        indexValue = equation.indexOf("<sup");
+    }
+    return equation;
+}
+
+//Custom Functions, Classes and Methods
 let funcList = {
     list: [],
     getAngleConversion: function (type) {
@@ -143,6 +373,16 @@ class RefFunc extends func {
         return this.ref.ParseValue(innerParse);
     }
 }
+const parseVars = function (parse, varArray) {
+    console.log(parse)
+    for (let varDef of varArray) {
+        let varIndex = parse.findIndex((element) => (element.subtype == "var" && element.text == varDef.name));
+        if (varIndex > -1) {
+            parse.splice(varIndex, 1, ...Array.isArray(varDef) ? varDef : [varDef]);
+        }
+    }
+    return parse;
+}
 funcList.list.concat([
     new HybridFunc("sin", (arry) => {
         let input = new Decimal(arry[0]);
@@ -226,6 +466,8 @@ funcList.list.concat([
         return Decimal.pow(base, arg);
     })
 ]);
+
+//Parse Classes and Methods
 class parseTerm {
     constructor() {
         this.opCount = 0;
@@ -276,118 +518,6 @@ class opTerm extends parseTerm {
         this.groupIndex = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, -1, -1, -1][this.typeIndex];
     };
 }
-
-Array.prototype.replaceAll = function (value, replacement) {
-    let idxs = [];
-    for (let i = 0; i < this.length; i++) {
-        if (this[i] == value) {
-            idxs.push(i)
-        }
-    }
-    for (let idx of idxs) {
-        this[idx] = replacement
-    }
-    return this;
-};
-String.prototype.indexOfAll = function (value) {
-    let retArry = [];
-    let lastIndex = 0;
-    while (true) {
-        let idx = this.indexOf(value, lastIndex);
-        if (idx == -1) {
-            break;
-        }
-        retArry.push(idx);
-        lastIndex = idx + 1;
-    }
-    return retArry;
-};
-String.prototype.varIns = function (tVar) {
-    let count = 0;
-    let temp = this
-    while (true) {
-        if (temp.includes(tVar)) {
-            temp = temp.substring(temp.indexOf(tVar) + tVar.length)
-            count++;
-        } else {
-            break;
-        }
-    }
-    return count;
-}
-String.prototype.hasVar = function () {
-    if (varInEquat(this).length > 0) {
-        return true
-    } else {
-        return false;
-    }
-}
-String.prototype.findMatch = function (start, end) {
-    let copyString = this;
-
-    let matchIdx = -1;
-    let direction = true;
-    if (arguments[2] != undefined) {
-        direction = arguments[2];
-    }
-    let fromIndex = direction ? 0 : copyString.length;
-    while (true) {
-        let startIndex = direction ? copyString.indexOf(start, fromIndex) : copyString.lastIndexOf(start, fromIndex);
-        let endIndex = direction ? copyString.indexOf(end, fromIndex) : copyString.lastIndexOf(end, fromIndex);
-        if (startIndex > -1 && endIndex > -1) {
-            if (direction ? startIndex < endIndex : startIndex > endIndex) {
-                fromIndex = direction ? endIndex + end.length : startIndex;
-            } else {
-                matchIdx = direction ? endIndex : startIndex + start.length;
-                break;
-            }
-        } else if (direction ? endIndex > -1 : startIndex > -1) {
-            matchIdx = direction ? endIndex : startIndex + start.length;
-            break;
-        } else if (startIndex == -1 && endIndex == -1) {
-            matchIdx = direction ? this.length : 0;
-            break;
-        }
-    }
-    return matchIdx;
-}
-String.prototype.findCharMatch = function (char) {
-    let direction = true;
-    if (arguments[3] != undefined) {
-        direction = arguments[3];
-    }
-    let indexes = this.indexOfAll(char);
-    for (let i = direction ? 0 : indexes.length - 1; direction ? i < indexes.length : i >= 0; direction ? i++ : i--) {
-        if (isOperator(direction ? this[indexes[i] - 1] : this[indexes[i] + 1])) {
-            i++;
-            continue;
-        } else {
-            return indexes[i];
-        }
-    }
-    return direction ? this.length : 0;
-}
-const findTerm = function (equation) {
-    let direction = true;
-    let endIndex = 0;
-    if (arguments[1] != undefined) {
-        direction = arguments[1];
-    }
-    for (let i = direction ? 0 : equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--) {
-        if (equation[i] == "(" || equation[i] == ")") {
-            let nextIndex = direction ? equation.substring(i).findMatch("(", ")", direction) : equation.substring(0, i - 1).findMatch("(", ")", direction);
-            if (nextIndex != -1) {
-                i = nextIndex - 1;
-                endIndex = i;
-            }
-        } else if (equation[i] == '+' || equation[i] == '-' || equation[i] == '×' || equation[i] == '<' || equation[i] == '>' || equation[i] == '*' || equation[i] == '÷' || equation[i] == '/' || equation[i] == '√' || equation[i] == '^' || equation[i] == '%' || equation[i] == '!' || equation[i] == ',' || equation[i] == '|') {
-            endIndex = i;
-            break;
-        }
-        endIndex = endIndex + (direction ? 1 : -1);
-    }
-    return direction ? equation.substring(0, endIndex) : equation.substring(endIndex + 1);
-}
 const backward = function (sub) {
     let outputSub = "";
     for (let i = 0; i <= sub.length - 1; i++) {
@@ -422,42 +552,6 @@ const backward = function (sub) {
     }
     return outputSub;
 }
-const varInEquat = function (equation) {
-    let varArray = [];
-    for (let i = 0; i < equation.length; i++) {
-        if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
-            if (isVar(equation.substring(i)) === 0) {
-                if (varInList(varArray, equation.substring(i, i + 1)) == null) {
-                    varArray.push(
-                        {
-                            "letter": equation.substring(i, i + 1),
-                            "positions": [i]
-                        }
-                    );
-                } else {
-                    let func = varInList(varArray, equation.substring(i, i + 1));
-                    func.positions.push(i);
-                }
-            } else {
-                i += isVar(equation.substring(i)) - 1;
-            }
-        }
-    }
-    return varArray;
-}
-const numInEquat = function (equation) {
-    let numArry = [];
-    let currentNum = "";
-    for (let i = 0; i < equation.length; i++) {
-        if (!isNaN(equation[i])) {
-            currentNum += equation[i];
-        } else if (currentNum != "") {
-            numArry.push(currentNum);
-            currentNum = "";
-        }
-    }
-    return numArry;
-}
 const parseTextTerm = function (text) {
     let retArray = [];
     let nums = numInEquat(text);
@@ -488,49 +582,6 @@ const parInnerString = function (sub) {
     }
     let endIdx = sub.findMatch("(", ")", direction);
     return direction ? sub.substring(0, endIdx) : sub.substring(endIdx);
-}
-const builtInFunc = function (equation) {
-    equation = equation.replaceAll('×', '*');
-    equation = equation.replaceAll('÷', '/');
-    let indexValue = equation.indexOf("√");
-    while (indexValue >= 0) {
-        let root = "2";
-        let from = indexValue;
-        if (indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>") {
-            let matchSup = equation.substring(0, indexValue - 6).findMatch("<sup", "</sup>", false);
-            root = findTerm(equation.substring(0, indexValue - 6), false);
-            from = matchSup - 4;
-        }
-
-        let term = findTerm(equation.substring(indexValue + 1));
-        let replacement = "(" + term + "^(1/" + root + "))";
-        if (from != 0 && !isOperator(equation[from - 1])) {
-            replacement = "*" + replacement;
-        }
-        equation = equation.substring(0, from) + replacement + equation.substring(indexValue + term.length + 1);
-        indexValue = equation.indexOf("√");
-    }
-    indexValue = equation.indexOf("|");
-    while (indexValue >= 0) {
-        let matchEnd = equation.substring(indexValue + 1).findCharMatch("|", true) + indexValue;
-        let replacement = "abs(" + equation.substring(indexValue + 1, matchEnd + 1) + ")";
-        if (indexValue - 1 >= 0 && !isOperator(equation[indexValue - 1])) {
-            replacement = "*" + replacement;
-        }
-        if (matchEnd + 2 <= equation.length && !isOperator(equation[matchEnd + 2])) {
-            replacement = replacement + "*";
-        }
-        equation = equation.substring(0, indexValue) + replacement + equation.substring(matchEnd + 2);
-        indexValue = equation.indexOf("|");
-    }
-    indexValue = equation.indexOf("<sup");
-    while (indexValue >= 0) {
-        let matchEnd = equation.substring(equation.indexOf(">", indexValue) + 1).findMatch("<sup", "</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">", indexValue) + 1).length;
-        let term = findTerm(equation.substring(equation.indexOf(">", indexValue) + 1));
-        equation = equation.substring(0, indexValue) + "^(" + term + ")" + equation.substring(matchEnd + 6);
-        indexValue = equation.indexOf("<sup");
-    }
-    return equation;
 }
 const parseEquation = function (equation) {
     let equatParse = [];
@@ -794,7 +845,9 @@ const combineParse = function (parse) {
         return parse
     }
 }
-const fullSolver =function (equation){
+
+//Solve Environment, Classes and Methods
+const fullSolver = function (equation){
 
     let parsedEquat = parseEquation(builtInFunc(equation));
     let hasEqual = parsedEquat.findIndex(e => e.subtype == 'Equals');
@@ -806,47 +859,8 @@ const fullSolver =function (equation){
         return combineParse(parsedEquat);
     }
 }
-const getParseVars = function (parse){
-    let varList = [];
-    parse.forEach(item =>{
-        if(item.subtype == 'var'){
-            varList.push(item.text);
-        }else if(item.type == "parSec"){
-            varList.concat(getParseVars(item.parse))
-        }
-    });
-    return varList;
-}
-const varInList = function (list, varLetter) {
-    for (let item of list) {
-        if (item.letter == varLetter) {
-            return item;
-        }
-    }
-    return null;
-}
-const parseVars = function (parse, varArray) {
-    console.log(parse)
-    for (let varDef of varArray) {
-        let varIndex = parse.findIndex((element) => (element.subtype == "var" && element.text == varDef.name));
-        if (varIndex > -1) {
-            parse.splice(varIndex, 1, ...Array.isArray(varDef) ? varDef : [varDef]);
-        }
-    }
-    return parse;
-}
-//end CombineMethods*******************************************************************
-const isVar = function (entry) {
-    let func = funcList.getFunction(entry);
-    if (func) {
-        return func.size;
-    } else {
-        return 0;
-    }
-}
-const cleanObject = function (object) {
-    return JSON.parse(JSON.stringify(object));
-}
+
+
 console.log(funcList.list)
 console.log("done loading beta worker");
 console.log(funcList.getFunction("asin"))
@@ -855,4 +869,4 @@ console.log(funcList.createFunction("function", 'testor', "x*5+u"))
 console.log(funcList.getFunction("testor"))
 console.log(parseEquation("testor(23,3)*43=0"))
 console.log(inverseParse(parseEquation("x*4"), parseEquation("5")))
-console.log(fullSolver("5*43"))
+console.log(fullSolver("5*43.3"))
