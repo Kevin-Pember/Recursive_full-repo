@@ -2,6 +2,9 @@ import Decimal from './packages/decimal.mjs';
 console.log("Beta Worker Loaded");
 let settings = { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 };
 
+let instance = {
+
+}
 
 //Method Extensions
 Array.prototype.replaceAll = function (value, replacement) {
@@ -386,51 +389,63 @@ const parseVars = function (parse, varArray) {
 funcList.list.concat([
     new HybridFunc("sin", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.mul(funcList.getAngleConversion("deg")).sin().toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return input.mul(convertor).sin().toString();
     }, "asin"),
     new RefFunc("arcsin", new HybridFunc("asin", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.asin().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return input.asin().mul(convertor).toString();
     }, "sin")),
     new HybridFunc("cos", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.mul(funcList.getAngleConversion("deg")).cos().toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return input.mul(convertor).cos().toString();
     }, "acos"),
     new RefFunc("arccos", new HybridFunc("acos", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.acos().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "rad");
+        return input.acos().mul(convertor).toString();
     }, "cos")),
     new HybridFunc("tan", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.mul(funcList.getAngleConversion("deg")).tan().toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return input.mul(convertor).tan().toString();
     }, "atan"),
     new RefFunc("arctan", new HybridFunc("atan", (arry) => {
         let input = new Decimal(arry[0]);
-        return input.atan().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "rad");
+        return input.atan().mul(convertor).toString();
     }, "tan")),
     new HybridFunc("csc", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input.mul(funcList.getAngleConversion("deg")).sin()).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return new Decimal(1).div(input.mul(convertor).sin()).toString();
     }, "acsc"),
     new RefFunc("arccsc", new HybridFunc("acsc", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input).asin().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "rad");
+        return new Decimal(1).div(input).asin().mul(convertor).toString();
     }, "csc")),
     new HybridFunc("sec", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input.mul(funcList.getAngleConversion("deg")).cos()).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return new Decimal(1).div(input.mul(convertor).cos()).toString();
     }, "asec"),
     new RefFunc("arcsec", new HybridFunc("asec", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input).acos().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "rad");
+        return new Decimal(1).div(input).acos().mul(convertor).toString();
     }, "sec")),
     new HybridFunc("cot", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input.mul(funcList.getAngleConversion("deg")).tan()).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return new Decimal(1).div(input.mul(convertor).tan()).toString();
     }, "acot"),
     new RefFunc("arccot", new HybridFunc("acot", (arry) => {
         let input = new Decimal(arry[0]);
-        return new Decimal(1).div(input).atan().mul(funcList.getAngleConversion("rad")).toString();
+        let convertor = funcList.getAngleConversion(arguments[1] ? arguments[1] : "deg");
+        return new Decimal(1).div(input).atan().mul(convertor).toString();
     }, "cot")),
     new HybridFunc("abs", (arry) => {
         let input = new Decimal(arry[0]);
@@ -638,8 +653,9 @@ const parseEquation = function (equation) {
     console.log(equatParse);
     return equatParse;
 }
-const inverseParse = function (targetParse, inverseParse){
+const inverseParse = function (targetParse, inverseParse, targetElem){
     let targetVar
+    let targetParse = targetParse[targetElem];
     let first = 0;
     let last = 0;
     let targetIdx = 0;
@@ -668,6 +684,11 @@ const inverseParse = function (targetParse, inverseParse){
             targetIdx = first;
             firstLast = true;
         }
+        if(targetIdx - 1 == targetElem){
+            firstLast = true;
+        }else if (targetIdx + 1 == targetElem){
+            firstLast = false;
+        }
         if(targetParse[targetIdx-1].type == "parSec" && targetParse[targetIdx-1].type == "var" && targetParse[targetIdx+1].type != "var" && targetParse[targetIdx+1].type != "parSec"){
             inverseParse = inverseParse.concat([targetParse[targetIdx], targetParse[targetIdx + 1]]);
             targetParse.splice(targetIdx, 2);
@@ -686,6 +707,7 @@ const inverseParse = function (targetParse, inverseParse){
         }
         iter++;
         if(iter > 100){
+            console.log("%cinfinite loop", "color: red");
             break;
         }
         
