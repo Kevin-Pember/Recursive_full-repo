@@ -1,9 +1,8 @@
 import Decimal from './packages/decimal.mjs';
 console.log("Beta Worker Loaded");
-let settings = { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 };
 
 let instance = {
-
+    settings: { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 }
 }
 
 //Method Extensions
@@ -44,13 +43,6 @@ String.prototype.varIns = function (tVar) {
         }
     }
     return count;
-}
-String.prototype.hasVar = function () {
-    if (varInEquat(this).length > 0) {
-        return true
-    } else {
-        return false;
-    }
 }
 String.prototype.findMatch = function (start, end) {
     let copyString = this;
@@ -99,45 +91,27 @@ String.prototype.findCharMatch = function (char) {
 }
 
 //General Helper Functions
-const isVar = function (entry) {
-    let func = funcList.getFunction(entry);
-    if (func) {
-        return func.size;
-    } else {
-        return 0;
-    }
-}
-const varInList = function (list, varLetter) {
-    for (let item of list) {
-        if (item.letter == varLetter) {
-            return item;
-        }
-    }
-    return null;
-}
+
 const varInEquat = function (equation) {
-    let varArray = [];
+    let varArray = new Map();
     for (let i = 0; i < equation.length; i++) {
         if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
-            if (isVar(equation.substring(i)) === 0) {
-                if (varInList(varArray, equation.substring(i, i + 1)) == null) {
-                    varArray.push(
-                        {
-                            "letter": equation.substring(i, i + 1),
-                            "positions": [i]
-                        }
-                    );
+            let isFunc = funcList.getFunction(equation.substring(i))
+            if (isFunc === 0) {
+                let funcLength 
+                if (varArray.get(equation.substring(i, i + 1)) == null) {
+                    varArray.set(equation.substring(i, i + 1),{"positions": [i]});
                 } else {
-                    let func = varInList(varArray, equation.substring(i, i + 1));
-                    func.positions.push(i);
+                    varArray.get(equation.substring(i, i + 1)).positions.push(i);
                 }
             } else {
-                i += isVar(equation.substring(i)) - 1;
+                i += isFunc - 1;
             }
         }
     }
     return varArray;
 }
+
 const numInEquat = function (equation) {
     let numArry = [];
     let currentNum = "";
@@ -237,7 +211,7 @@ const builtInFunc = function (equation) {
 let funcList = {
     list: [],
     getAngleConversion: function (type) {
-        if (settings.degRad) {
+        if (instance.settings.degRad) {
             if (type == 'deg') {
                 return new Decimal.acos(-1).div(new Decimal(180));
             } else if (type = "rad") {
@@ -267,7 +241,7 @@ let funcList = {
                 largest = value;
             }
         })
-        return largest.funcObject;
+        return largest.funcObject ? largest.funcObject : 0;
     }
 };
 class func {
@@ -331,7 +305,7 @@ class TextFunc extends func {
         this.type = "function";
         this.ogFunc = func;
         this.funcParse = parseEquation(func);
-        this.vars = varInEquat(func);
+        this.vars = this.funcParse.vars;
         if (arguments[2]) {
             this.inverse = arguments[2];
         }
@@ -341,21 +315,19 @@ class TextFunc extends func {
         return this
     }
     ParseValue(innerParse) {
-        let argArray = [];
-        if (!Array.isArray(innerParse)) {
-            innerParse = [innerParse]
-        }
-        let findMethod = (e) => {
-            return (e.subtype == "Comma")
-        }
-        let commaIndex = innerParse.findIndex(findMethod);
+        let parsedInner = parseEquation(innerParse).a;
+        let argArray = cleanObject(this.funcParse.vars);
+        //let findMethod = 
+        let commaIndex = 0;
         while (commaIndex > -1) {
-            argArray.push(innerParse.splice(0, commaIndex));
-            innerParse.shift();
-            commaIndex = innerParse.findIndex(findMethod);
+            commaIndex = parsedInner.findIndex((e) => {
+                return (e.subtype == "Comma")
+            });
+            argArray.push(parsedInner.splice(0, commaIndex));
+            parsedInner.shift();
         }
-        argArray.push(innerParse);
-        return combineParse(parseVars(this.funcParse, argArray));
+        argArray.push(parsedInner);
+        return combineParse(setVarEquat(this.funcParse.a, argArray));
     }
 }
 class RefFunc extends func {
@@ -483,6 +455,13 @@ funcList.list.concat([
 ]);
 
 //Parse Classes and Methods
+class Parse {
+    constructor() {
+        this.a = [];
+        this.type = "test"
+        this.vars = []
+    }
+}
 class parseTerm {
     constructor() {
         this.opCount = 0;
@@ -505,10 +484,11 @@ class textTerm extends parseTerm {
     }
 }
 class varTerm extends parseTerm {
-    constructor(letter) {
+    constructor(letter,value) {
         super();
         this.type = "var";
         this.letter = letter;
+        this.value = value;
         this.powId = {};
         this.mutiId = {};
     }
@@ -566,29 +546,6 @@ const backward = function (sub) {
     }
     return outputSub;
 }
-const parseTextTerm = function (text) {
-    let retArray = [];
-    let nums = numInEquat(text);
-    let product = 1;
-    for (let num of nums) {
-        product *= num;
-    }
-    if (product != 1) {
-        retArray.push(new textTerm(product));
-        retArray.push(new opTerm("*"));
-    }
-    let varList = varInEquat(text);
-    for (let varIn of varList) {
-        retArray.push(new varTerm(varIn.letter));
-        if (varIn.positions.length > 1) {
-            retArray.push(new opTerm("^"));
-            retArray.push(new textTerm(varIn.positions.length));
-        }
-        retArray.push(new opTerm("*"));
-    }
-    retArray.pop();
-    return retArray;
-}
 const parInnerString = function (sub) {
     let direction = true;
     if (arguments[1] != undefined) {
@@ -598,15 +555,15 @@ const parInnerString = function (sub) {
     return direction ? sub.substring(0, endIdx) : sub.substring(endIdx);
 }
 const parseEquation = function (equation) {
-    let equatParse = [];
+    let equatParse = new Parse();
     let cutLength = 0;
     while (true) {
-        let cutString = 0;
-        let currentSec = [];
-        let termText = backward(equation);
-        let currTerm;
-        let currOp;
-        let func;
+        let cutString = 0, 
+        currentSec = [],
+        termText = backward(equation),
+        currTerm,
+        currOp,
+        func;
         if (termText) {
             currTerm = new textTerm(termText);
             cutString += currTerm.text.length;
@@ -619,9 +576,34 @@ const parseEquation = function (equation) {
                     currentSec.shift();
                 }
             }
-            if (varInEquat(currTerm.text).length != 0) {
+            let varList = varInEquat(currTerm.text)
+            if (varList.size != 0) {
                 currentSec.shift();
-                currentSec.unshift(...parseTextTerm(currTerm.text));
+                
+                let retArray = [],
+                nums = numInEquat(currTerm.text),
+                product = 1,
+                newVar;
+
+                for (let num of nums) {
+                    product *= num;
+                }
+                if (product != 1) {
+                    retArray.push(new textTerm(product));
+                    retArray.push(new opTerm("*"));
+                }
+                for (let varIn of varList) {
+                    newVar = new varTerm(varIn[0])
+                    retArray.push(newVar);
+                    equatParse.vars.push(newVar)
+                    if (varIn[1].positions.length > 1) {
+                        retArray.push(new opTerm("^"));
+                        retArray.push(new textTerm(varIn[1].positions.length));
+                    }
+                    retArray.push(new opTerm("*"));
+                }
+                retArray.pop();
+                currentSec.unshift(...retArray);
             }
         }
         if (equation.substring(cutString) != "") {
@@ -639,17 +621,18 @@ const parseEquation = function (equation) {
                 currentSec.push(parSection);
             } else {
                 currentSec.push(currOp);
+                console.log(currentSec)
                 cutString++;
             }
         }
         cutLength += cutString;
         equation = equation.substring(cutString);
-        equatParse.push(...currentSec);
+        console.log("Right before push ",currentSec )
+        equatParse.a.push(...currentSec);
         if (equation.length == 0) {
             break;
         }
     }
-    console.log(equatParse);
     return equatParse;
 }
 const inverseParse = function (targetParse, inverseParse, targetElem) {
@@ -715,17 +698,6 @@ const inverseParse = function (targetParse, inverseParse, targetElem) {
 }
 const combinable = function (index, parse) {
     let [borderTerms, combineType] = [[parse[index - 1], parse[index + 1]], -2];
-    /*let [termType, borderTerms, combineType] = [parse[index].groupIdx, [parse[index - 1], parse[index + 1]], -1];
-    if (borderTerms[0].ignore != true && borderTerms[1].ignore != true && borderTerms[0].subtype != "var" && borderTerms[1].subtype != "var") {
-        combineType = -2;
-    } else if (borderTerms[1].ignore != true && borderTerms[1].subtype != "var" && (borderTerms[0].ignore == true || borderTerms[0].subtype == "var")) {
-        let sameIdx = parse.findLastIndex((element, idx) => (element.groupIdx == termType && idx < index && element.ignore != true));
-        let diffIdx = parse.findLastIndex((element, idx) => (element.groupIdx < termType && idx < index && element.ignore != true));
-        if (sameIdx > diffIdx) {
-            combineType = sameIdx;
-        }
-    }*/
-    //let combineType = {};
     if (borderTerms[0].ignore == true || borderTerms[1].ignore == true) {
         combineType = -1;
     } else if (parse[index].groupIndex > 0 && (borderTerms[0].type == "var" || borderTerms[1].type == "var")) {
@@ -871,33 +843,26 @@ const combineParse = function (parse) {
 const fullSolver = function (equation) {
 
     let parsedEquat = parseEquation(builtInFunc(equation));
-    let hasEqual = parsedEquat.findIndex(e => e.subtype == 'Equals');
+    console.log(parsedEquat)
+    let hasEqual = parsedEquat.a.findIndex(e => e.subtype == 'Equals');
     console.log(hasEqual)
     if (hasEqual > -1) {
 
     } else {
         console.log("combining")
-        return combineParse(parsedEquat);
+        return combineParse(parsedEquat.a);
     }
 }
 const setVarEquat = function (equation, varList) {
     let setEquation;
-    for (let data of varList) {
-        /*for (let i = 0; i < equation.length; i++) {
-            let funcInStringVar = funcInString(equation.substring(i), true);
-            if (funcInStringVar != "") {
-                i += funcInStringVar.func.length - 1;
-            } else if (equation.substring(i, i + data.letter.length) == data.letter) {
-                if (data.value != "" && data.value != undefined) {
-                    equation = equation.substring(0, i) + "(" + data.value + ")" + equation.substring(i + 1);
-                }
-            }
-        }*/
-        if(data.value != undefined){
-            setEquation = equation.map( (elem) => {
-                if(elem.type == "var" && elem.letter == data.letter){
+    for (let data in varList) {
+        if (data.value != undefined) {
+            
+            setEquation = equation.map((elem) => {
+                console.log(elem);
+                if (elem.type == "var" && elem.letter == data.letter) {
                     return new textTerm(data.value)
-                }else{
+                } else {
                     return elem;
                 }
             })
@@ -909,18 +874,22 @@ class solveEnv {
     constructor(object) {
         this.id = object.id
         this.vars = [];
+        this.envSettings = {
+            "gMin": instance.settings.gMin,
+            "gMax": instance.settings.gMax,
+            "degRad": instance.settings.degRad
+        };
     }
     calc(equation) {
-        let solvableEquat = setVarEquat(equation, this.vars);
-        return fullSolve(solvableEquat, this.vars)
+        return fullSolver(setVarEquat(equation, this.vars))
     }
     calcArray(type, equation) {
         if (type == "graph" || type == "table") {
             let solvableEquat = setVarEquat(equation, this.vars);
             if (type == "graph") {
-                return { "points": calculatePoints(solvableEquat, this.envVars.gMin, this.envVars.gMax, settings.gR, settings), "extrema": calculateExtrema(setVarEquat(equation, this.vars)) }
+                return { "points": calculatePoints(solvableEquat, this.envSettings.gMin, this.envSettings.gMax, settings.gR, settings), "extrema": calculateExtrema(setVarEquat(equation, this.vars)) }
             } else {
-                return calculatePoints(solvableEquat, settings.tMin, settings.tMax, settings.tC, settings)
+                return calculatePoints(solvableEquat, instance.settings.tMin, instance.settings.tMax, instance.settings.tC, instance.settings)
             }
         } else if (type = "array") {
             let retArray = [];
@@ -937,42 +906,13 @@ class solveEnv {
             return retArray;
         }
     }
-    setEnvVar(object) {
-        this.envVars = {
-            ...this.envType,
-            ...object
+    setVar(target, value) {
+        let varDef = this.vars.find(elem => elem.letter == target);
+        if (!varDef) {
+            this.vars.push({ "letter": target, "value": value })
+            varDef = this.vars[this.vars.length - 1]
         }
-    }
-
-}
-class StaticEnv extends solveEnv {
-    constructor(object) {
-        super(object)
-        this.envType = "static"
-        this.envVars = {
-            "gMin": settings.gMin,
-            "gMax": settings.gMax
-        };
-        this.id = object.id
-
-        this.equation = object.equation;
-        if (object.isFunc) {
-            this.func = getFuncByName(this.id);
-            this.isFunc = object.isFunc;
-            this.vars = this.func.vars;
-        } else {
-            this.isFunc = false;
-            this.vars = object.vars;
-        }
-        if (this.equation.includes('=')) {
-            this.type = "mutiSide"
-            for (let varI of this.vars) {
-                varI.equalTo = findValueOf(varI.letter, this.equation)
-            }
-        } else {
-            this.type = "singleSide"
-        }
-        this.getUndefVars();
+        varDef.value = value;
     }
     getParsedEquation() {
         if (this.isFunc) {
@@ -993,118 +933,7 @@ class StaticEnv extends solveEnv {
             return setVarEquat(this.equation, this.vars, false);
         }
     }
-    changeEquat(equat) {
-        this.vars = varInEquat(equat);
-        this.equation = equat;
-        if (this.equation.includes('=')) {
-            this.type = "mutiSide"
-        } else {
-            this.type = "singleSide"
-        }
-        this.checkCalculable();
-    }
-    setVar(target, value) {
-        let targElem = this.vars.find(elem => elem.letter == target);
-        targElem.value = value
-        return this.checkCalculable();
-    }
-    getUndefVars() {
-        let undef = [];
-        this.vars.forEach(elem => {
-            if (!elem.value) {
-                undef.push(elem)
-            }
-        });
-        this.undefVars = undef;
-        return undef;
-    }
-    calcEquation(verified) {
-        if (verified) {
-            return this.calc(this.equation);
-        } else {
-            let undef = this.undefVars;
-            if (undef.length == 1) {
-                if (this.type == "mutiSide") {
-                    this.tempEquation = arryToString(createSidedEquation(this.equation, undef[0].letter))
-                    return this.calc(this.tempEquation);
-                }
-            } else if (undef.length == 0) {
-                return this.calc(this.equation);
-            } else {
-                return "";
-            }
-        }
-    }
-    calcGraph(verified) {
-        if (verified) {
-            return this.calcArray("graph", this.equation);
-        } else {
-            let undef = this.undefVars;
-            if (undef.length == 1 && this.type != "mutiSide") {
-                return this.calcArray("graph", this.equation);
-            } else {
-                return [];
-            }
-        }
-    }
-    calcTable(verified) {
-        if (verified) {
-            return this.calcArray("table", this.equation);
-        } else {
-            let undef = this.undefVars;
-            if (undef.length == 1 && this.type != "mutiSide") {
-                return this.calcArray("table", this.equation);
-            } else {
-                return [];
-            }
-        }
-    }
-    checkCalculable() {
-        this.getUndefVars();
-        let pointCalc = this.calcEquation();
-        let graphCalc = this.calcGraph();
-        let tableCalc = this.calcTable();
-        let rtnVal = {
-            result: this.getParsedEquation(),
-            point: pointCalc,
-            graph: graphCalc,
-            table: tableCalc
-        }
-        return rtnVal;
-    }
-}
-class DynamicEnv extends solveEnv {
-    constructor(object) {
-        super(object)
-        this.type = "dynamic"
-        this.target = object.target
-        if (this.target == "graph") {
-            this.envVars = {
-                "gMin": settings.gMin,
-                "gMax": settings.gMax
-            };
-        }
-    }
-    calcArray(arry) {
-        for (let item of arry) {
-
-        }
-    }
-    isVar() {
-        let equatVars = varInEquat(equation)
-        let defVars = this.vars.filter(elem => elem.value != undefined && elem.value != "")
-        let undefVars = equatVars.filter(elem => !defVars.find(elem2 => elem.letter == elem2.letter))
-        let hasEqual = equation.includes('=');
-        if (undefVars.length == 1) {
-            let targetVar = undefVars[0];
-            if (hasEqual) {
-                let value = createSidedEquation(equation, targetVar.letter)
-                setVar(targetVar.letter, +value)
-                return value;
-            }
-        }
-        return undefined;
-    }
+    
     isCalculable(equation) {
         //console.log(typeof equation)
         let equatVars = varInEquat(equation)
@@ -1130,53 +959,74 @@ class DynamicEnv extends solveEnv {
         }
 
     }
-    solveEquation(equation) {
-        if (!isVar(equation)) {
-            let calc = this.isCalculable(equation);
-            if (calc == "cant") {
-                return "cant"
-            } else if (calc == "r") {
-                let result = this.calc(equation);
-                return result
-            } else if (calc == "ds") {
-                let solvableEquat = setVarEquat(equation, this.vars);
-                let front = solvableEquat.substring(0, solvableEquat.indexOf('='))
-                let back = solvableEquat.substring(solvableEquat.indexOf('=') + 1)
-                let result1 = this.calc(front)
-                let result2 = this.calc(back)
-                return +result1 == +result2
-            }
-        }
-    }
-    solvePointArray(arry) {
-        this.vars = [];
-        if (this.target == "graph" || this.target == "table") {
-            let retArry = [];
-            for (let equation of arry) {
-                let isCalc = this.isCalculable(equation);
-                if (isCalc != "cant" && isCalc != "dS") {
-                    let result = this.calcArray(this.target, equation);
-                    retArry.push(result)
-                } else {
-                    retArry.push(undefined)
-                }
-            }
-            return retArry;
-        } else {
-            return "Not a valid target"
-        }
-    }
-    setVar(target, value) {
-        if (this.vars.find(entry => entry.letter == target)) {
-            this.vars.find(entry => entry.letter == target).value = value
-        } else {
-            this.vars.push({ "letter": target, "value": value })
-        }
-
-    }
     clearVars() {
         this.vars = [];
     }
+}
+class StaticEnv extends solveEnv {
+    constructor(object) {
+        super(object)
+        this.envType = "static"
+        this.id = object.id
+
+        this.equation = parseEquation(object.equation);
+        if (object.isFunc) {
+            this.func = getFuncByName(this.id);
+            this.isFunc = true;
+            this.vars = this.func.vars;
+        } else {
+            this.isFunc = false;
+            this.vars = this.equation.vars;
+        }
+        this.getUndefinedVars();
+    }
+    calc() {
+        return super.calc(this.equation, this.vars);
+    }
+    changeEquation(equation) {
+        this.equation = parseEquation(equation)
+        this.vars = this.equation.vars;
+        this.checkCalculable();
+    }
+    setVar(target, value) {
+        super.setVar(target, value);
+        return this.checkCalculable();
+    }
+    getData(type) {
+
+    }
+    //Still working on rewriting methods don't know if getUndef
+}
+class DynamicEnv extends solveEnv {
+    constructor(object) {
+        super(object)
+        this.type = "dynamic"
+        this.target = object.target
+        if (this.target == "graph") {
+
+        }
+    }
+    calcArray(arry) {
+        for (let item of arry) {
+
+        }
+    }
+    isVar(equation) {
+        let equatVars = varInEquat(equation)
+        let defVars = this.vars.filter(elem => elem.value != undefined && elem.value != "")
+        let undefVars = equatVars.filter(elem => !defVars.find(elem2 => elem.letter == elem2.letter))
+        let hasEqual = equation.includes('=');
+        if (undefVars.length == 1) {
+            let targetVar = undefVars[0];
+            if (hasEqual) {
+                let value = createSidedEquation(equation, targetVar.letter)
+                setVar(targetVar.letter, +value)
+                return value;
+            }
+        }
+        return undefined;
+    }
+
 }
 
 console.log(funcList.list)
@@ -1187,5 +1037,5 @@ console.log(funcList.createFunction("function", 'testor', "x*5+u"))
 console.log(funcList.getFunction("testor"))
 console.log(parseEquation("testor(23,3)*43=0"))
 //console.log(inverseParse(parseEquation("x*4"), parseEquation("5")))
-console.log(setVarEquat(parseEquation("x*4"),[{letter:"x", value:"5"}]))
-console.log(fullSolver("5*43.3"))
+console.log(setVarEquat(parseEquation("x*4").a, [new varTerm("x",5)]))
+console.log(parseEquation("x*43.3+7+y"))
