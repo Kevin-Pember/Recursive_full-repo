@@ -2,7 +2,7 @@ import Decimal from './packages/decimal.mjs';
 console.log("Beta Worker Loaded");
 
 let instance = {
-    settings: { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 }
+    settings: { "version": 1, "oL": "auto", "degRad": true, "notation": "simple", "theme": "darkMode", "acc": "blue", "tC": 5, "tMin": -10, "tMax": 10, "gR": 100, "gMin": -10, "gMax": 10 },
 }
 
 //Method Extensions
@@ -31,19 +31,6 @@ String.prototype.indexOfAll = function (value) {
     }
     return retArry;
 };
-String.prototype.varIns = function (tVar) {
-    let count = 0;
-    let temp = this
-    while (true) {
-        if (temp.includes(tVar)) {
-            temp = temp.substring(temp.indexOf(tVar) + tVar.length)
-            count++;
-        } else {
-            break;
-        }
-    }
-    return count;
-}
 String.prototype.findMatch = function (start, end) {
     let copyString = this;
 
@@ -111,7 +98,6 @@ const varInEquat = function (equation) {
     }
     return varArray;
 }
-
 const numInEquat = function (equation) {
     let numArry = [];
     let currentNum = "";
@@ -208,6 +194,74 @@ const builtInFunc = function (equation) {
 }
 
 //Custom Functions, Classes and Methods
+let operators = new Map([
+    ["+" , (object)=> {
+        object.inverse = "-";
+        object.subtype = "Plus";
+        object.groupIdx = 0;
+    }],
+    ["-", (object)=> {
+        object.inverse = "+";
+        object.subtype = "Minus";
+        object.groupIdx = 0;
+    }],
+    ["*", (object)=> {
+        object.inverse = "/";
+        object.subtype = "Muti";
+        object.groupIdx = 1;
+    }],
+    ["/", (object)=> {
+        object.inverse = "*";
+        object.subtype = "Div";
+        object.groupIdx = 1;
+    }],
+    ["!", (object)=> {
+        object.inverse = "!";
+        object.subtype = "factor";
+        object.groupIdx = 1;
+    }],
+    ["^", (object)=> {
+        object.inverse = "^";
+        object.subtype = "Pow";
+        object.groupIdx = 2;
+    }],
+    ["√", (object)=> {
+        object.inverse = "√";
+        object.subtype = "Sqrt";
+        object.groupIdx = 2;
+    }],
+    ["%", (object)=> {
+        object.inverse = "%";
+        object.subtype = "Percent";
+        object.groupIdx = 1;
+    }],
+    ["(", (object)=> {
+        object.inverse = ")";
+        object.subtype = "ParStart";
+        object.groupIdx = 3;
+    }],
+    [")", (object)=> {
+        object.inverse = "(";
+        object.subtype = "ParEnd";
+        object.groupIdx = 3;
+    }],
+    [",", (object)=> {
+        object.inverse = ",";
+        object.subtype = "Comma";
+        object.groupIdx = -1;
+    }],
+    ["|", (object)=> {
+        object.inverse = "|";
+        object.subtype = "Abs";
+        object.groupIdx = -1;
+    }],
+    ["=", (object)=> {
+        object.inverse = "=";
+        object.subtype = "Equals";
+        object.groupIdx = -1;
+        object.calcIndicator = true;
+    }],
+]);
 let funcList = {
     list: [],
     getAngleConversion: function (type) {
@@ -459,6 +513,7 @@ class Parse {
     constructor() {
         this.a = [];
         this.type = "test"
+        this.indicator;
         this.vars = []
     }
 }
@@ -505,17 +560,13 @@ class opTerm extends parseTerm {
     }
     setVal(text) {
         this.text = text;
-        this.typeIndex = ['+', '-', '*', '/', '!', '^', "√", '%', '(', ')', ',', "|", "="].indexOf(this.text);
-        this.inverse = ['-', '+', '/', '*', '!', '^', "√", '%', ')', '(', ',', "|", "="][this.typeIndex];
-        this.subtype = ["Plus", "Minus", "Muti", "Div", 'factor', "Pow", "Sqrt", 'Percent', "ParStart", "ParEnd", 'Comma', "Abs", "Equals"][this.typeIndex];
-        this.group = ["add", "add", "muti", "muti", "muti", "pow", "pow", "muti", "par", "par", "non", "non", "non"][this.typeIndex];
-        this.groupIndex = [0, 0, 1, 1, 1, 2, 2, 1, 3, 3, -1, -1, -1][this.typeIndex];
+        operators.get(text)(this)
     };
 }
 const backward = function (sub) {
     let outputSub = "";
     for (let i = 0; i <= sub.length - 1; i++) {
-        if (sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|' && sub.charAt(i) != '=') {
+        if (!operators.get(sub.charAt(i))){//sub.charAt(i) != '×' && sub.charAt(i) != '*' && sub.charAt(i) != '÷' && sub.charAt(i) != '/' && sub.charAt(i) != '√' && sub.charAt(i) != '²' && sub.charAt(i) != '^' && sub.charAt(i) != '(' && sub.charAt(i) != ')' && sub.charAt(i) != '%' && sub.charAt(i) != '!' && sub.charAt(i) != 'π' && sub.charAt(i) != ',' && sub.charAt(i) != '|' && sub.charAt(i) != '=') {
             if (i == sub.length - 1) {
                 outputSub = sub.substring(0, i + 1);
                 break;
@@ -620,6 +671,9 @@ const parseEquation = function (equation) {
                 }
                 currentSec.push(parSection);
             } else {
+                if(currOp.calcIndicator){
+                    equatParse.indicator = currOp
+                }
                 currentSec.push(currOp);
                 console.log(currentSec)
                 cutString++;
@@ -747,7 +801,7 @@ const combineParse = function (parse) {
     console.log("powersSection")
     getFuncParse = (e, i) => {
         targetIndex = i;
-        return (e.group == 'pow' && e.ignore != true && i > ignoreIndex)
+        return (e.groupIdx == 3 && e.ignore != true && i > ignoreIndex)
     }
     target = parse.find(getFuncParse);
     while (target) {
@@ -771,7 +825,7 @@ const combineParse = function (parse) {
     console.log(parse)
     getFuncParse = (e, i) => {
         targetIndex = i;
-        return (e.group == 'muti' && e.ignore != true && i > ignoreIndex)
+        return (e.groupIdx == 2 && e.ignore != true && i > ignoreIndex)
     }
     target = parse.find(getFuncParse);
     while (target) {
@@ -803,7 +857,7 @@ const combineParse = function (parse) {
     console.log("addSection")
     getFuncParse = (e, i) => {
         targetIndex = i;
-        return (e.group == 'add' && e.ignore != true && i > ignoreIndex)
+        return (e.groupIdx == 1 && e.ignore != true && i > ignoreIndex)
     }
     target = parse.find(getFuncParse);
     while (target) {
@@ -870,7 +924,7 @@ const setVarEquat = function (equation, varList) {
     }
     return setEquation;
 }
-class solveEnv {
+class SolveEnv {
     constructor(object) {
         this.id = object.id
         this.vars = [];
@@ -936,9 +990,8 @@ class solveEnv {
     
     isCalculable(equation) {
         //console.log(typeof equation)
-        let equatVars = varInEquat(equation)
-        let defVars = this.vars.filter(elem => elem.value != undefined && elem.value != "")
-        let undefVars = equatVars.filter(elem => !defVars.find(elem2 => elem.letter == elem2.letter))
+        //let equatVars = varInEquat(equation)
+        let undefVars = this.vars.filter(elem => elem.value == undefined || elem.value == "")
         let hasEqual = equation.includes('=');
         if (undefVars.length == 1) {
             if (!hasEqual) {
@@ -963,7 +1016,7 @@ class solveEnv {
         this.vars = [];
     }
 }
-class StaticEnv extends solveEnv {
+class StaticEnv extends SolveEnv {
     constructor(object) {
         super(object)
         this.envType = "static"
@@ -997,7 +1050,7 @@ class StaticEnv extends solveEnv {
     }
     //Still working on rewriting methods don't know if getUndef
 }
-class DynamicEnv extends solveEnv {
+class DynamicEnv extends SolveEnv {
     constructor(object) {
         super(object)
         this.type = "dynamic"
