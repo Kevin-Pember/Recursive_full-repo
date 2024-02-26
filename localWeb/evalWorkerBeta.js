@@ -84,8 +84,8 @@ const varInEquat = function (equation) {
     for (let i = 0; i < equation.length; i++) {
         if (equation.charCodeAt(i) > 96 && equation.charCodeAt(i) < 123 || equation.charCodeAt(i) == 77) {
             let isFunc = funcList.getFunction(equation.substring(i))
+            console.log(isFunc)
             if (isFunc === 0) {
-                let funcLength 
                 if (varArray.get(equation.substring(i, i + 1)) == null) {
                     varArray.set(equation.substring(i, i + 1),{"positions": [i]});
                 } else {
@@ -403,7 +403,6 @@ class RefFunc extends func {
     }
 }
 const parseVars = function (parse, varArray) {
-    console.log(parse)
     for (let varDef of varArray) {
         let varIndex = parse.findIndex((element) => (element.type == "var" && element.text == varDef.name));
         if (varIndex > -1) {
@@ -555,7 +554,6 @@ class opTerm extends parseTerm {
         this.setVal(opText.charAt(0));
     }
     setInverse() {
-        console.log("setting Inverse to " + this.inverse);
         this.setVal(this.inverse);
     }
     setVal(text) {
@@ -675,13 +673,11 @@ const parseEquation = function (equation) {
                     equatParse.indicator = currOp
                 }
                 currentSec.push(currOp);
-                console.log(currentSec)
                 cutString++;
             }
         }
         cutLength += cutString;
         equation = equation.substring(cutString);
-        console.log("Right before push ",currentSec )
         equatParse.a.push(...currentSec);
         if (equation.length == 0) {
             break;
@@ -743,7 +739,6 @@ const inverseParse = function (targetParse, inverseParse, targetElem) {
         }
         iter++;
         if (iter > 100) {
-            console.log("%cinfinite loop", "color: red");
             break;
         }
 
@@ -778,7 +773,6 @@ const combineParse = function (parse) {
     target = parse.find(getFuncParse);
     while (target) {
         let combinePar = combineParse(target.parse);
-        console.log(target.func)
         if (target.func) {
             parse.splice(targetIndex, 1, target.func.ParseValue(combinePar))
         } else {
@@ -794,11 +788,9 @@ const combineParse = function (parse) {
 
         target = parse.find(getFuncParse);
     }
-    console.log(parse)
     //end*******************************************************************
     ignoreIndex = 0;
     /*Powers Secition******************************************************/
-    console.log("powersSection")
     getFuncParse = (e, i) => {
         targetIndex = i;
         return (e.groupIdx == 3 && e.ignore != true && i > ignoreIndex)
@@ -821,8 +813,6 @@ const combineParse = function (parse) {
     //end*******************************************************************
     ignoreIndex = 0;
     /*Muti Secition********************************************************/
-    console.log("mutiSection")
-    console.log(parse)
     getFuncParse = (e, i) => {
         targetIndex = i;
         return (e.groupIdx == 2 && e.ignore != true && i > ignoreIndex)
@@ -830,9 +820,7 @@ const combineParse = function (parse) {
     target = parse.find(getFuncParse);
     while (target) {
         combineIdx = combinable(targetIndex, parse);
-        console.log(combineIdx)
         if (combineIdx == -2) {
-            console.log(parse[targetIndex - 1].text)
             if (target.subtype == 'Div') {
                 parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).div(Number(parse[targetIndex + 1].text)).toString();
             } else if (target.subtype == 'Muti') {
@@ -840,7 +828,6 @@ const combineParse = function (parse) {
             }
             parse.splice(targetIndex, 2);
         } else if (combineIdx > -1) {
-            console.log(parse[targetIndex + 1])
             parse[combineIdx - 1].text = new Decimal(parse[combineIdx - 1].text).plus(Number(parse[targetIndex + 1].text)).toString();
             parse.splice(targetIndex, 2);
         } else {
@@ -854,19 +841,15 @@ const combineParse = function (parse) {
     //end*******************************************************************
     ignoreIndex = 0;
     /*Add Secition*********************************************************/
-    console.log("addSection")
     getFuncParse = (e, i) => {
         targetIndex = i;
         return (e.groupIdx == 1 && e.ignore != true && i > ignoreIndex)
     }
     target = parse.find(getFuncParse);
     while (target) {
-        console.log("found an add")
         combineIdx = combinable(targetIndex, parse);
-        console.log(target.subtype)
         if (combineIdx == -2) {
             if (target.subtype == 'Plus') {
-                console.log(JSON.parse(JSON.stringify(parse)));
                 parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).plus(Number(parse[targetIndex + 1].text)).toString();
             } else if (target.subtype == 'Minus') {
                 parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).minus(Number(parse[targetIndex + 1].text)).toString();
@@ -884,7 +867,6 @@ const combineParse = function (parse) {
         target = parse.find(getFuncParse);
     }
     //end*******************************************************************
-    console.log(parse)
     if (parse.length == 1) {
         return parse[0]
     } else {
@@ -897,13 +879,10 @@ const combineParse = function (parse) {
 const fullSolver = function (equation) {
 
     let parsedEquat = parseEquation(builtInFunc(equation));
-    console.log(parsedEquat)
     let hasEqual = parsedEquat.a.findIndex(e => e.subtype == 'Equals');
-    console.log(hasEqual)
     if (hasEqual > -1) {
 
     } else {
-        console.log("combining")
         return combineParse(parsedEquat.a);
     }
 }
@@ -913,7 +892,6 @@ const setVarEquat = function (equation, varList) {
         if (data.value != undefined) {
             
             setEquation = equation.map((elem) => {
-                console.log(elem);
                 if (elem.type == "var" && elem.letter == data.letter) {
                     return new textTerm(data.value)
                 } else {
@@ -1082,7 +1060,7 @@ class DynamicEnv extends SolveEnv {
 
 }
 
-console.log(funcList.list)
+/*console.log(funcList.list)
 console.log("done loading beta worker");
 console.log(funcList.getFunction("asin"))
 console.log(parseEquation(builtInFunc("<sup>42</sup>√23")))
@@ -1091,4 +1069,28 @@ console.log(funcList.getFunction("testor"))
 console.log(parseEquation("testor(23,3)*43=0"))
 //console.log(inverseParse(parseEquation("x*4"), parseEquation("5")))
 console.log(setVarEquat(parseEquation("x*4").a, [new varTerm("x",5)]))
-console.log(parseEquation("x*43.3+7+y"))
+console.log(parseEquation("x*43.3+7+y"))*/
+let outObject = {};
+
+funcList.createFunction("function", 'tester', "x*5+u")
+let funcTester = funcList.getFunction("tester");
+if(funcTester){
+    outObject.Func_Test = ["✅ Tester Func Found", funcTester];
+}else{
+    outObject.Func_Test = ["❌ Tester Func failed", funcTester]
+}
+let basicParse = parseEquation("x*43.3+7+y")
+if(JSON.stringify(basicParse) === `{"a":[{"opCount":0,"type":"var","letter":"x","powId":{},"mutiId":{}},{"opCount":0,"type":"op","text":"*","inverse":"/","subtype":"Muti","groupIdx":1},{"opCount":0,"type":"term","text":"43.3"},{"opCount":0,"type":"op","text":"+","inverse":"-","subtype":"Plus","groupIdx":0},{"opCount":0,"type":"term","text":"7"},{"opCount":0,"type":"op","text":"+","inverse":"-","subtype":"Plus","groupIdx":0},{"opCount":0,"type":"var","letter":"y","powId":{},"mutiId":{}}],"type":"test","vars":[{"opCount":0,"type":"var","letter":"x","powId":{},"mutiId":{}},{"opCount":0,"type":"var","letter":"y","powId":{},"mutiId":{}}]}`){
+    outObject.Basic_Parse_Test = ["✅ Basic Parse Match", basicParse]
+}else{
+    outObject.Basic_Parse_Test = ["❌ Basic Parse failed", basicParse]
+}
+let challengeParse = parseEquation("tester(23,3)*43=0")
+if(JSON.stringify(challengeParse) === `{"a":[{"opCount":0,"type":"parSec","subtype":"ParStart","text":"23,3","parse":{"a":[{"opCount":0,"type":"term","text":"23"},{"opCount":0,"type":"op","text":",","inverse":",","subtype":"Comma","groupIdx":-1},{"opCount":0,"type":"term","text":"3"}],"type":"test","vars":[]},"func":{"name":"tester","size":6,"type":"function","ogFunc":"x*5+u","funcParse":{"a":[{"opCount":0,"type":"var","letter":"x","powId":{},"mutiId":{}},{"opCount":0,"type":"op","text":"*","inverse":"/","subtype":"Muti","groupIdx":1},{"opCount":0,"type":"term","text":"5"},{"opCount":0,"type":"op","text":"+","inverse":"-","subtype":"Plus","groupIdx":0},{"opCount":0,"type":"var","letter":"u","powId":{},"mutiId":{}}],"type":"test","vars":[{"opCount":0,"type":"var","letter":"x","powId":{},"mutiId":{}},{"opCount":0,"type":"var","letter":"u","powId":{},"mutiId":{}}]},"vars":[{"opCount":0,"type":"var","letter":"x","powId":{},"mutiId":{}},{"opCount":0,"type":"var","letter":"u","powId":{},"mutiId":{}}]}},{"opCount":0,"type":"op","text":"*","inverse":"/","subtype":"Muti","groupIdx":1},{"opCount":0,"type":"term","text":"43"},{"opCount":0,"type":"op","text":"=","inverse":"=","subtype":"Equals","groupIdx":-1,"calcIndicator":true},{"opCount":0,"type":"term","text":"0"}],"type":"test","vars":[],"indicator":{"opCount":0,"type":"op","text":"=","inverse":"=","subtype":"Equals","groupIdx":-1,"calcIndicator":true}}`){
+    outObject.Challenge_Parse_Test = ["✅ Challenge Parse Match", challengeParse]
+}else{
+    outObject.Challenge_Parse_Test = ["❌ Challenge Parse failed", challengeParse]
+}
+console.log(JSON.stringify(challengeParse))
+console.log("%cTest Cases","color: #90EE90; font-family:sans-serif; font-size: 20px");
+console.dir(outObject)
