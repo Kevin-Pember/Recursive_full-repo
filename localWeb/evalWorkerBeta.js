@@ -261,6 +261,30 @@ let operators = new Map([
         object.groupIdx = -1;
         object.calcIndicator = true;
     }],
+    ["<", (object)=> {
+        object.inverse = ">";
+        object.subtype = "LessThan";
+        object.groupIdx = -1;
+        object.calcIndicator = true;
+    }],
+    [">", (object)=> {
+        object.inverse = "<";
+        object.subtype = "GreaterThan";
+        object.groupIdx = -1;
+        object.calcIndicator = true;
+    }],
+    ["≤", (object)=> {
+        object.inverse = "≥";
+        object.subtype = "LessThanEqual";
+        object.groupIdx = -1;
+        object.calcIndicator = true;
+    }],
+    ["≥", (object)=> {
+        object.inverse = "≤";
+        object.subtype = "GreaterThanEqual";
+        object.groupIdx = -1;
+        object.calcIndicator = true;
+    }]
 ]);
 let funcList = {
     list: [],
@@ -879,7 +903,7 @@ const combineParse = function (parse) {
 const fullSolver = function (equation) {
 
     let parsedEquat = parseEquation(builtInFunc(equation));
-    let hasEqual = parsedEquat.a.findIndex(e => e.subtype == 'Equals');
+    //let hasEqual = parsedEquat.a.findIndex(e => e.subtype == 'Equals');
     if (hasEqual > -1) {
 
     } else {
@@ -1059,17 +1083,6 @@ class DynamicEnv extends SolveEnv {
     }
 
 }
-
-/*console.log(funcList.list)
-console.log("done loading beta worker");
-console.log(funcList.getFunction("asin"))
-console.log(parseEquation(builtInFunc("<sup>42</sup>√23")))
-console.log(funcList.createFunction("function", 'testor', "x*5+u"))
-console.log(funcList.getFunction("testor"))
-console.log(parseEquation("testor(23,3)*43=0"))
-//console.log(inverseParse(parseEquation("x*4"), parseEquation("5")))
-console.log(setVarEquat(parseEquation("x*4").a, [new varTerm("x",5)]))
-console.log(parseEquation("x*43.3+7+y"))*/
 let outObject = {};
 
 funcList.createFunction("function", 'tester', "x*5+u")
