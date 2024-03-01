@@ -902,22 +902,27 @@ const combineParse = function (parse) {
 //Solve Environment, Classes and Methods
 const fullSolver = function (equation) {
 
-    let parsedEquat = parseEquation(builtInFunc(equation));
-    //let hasEqual = parsedEquat.a.findIndex(e => e.subtype == 'Equals');
+    /*let parsedEquat = parseEquation(builtInFunc(equation));
     if (hasEqual > -1) {
 
     } else {
         return combineParse(parsedEquat.a);
+    }*/
+    let indicator = equation.a.find((elem) => elem.calcIndicator == true)
+    if(equation.defVars.length == 1){
+        
     }
 }
 const setVarEquat = function (equation, varList) {
     let setEquation;
+    
     for (let data in varList) {
         if (data.value != undefined) {
             
             setEquation = equation.map((elem) => {
                 if (elem.type == "var" && elem.letter == data.letter) {
-                    return new textTerm(data.value)
+                    elem.text = data.value;
+                    return elem;
                 } else {
                     return elem;
                 }
