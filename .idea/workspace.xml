@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe12090f-7b40-4456-afca-135358399384" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Recursive_full-repo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Recursive_full-repo.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/localWeb/evalWorkerBeta.js" beforeDir="false" afterPath="$PROJECT_DIR$/localWeb/evalWorkerBeta.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -217,7 +217,7 @@ let operators = new Map([
     }],
     ["!", (object)=> {
         object.inverse = "!";
-        object.subtype = "factor";
+        object.subtype = "Factor";
         object.groupIdx = 1;
     }],
     ["^", (object)=> {
@@ -694,7 +694,7 @@ const parseEquation = function (equation) {
                 currentSec.push(parSection);
             } else {
                 if(currOp.calcIndicator){
-                    equatParse.indicator = currOp
+                    equatParse.indicator = currOp;
                 }
                 currentSec.push(currOp);
                 cutString++;
@@ -845,10 +845,16 @@ const combineParse = function (parse) {
     while (target) {
         combineIdx = combinable(targetIndex, parse);
         if (combineIdx == -2) {
-            if (target.subtype == 'Div') {
+            switch(target.subtype){
+                case("Div"):
                 parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).div(Number(parse[targetIndex + 1].text)).toString();
-            } else if (target.subtype == 'Muti') {
-                parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).times(Number(parse[targetIndex + 1].text)).toString();
+                break;
+                case("Muti"):
+                    parse[targetIndex - 1].text = new Decimal(parse[targetIndex - 1].text).times(Number(parse[targetIndex + 1].text)).toString();
+                break;
+                case("Factor"):
+
+                break;
             }
             parse.splice(targetIndex, 2);
         } else if (combineIdx > -1) {
@@ -908,9 +914,25 @@ const fullSolver = function (equation) {
     } else {
         return combineParse(parsedEquat.a);
     }*/
-    let indicator = equation.a.find((elem) => elem.calcIndicator == true)
-    if(equation.defVars.length == 1){
-        
+    let indicatorIndex = equation.a.indexOf(equation.indicator),
+     side1 = equation.a.slice(0, indicatorIndex),
+     side2 = equation.a.slice(indicatorIndex + 1)
+    switch(equation.indicator.text){
+        case("="):
+
+        break;
+        case("<"):
+
+        break;
+        case(">"):
+
+        break;
+        case("≤"):
+
+        break;
+        case("≥"):
+
+        break;
     }
 }
 const setVarEquat = function (equation, varList) {
@@ -972,6 +994,7 @@ class SolveEnv {
         if (!varDef) {
             this.vars.push({ "letter": target, "value": value })
             varDef = this.vars[this.vars.length - 1]
+            return;
         }
         varDef.value = value;
     }
