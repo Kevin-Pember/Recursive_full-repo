@@ -193,7 +193,7 @@ const builtInFunc = function (equation) {
     return equation;
 }
 
-//Custom Functions, Classes and Methods
+//Functions, methods and helper methods which implement a 
 let operators = new Map([
     ["+" , (object)=> {
         object.inverse = "-";
@@ -531,7 +531,7 @@ funcList.list.concat([
     })
 ]);
 
-//Parse Classes and Methods
+//Parse, methods and helper methods which handle the parsing of equations 
 class Parse {
     constructor() {
         this.a = [];
@@ -709,6 +709,8 @@ const parseEquation = function (equation) {
     }
     return equatParse;
 }
+
+//Operations, methods which do operations on the equation parse 
 const inverseParse = function (targetParse, inverseParse, targetElem) {
     let targetVar
     let ignoreElem = targetParse[targetElem];
@@ -904,8 +906,6 @@ const combineParse = function (parse) {
         return parse
     }
 }
-
-//Solve Environment, Classes and Methods
 const fullSolver = function (equation) {
 
     /*let parsedEquat = parseEquation(builtInFunc(equation));
@@ -953,6 +953,8 @@ const setVarEquat = function (equation, varList) {
     }
     return setEquation;
 }
+
+//Environments, takes variables, settings, and equations to return solved equations. What the api actually interacts with 
 class SolveEnv {
     constructor(object) {
         this.id = object.id
@@ -1111,8 +1113,11 @@ class DynamicEnv extends SolveEnv {
     }
 
 }
-let outObject = {};
 
+
+
+//Runtime Tests, general console. outputs to test functions in development 
+let outObject = {};
 funcList.createFunction("function", 'tester', "x*5+u")
 let funcTester = funcList.getFunction("tester");
 if(funcTester){
