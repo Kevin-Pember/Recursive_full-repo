@@ -7,31 +7,27 @@ let instance = {
 
 //Method Extensions
 Array.prototype.replaceAll = function (value, replacement) {
-    let idxs = [];
     for (let i = 0; i < this.length; i++) {
         if (this[i] == value) {
-            idxs.push(i)
+            this[i] = replacement
         }
-    }
-    for (let idx of idxs) {
-        this[idx] = replacement
     }
     return this;
 };
 String.prototype.indexOfAll = function (value) {
-    let retArry = [];
+    let retArray = [];
     let lastIndex = 0;
     while (true) {
         let idx = this.indexOf(value, lastIndex);
         if (idx == -1) {
             break;
         }
-        retArry.push(idx);
+        retArray.push(idx);
         lastIndex = idx + 1;
     }
-    return retArry;
+    return retArray;
 };
-String.prototype.findMatch = function (start, end) {
+String.prototype.encapIndex = function (start, end) {
     let copyString = this;
 
     let matchIdx = -1;
@@ -136,7 +132,7 @@ const findTerm = function (equation) {
     }
     for (let i = direction ? 0 : equation.length - 1; direction ? i < equation.length : i >= 0; direction ? i++ : i--) {
         if (equation[i] == "(" || equation[i] == ")") {
-            let nextIndex = direction ? equation.substring(i).findMatch("(", ")", direction) : equation.substring(0, i - 1).findMatch("(", ")", direction);
+            let nextIndex = direction ? equation.substring(i).encapIndex("(", ")", direction) : equation.substring(0, i - 1).encapIndex("(", ")", direction);
             if (nextIndex != -1) {
                 i = nextIndex - 1;
                 endIndex = i;
@@ -157,7 +153,7 @@ const builtInFunc = function (equation) {
         let root = "2";
         let from = indexValue;
         if (indexValue > 6 && equation.substring(indexValue - 6, indexValue) == "</sup>") {
-            let matchSup = equation.substring(0, indexValue - 6).findMatch("<sup", "</sup>", false);
+            let matchSup = equation.substring(0, indexValue - 6).encapIndex("<sup", "</sup>", false);
             root = findTerm(equation.substring(0, indexValue - 6), false);
             from = matchSup - 4;
         }
@@ -185,7 +181,7 @@ const builtInFunc = function (equation) {
     }
     indexValue = equation.indexOf("<sup");
     while (indexValue >= 0) {
-        let matchEnd = equation.substring(equation.indexOf(">", indexValue) + 1).findMatch("<sup", "</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">", indexValue) + 1).length;
+        let matchEnd = equation.substring(equation.indexOf(">", indexValue) + 1).encapIndex("<sup", "</sup>") + indexValue + equation.substring(indexValue, equation.indexOf(">", indexValue) + 1).length;
         let term = findTerm(equation.substring(equation.indexOf(">", indexValue) + 1));
         equation = equation.substring(0, indexValue) + "^(" + term + ")" + equation.substring(matchEnd + 6);
         indexValue = equation.indexOf("<sup");
@@ -624,7 +620,7 @@ const parInnerString = function (sub) {
     if (arguments[1] != undefined) {
         direction = arguments[1];
     }
-    let endIdx = sub.findMatch("(", ")", direction);
+    let endIdx = sub.encapIndex("(", ")", direction);
     return direction ? sub.substring(0, endIdx) : sub.substring(endIdx);
 }
 const parseEquation = function (equation) {
@@ -1050,9 +1046,16 @@ class SolveEnv {
 }
 class StaticEnv extends SolveEnv {
     constructor(object) {
+        /*
+            Expected maximum Object
+            {
+                id : "funcUI",
+                equation: "func(x,y,z)",
+                isFunc: true
+            }
+        */
         super(object)
         this.envType = "static"
-        this.id = object.id
 
         this.equation = parseEquation(object.equation);
         if (object.isFunc) {
@@ -1114,7 +1117,9 @@ class DynamicEnv extends SolveEnv {
 
 }
 
+onmessage =  (e) => {
 
+}
 
 //Runtime Tests, general console. outputs to test functions in development 
 let outObject = {};
