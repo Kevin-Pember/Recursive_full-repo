@@ -1,3 +1,4 @@
+
 let colorArray = [];
 
 function setFocus(node, index) {
@@ -1153,7 +1154,7 @@ class historyDisplay extends recursiveComponent {
                                 <h4 id='previousEquation'></h4>
                                 <br>
                             </template>
-                            <rich-input id="mainEntry" style="height: 47px; font-size: 40px; display: block; padding-left:10px;"></rich-input>
+                            <math-field> id="mainEntry" style="height: 47px; font-size: 40px; display: block; padding-left:10px;"></math-field>
                         </div>
                         <div id="overlayContainer">
                                 <button id="MRCOverlay" class="textOverlay" name="Memory recall / clear">
@@ -1178,7 +1179,8 @@ class historyDisplay extends recursiveComponent {
         `
         let calcBody = this.shadowRoot.querySelector('#uifCalculator');
         let enterContainer = this.shadowRoot.querySelector('#mainEntry');
-        let enterHeader = enterContainer.input;
+        console.log(enterContainer)
+        //let enterHeader = enterContainer;
         let historyHeader = this.shadowRoot.querySelector('#historyHeader');
         let deleteHistoryButton = this.shadowRoot.querySelector('#deleteHistory');
         let MRCOverlay = this.shadowRoot.querySelector('#MRCOverlay');
@@ -1258,22 +1260,22 @@ class historyDisplay extends recursiveComponent {
                 "symbol": "|"
             }
         ]
-        enterHeader.addEventListener("input", (e) => {
-            let text = enterHeader.innerHTML;
-            for (let item of letToSybol) {
-                for (let letItem of item.lets) {
-                    if (text.includes(letItem)) {
-                        text = text.replace(letItem, item.symbol);
-                        enterHeader.innerHTML = text;
-                        console.log("focus Modified")
-                        let sel = window.getSelection();
-                        let range = document.createRange();
-                        enterHeader.childNodes
-                        break;
-                    }
-                }
-            }
-        });
+        // enterHeader.addEventListener("input", (e) => {
+        //     let text = enterHeader.innerHTML;
+        //     for (let item of letToSybol) {
+        //         for (let letItem of item.lets) {
+        //             if (text.includes(letItem)) {
+        //                 text = text.replace(letItem, item.symbol);
+        //                 enterHeader.innerHTML = text;
+        //                 console.log("focus Modified")
+        //                 let sel = window.getSelection();
+        //                 let range = document.createRange();
+        //                 enterHeader.childNodes
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // });
         calcBody.defineClick = (elem) => {
             elem.addEventListener("focus", () => {
                 this.scrollBottom();
@@ -1283,7 +1285,7 @@ class historyDisplay extends recursiveComponent {
         this.calcBody = calcBody;
         this.historyHeader = historyHeader;
         this.enterContainer = enterContainer;
-        this.enterHeader = enterHeader;
+        //this.enterHeader = enterHeader;
         this.memoryTextBoarder = memoryTextBoarder;
     }
     static get observedAttributes() {
